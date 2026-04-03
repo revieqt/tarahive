@@ -1,8 +1,10 @@
 import express from 'express';
-// import taragRouter from './modules/tarag/tarag.routes';
+import authRoutes from './auth/auth.routes';
+import systemRoutes from './system/system.routes';
 
 const router = express.Router();
 
-// router.post('/google', googleAuth);
+router.use('/auth', authRoutes);
+router.use('/system', systemRoutes);
 
 export default router;

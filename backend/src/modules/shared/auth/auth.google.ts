@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { OAuth2Client } from "google-auth-library";
-import User from "./account.model";
+import User from "./auth.model";
 import { generateAccessToken, generateRefreshToken } from "./auth.service";
 import { logAction } from "../../../utils/logAction";
 

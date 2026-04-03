@@ -83,7 +83,6 @@ export async function getWeather(
           : null,
     };
 
-    // Cache in Redis with 6-hour TTL
     await redis.setex(key, 60 * 60 * 6, JSON.stringify(weather));
     console.log('✅ Cached weather in Redis for:', key);
 

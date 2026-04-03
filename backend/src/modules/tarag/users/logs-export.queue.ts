@@ -1,5 +1,5 @@
 import { Queue, QueueEvents } from 'bullmq';
-import redis from '../../../config/redis';
+import redis from '../../config/redis';
 
 export interface LogsExportJobData {
   userId: string;

@@ -1,7 +1,7 @@
 import { Worker } from 'bullmq';
-import redis from '../../../config/redis';
+import redis from '../../config/redis';
 import { LogModel } from '../system/logs.model';
-import { sendEmail } from '../../../utils/sendEmail';
+import { sendEmail } from '../../utils/sendEmail';
 import { LogsExportJobData } from './logs-export.queue';
 import { createObjectCsvWriter } from 'csv-writer';
 import * as fs from 'fs';

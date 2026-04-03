@@ -37,7 +37,7 @@ connectMongoDB();
 
 // Initialize BullMQ Workers
 import { logsExportWorker, initializeLogsExportWorker } from './modules/shared/account/logs-export.worker';
-import { authWorker, initializeAuthWorker } from './modules/shared/account/auth.worker';
+import { authWorker, initializeAuthWorker } from './modules/shared/auth/auth.worker';
 
 import sharedRouter from './modules/shared/shared.routes';
 import taragRouter from './modules/tarag/tarag.routes';

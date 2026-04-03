@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import User, { IUser } from './account.model';
+import User, { IUser } from '../auth/auth.model';
 import { addSendVerificationEmailJob, addVerify2FAEmailJob, addSendPasswordResetEmailJob } from './auth.queue';
 import {
   generateVerificationCode as generateCode,
