@@ -1,9 +1,37 @@
-import redis from '../config/redis';
+import redis from '../../../config/redis';
+import jwt from 'jsonwebtoken';
+import { IUser } from '../auth/auth.model';
 
 const VERIFICATION_CODE_EXPIRATION = 30 * 60; // 30 minutes in seconds
 const VERIFICATION_CODE_PREFIX = 'verification_code:';
 const TWO_FA_CODE_PREFIX = '2fa_code:';
 const PASSWORD_RESET_CODE_PREFIX = 'password_reset_code:';
+
+export const generateAccessToken = (user: IUser, app: string): string => {
+  const secretKey = process.env.JWT_SECRET || 'default_secret';
+  const userId = (user._id as any).toString();
+  const accessToken = jwt.sign({ 
+    id: userId, 
+    userId: userId, 
+    email: user.email,
+    app: app
+  },
+    secretKey,
+    { expiresIn: '1h' } // 1 hour
+  );
+  return accessToken;
+}
+
+export const generateRefreshToken = (user: IUser): string => {
+  const secretKey = process.env.JWT_SECRET || 'default_secret';
+  const userId = (user._id as any).toString();
+  const refreshToken = jwt.sign(
+    { id: userId, userId: userId },
+    secretKey,
+    { expiresIn: '14d' } // 14 days
+  );
+  return refreshToken;
+}
 
 /**
  * Generate a 6-digit verification code

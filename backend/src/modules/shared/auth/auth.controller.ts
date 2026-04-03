@@ -11,6 +11,51 @@ interface AuthRequest extends Request {
   };
 }
 
+export const login = async (req: Request, res: Response) => {
+  const { identifier, password, app, device } = req.body;
+
+  try {
+    if (!identifier || !password) {
+      return res.status(400).json({ error: 'Email/username and password are required' });
+    }
+
+    const result = await loginUser(identifier, password, app);
+
+    await logAction(req, {
+      action: "LOGIN_SUCCESS",
+      module: "AUTH",
+      severity: "info",
+      description: `Login success`,
+      userId: result.user._id?.toString(),
+      device: device,
+      appInfo: { app: app, appVersion: req.body.device.appVersion }
+    });
+
+    res.status(200).json(result);
+  } catch (error: any) {
+    if (error.message === 'Invalid credentials') {
+      await logAction(req, {
+        action: "LOGIN_ATTEMPT_FAILED",
+        module: "AUTH",
+        severity: "warning",
+        description: error,
+        device: req.body.device,
+        appInfo: { app: app, appVersion: req.body.device.appVersion }
+      });
+      return res.status(401).json({ error: 'Invalid email/username or password' });
+    }
+    await logAction(req, {
+      action: "LOGIN_FAILED",
+      module: "AUTH",
+      severity: "error",
+      description: error,
+      device: req.body.device,
+      appInfo: { app: app, appVersion: req.body.device.appVersion }
+    });
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 export const passwordReset = async (req: Request, res: Response) => {
   try {
     const { userId, email, newPassword, device } = req.body;
@@ -109,46 +154,6 @@ export const changePassword = async (req: AuthRequest, res: Response) => {
       device: req.body.device,
     });
     res.status(500).json({ error: error.message || 'Failed to update password' });
-  }
-};
-
-export const login = async (req: Request, res: Response) => {
-  try {
-    const { identifier, password, device } = req.body;
-
-    if (!identifier || !password) {
-      return res.status(400).json({ error: 'Email/username and password are required' });
-    }
-
-    const result = await loginUser(identifier, password);
-    await logAction(req, {
-      action: "LOGIN_SUCCESS",
-      module: "AUTH",
-      severity: "info",
-      description: `Login success`,
-      userId: result.user._id?.toString(),
-      device: device,
-    });
-    res.status(200).json(result);
-  } catch (error: any) {
-    if (error.message === 'Invalid credentials') {
-      await logAction(req, {
-        action: "LOGIN_ATTEMPT_FAILED",
-        module: "AUTH",
-        severity: "warning",
-        description: error,
-        device: req.body.device,
-      });
-      return res.status(401).json({ error: 'Invalid email/username or password' });
-    }
-    await logAction(req, {
-      action: "LOGIN_FAILED",
-      module: "AUTH",
-      severity: "error",
-      description: error,
-      device: req.body.device,
-    });
-    res.status(500).json({ error: 'Internal server error' });
   }
 };
 

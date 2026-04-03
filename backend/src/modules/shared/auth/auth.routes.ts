@@ -17,9 +17,11 @@ import { authMiddleware } from '../../../middleware/authMiddleware';
 
 const router = express.Router();
 
-router.post('/google', googleAuth);
-router.post('/register', register);
+
+// POST /auth/login body: { identifier: string, password: string, app: string }
 router.post('/login', login);
+router.post('/register', register);
+router.post('/google', googleAuth);
 router.post('/send-verification', sendEmailVerification);
 router.post('/send-2fa', send2FA);
 router.post('/send-password-reset-code', sendPasswordResetCodeHandler);

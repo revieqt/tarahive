@@ -12,6 +12,11 @@ interface DeviceInfo {
   appVersion?: string;
 }
 
+interface AppInfo {
+  app?: string;
+  appVersion?: string;
+}
+
 interface LogParams {
   action: string;
   module: string;
@@ -20,6 +25,7 @@ interface LogParams {
   metadataID?: string;
   userId?: string;
   device?: DeviceInfo;
+  appInfo?: AppInfo;
 }
 
 export const logAction = async (req: Request, params: LogParams) => {
@@ -60,6 +66,7 @@ export const logAction = async (req: Request, params: LogParams) => {
       platform: ua.platform,
 
       device: deviceInfo,
+      appInfo: params.appInfo,
 
       createdOn: new Date(),
     });

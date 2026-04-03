@@ -17,6 +17,7 @@ export interface IUser extends Document {
   createdOn: Date;
   updatedOn: Date;
   apps?: string[];
+  defaultPaymentMethod?: string;
   isEmailVerified?: boolean;
   isContactNumberVerified?: boolean;
   is2FAEnabled: boolean;
@@ -49,6 +50,7 @@ const userSchema = new Schema<IUser>({
   createdOn: { type: Date, default: Date.now },
   updatedOn: { type: Date, default: Date.now },
   apps: { type: [String], default: [] },
+  defaultPaymentMethod: { type: String, required: false },
   isEmailVerified: { type: Boolean, default: false },
   isContactNumberVerified: { type: Boolean, default: function() { return this.contactNumber ? false : undefined; } },
   is2FAEnabled: { type: Boolean, default: false }

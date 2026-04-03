@@ -1,5 +1,4 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import User, { IUser } from '../auth/auth.model';
 import { addSendVerificationEmailJob, addVerify2FAEmailJob, addSendPasswordResetEmailJob } from './auth.queue';
 import {
@@ -10,7 +9,9 @@ import {
   verify2FACode,
   storePasswordResetCode,
   verifyPasswordResetCode,
-} from '../../../utils/verificationCodeUtils';
+  generateAccessToken, 
+  generateRefreshToken
+} from './auth.utils';
 
 interface RegisterUserData {
   fname: string;
@@ -33,31 +34,8 @@ interface LoginResponse {
 const adminEmails = process.env.ADMIN_EMAILS?.split(",") || [];
 const superAdminEmails = process.env.SUPER_ADMIN_EMAILS?.split(",") || [];
 
-export const generateAccessToken = (user: IUser): string => {
-  const secretKey = process.env.JWT_SECRET || 'default_secret';
-  const userId = (user._id as any).toString();
-  const accessToken = jwt.sign(
-    { id: userId, userId: userId, email: user.email },
-    secretKey,
-    { expiresIn: '1h' } // 1 hour
-  );
-  return accessToken;
-}
-
-export const generateRefreshToken = (user: IUser): string => {
-  const secretKey = process.env.JWT_SECRET || 'default_secret';
-  const userId = (user._id as any).toString();
-  const refreshToken = jwt.sign(
-    { id: userId, userId: userId },
-    secretKey,
-    { expiresIn: '14d' } // 14 days
-  );
-  return refreshToken;
-}
-
-export const loginUser = async (identifier: string, password: string): Promise<LoginResponse> => {
+export const loginUser = async (identifier: string, password: string, app: string): Promise<LoginResponse> => {
   try {
-    // Find user by email or username
     const user = await User.findOne({
       $or: [
         { email: identifier },
@@ -69,26 +47,13 @@ export const loginUser = async (identifier: string, password: string): Promise<L
       throw new Error('Invalid credentials');
     }
 
-    // Compare password
     const isValidPassword = await bcrypt.compare(password, user.password || '');
     if (!isValidPassword) {
       throw new Error('Invalid credentials');
     }
 
-    // Generate tokens
-    const secretKey = process.env.JWT_SECRET || 'default_secret';
-    const userId = (user._id as any).toString();
-    const accessToken = jwt.sign(
-      { id: userId, userId: userId, email: user.email },
-      secretKey,
-      { expiresIn: '1h' } // 1 hour
-    );
-    
-    const refreshToken = jwt.sign(
-      { id: userId, userId: userId },
-      secretKey,
-      { expiresIn: '14d' } // 14 days
-    );
+    const accessToken = generateAccessToken(user, app);
+    const refreshToken = generateRefreshToken(user);
 
     const userObject = user.toObject();
 

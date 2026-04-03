@@ -10,6 +10,11 @@ export interface IDevice {
   appVersion?: string;
 }
 
+export interface IApp {
+  app?: string;
+  appVersion?: string;
+}
+
 export interface ILog extends Document {
   userId?: string;
   action: string;
@@ -18,6 +23,7 @@ export interface ILog extends Document {
   ip?: string;
   platform?: string;
   device?: IDevice;
+  appInfo?: IApp;
   severity?: LogSeverity;
   metadataID?: string;
   createdOn: Date;
@@ -35,6 +41,10 @@ const LogSchema = new Schema<ILog>({
     model: { type: String },
     os: { type: String },
     type: { type: String },
+    appVersion: { type: String },
+  },
+  appInfo: {
+    app: { type: String },
     appVersion: { type: String },
   },
   severity: { type: String, enum: ["info", "warning", "error"], default: "info" },
