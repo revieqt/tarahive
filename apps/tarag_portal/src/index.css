@@ -1,0 +1,106 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700;9..40,900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+/* Tailwind v4: register custom theme tokens so tw classes like text-tarag-secondary work */
+@theme {
+  --color-tarag-text: var(--text-color);
+  --color-tarag-background: var(--background-color);
+  --color-tarag-icon: var(--icon-color);
+  --color-tarag-primary: var(--primary-color);
+  --color-tarag-secondary: var(--secondary-color);
+  --color-tarag-accent: var(--accent-color);
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+};
+
+:root {
+  font-family: 'DM Sans', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Light theme (default) */
+  --text-color: #2C3333;
+  --background-color: #F4F4F4;
+  --icon-color: #687076;
+  --primary-color: #FFFFFF;
+  --secondary-color: #0065F8;
+  --accent-color: #00CAFF;
+
+  /* Card variables */
+  --card-bg: rgba(255, 255, 255, 0.7);
+  --card-border: rgba(0, 0, 0, 0.08);
+
+  /* Header */
+  --header-bg: rgba(244, 244, 244, 0.85);
+}
+
+[data-theme="dark"] {
+  --text-color: #ECEDEE;
+  --background-color: #020D19;
+  --icon-color: #9BA1A6;
+  --primary-color: #001C30;
+  --secondary-color: #0065F8;
+  --accent-color: #00CAFF;
+
+  /* Card variables */
+  --card-bg: rgba(0, 28, 48, 0.6);
+  --card-border: rgba(255, 255, 255, 0.08);
+
+  /* Header */
+  --header-bg: rgba(2, 13, 25, 0.85);
+}
+
+html {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow-x: hidden;
+  color: var(--text-color);
+  background-color: var(--background-color);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,101,248,0.3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,101,248,0.5); }
+
+/* Custom utility classes */
+.bg-gradient-primary {
+  background: linear-gradient(to right, var(--secondary-color), var(--accent-color));
+}
+
+.text-gradient-primary {
+  background: linear-gradient(to right, var(--secondary-color), var(--accent-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.card-gradient {
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--card-border);
+}

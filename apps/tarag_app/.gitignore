@@ -1,0 +1,72 @@
+# -------------------------
+# Node dependencies
+# -------------------------
+node_modules/
+
+# -------------------------
+# Expo
+# -------------------------
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# -------------------------
+# Native / Android / iOS
+# -------------------------
+android/.gradle/
+android/build/
+android/app/build/
+ios/Pods/
+ios/build/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# -------------------------
+# Metro / Bundler
+# -------------------------
+.metro-cache/
+.metro-health-check*
+
+# -------------------------
+# Debug / Logs
+# -------------------------
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+*.log
+
+# -------------------------
+# macOS
+# -------------------------
+.DS_Store
+
+# -------------------------
+# Local environment files
+# -------------------------
+.env
+.env.local
+.env.*.local
+
+# -------------------------
+# TypeScript
+# -------------------------
+*.tsbuildinfo
+
+# -------------------------
+# VSCode / IDEs
+# -------------------------
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# -------------------------
+# Misc
+# -------------------------
+*.pem
+*.keystore

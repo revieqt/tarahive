@@ -1,0 +1,131 @@
+# =====================================
+# Dependencies
+# =====================================
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# =====================================
+# Environment Variables
+# =====================================
+.env
+.env.local
+.env.*.local
+.env.production.local
+.env.development.local
+
+# =====================================
+# Logs and Debugging
+# =====================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# =====================================
+# Build Outputs
+# =====================================
+dist/
+dist-ssr/
+build/
+out/
+coverage/
+
+# =====================================
+# IDE and Editor Files
+# =====================================
+.vscode/
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.swp
+*.swo
+*~
+*.su
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.sublime-workspace
+.sublime-project
+
+# =====================================
+# OS Specific Files
+# =====================================
+Thumbs.db
+.DS_Store
+.AppleDouble
+.LSOverride
+*.pem
+
+# =====================================
+# Database
+# =====================================
+mongo_data/
+
+# =====================================
+# Uploads and Temporary Files
+# =====================================
+uploads/
+tmp/
+temp/
+
+# =====================================
+# Docker
+# =====================================
+.docker/
+docker-compose.override.yml
+
+# =====================================
+# Local Development
+# =====================================
+.cache/
+.next/
+.nuxt/
+*.local
+
+# =====================================
+# Mobile Apps (Expo, React Native)
+# =====================================
+.expo/
+.expo-shared/
+web-build/
+.metro-cache/
+.metro-health-check*
+expo-env.d.ts
+
+# =====================================
+# Native Build Files
+# =====================================
+android/.gradle/
+android/build/
+android/app/build/
+ios/Pods/
+ios/build/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# =====================================
+# macOS
+# =====================================
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+._*
+
+# =====================================
+# Windows
+# =====================================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
