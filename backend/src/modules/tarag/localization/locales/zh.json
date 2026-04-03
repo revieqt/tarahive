@@ -1,0 +1,15 @@
+{
+  "common": {
+    "welcome": "欢迎来到TaraG"
+  },
+  "login": {
+    "title": "智能规划",
+    "subtitle": "安全出行, 加入TaraG!",
+    "email": "电子邮件",
+    "password": "密码",
+    "login_button": "登录",
+    "forgot_password_prompt": "忘记密码？",
+    "google_prompt": "使用 Google 登录",
+    "register_prompt": "还没有账号？请在此注册。"
+  }
+}

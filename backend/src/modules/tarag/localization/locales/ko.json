@@ -1,0 +1,15 @@
+{
+  "common": {
+    "welcome": "TaraG에 오신 것을 환영합니다"
+  },
+  "login": {
+    "title": "스마트한 계획",
+    "subtitle": "더 안전한 여행. TaraG에 가입하세요!",
+    "email": "이메일",
+    "password": "비밀번호",
+    "login_button": "로그인",
+    "forgot_password_prompt": "비밀번호를 잊으셨나요?",
+    "google_prompt": "Google로 계속하기",
+    "register_prompt": "계정이 없으신가요? 여기에서 등록하세요."
+  }
+}

@@ -3,7 +3,7 @@ import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
 import { ExpressAdapter } from "@bull-board/express";
 
 import { sosQueue } from "../modules/safety/sos.queue";
-import { logsExportQueue } from "../modules/account/logs-export.queue";
+import { logsExportQueue } from "../modules/shared/account/logs-export.queue";
 
 const serverAdapter = new ExpressAdapter();
 
