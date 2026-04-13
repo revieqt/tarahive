@@ -1,9 +1,11 @@
+version: "3.9"
+
 services:
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
-    container_name: tarag-backend
+    container_name: tarahive-backend
     restart: always
     ports:
       - "5000:5000"
@@ -11,15 +13,30 @@ services:
       - ./backend/.env
     depends_on:
       - mongodb
+      - postgres
       - redis
     volumes:
-      - ./backend:/usr/src/app:cached
-      - backend_node_modules:/usr/src/app/node_modules
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
     command: npm run dev
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: tarahive-postgres
+    restart: always
+    ports:
+      - "5432:5432"
     environment:
-      - NODE_ENV=development
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: tarahive_postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     logging:
       driver: "json-file"
       options:
@@ -28,7 +45,7 @@ services:
 
   mongodb:
     image: mongo:7.0
-    container_name: tarag-mongodb
+    container_name: tarahive-mongodb
     restart: always
     ports:
       - "27017:27017"
@@ -42,7 +59,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: tarag-redis
+    container_name: tarahive-redis
     restart: always
     ports:
       - "6379:6379"
@@ -54,10 +71,27 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: tarahive-pgadmin
+    restart: always
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@tarahive.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - postgres
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
 volumes:
   mongo_data:
-    name: tarag_mongo_data
+    name: tarahive_mongo_data
+  postgres_data:
+    name: tarahive_postgres_data
   redis_data:
-    name: tarag_redis_data
-  backend_node_modules:
-    name: tarag_backend_node_modules
+    name: tarahive_redis_data

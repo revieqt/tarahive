@@ -12,7 +12,6 @@ dotenv.config();
 const app = express();
 const server = createServer(app);
 
-// Initialize Socket.IO with CORS
 const io = new SocketIOServer(server, {
   cors: {
     origin: process.env.FRONTEND_URL || '*',
@@ -32,31 +31,21 @@ app.use('/api/public', express.static(path.join(__dirname, "../public")));
 app.use('/uploads', express.static(path.join(__dirname, "../uploads")));
 app.set("trust proxy", 1);
 
-// Initialize MongoDB
 connectMongoDB();
 
-// Initialize BullMQ Workers
-import { logsExportWorker, initializeLogsExportWorker } from './modules/shared/account/logs-export.worker';
-import { authWorker, initializeAuthWorker } from './modules/shared/auth/auth.worker';
+import { initializeV1Workers } from './modules/v1/v1.workers';
+import v1Router from './modules/v1/v1.routes';
 
-import sharedRouter from './modules/shared/shared.routes';
-import taragRouter from './modules/tarag/tarag.routes';
-import veehiveRouter from './modules/veehive/veehive.routes';
-
-app.use('/', sharedRouter);
-app.use('/tarag', taragRouter);
-app.use('/veehive', veehiveRouter);
+app.use('/v1', v1Router);
 app.use("/admin/queues", serverAdapter.getRouter());
 
 
 app.get('/health', (_req, res) => {
-  res.send('TaraG Backend is Running');
+  res.send('Tarahive Backend is Running');
 });
 
 (async () => {
-  // Initialize BullMQ workers
-  await initializeLogsExportWorker();
-  await initializeAuthWorker();
+  await initializeV1Workers();
   
   server.listen(PORT, () => {
     console.log(`🚀 Server running at http://localhost:${PORT}`);
