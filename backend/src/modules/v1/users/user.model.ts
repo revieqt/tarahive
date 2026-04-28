@@ -1,64 +1,119 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+  Index,
+} from "typeorm";
 
-export interface ITaraGUser extends Document {
-  userID: string;
-  likes?: string[];
-  bio: string;
-  isFirstLogin: boolean;
-  isProUser: boolean;
-  expPoints: number;
-  createdOn: Date;
-  updatedOn: Date;
-  safetyState: {
-    isInAnEmergency: boolean;
-    emergencyType: string;
-    emergencyContact?: string;
-  };
-  visibilitySettings: {
-    isProfilePublic: boolean;
-    isPersonalInfoPublic: boolean;
-    isTravelInfoPublic: boolean;
-  };
-  taraBuddySettings: {
-    isTaraBuddyEnabled: boolean;
-    preferredGender?: string;
-    preferredDistance?: number;
-    preferredAgeRange?: number[];
-    preferredZodiac?: string[];
-  };
+export enum UserRole {
+  USER = "USER",
+  ADMIN = "ADMIN",
+  SUPER_ADMIN = "SUPER_ADMIN",
 }
 
-const taragUserSchema = new Schema<ITaraGUser>({
-  userID: { type: String, required: true },
-  likes: { type: [String], default: [] },
-  bio: { type: String, default: "" },
-  isFirstLogin: { type: Boolean, default: true },
-  isProUser: { type: Boolean, default: false },
-  expPoints: { type: Number, default: 0 },
-  createdOn: { type: Date, default: Date.now },
-  updatedOn: { type: Date, default: Date.now },
-  safetyState: {
-    isInAnEmergency: { type: Boolean, default: false },
-    emergencyType: { type: String, default: "" },
-    emergencyContact: { type: String, default: "" }
-  },
-  visibilitySettings: {
-    isProfilePublic: { type: Boolean, default: true },
-    isPersonalInfoPublic: { type: Boolean, default: true },
-    isTravelInfoPublic: { type: Boolean, default: true },
-  },
-  taraBuddySettings: {
-    type: {
-      isTaraBuddyEnabled: { type: Boolean, default: false },
-      preferredGender: String,
-      preferredDistance: Number,
-      preferredAgeRange: [Number],
-      preferredZodiac: [String],
+export interface UserSettings {
+  theme: "light" | "dark" | "system";
+  language: string;
+
+  notifications: {
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+  };
+
+  locationSharing: boolean;
+}
+
+@Entity({ name: "users" })
+@Index(["email"], { unique: true })
+export class User {
+  // ======================
+  // CORE IDENTITY
+  // ======================
+
+  @PrimaryGeneratedColumn("uuid")
+  id!: string;
+
+  @Column({ type: "varchar", length: 255, unique: true })
+  email!: string;
+
+  @Column({ type: "varchar", length: 255, select: false })
+  password!: string;
+
+  @Column({ type: "varchar", length: 100, nullable: true })
+  firstName?: string;
+
+  @Column({ type: "varchar", length: 100, nullable: true })
+  lastName?: string;
+
+  // ======================
+  // AUTH / RBAC
+  // ======================
+
+  @Column({ type: "enum", enum: UserRole, default: UserRole.USER })
+  role!: UserRole;
+
+  @Column({ type: "boolean", default: false })
+  isEmailVerified!: boolean;
+
+  @Column({ type: "boolean", default: true })
+  isActive!: boolean;
+
+  // ======================
+  // TARA G SETTINGS (JSONB)
+  // ======================
+
+  @Column({
+    type: "jsonb",
+    default: {
+      theme: "system",
+      language: "en",
+      notifications: {
+        email: true,
+        push: true,
+        sms: false,
+      },
+      locationSharing: true,
     },
-    required: false,
-    default: undefined
-  }
-}, { timestamps: { createdAt: 'createdOn', updatedAt: 'updatedOn' }});
+  })
+  settings!: UserSettings;
 
-export default mongoose.model<ITaraGUser>('TaraGUser', taragUserSchema);
+  // ======================
+  // EXP / LEVEL SYSTEM
+  // ======================
 
+  @Column({ type: "int", default: 1 })
+  level!: number;
+
+  @Column({ type: "int", default: 0 })
+  currentExp!: number;
+
+  @Column({ type: "int", default: 0 })
+  totalExp!: number;
+
+  @Column({ type: "varchar", length: 50, default: "Rookie Traveler" })
+  title!: string;
+
+  // ======================
+  // TRACKING / ANALYTICS
+  // ======================
+
+  @Column({ type: "timestamp", nullable: true })
+  lastLoginAt?: Date;
+
+  // ======================
+  // AUDIT FIELDS
+  // ======================
+
+  @CreateDateColumn()
+  createdAt!: Date;
+
+  @UpdateDateColumn()
+  updatedAt!: Date;
+
+  @DeleteDateColumn()
+  deletedAt?: Date;
+}
