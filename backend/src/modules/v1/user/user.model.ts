@@ -4,13 +4,14 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  DeleteDateColumn,
   Index,
 } from "typeorm";
-import { UserRole, UserSettings, UserEmergencyState } from "./user.types";
+import { Provider, UserStatus, UserType } from "./user.types";
 
-@Entity({ name: "users" })
+@Entity("users")
 @Index(["email"], { unique: true })
+@Index(["username"], { unique: true })
+@Index(["googleId"])
 
 export class User {
   // ======================
@@ -20,76 +21,148 @@ export class User {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column({ type: "varchar", length: 255, unique: true })
+  @Column({ type: "varchar", length: 100 })
+  fname!: string;
+
+  @Column({ type: "varchar", length: 100, nullable: true })
+  lname?: string;
+
+  @Column({ type: "varchar", length: 20, nullable: true, unique: true })
+  username?: string;
+
+  @Column({ type: "varchar", unique: true })
   email!: string;
 
-  @Column({ type: "varchar", length: 255, select: false })
-  password!: string;
+  @Column({ type: "varchar", nullable: true, select: false })
+  password?: string;
 
-  @Column({ type: "varchar", length: 100, nullable: true })
-  firstName?: string;
+  @Column({ type: "enum", enum: Provider, default: Provider.EMAIL })
+  provider!: Provider;
 
-  @Column({ type: "varchar", length: 100, nullable: true })
-  lastName?: string;
+  @Column({ type: "varchar", nullable: true, unique: true })
+  googleId?: string;
+
+  @Column({ type: "varchar", nullable: true })
+  contactNumber?: string;
+
+  @Column({ type: "date", nullable: true })
+  bdate?: Date;
+
+  @Column({ type: "varchar", default: "" })
+  gender!: string;
+
+  @Column({ type: "varchar", nullable: true })
+  profileImage?: string;
 
   // ======================
-  // AUTH / RBAC
+  // USER PROFILE DATA
   // ======================
 
-  @Column({ type: "enum", enum: UserRole, default: UserRole.TRAVELER })
-  role!: UserRole;
+  @Column({ type: "text", default: "" })
+  bio!: string;
+
+  @Column({ type: "varchar" })
+  type!: UserType;
+
+  @Column({ type: "enum", enum: UserStatus, default: UserStatus.PENDING })
+  status!: UserStatus;
 
   @Column({ type: "boolean", default: false })
-  isEmailVerified!: boolean;
-
-  @Column({ type: "boolean", default: true })
-  isActive!: boolean;
+  isProUser!: boolean;
 
   // ======================
-  // TARA G SETTINGS (JSONB)
+  // GAMIFICATION (TARA G EXP SYSTEM)
   // ======================
-
-  @Column({
-    type: "jsonb",
-    default: {
-      pushNotifications: true,
-      locationSharing: true,
-    },
-  })
-  emergencyState!: UserEmergencyState;
-
-  @Column({
-    type: "jsonb",
-    default: {
-      pushNotifications: true,
-      locationSharing: true,
-    },
-  })
-  settings!: UserSettings;
-
-  // ======================
-  // EXP / LEVEL SYSTEM
-  // ======================
-
-  @Column({ type: "int", default: 1 })
-  level!: number;
 
   @Column({ type: "int", default: 0 })
-  currentExp!: number;
+  expPoints!: number;
 
   // ======================
-  // TRACKING / AUDIT
+  // RELATION DATA (Mongo arrays → Postgres array/jsonb)
   // ======================
 
-  @Column({ type: "timestamp", nullable: true })
-  lastLoginAt?: Date;
+  @Column({ type: "text", array: true, default: [] })
+  interests!: string[];
 
-  @CreateDateColumn()
-  createdAt!: Date;
+  // ======================
+  // SAFETY SYSTEM (TaraG core feature)
+  // ======================
 
-  @UpdateDateColumn()
-  updatedAt!: Date;
+  @Column({
+    type: "jsonb",
+    default: {
+      isInAnEmergency: false,
+      emergencyContact: {},
+    },
+  })
+  safetyState!: {
+    isInAnEmergency: boolean;
+    emergencyType?: string;
+    emergencyNote?: string;
+    emergencyContact?:{
+      email?: string;
+      phone?: string;
+    };
+    lastKnownLocation?: {
+      locationName: string;
+      latitude: number;
+      longitude: number;
+    };
+  };
 
-  @DeleteDateColumn()
-  deletedAt?: Date;
+  // ======================
+  // SETTINGS
+  // ======================
+
+  @Column({
+    type: "jsonb",
+    default: {
+      visibility: {
+        isProfilePublic: true,
+        isPersonalInfoPublic: true,
+        isTravelInfoPublic: true,
+      },
+      personalization: {
+        pushNotifications: true,
+        locationSharing: false,
+      },
+      security: {
+        is2FAEnabled: false,
+      },
+      taraBuddy: {
+        isTaraBuddyEnabled: false,
+      },
+    },
+  })
+  settings!: {
+    visibility: {
+      isProfilePublic: boolean;
+      isPersonalInfoPublic: boolean;
+      isTravelInfoPublic: boolean;
+    };
+    personalization: {
+      pushNotifications: boolean;
+      locationSharing: boolean;
+    };
+    security: {
+      is2FAEnabled: boolean;
+    };
+    taraBuddy: {
+      isTaraBuddyEnabled: boolean;
+      preferredGender?: string;
+      preferredDistance?: number;
+      preferredAgeRange?: number[];
+      preferredZodiac?: string[];
+    };
+  };
+
+  // ======================
+  // AUDIT FIELDS
+  // ======================
+
+  @CreateDateColumn({ name: "created_on" })
+  createdOn!: Date;
+
+  @UpdateDateColumn({ name: "updated_on" })
+  updatedOn!: Date;
 }
