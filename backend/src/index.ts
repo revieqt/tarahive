@@ -33,7 +33,7 @@ app.set("trust proxy", 1);
 
 connectMongoDB();
 
-import { initializeV1Workers } from './modules/v1/v1.workers';
+// import { initializeV1Workers } from './modules/v1/v1.workers';
 import v1Router from './modules/v1/v1.routes';
 
 app.use('/v1', v1Router);
@@ -45,7 +45,7 @@ app.get('/health', (_req, res) => {
 });
 
 (async () => {
-  await initializeV1Workers();
+  // await initializeV1Workers();
   
   server.listen(PORT, () => {
     console.log(`🚀 Server running at http://localhost:${PORT}`);
