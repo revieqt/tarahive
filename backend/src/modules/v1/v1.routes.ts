@@ -2,7 +2,7 @@ import { Router } from 'express';
 import authRoutes from './auth/auth.routes';
 import localizationRoutes from './localization/localization.routes';
 import systemRoutes from './system/system.routes';
-import userRoutes from './users/user.routes';
+import userRoutes from './user/user.routes';
 import weatherRoutes from './weather/weather.routes';
 
 const v1Router = Router();

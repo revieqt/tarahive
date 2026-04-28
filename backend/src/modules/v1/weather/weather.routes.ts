@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { getWeatherController } from './weather.controller';
-import { rateLimitMiddleware } from '../../../middleware/rateLimitMiddleware';
+import { rateLimiter } from '../../../middleware/rateLimitMiddleware';
 
 const router = Router();
 
-router.get('/', rateLimitMiddleware('moderate'), getWeatherController);
+router.get('/', rateLimiter('MODERATE'), getWeatherController);
 
 export default router;

@@ -7,28 +7,11 @@ import {
   DeleteDateColumn,
   Index,
 } from "typeorm";
-
-export enum UserRole {
-  USER = "USER",
-  ADMIN = "ADMIN",
-  SUPER_ADMIN = "SUPER_ADMIN",
-}
-
-export interface UserSettings {
-  theme: "light" | "dark" | "system";
-  language: string;
-
-  notifications: {
-    email: boolean;
-    push: boolean;
-    sms: boolean;
-  };
-
-  locationSharing: boolean;
-}
+import { UserRole, UserSettings, UserEmergencyState } from "./user.types";
 
 @Entity({ name: "users" })
 @Index(["email"], { unique: true })
+
 export class User {
   // ======================
   // CORE IDENTITY
@@ -53,7 +36,7 @@ export class User {
   // AUTH / RBAC
   // ======================
 
-  @Column({ type: "enum", enum: UserRole, default: UserRole.USER })
+  @Column({ type: "enum", enum: UserRole, default: UserRole.TRAVELER })
   role!: UserRole;
 
   @Column({ type: "boolean", default: false })
@@ -69,13 +52,16 @@ export class User {
   @Column({
     type: "jsonb",
     default: {
-      theme: "system",
-      language: "en",
-      notifications: {
-        email: true,
-        push: true,
-        sms: false,
-      },
+      pushNotifications: true,
+      locationSharing: true,
+    },
+  })
+  emergencyState!: UserEmergencyState;
+
+  @Column({
+    type: "jsonb",
+    default: {
+      pushNotifications: true,
       locationSharing: true,
     },
   })
@@ -91,22 +77,12 @@ export class User {
   @Column({ type: "int", default: 0 })
   currentExp!: number;
 
-  @Column({ type: "int", default: 0 })
-  totalExp!: number;
-
-  @Column({ type: "varchar", length: 50, default: "Rookie Traveler" })
-  title!: string;
-
   // ======================
-  // TRACKING / ANALYTICS
+  // TRACKING / AUDIT
   // ======================
 
   @Column({ type: "timestamp", nullable: true })
   lastLoginAt?: Date;
-
-  // ======================
-  // AUDIT FIELDS
-  // ======================
 
   @CreateDateColumn()
   createdAt!: Date;

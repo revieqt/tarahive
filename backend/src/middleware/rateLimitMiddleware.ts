@@ -1,36 +1,44 @@
-import rateLimit, { RateLimitRequestHandler } from 'express-rate-limit';
+import rateLimit, { RateLimitRequestHandler } from "express-rate-limit";
 
-type Sensitivity = 'low' | 'moderate' | 'high';
+type Sensitivity = "LOW" | "MODERATE" | "HIGH";
 
 const sensitivityConfig: Record<Sensitivity, { windowMs: number; max: number }> = {
-  low: {
-    windowMs: 60 * 1000, // 1 minute
-    max: 20,
+  LOW: {
+    windowMs: 60 * 1000,
+    max: 30,
   },
-  moderate: {
-    windowMs: 60 * 1000, // 1 minute
-    max: 10,
+  MODERATE: {
+    windowMs: 60 * 1000,
+    max: 15,
   },
-  high: {
-    windowMs: 60 * 1000, // 1 minute
-    max: 3,
+  HIGH: {
+    windowMs: 60 * 1000,
+    max: 5,
   },
 };
 
-export const rateLimitMiddleware = (sensitivity: Sensitivity): RateLimitRequestHandler => {
+export const rateLimiter = (sensitivity: Sensitivity): RateLimitRequestHandler => {
   const config = sensitivityConfig[sensitivity];
 
   return rateLimit({
     windowMs: config.windowMs,
     max: config.max,
+
     standardHeaders: true,
     legacyHeaders: false,
-    message: {
-      status: 429,
-      message: 'Too many requests from this IP, please try again later.',
-    },
+
     keyGenerator: (req) => {
-      return req.ip || 'undefined';
+      const user = (req as any).user;
+      return user?.id ? `user:${user.id}` : `ip:${req.ip}`;
+    },
+
+    skip: (req) => {
+      return req.path === "/health";
+    },
+
+    message: {
+      error: "RATE_LIMIT_EXCEEDED",
+      message: "Too many requests. Please try again later.",
     },
   });
 };
