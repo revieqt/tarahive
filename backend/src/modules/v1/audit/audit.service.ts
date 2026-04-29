@@ -1,100 +1,98 @@
-// utils/logAction.ts
-import { Request } from "express";
-import { LogModel } from "./audit.model";
+import { AppDataSource } from "../../../config/postgres";
+import { Log } from "./audit.entity";
+import { LogSeverity } from "./audit.types";
+import { maskIP } from "../../../utils/maskIP";
 
-interface DeviceInfo {
-  deviceId?: string;
-  brand?: string;
-  model?: string;
-  os?: string;
-  type?: string;
-  appVersion?: string;
-}
+export interface AuditLogPayload {
+  userId?: string;
 
-interface AppInfo {
-  app?: string;
-  appVersion?: string;
-}
-
-interface LogParams {
   action: string;
   module: string;
   description?: string;
-  severity?: "info" | "warning" | "error";
+
+  resourceType?: string;
+  resourceId?: string;
+
+  success?: boolean;
+  errorMessage?: string;
+
+  ip?: string;
+  platform?: string;
+
+  device?: any;
+  appInfo?: any;
+
+  severity?: LogSeverity;
   metadataID?: string;
-  userId?: string;
-  device?: DeviceInfo;
-  appInfo?: AppInfo;
+  requestId?: string;
 }
 
-export const logAction = async (req: Request, params: LogParams) => {
-  try {
-    const ua = parseUserAgent(req.headers["user-agent"]);
+export class AuditService {
+  private static logRepo = AppDataSource.getRepository(Log);
 
-    // Use device from params if provided, otherwise fall back to parsed user agent
-    const deviceInfo: DeviceInfo = params.device ? {
-      deviceId: params.device.deviceId || "",
-      brand: params.device.brand || ua.browser,
-      model: params.device.model || "",
-      os: params.device.os || ua.os,
-      type: params.device.type || ua.platform.toLowerCase(),
-      appVersion: params.device.appVersion || "",
-    } : {
-      deviceId: "",
-      brand: ua.browser,
-      model: "",
-      os: ua.os,
-      type: ua.platform.toLowerCase(),
-      appVersion: "",
-    };
+  static async log(payload: AuditLogPayload): Promise<void> {
+    try {
+      const log = this.logRepo.create({
+        userId: payload.userId,
 
-    // Use clientIp from middleware if available, otherwise fall back to req.ip
-    const clientIp = (req as any).clientIp || req.ip || req.headers["x-forwarded-for"] || "Unknown";
+        action: payload.action,
+        module: payload.module,
+        description: payload.description,
 
-    await LogModel.create({
-      action: params.action,
-      module: params.module,
-      description: params.description || "",
-      severity: params.severity || "info",
-      metadataID: params.metadataID,
+        resourceType: payload.resourceType,
+        resourceId: payload.resourceId,
 
-      // userId from params or from req.user
-      userId: params.userId || (req as any).user?.id,
+        success: payload.success ?? true,
+        errorMessage: payload.errorMessage,
 
-      ip: clientIp,
-      platform: ua.platform,
+        ip: maskIP(payload.ip),
+        platform: payload.platform,
 
-      device: deviceInfo,
-      appInfo: params.appInfo,
+        device: payload.device,
+        appInfo: payload.appInfo,
 
-      createdOn: new Date(),
+        severity: payload.severity ?? LogSeverity.INFO,
+        metadataID: payload.metadataID,
+        requestId: payload.requestId,
+      });
+
+      await this.logRepo.save(log);
+    } catch (err) {
+      // 🚨 NEVER break app flow because logging failed
+      console.error("[AuditService] Failed to write log:", err);
+    }
+  }
+
+  /**
+   * Shortcut for success logs
+   */
+  static async info(payload: AuditLogPayload): Promise<void> {
+    return this.log({
+      ...payload,
+      severity: LogSeverity.INFO,
+      success: payload.success ?? true,
     });
-  } catch (error) {
-    console.error("Failed to save log:", error);
-  }
-};
-
-export const parseUserAgent = (userAgent?: string) => {
-  if (!userAgent) {
-    return {
-      browser: "Unknown",
-      os: "Unknown",
-      platform: "Unknown",
-    };
   }
 
-  // Simple parsing (good enough for logs)
-  const browserMatch = userAgent.match(
-    /(firefox|msie|chrome|safari|trident|edg)\/?\s*(\d+)/i
-  );
+  /**
+   * Shortcut for warnings
+   */
+  static async warn(payload: AuditLogPayload): Promise<void> {
+    return this.log({
+      ...payload,
+      severity: LogSeverity.WARNING,
+      success: payload.success ?? false,
+    });
+  }
 
-  const osMatch = userAgent.match(
-    /(Windows NT|Mac OS X|Android|iPhone OS|Linux)[\s\/]?([0-9\._]+)?/
-  );
-
-  return {
-    browser: browserMatch ? `${browserMatch[1]} ${browserMatch[2]}` : "Unknown",
-    os: osMatch ? `${osMatch[1]} ${osMatch[2] || ""}`.trim() : "Unknown",
-    platform: /mobile/i.test(userAgent) ? "Mobile" : "Desktop",
-  };
-};
+  /**
+   * Shortcut for errors
+   */
+  static async error(payload: AuditLogPayload): Promise<void> {
+    return this.log({
+      ...payload,
+      severity: LogSeverity.ERROR,
+      success: false,
+    });
+  }
+}

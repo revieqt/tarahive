@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "bullmq": "^5.70.4",
-    "fast-csv": "^5.0.5",
-    "ioredis": "^5.10.0",
-    "typeorm": "^0.3.28"
-  }
-}

@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
+
 export class LocalizationService {
   private localesPath = path.join(__dirname, 'locales');
 
@@ -21,8 +22,9 @@ export class LocalizationService {
       const data = fs.readFileSync(filePath, 'utf-8');
       return JSON.parse(data);
     } catch (err) {
-      console.error('LocalizationService error:', err.message);
-      throw err;
+      const error = err instanceof Error ? err : new Error(String(err));
+      console.error('LocalizationService error:', error.message);
+      throw error;
     }
   }
 }
