@@ -2,18 +2,18 @@
 
 ## Overview
 
-This document explains how to use the `AuditService` in the TaraG backend to record system events such as user actions, errors, warnings, and security-related activities.
+This document explains how to use the `LogAction` in the TaraG backend to record system events such as user actions, errors, warnings, and security-related activities.
 
-The AuditService is designed to be a **centralized logging layer** that ensures consistency, traceability, and safety in production environments.
+The LogAction is designed to be a **centralized logging layer** that ensures consistency, traceability, and safety in production environments.
 
 ---
 
-## Importing the AuditService
+## Importing the LogAction
 
 Before using it, import the service:
 
 ```ts
-import { AuditService } from "../services/audit.service";
+import { LogAction } from "../services/audit.service";
 ```
 
 ---
@@ -27,7 +27,7 @@ The service provides three main logging methods:
 Used for successful operations and standard user activity.
 
 ```ts
-await AuditService.info({
+await LogAction.info({
   userId: req.user.id,
   action: "CREATE_TRIP",
   module: "Trip",
@@ -49,7 +49,7 @@ await AuditService.info({
 Used for abnormal behavior such as failed login attempts or rate-limiting events.
 
 ```ts
-await AuditService.warn({
+await LogAction.warn({
   userId: user.id,
   action: "LOGIN_FAILED",
   module: "Auth",
@@ -67,7 +67,7 @@ await AuditService.warn({
 Used when an operation fails due to exceptions or system issues.
 
 ```ts
-await AuditService.error({
+await LogAction.error({
   userId: req.user.id,
   action: "DELETE_TRIP",
   module: "Trip",
@@ -91,7 +91,7 @@ await AuditService.error({
 #### Login Success
 
 ```ts
-await AuditService.info({
+await LogAction.info({
   userId: user.id,
   action: "LOGIN_SUCCESS",
   module: "Auth",
@@ -105,7 +105,7 @@ await AuditService.info({
 #### Login Failure
 
 ```ts
-await AuditService.warn({
+await LogAction.warn({
   action: "LOGIN_FAILED",
   module: "Auth",
   description: "Invalid credentials",
@@ -122,7 +122,7 @@ await AuditService.warn({
 #### Create
 
 ```ts
-await AuditService.info({
+await LogAction.info({
   userId: req.user.id,
   action: "CREATE_TRIP",
   module: "Trip",
@@ -134,7 +134,7 @@ await AuditService.info({
 #### Update
 
 ```ts
-await AuditService.info({
+await LogAction.info({
   userId: req.user.id,
   action: "UPDATE_TRIP",
   module: "Trip",
@@ -146,7 +146,7 @@ await AuditService.info({
 #### Delete
 
 ```ts
-await AuditService.info({
+await LogAction.info({
   userId: req.user.id,
   action: "DELETE_TRIP",
   module: "Trip",
@@ -224,7 +224,7 @@ This allows you to:
 
 ## Summary
 
-The AuditService provides a structured way to track important system events in TaraG. It ensures:
+The LogAction provides a structured way to track important system events in TaraG. It ensures:
 
 * Consistency
 * Debuggability

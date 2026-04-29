@@ -1,38 +1,22 @@
 import { AppDataSource } from "../../../config/postgres";
 import { Log } from "./audit.entity";
-import { LogSeverity } from "./audit.types";
+import { LogSeverity, AuditLogPayload } from "./audit.types";
 import { maskIP } from "../../../utils/maskIP";
 
-export interface AuditLogPayload {
-  userId?: string;
-
-  action: string;
-  module: string;
-  description?: string;
-
-  resourceType?: string;
-  resourceId?: string;
-
-  success?: boolean;
-  errorMessage?: string;
-
-  ip?: string;
-  platform?: string;
-
-  device?: any;
-  appInfo?: any;
-
-  severity?: LogSeverity;
-  metadataID?: string;
-  requestId?: string;
-}
-
-export class AuditService {
+class LogActionClass {
   private static logRepo = AppDataSource.getRepository(Log);
+  private static instance: LogActionClass;
 
-  static async log(payload: AuditLogPayload): Promise<void> {
+  static get(): LogActionClass {
+    if (!LogActionClass.instance) {
+      LogActionClass.instance = new LogActionClass();
+    }
+    return LogActionClass.instance;
+  }
+
+  async log(payload: AuditLogPayload): Promise<void> {
     try {
-      const log = this.logRepo.create({
+      const log = LogActionClass.logRepo.create({
         userId: payload.userId,
 
         action: payload.action,
@@ -56,7 +40,7 @@ export class AuditService {
         requestId: payload.requestId,
       });
 
-      await this.logRepo.save(log);
+      await LogActionClass.logRepo.save(log);
     } catch (err) {
       // 🚨 NEVER break app flow because logging failed
       console.error("[AuditService] Failed to write log:", err);
@@ -66,7 +50,7 @@ export class AuditService {
   /**
    * Shortcut for success logs
    */
-  static async info(payload: AuditLogPayload): Promise<void> {
+  async info(payload: AuditLogPayload): Promise<void> {
     return this.log({
       ...payload,
       severity: LogSeverity.INFO,
@@ -77,7 +61,7 @@ export class AuditService {
   /**
    * Shortcut for warnings
    */
-  static async warn(payload: AuditLogPayload): Promise<void> {
+  async warn(payload: AuditLogPayload): Promise<void> {
     return this.log({
       ...payload,
       severity: LogSeverity.WARNING,
@@ -88,7 +72,7 @@ export class AuditService {
   /**
    * Shortcut for errors
    */
-  static async error(payload: AuditLogPayload): Promise<void> {
+  async error(payload: AuditLogPayload): Promise<void> {
     return this.log({
       ...payload,
       severity: LogSeverity.ERROR,
@@ -96,3 +80,8 @@ export class AuditService {
     });
   }
 }
+
+// Singleton instance for easy usage: LogAction() or LogAction.info()
+const LogAction = LogActionClass.get();
+
+export { LogAction };

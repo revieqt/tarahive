@@ -111,6 +111,23 @@ export class User {
   };
 
   // ======================
+  // DEVICE INFO (JSONB array)
+  // ======================
+
+  @Column({
+    type: "jsonb",
+    default: [],
+  })
+  device!: Array<{
+    deviceId: string;
+    brand: string;
+    model: string;
+    os: string;
+    type: string;
+    appVersion?: string;
+  }>;
+
+  // ======================
   // SETTINGS
   // ======================
 
