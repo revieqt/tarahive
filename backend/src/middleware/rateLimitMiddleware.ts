@@ -1,19 +1,23 @@
 import rateLimit, { RateLimitRequestHandler } from "express-rate-limit";
 
-type Sensitivity = "LOW" | "MODERATE" | "HIGH";
+type Sensitivity = "LOW" | "MODERATE" | "HIGH" | "SENSITIVE";
 
 const sensitivityConfig: Record<Sensitivity, { windowMs: number; max: number }> = {
   LOW: {
     windowMs: 60 * 1000,
-    max: 30,
+    max: 20,
   },
   MODERATE: {
     windowMs: 60 * 1000,
-    max: 15,
+    max: 10,
   },
   HIGH: {
     windowMs: 60 * 1000,
     max: 5,
+  },
+  SENSITIVE: {
+    windowMs: 60 * 1000,
+    max: 3,
   },
 };
 
