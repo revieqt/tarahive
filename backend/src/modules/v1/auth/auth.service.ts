@@ -29,7 +29,7 @@ export const generateRefreshToken = (user: User): string => {
   const secretKey = process.env.JWT_SECRET || 'default_secret';
   const userId = (user.id as any).toString();
   const refreshToken = jwt.sign(
-    { id: userId },
+    { id: userId , email: user.email },
     secretKey,
     { expiresIn: '14d' }
   );
@@ -208,3 +208,36 @@ export const loginUser = async (data: LoginDto): Promise<{
 
   throw new Error('Account status unknown');
 };
+
+// export const updatePassword = async (
+//   oldPassword: string,
+//   newPassword: string,
+//   confirmPassword: string
+// ): Promise<void> => {
+//   try {
+//     // Verify passwords match
+//     if (newPassword !== confirmPassword) {
+//       throw new Error('New passwords do not match');
+//     }
+
+//     // Find user
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       throw new Error('User not found');
+//     }
+
+//     // Verify old password
+//     const isValidPassword = await bcrypt.compare(oldPassword, user.password || '');
+//     if (!isValidPassword) {
+//       throw new Error('Current password is incorrect');
+//     }
+
+//     // Hash and update new password
+//     const salt = await bcrypt.genSalt(10);
+//     const hashedPassword = await bcrypt.hash(newPassword, salt);
+//     user.password = hashedPassword;
+//     await user.save();
+//   } catch (error) {
+//     throw error;
+//   }
+// };
