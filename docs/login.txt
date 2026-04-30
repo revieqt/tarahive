@@ -25,7 +25,7 @@ a. if status === active, return
 {
  success: true,
  message,
- nextStep: "dashboard", //added this for future plans
+ nextStep: "home",
  accessToken,
  refreshToken,
  user: {user data except password}
@@ -33,7 +33,14 @@ a. if status === active, return
 b. if status === pending, return 
 {
  success: false,
- message: "We've sent a 6 digit code to [email], valid for 30 mins"
- nextStep: "email_verification"
+ message: "You need to verify your email first before you continue.",
+ nextStep: "email-verification",
+ email
+}
+c. if status === banned, return 
+{
+ success: false,
+ message: "You are currently banned",
+ nextStep: "login",
 }
 

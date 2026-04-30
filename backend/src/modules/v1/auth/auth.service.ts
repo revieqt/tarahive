@@ -1,8 +1,8 @@
 import { AppDataSource } from "../../../config/postgres";
 import { User } from "../user/user.entity";
 import { Provider, UserStatus, UserType } from "../user/user.types";
-import { validatePassword, validateAge, hashPassword, generateVerificationCode } from "./auth.utils";
-import { RegisterDto } from "./auth.types";
+import { validatePassword, validateAge, hashPassword, generateVerificationCode, comparePassword } from "./auth.utils";
+import { RegisterDto, LoginDto } from "./auth.types";
 import { addSendVerificationEmailJob, addSendPasswordResetEmailJob } from './auth.queue';
 import jwt from 'jsonwebtoken';
 import {
@@ -149,4 +149,62 @@ export const verifyUserEmail = async (email: string, code: string): Promise<void
     console.error('Error verifying email:', error);
     throw error;
   }
+};
+
+export const loginUser = async (data: LoginDto): Promise<{
+  success: boolean;
+  message: string;
+  nextStep?: string;
+  accessToken?: string;
+  refreshToken?: string;
+  user?: Partial<User>;
+  email?: string;
+}> => {
+  // Find user by email or username and explicitly include the password hash
+  const user = await userRepo
+    .createQueryBuilder('user')
+    .addSelect('user.password')
+    .where('user.email = :identifier', { identifier: data.identifier })
+    .orWhere('user.username = :identifier', { identifier: data.identifier })
+    .getOne();
+
+  if (!user) throw new Error('Invalid username or password');
+  if (!user.password) throw new Error('Invalid username or password');
+
+  const isPasswordValid = await comparePassword(data.password, user.password);
+  if (!isPasswordValid) throw new Error('Invalid username or password');
+
+  // Check user status
+  if (user.status === UserStatus.ACTIVE) {
+    // Generate tokens
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+
+    // Return user without password
+    const { password: _, ...userWithoutPassword } = user;
+
+    return {
+      success: true,
+      message: 'Login successful',
+      nextStep: 'home',
+      accessToken,
+      refreshToken,
+      user: userWithoutPassword,
+    };
+  } else if (user.status === UserStatus.PENDING) {
+    return {
+      success: false,
+      message: 'You need to verify your email first before you continue.',
+      nextStep: 'email-verification',
+      email: user.email,
+    };
+  } else if (user.status === UserStatus.BANNED) {
+    return {
+      success: false,
+      message: 'You are currently banned',
+      nextStep: 'login',
+    };
+  }
+
+  throw new Error('Account status unknown');
 };

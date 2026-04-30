@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { registerUser, sendVerificationCode, verifyUserEmail } from './auth.service';
+import { registerUser, sendVerificationCode, verifyUserEmail, loginUser } from './auth.service';
 import { LogAction } from '../audit/audit.service';
 
 /**
@@ -162,5 +162,83 @@ export const verifyEmail = async (req: Request, res: Response) => {
         .json({ success: false, message: 'Invalid or expired verification code' });
     }
     res.status(500).json({ success: false, message: errorMsg });
+  }
+};
+
+/**
+ * POST /auth/login
+ * Login a user
+ */
+export const login = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const result = await loginUser(req.body);
+
+    if (result.success) {
+      await LogAction.info({
+        userId: result.user?.id,
+        action: "USER_LOGGED_IN",
+        module: "auth",
+        description: `User logged in: ${result.user?.email}`,
+        resourceType: "user",
+        resourceId: result.user?.id,
+        success: true,
+        ip: req.ip,
+        platform: req.body.device?.type,
+        device: {
+          deviceId: req.body.device?.deviceId,
+          brand: req.body.device?.brand,
+          model: req.body.device?.model,
+          os: req.body.device?.os,
+        },
+        appInfo: {
+          appVersion: req.body.device?.appVersion,
+        },
+      });
+    } else {
+      await LogAction.error({
+        action: "USER_LOGIN_FAILED",
+        module: "auth",
+        description: `Login failed for ${req.body.identifier}: ${result.message}`,
+        resourceType: "user",
+        success: false,
+        ip: req.ip,
+        platform: req.body.device?.type,
+        device: {
+          deviceId: req.body.device?.deviceId,
+          brand: req.body.device?.brand,
+          model: req.body.device?.model,
+          os: req.body.device?.os,
+        },
+        appInfo: {
+          appVersion: req.body.device?.appVersion,
+        },
+      });
+    }
+
+    res.status(200).json(result);
+  } catch (error: any) {
+    await LogAction.error({
+      action: "USER_LOGIN_ERROR",
+      module: "auth",
+      description: `Login error for ${req.body.identifier}: ${error.message}`,
+      resourceType: "user",
+      success: false,
+      ip: req.ip,
+      platform: req.body.device?.type,
+      device: {
+        deviceId: req.body.device?.deviceId,
+        brand: req.body.device?.brand,
+        model: req.body.device?.model,
+        os: req.body.device?.os,
+      },
+      appInfo: {
+        appVersion: req.body.device?.appVersion,
+      },
+    });
+
+    res.status(400).json({
+      success: false,
+      message: error.message || 'Login failed',
+    });
   }
 };

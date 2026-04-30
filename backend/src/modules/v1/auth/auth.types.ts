@@ -15,3 +15,16 @@ export interface RegisterDto {
     appVersion?: string;
   };
 }
+
+export interface LoginDto {
+  identifier: string; // email or username
+  password: string;
+  device: {
+    deviceId: string;
+    brand: string;
+    model: string;
+    os: string;
+    type: string;
+    appVersion?: string;
+  };
+}
