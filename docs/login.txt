@@ -1,0 +1,39 @@
+Create this endpoint:
+POST /auth/login
+header: Content-Type application/json
+body (example):
+{
+  "identifier": "john@example.com",
+  "password": "Password123",
+  "device": {
+    "deviceId": "550e8400-e29b-41d4-a716-446655440000",
+    "brand": "Chrome 142",
+    "model": "",
+    "os": "Windows NT 10.0",
+    "type": "desktop",
+    "appVersion": "1.0.0"
+  }
+}
+
+Create a function in backend (also add Dto in types).
+FLOW:
+1. frontend passes these data
+2. backend finds the user via identifier (email or username)
+3. backend checks if password is correct
+4. If found, check if:
+a. if status === active, return 
+{
+ success: true,
+ message,
+ nextStep: "dashboard", //added this for future plans
+ accessToken,
+ refreshToken,
+ user: {user data except password}
+}
+b. if status === pending, return 
+{
+ success: false,
+ message: "We've sent a 6 digit code to [email], valid for 30 mins"
+ nextStep: "email_verification"
+}
+

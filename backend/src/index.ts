@@ -7,8 +7,9 @@ import { ipMiddleware } from './middleware/ipMiddleware';
 import { connectPostgres } from './config/postgres';
 import { connectMongoDB } from './config/mongodb';
 import { serverAdapter } from "./config/bullBoard";
+import { initializeFirebase } from './config/firebase';
 import v1Router from './modules/v1/v1.routes';
-// import { initializeV1Workers } from './modules/v1/v1.workers';
+import { initializeV1Workers } from './modules/v1/v1.workers';
 dotenv.config();
 
 const app = express();
@@ -20,7 +21,7 @@ app.use(express.json());
 app.use(ipMiddleware);
 app.use('/public', express.static(path.join(__dirname, "../public")));
 app.use('/uploads', express.static(path.join(__dirname, "../uploads")));
-app.use("/admin/queues", serverAdapter.getRouter());
+app.use("/queues", serverAdapter.getRouter());
 app.use('/v1', v1Router);
 app.set("trust proxy", 1);
 
@@ -28,11 +29,12 @@ async function bootstrap() {
   try {
     await connectMongoDB();
     await connectPostgres();
+    initializeFirebase();
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`Bootstrap Completed!`);
     });
   } catch (error) {
-    console.error("❌ Server startup failed:", error);
+    console.error("Bootstrap failed:", error);
     process.exit(1);
   }
 }
@@ -44,7 +46,7 @@ app.get('/health', (_req, res) => {
 });
 
 (async () => {
-  // await initializeV1Workers();
+  await initializeV1Workers();
   server.listen(PORT, () => {
     console.log(`🚀 Server running at http://localhost:${PORT}`);
     console.log(`🔌 Socket.IO listening on port ${PORT}`);

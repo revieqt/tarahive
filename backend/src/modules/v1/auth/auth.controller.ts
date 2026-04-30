@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { registerUser } from './auth.service';
+import { registerUser, sendVerificationCode } from './auth.service';
 import { LogAction } from '../audit/audit.service';
 
 /**
@@ -34,12 +34,69 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     res.status(201).json({
       success: true,
       message: 'User registered successfully',
-      data: user,
     });
   } catch (error: any) {
     res.status(400).json({
       success: false,
       message: error.message || 'Registration failed',
     });
+  }
+};
+
+export const sendEmailVerification = async (req: Request, res: Response) => {
+  const { email, device } = req.body;
+  try {
+    
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    await sendVerificationCode(email);
+    
+    await LogAction.info({
+      action: "EMAIL_VERIFICATION_CODE_SENT",
+      module: "auth",
+      description: `Verification code sent to ${email}`,
+      resourceType: "user",
+      success: true,
+      ip: req.ip,
+      platform: device?.type,
+      device: {
+        deviceId: device?.deviceId,
+        brand: device?.brand,
+        model: device?.model,
+        os: device?.os,
+      },
+      appInfo: {
+        appVersion: device?.appVersion,
+      },
+    });
+    res.status(200).json({ 
+      success: true,
+      message: `Verification code sent to ${email}`
+     });
+  } catch (error: any) {
+    await LogAction.error({
+      action: "EMAIL_VERIFICATION_CODE_FAILED",
+      module: "auth",
+      description: `Verification code sent to ${email}`,
+      resourceType: "user",
+      success: false,
+      ip: req.ip,
+      platform: device?.type,
+      device: {
+        deviceId: device?.deviceId,
+        brand: device?.brand,
+        model: device?.model,
+        os: device?.os,
+      },
+      appInfo: {
+        appVersion: device?.appVersion,
+      },
+    });
+    res.status(500).json({ 
+      success: false,
+      message: error.message || 'Failed to send verification code'
+     });
   }
 };

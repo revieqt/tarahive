@@ -1,10 +1,40 @@
 import { AppDataSource } from "../../../config/postgres";
 import { User } from "../user/user.entity";
 import { Provider, UserStatus, UserType } from "../user/user.types";
-import { validatePassword, validateAge, hashPassword } from "./auth.utils";
+import { validatePassword, validateAge, hashPassword, generateVerificationCode } from "./auth.utils";
 import { RegisterDto } from "./auth.types";
+import { addSendVerificationEmailJob, addSendPasswordResetEmailJob } from './auth.queue';
+import jwt from 'jsonwebtoken';
+import {
+  storeVerificationCode,
+  verifyVerificationCode,
+  storePasswordResetCode,
+  verifyPasswordResetCode,
+} from './auth.redis';
 
 const userRepo = AppDataSource.getRepository(User);
+
+export const generateAccessToken = (user: User): string => {
+  const secretKey = process.env.JWT_SECRET || 'default_secret';
+  const userId = (user.id as any).toString();
+  const accessToken = jwt.sign(
+    { id: userId, email: user.email },
+    secretKey,
+    { expiresIn: '1h' }
+  );
+  return accessToken;
+}
+
+export const generateRefreshToken = (user: User): string => {
+  const secretKey = process.env.JWT_SECRET || 'default_secret';
+  const userId = (user.id as any).toString();
+  const refreshToken = jwt.sign(
+    { id: userId },
+    secretKey,
+    { expiresIn: '14d' }
+  );
+  return refreshToken;
+}
 
 export const registerUser = async (data: RegisterDto): Promise<Partial<User>> => {
   // 1. Validate password
@@ -35,7 +65,7 @@ export const registerUser = async (data: RegisterDto): Promise<Partial<User>> =>
     gender: data.gender,
     provider: Provider.EMAIL,
     type: UserType.TRAVELER,
-    status: UserStatus.ACTIVE,
+    status: UserStatus.PENDING,
     isProUser: false,
     expPoints: 0,
       interests: [],
@@ -69,3 +99,29 @@ export const registerUser = async (data: RegisterDto): Promise<Partial<User>> =>
     const { password: _, ...userWithoutPassword } = savedUser;
     return userWithoutPassword;
   }
+
+export const sendVerificationCode = async (email: string): Promise<string> => {
+  try {
+    const user = await userRepo.findOne({ where: { email } });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const code = generateVerificationCode();
+
+    // Store code in Redis with 30-minute expiration
+    await storeVerificationCode(email, code);
+
+    // Queue the email job to send the code
+    await addSendVerificationEmailJob({
+      email,
+      code,
+    });
+
+    console.log(`📧 Verification code generated and queued for ${email}`);
+    return code;
+  } catch (error) {
+    console.error('Error sending verification code:', error);
+    throw error;
+  }
+};

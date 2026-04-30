@@ -4,6 +4,18 @@ export type NotificationPayload = {
   data?: Record<string, any>;
 };
 
-export type NotificationProvider = "push" | "sms" | "email";
+export type EmailPayload = {
+  to: string | string[];
+  subject: string;
+  content?: string;
+  rawHtml?: string;
+  text?: string;
+  cc?: string | string[];
+  bcc?: string | string[];
+  attachments?: {
+    filename: string;
+    path: string;
+  }[];
+};
 
-export type AppType = "tarag" | "veehive";
+export type NotificationProvider = "push" | "sms" | "email";
