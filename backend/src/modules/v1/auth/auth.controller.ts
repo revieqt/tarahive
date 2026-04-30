@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { registerUser, sendVerificationCode } from './auth.service';
+import { registerUser, sendVerificationCode, verifyUserEmail } from './auth.service';
 import { LogAction } from '../audit/audit.service';
 
 /**
@@ -48,7 +48,7 @@ export const sendEmailVerification = async (req: Request, res: Response) => {
   try {
     
     if (!email) {
-      return res.status(400).json({ error: 'Email is required' });
+      return res.status(400).json({ success: false, message: 'Email is required' });
     }
 
     await sendVerificationCode(email);
@@ -98,5 +98,69 @@ export const sendEmailVerification = async (req: Request, res: Response) => {
       success: false,
       message: error.message || 'Failed to send verification code'
      });
+  }
+};
+
+export const verifyEmail = async (req: Request, res: Response) => {
+  const { email, code, device } = req.body;
+  try {
+    
+    if (!email || !code) {
+      return res.status(400).json({ success: false, message: 'Email and code are required' });
+    }
+
+    await verifyUserEmail(email, code);
+
+    await LogAction.info({
+      action: "EMAIL_VERIFICATION_SUCCESS",
+      module: "auth",
+      description: `Email verified for ${email}`,
+      resourceType: "user",
+      success: true,
+      ip: req.ip,
+      platform: device?.type,
+      device: {
+        deviceId: device?.deviceId,
+        brand: device?.brand,
+        model: device?.model,
+        os: device?.os,
+      },
+      appInfo: {
+        appVersion: device?.appVersion,
+      },
+    });
+    res.status(200).json({ 
+      success: true,
+      message: 'Email verified successfully' 
+    });
+  } catch (error: any) {
+    const errorMsg = error.message || 'Failed to verify email';
+    if (
+      errorMsg.includes('Invalid') ||
+      errorMsg.includes('expired')
+    ) {
+      await LogAction.error({
+        action: "EMAIL_VERIFICATION_FAILED",
+        module: "auth",
+        description: `Failed to verify email ${email}`,
+        resourceType: "user",
+        success: false,
+        ip: req.ip,
+        platform: device?.type,
+        device: {
+          deviceId: device?.deviceId,
+          brand: device?.brand,
+          model: device?.model,
+          os: device?.os,
+        },
+        appInfo: {
+          appVersion: device?.appVersion,
+        },
+      });
+      return res
+        .status(400)
+        .json({ success: false, message: 'Invalid or expired verification code' });
+    }
+    res.status(500).json({ success: false, message: errorMsg });
   }
 };

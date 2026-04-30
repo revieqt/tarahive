@@ -125,3 +125,28 @@ export const sendVerificationCode = async (email: string): Promise<string> => {
     throw error;
   }
 };
+
+export const verifyUserEmail = async (email: string, code: string): Promise<void> => {
+  try {
+    // Verify the code against Redis
+    const isValid = await verifyVerificationCode(email, code);
+
+    if (!isValid) {
+      throw new Error('Invalid or expired verification code');
+    }
+
+    // Find and update user status to active
+    const user = await userRepo.findOne({ where: { email } });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    user.status = UserStatus.ACTIVE;
+    await userRepo.save(user);
+
+    console.log(`✅ Email verified and user activated for ${email}`);
+  } catch (error) {
+    console.error('Error verifying email:', error);
+    throw error;
+  }
+};
