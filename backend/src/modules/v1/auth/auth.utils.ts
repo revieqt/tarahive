@@ -20,25 +20,12 @@ export function validatePassword(password: string): void {
 
   const errors: string[] = [];
 
-  if (password.length < minLength) {
-    errors.push(`Password must be at least ${minLength} characters`);
-  }
-  if (!hasUppercase) {
-    errors.push("Password must contain at least 1 uppercase letter");
-  }
-  if (!hasLowercase) {
-    errors.push("Password must contain at least 1 lowercase letter");
-  }
-  if (!hasNumber) {
-    errors.push("Password must contain at least 1 number");
-  }
-  if (!hasSpecialChar) {
-    errors.push("Password must contain at least 1 special character");
-  }
-
-  if (errors.length > 0) {
-    throw new Error(errors.join(", "));
-  }
+  if (password.length < minLength) errors.push(`Password must be at least ${minLength} characters`);
+  if (!hasUppercase) errors.push("Password must contain at least 1 uppercase letter");
+  if (!hasLowercase) errors.push("Password must contain at least 1 lowercase letter");
+  if (!hasNumber) errors.push("Password must contain at least 1 number");
+  if (!hasSpecialChar) errors.push("Password must contain at least 1 special character");
+  if (errors.length > 0) throw new Error(errors.join(", "));
 }
 
 /**
@@ -53,13 +40,8 @@ export function validateAge(birthDate: string): void {
   const monthDiff = today.getMonth() - birth.getMonth();
   
   // Adjust if birthday hasn't occurred this year
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-    age--;
-  }
-
-  if (age < 13) {
-    throw new Error("You must be at least 13 years old to register");
-  }
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) age--;
+  if (age < 13) throw new Error("You must be at least 13 years old to register");
 }
 
 /**

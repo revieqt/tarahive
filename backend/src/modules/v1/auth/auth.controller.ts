@@ -295,7 +295,6 @@ export const changePassword = async (req: AuthRequest, res: Response) => {
     });
     res.status(200).json({ message: 'Password updated successfully' });
   } catch (error: any) {
-    let passedError;
     if (error.message === 'New passwords do not match') {
       await LogAction.info({
         userId: userId,

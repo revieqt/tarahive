@@ -216,13 +216,21 @@ export const updatePassword = async (
   confirmPassword: string
 ): Promise<void> => {
   try {
-    // Find user
-    const user = await userRepo.findOne({ where: { id: userId } });
+    // Find user and explicitly include password hash
+    const user = await userRepo
+      .createQueryBuilder('user')
+      .addSelect('user.password')
+      .where('user.id = :userId', { userId })
+      .getOne();
+
     if (!user) throw new Error('User not found');
     // Verify passwords match
     if (newPassword !== confirmPassword) throw new Error('New passwords do not match');
+    // Validate new password strength
+    validatePassword(newPassword);
     // Verify old password
-    const isValidPassword = await comparePassword(oldPassword, user.password || '');
+    if (!user.password) throw new Error('Current password is incorrect');
+    const isValidPassword = await comparePassword(oldPassword, user.password);
     if (!isValidPassword) throw new Error('Current password is incorrect');
 
     const hashedPassword = await hashPassword(newPassword);

@@ -17,7 +17,7 @@ export interface RegisterDto {
 }
 
 export interface LoginDto {
-  identifier: string; // email or username
+  identifier: string;
   password: string;
   device: {
     deviceId: string;
