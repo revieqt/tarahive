@@ -93,7 +93,7 @@ export const authWorker = new Worker(
         
         await sendEmail({
           to: data.email,
-          subject: 'TaraG Email Verification',
+          subject: 'Tarahive Email Verification',
           content: generateVerificationEmailContent(data.code),
         });
 
@@ -106,7 +106,7 @@ export const authWorker = new Worker(
         
         await sendEmail({
           to: data.email,
-          subject: 'TaraG - Password Reset Code',
+          subject: 'Tarahive - Password Reset Code',
           content: generatePasswordResetEmailContent(data.code),
         });
 

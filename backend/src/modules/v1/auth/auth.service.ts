@@ -209,35 +209,26 @@ export const loginUser = async (data: LoginDto): Promise<{
   throw new Error('Account status unknown');
 };
 
-// export const updatePassword = async (
-//   oldPassword: string,
-//   newPassword: string,
-//   confirmPassword: string
-// ): Promise<void> => {
-//   try {
-//     // Verify passwords match
-//     if (newPassword !== confirmPassword) {
-//       throw new Error('New passwords do not match');
-//     }
+export const updatePassword = async (
+  userId: string, 
+  oldPassword: string,
+  newPassword: string,
+  confirmPassword: string
+): Promise<void> => {
+  try {
+    // Find user
+    const user = await userRepo.findOne({ where: { id: userId } });
+    if (!user) throw new Error('User not found');
+    // Verify passwords match
+    if (newPassword !== confirmPassword) throw new Error('New passwords do not match');
+    // Verify old password
+    const isValidPassword = await comparePassword(oldPassword, user.password || '');
+    if (!isValidPassword) throw new Error('Current password is incorrect');
 
-//     // Find user
-//     const user = await User.findById(userId);
-//     if (!user) {
-//       throw new Error('User not found');
-//     }
-
-//     // Verify old password
-//     const isValidPassword = await bcrypt.compare(oldPassword, user.password || '');
-//     if (!isValidPassword) {
-//       throw new Error('Current password is incorrect');
-//     }
-
-//     // Hash and update new password
-//     const salt = await bcrypt.genSalt(10);
-//     const hashedPassword = await bcrypt.hash(newPassword, salt);
-//     user.password = hashedPassword;
-//     await user.save();
-//   } catch (error) {
-//     throw error;
-//   }
-// };
+    const hashedPassword = await hashPassword(newPassword);
+    user.password = hashedPassword;
+    await userRepo.save(user);
+  } catch (error) {
+    throw error;
+  }
+};

@@ -1,6 +1,13 @@
 import { Request, Response } from 'express';
-import { registerUser, sendVerificationCode, verifyUserEmail, loginUser } from './auth.service';
+import { registerUser, sendVerificationCode, verifyUserEmail, loginUser, updatePassword } from './auth.service';
 import { LogAction } from '../audit/audit.service';
+
+interface AuthRequest extends Request {
+  user?: {
+    id?: string;
+    email: string;
+  };
+}
 
 /**
  * POST /auth/register
@@ -240,5 +247,122 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       success: false,
       message: error.message || 'Login failed',
     });
+  }
+};
+
+/**
+ * POST /auth/change-password
+ * Change user password
+ */
+export const changePassword = async (req: AuthRequest, res: Response) => {
+  const { oldPassword, newPassword, confirmPassword, device } = req.body;
+  const userId = req.user?.id;
+  try {
+    if (!userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({ error: 'All password fields are required' });
+    }
+
+    // Password strength validation
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: 'New password must be at least 6 characters long' });
+    }
+
+    await updatePassword(userId, oldPassword, newPassword, confirmPassword);
+
+    await LogAction.info({
+      userId: userId,
+      action: "PASSWORD_UPDATE_SUCCESS",
+      module: "auth",
+      description: `User updated password: ${req.user?.email}`,
+      resourceType: "user",
+      resourceId: userId,
+      success: true,
+      ip: req.ip,
+      platform: req.body.device?.type,
+      device: {
+        deviceId: req.body.device?.deviceId,
+        brand: req.body.device?.brand,
+        model: req.body.device?.model,
+        os: req.body.device?.os,
+      },
+      appInfo: {
+        appVersion: req.body.device?.appVersion,
+      },
+    });
+    res.status(200).json({ message: 'Password updated successfully' });
+  } catch (error: any) {
+    let passedError;
+    if (error.message === 'New passwords do not match') {
+      await LogAction.info({
+        userId: userId,
+        action: "PASSWORD_UPDATE_ATTEMPT_FAILED",
+        module: "auth",
+        description: `User updated password: ${req.user?.email}`,
+        resourceType: "user",
+        resourceId: userId,
+        success: false,
+        ip: req.ip,
+        platform: req.body.device?.type,
+        device: {
+          deviceId: req.body.device?.deviceId,
+          brand: req.body.device?.brand,
+          model: req.body.device?.model,
+          os: req.body.device?.os,
+        },
+        appInfo: {
+          appVersion: req.body.device?.appVersion,
+        },
+      });
+
+      return res.status(400).json({ error: 'New passwords do not match' });
+    }
+    if (error.message === 'Current password is incorrect') {
+      await LogAction.info({
+        userId: userId,
+        action: "PASSWORD_UPDATE_ATTEMPT_FAILED",
+        module: "auth",
+        description: `Current password is incorrect`,
+        resourceType: "user",
+        resourceId: userId,
+        success: false,
+        ip: req.ip,
+        platform: req.body.device?.type,
+        device: {
+          deviceId: req.body.device?.deviceId,
+          brand: req.body.device?.brand,
+          model: req.body.device?.model,
+          os: req.body.device?.os,
+        },
+        appInfo: {
+          appVersion: req.body.device?.appVersion,
+        },
+      });
+      return res.status(401).json({ error: 'Current password is incorrect' });
+    }
+    await LogAction.info({
+      userId: userId,
+      action: "PASSWORD_UPDATE_FAILED",
+      module: "auth",
+      description: `Failed to update password: ${error.message}`,
+      resourceType: "user",
+      resourceId: userId,
+      success: false,
+      ip: req.ip,
+      platform: req.body.device?.type,
+      device: {
+        deviceId: req.body.device?.deviceId,
+        brand: req.body.device?.brand,
+        model: req.body.device?.model,
+        os: req.body.device?.os,
+      },
+      appInfo: {
+        appVersion: req.body.device?.appVersion,
+      },
+    });
+    res.status(500).json({ error: error.message || 'Failed to update password' });
   }
 };
