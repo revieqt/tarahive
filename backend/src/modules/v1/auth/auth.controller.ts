@@ -293,7 +293,7 @@ export const changePassword = async (req: AuthRequest, res: Response) => {
         appVersion: req.body.device?.appVersion,
       },
     });
-    res.status(200).json({ message: 'Password updated successfully' });
+    res.status(200).json({ success: true, message: 'Password updated successfully' });
   } catch (error: any) {
     if (error.message === 'New passwords do not match') {
       await LogAction.info({
@@ -317,7 +317,7 @@ export const changePassword = async (req: AuthRequest, res: Response) => {
         },
       });
 
-      return res.status(400).json({ error: 'New passwords do not match' });
+      return res.status(400).json({ success: false, message: 'New passwords do not match' });
     }
     if (error.message === 'Current password is incorrect') {
       await LogAction.info({
@@ -340,7 +340,7 @@ export const changePassword = async (req: AuthRequest, res: Response) => {
           appVersion: req.body.device?.appVersion,
         },
       });
-      return res.status(401).json({ error: 'Current password is incorrect' });
+      return res.status(401).json({ success: false, message: 'Current password is incorrect' });
     }
     await LogAction.info({
       userId: userId,
@@ -362,6 +362,6 @@ export const changePassword = async (req: AuthRequest, res: Response) => {
         appVersion: req.body.device?.appVersion,
       },
     });
-    res.status(500).json({ error: error.message || 'Failed to update password' });
+    res.status(500).json({ success: false, message: error.message || 'Failed to update password' });
   }
 };

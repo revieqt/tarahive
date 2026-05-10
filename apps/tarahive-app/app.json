@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Tarahive",
-    "slug": "tarahive-app",
-    "scheme": "tarahiveapp",
+    "name": "TaraG",
+    "slug": "tarag_app",
+    "scheme": "taragapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -12,21 +12,21 @@
       "backgroundColor": "#0065F8"
     },
     "ios": {
-      "bundleIdentifier": "com.tarahiveapp",
+      "bundleIdentifier": "com.taragapp",
       "supportsTablet": true,
       "googleMobileAdsAppId": "ca-app-pub-8325794315541816~2492770428",
       "config": {
         "googleMapsApiKey": "AIzaSyDI_dL8xl7gnjcPps-CXgDJM9DtF3oZPVI"
       },
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Tarahive uses your location to show your current position and routes.",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "Tarahive requires background location to track trips accurately.",
-        "NSLocationAlwaysUsageDescription": "Tarahive needs background location to provide travel features.",
-        "NSCameraUsageDescription": "Allow Tarahive to access your camera."
+        "NSLocationWhenInUseUsageDescription": "TaraG uses your location to show your current position and routes.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "TaraG requires background location to track trips accurately.",
+        "NSLocationAlwaysUsageDescription": "TaraG needs background location to provide travel features.",
+        "NSCameraUsageDescription": "Allow TaraG to access your camera."
       }
     },
     "android": {
-      "package": "com.tarahiveapp",
+      "package": "com.taragapp",
       "versionCode": 1,
       "googleMobileAdsAppId": "ca-app-pub-8325794315541816~1418527751",
       "usesCleartextTraffic": true,
@@ -61,20 +61,9 @@
         }
       ],
       [
-        "react-native-background-geolocation",
-        {
-          "backgroundPermissionRationale": {
-            "title": "Allow Tarahive to access your location",
-            "message": "Tarahive needs your location in the background to track trips, routes, and safety features.",
-            "positiveAction": "Allow",
-            "negativeAction": "Cancel"
-          }
-        }
-      ],
-      [
         "expo-camera",
         {
-          "cameraPermission": "Allow Tarahive to access your camera."
+          "cameraPermission": "Allow TaraG to access your camera."
         }
       ],
       [

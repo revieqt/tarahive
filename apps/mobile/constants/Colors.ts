@@ -7,6 +7,10 @@ export const Colors = {
     primary: '#fff',
     secondary: '#0065F8',
     accent: '#00CAFF',
+
+    error: '#FF4D4D',
+    success: '#4CAF50',
+    warning: '#FFC107',
   },
   dark: {
     text: '#ECEDEE',
@@ -16,5 +20,9 @@ export const Colors = {
     primary: '#001C30',
     secondary: '#0065F8',
     accent: '#00CAFF',
+    
+    error: '#FF4D4D',
+    success: '#4CAF50',
+    warning: '#FFC107',
   },
 };

@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "Tarahive",
+    "slug": "tarahive-mobile",
+    "scheme": "tarahiveapp",
+    "version": "1.0.0",
+    "plugins": [
+      "expo-router"
+    ]
+  }
+}
