@@ -4,7 +4,7 @@ import { LocalizationController } from './localization.controller';
 const router = Router();
 const controller = new LocalizationController();
 
-// GET /api/locales/:lang
-router.get('/:lang', controller.getTranslations.bind(controller));
+// GET /localization/:lang/:namespace
+router.get('/:lang/:namespace', controller.getTranslations.bind(controller));
 
 export default router;

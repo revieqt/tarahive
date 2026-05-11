@@ -267,8 +267,8 @@ export const changePassword = async (req: AuthRequest, res: Response) => {
     }
 
     // Password strength validation
-    if (newPassword.length < 6) {
-      return res.status(400).json({ error: 'New password must be at least 6 characters long' });
+    if (newPassword.length < 8) {
+      return res.status(400).json({ error: 'New password must be at least 8 characters long' });
     }
 
     await updatePassword(userId, oldPassword, newPassword, confirmPassword);
