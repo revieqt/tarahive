@@ -28,7 +28,7 @@ export type ThemedIconProps = {
 
 /* ---------------- VIEW ---------------- */
 
-export function ThemedView({
+export function TView({
   style,
   lightColor,
   darkColor,
@@ -81,7 +81,7 @@ export function ThemedView({
 
 /* ---------------- TEXT ---------------- */
 
-export function ThemedText({
+export function TText({
   style,
   lightColor,
   darkColor,
@@ -124,7 +124,7 @@ export function ThemedText({
 
 /* ---------------- ICON ---------------- */
 
-export function ThemedIcon({
+export function TIcon({
   name,
   size,
   color,

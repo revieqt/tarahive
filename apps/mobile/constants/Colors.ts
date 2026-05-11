@@ -5,8 +5,8 @@ export const Colors = {
     icon: '#687076', 
 
     primary: '#fff',
-    secondary: '#0065F8',
-    accent: '#00CAFF',
+    secondary: '#F59E0B',
+    accent: '#FFC94D',
 
     error: '#FF4D4D',
     success: '#4CAF50',
@@ -18,9 +18,9 @@ export const Colors = {
     icon: '#9BA1A6',
 
     primary: '#001C30',
-    secondary: '#0065F8',
-    accent: '#00CAFF',
-    
+    secondary: '#F59E0B',
+    accent: '#FFC94D',
+
     error: '#FF4D4D',
     success: '#4CAF50',
     warning: '#FFC107',

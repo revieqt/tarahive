@@ -1,25 +1,35 @@
-import { ThemedText, ThemedView } from "@/components/ui/Themed";
-import { Link } from "expo-router";
+import { Redirect } from "expo-router";
+import { useSession } from "@/context/SessionContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect, useState } from "react";
 
+const ONBOARDING_KEY = "ONBOARDING_COMPLETED";
 
-export default function HomeScreen() {
-  return (
-    <ThemedView
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <ThemedText type="title">Hello</ThemedText>
-      <ThemedText type="subtitle">Hello</ThemedText>
-      <ThemedText>Hello Expo Router</ThemedText>
-      <ThemedText type="error">Hello Expo Router</ThemedText>
-      <ThemedText type="warning">Hello Expo Router</ThemedText>
-      <ThemedText type="success">Hello Expo Router</ThemedText>
-      <Link href="/asset">
-        <ThemedText>Test not found!</ThemedText>
-      </Link>
-    </ThemedView>
-  );
+export default function Index() {
+  const { session, loading } = useSession();
+  const [onboardingChecked, setOnboardingChecked] = useState(false);
+  const [hasOnboarded, setHasOnboarded] = useState(false);
+
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      try {
+        const value = await AsyncStorage.getItem(ONBOARDING_KEY);
+        setHasOnboarded(value === "true");
+      } catch (_) {
+        setHasOnboarded(false);
+      } finally {
+        setOnboardingChecked(true);
+      }
+    };
+
+    checkOnboarding();
+  }, []);
+
+  if (loading || !onboardingChecked) return null;
+
+  if (!hasOnboarded) return <Redirect href="/onboarding" />;
+
+  if (session?.user) return <Redirect href="/(tabs)/home" />;
+
+  return <Redirect href="/onboarding" />;
 }

@@ -1,18 +1,18 @@
 import { Link, Stack } from 'expo-router';
-import { StyleSheet } from 'react-native';
-import { ThemedIcon, ThemedText, ThemedView } from '@/components/ui/Themed';
+import { StyleSheet, } from 'react-native';
+import { TIcon, TText, TView } from '@/components/ui/Themed';
 
 export default function NotFoundScreen() {
   return (
     <>
       <Stack.Screen options={{ title: 'Oops!' }} />
-      <ThemedView style={styles.container}>
-        <ThemedIcon name="emoticon-sad" size={50}/>
-        <ThemedText type="title">This screen doesn't exist.</ThemedText>
+      <TView style={styles.container}>
+        <TIcon name="emoticon-sad" size={50}/>
+        <TText type="title">This screen doesn't exist.</TText>
         <Link href="/">
-          <ThemedText>Go back to home screen!</ThemedText>
+          <TText>Go back to home screen!</TText>
         </Link>
-      </ThemedView>
+      </TView>
     </>
   );
 }
