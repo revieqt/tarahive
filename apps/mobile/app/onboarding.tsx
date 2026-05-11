@@ -14,6 +14,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { TView, TText } from "@/components/ui/Themed";
 import Button from "@/components/ui/Button";
+import LangButton from "@/components/common/LanguageButton";
 
 const { width, height } = Dimensions.get("window");
 
@@ -65,7 +66,7 @@ const slides: Slide[] = [
 function SlideItem({ item, index }: { item: Slide; index: number }) {
   return (
     <TView style={[styles.slide, {width}]}>
-
+      <LangButton />
       <Image source={item.image} style={{ width: 200, height: 200, marginBottom: 48 }} resizeMode="contain" />
 
       <View style={styles.textBlock}>

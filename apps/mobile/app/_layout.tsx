@@ -28,7 +28,7 @@ const queryClient = new QueryClient({
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     Inter: require('../assets/fonts/Inter-VariableFont_opsz,wght.ttf'),
-    PoppinsBold: require('../assets/fonts/Poppins-Bold.ttf'),
+    Baloo: require('../assets/fonts/Baloo2-ExtraBold.ttf'),
   });
 
   useEffect(() => {
@@ -65,6 +65,7 @@ function AppContent() {
         <Stack.Screen name="onboarding" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="auth/login" />
+        <Stack.Screen name="settings/language" />
         {/* <Stack.Screen name="document-view" />
         <Stack.Screen name="auth/login" />
         <Stack.Screen name="auth/register" />
