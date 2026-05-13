@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, type ViewProps, type TextProps } from "react-native";
-import { useThemeColor } from "@/hooks/useThemeColor";
+import { useThemeColor } from "@/shared/hooks/useThemeColor";
 import MaterialIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 /* ---------------- TYPES ---------------- */
@@ -113,7 +113,7 @@ export function TText({
         type === "error" && {fontFamily: "Inter",fontSize: 13,fontWeight: "500", color: errorColor},
         type === "warning" && {fontFamily: "Inter",fontSize: 13,fontWeight: "500", color: warningColor},
         type === "success" && {fontFamily: "Inter",fontSize: 13,fontWeight: "500", color: successColor},
-        type === "title" && {fontFamily: "Baloo",fontSize: 22,lineHeight: 38},
+        type === "title" && {fontFamily: "Baloo",fontSize: 24,lineHeight: 38},
         type === "subtitle" && {fontFamily: "Baloo",fontSize: 16,},
         style,
       ]}

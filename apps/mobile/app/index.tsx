@@ -1,5 +1,5 @@
 import { Redirect } from "expo-router";
-import { useSession } from "@/context/SessionContext";
+import { useSession } from "@/features/auth/context/SessionContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 

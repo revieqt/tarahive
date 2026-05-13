@@ -1,4 +1,3 @@
-import { useThemeColor } from '@/hooks/useThemeColor';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { TIcon} from '@/components/ui/Themed';
@@ -9,14 +8,12 @@ interface ButtonProps {
 }
 
 const LangButton: React.FC<ButtonProps> = ({style}) => {
-  const bgColor = useThemeColor({}, 'primary');
   return (
     <TouchableOpacity
       onPress={() => router.push('/settings/language')}
       style={[
         styles.button,
         style,
-        { backgroundColor: bgColor }
       ]}
     >
       <TIcon name="translate" size={20} />
