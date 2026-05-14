@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, ReactNode, useContext, useEffect, useState, useRef } from 'react';
-import { BACKEND_URL } from '@/shared/constants/Config';
+import { BACKEND_URL } from '@/Config';
 import { 
   loginUser, 
   registerUser, 

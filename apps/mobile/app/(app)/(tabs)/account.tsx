@@ -1,7 +1,7 @@
 import Button from '@/components/ui/Button';
 // import ProBadge from '@/components/custom/ProBadge';
 import { TIcon, TText, TView } from '@/components/ui/Themed';
-import { SUPPORT_FORM_URL } from '@/shared/constants/Config';
+import { SUPPORT_FORM_URL } from '@/Config';
 import { useSession } from '@/features/auth/context/SessionContext';
 import { router } from 'expo-router';
 import React, { useState } from 'react';

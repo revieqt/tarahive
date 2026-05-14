@@ -1,8 +1,13 @@
 import bcrypt from "bcrypt";
-import { randomUUID } from "crypto";
+import crypto , { randomUUID } from "crypto";
 import { usernameAdjectives } from "./auth.types";
 
 const SALT_ROUNDS = 10;
+const OTP_SECRET = process.env.OTP_SECRET;
+
+if (!OTP_SECRET) {
+  throw new Error("OTP_SECRET environment variable is required.");
+}
 
 /**
  * Validate password requirements:
@@ -47,17 +52,17 @@ export function validateAge(birthDate: string): void {
 }
 
 /**
- * Hash password using bcrypt
+ * Hasher using bcrypt
  */
-export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, SALT_ROUNDS);
+export async function hashPassword(toHash: string): Promise<string> {
+  return bcrypt.hash(toHash, SALT_ROUNDS);
 }
 
 /**
- * Compare password with hash
+ * Compare hash
  */
-export async function comparePassword(password: string, hash: string): Promise<boolean> {
-  return bcrypt.compare(password, hash);
+export async function comparePassword(toCompare: string, hash: string): Promise<boolean> {
+  return bcrypt.compare(toCompare, hash);
 }
 
 /**
@@ -85,3 +90,33 @@ export function generateUsername(
 
   return `${randomAdjective}_${cleanFirstName}_${uuidSuffix}`;
 }
+
+/**
+ * Hash OTP using HMAC-SHA256 + secret pepper
+ * @param otp - Raw OTP code
+ * @returns Hashed OTP string
+ */
+export const hashOTP = (otp: string): string => {
+  return crypto
+    .createHmac("sha256", OTP_SECRET)
+    .update(otp)
+    .digest("hex");
+};
+
+/**
+ * Compare raw OTP against hashed OTP
+ * @param otp - Raw OTP provided by user
+ * @param hashedOTP - Stored hashed OTP
+ * @returns True if OTP matches
+ */
+export const compareHashedOTP = (
+  otp: string,
+  hashedOTP: string
+): boolean => {
+  const hashedInput = hashOTP(otp);
+
+  return crypto.timingSafeEqual(
+    Buffer.from(hashedInput, "hex"),
+    Buffer.from(hashedOTP, "hex")
+  );
+};

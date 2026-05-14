@@ -1,7 +1,9 @@
 import redis from '../../../config/redis';
+import { compareHashedOTP, hashOTP } from './auth.utils';
 
 const VERIFICATION_CODE_EXPIRATION = 30 * 60; // 30 minutes in seconds
 const VERIFICATION_CODE_PREFIX = 'verification_code:';
+const VALIDATED_EMAIL_PREFIX = 'validated_';
 const TWO_FA_CODE_PREFIX = '2fa_code:';
 const PASSWORD_RESET_CODE_PREFIX = 'password_reset_code:';
 
@@ -20,24 +22,44 @@ export const storeVerificationCode = async (
 
     const existingCode = await redis.get(key);
     if (existingCode) {
-      console.log(`🗑️ Existing verification code found for ${email}; deleting old entry before storing new code.`);
+      console.log(
+        `🗑️ Existing verification code found for ${email}; deleting old entry before storing new code.`
+      );
+
       await redis.del(key);
     }
 
+    // Hash OTP before storing
+    const hashedCode = await hashOTP(code);
+
     console.log(`📝 Storing verification code with key: ${key}`);
     console.log(`   Code length: ${code.length} digits`);
-    console.log(`   Expiration: ${VERIFICATION_CODE_EXPIRATION} seconds (30 minutes)`);
-    
-    const result = await redis.setex(key, VERIFICATION_CODE_EXPIRATION, code);
-    
+    console.log(
+      `   Expiration: ${VERIFICATION_CODE_EXPIRATION} seconds (30 minutes)`
+    );
+
+    const result = await redis.setex(
+      key,
+      VERIFICATION_CODE_EXPIRATION,
+      hashedCode
+    );
+
     console.log(`✅ Verification code stored for ${email}`);
     console.log(`   Redis response:`, result);
-    
+
     // Verify it was stored
     const verification = await redis.get(key);
-    console.log(`   Verification - code exists in Redis:`, !!verification);
+
+    console.log(
+      `   Verification - hashed code exists in Redis:`,
+      !!verification
+    );
   } catch (error) {
-    console.error(`❌ Error storing verification code for ${email}:`, error);
+    console.error(
+      `❌ Error storing verification code for ${email}:`,
+      error
+    );
+
     throw error;
   }
 };
@@ -54,21 +76,29 @@ export const verifyVerificationCode = async (
 ): Promise<boolean> => {
   try {
     const key = `${VERIFICATION_CODE_PREFIX}${email}`;
-    const storedCode = await redis.get(key);
 
-    if (!storedCode) {
+    const storedHashedCode = await redis.get(key);
+
+    if (!storedHashedCode) {
       console.warn(`⚠️ No verification code found for ${email}`);
       return false;
     }
 
-    if (storedCode !== code) {
+    // Compare raw code against hashed code
+    const isValid = await compareHashedOTP(code, storedHashedCode);
+
+    if (!isValid) {
       console.warn(`⚠️ Invalid verification code for ${email}`);
       return false;
     }
 
-    // Delete the code after successful verification
+    // Delete code after successful verification
     await redis.del(key);
-    console.log(`✅ Verification code verified and deleted for ${email}`);
+
+    console.log(
+      `✅ Verification code verified and deleted for ${email}`
+    );
+
     return true;
   } catch (error) {
     console.error(`❌ Error verifying code for ${email}:`, error);
@@ -186,6 +216,66 @@ export const verifyPasswordResetCode = async (
     return true;
   } catch (error) {
     console.error(`❌ Error verifying password reset code for ${email}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Mark email as validated after successful verification
+ * @param email - User email
+ * @returns Promise that resolves when email is marked as validated
+ */
+export const markEmailAsValidated = async (email: string): Promise<void> => {
+  try {
+    const key = `${VALIDATED_EMAIL_PREFIX}${email}`;
+    console.log(`📝 Marking email as validated with key: ${key}`);
+    console.log(`   Expiration: ${VERIFICATION_CODE_EXPIRATION} seconds (30 minutes)`);
+    
+    const result = await redis.setex(key, VERIFICATION_CODE_EXPIRATION, '1');
+    
+    console.log(`✅ Email marked as validated for ${email}`);
+    console.log(`   Redis response:`, result);
+  } catch (error) {
+    console.error(`❌ Error marking email as validated for ${email}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Check if email is validated
+ * @param email - User email
+ * @returns Promise that resolves to true if email is validated
+ */
+export const isEmailValidated = async (email: string): Promise<boolean> => {
+  try {
+    const key = `${VALIDATED_EMAIL_PREFIX}${email}`;
+    const result = await redis.get(key);
+    
+    if (result) {
+      console.log(`✅ Email is validated: ${email}`);
+      return true;
+    }
+    
+    console.warn(`⚠️ Email is not validated: ${email}`);
+    return false;
+  } catch (error) {
+    console.error(`❌ Error checking if email is validated for ${email}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Delete validated email entry (after successful registration)
+ * @param email - User email
+ * @returns Promise that resolves when entry is deleted
+ */
+export const deleteValidatedEmail = async (email: string): Promise<void> => {
+  try {
+    const key = `${VALIDATED_EMAIL_PREFIX}${email}`;
+    await redis.del(key);
+    console.log(`✅ Validated email entry deleted for ${email}`);
+  } catch (error) {
+    console.error(`❌ Error deleting validated email entry for ${email}:`, error);
     throw error;
   }
 };

@@ -1,12 +1,10 @@
-import { registerUser } from '@/features/auth/services/auth.service';
-import { useDeviceInfo } from '@/shared/hooks/useDeviceInfo';
+import { registerUser, sendEmailVerificationCode, verifyEmail } from '@/features/auth/services/register.service';
 import { useState } from 'react';
 import { calculateAge } from '@/shared/utils/calculateAge';
-import { RegisterRequest } from '@/features/auth/types/auth.types';
+import { RegisterRequest } from '@/features/auth/services/register.service';
 import { showError } from '@/shared/services/toast.service';
 
 export const useRegister = () => {
-  const deviceInfo = useDeviceInfo();
   const [loading, setLoading] = useState(false);
 
   const validate = (data: RegisterRequest) => {
@@ -17,19 +15,19 @@ export const useRegister = () => {
       !data.email ||
       !data.password ||
       !data.confirmPassword
-    ) showError('Error', 'Required fields must not be empty.');
+    ) throw new Error('Required fields must not be empty.');
 
     const age = calculateAge(new Date(data.bdate));
 
-    if (age < 13) showError('Error', 'Must be at least 13 years old');
+    if (age < 13) throw new Error('Must be at least 13 years old');
 
-    if (data.password !== data.confirmPassword) showError('Error', 'Passwords do not match');
+    if (data.password !== data.confirmPassword) throw new Error('Passwords do not match');
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!emailRegex.test(data.email)) showError('Error', 'Invalid email');
+    if (!emailRegex.test(data.email)) throw new Error('Invalid email');
 
-    if (data.password.length < 6) showError('Error', 'Password too short');
+    if (data.password.length < 6) throw new Error('Password too short');
   };
 
   const register = async (data: RegisterRequest) => {
@@ -37,12 +35,7 @@ export const useRegister = () => {
 
     try {
       validate(data);
-
-      if (!deviceInfo.isLoaded) {
-        throw new Error('Device info not loaded');
-      }
-
-      return await registerUser(data, deviceInfo);
+      return await registerUser(data);
     } finally {
       setLoading(false);
     }
@@ -52,4 +45,40 @@ export const useRegister = () => {
     register,
     loading,
   };
+};
+
+
+export const useEmailVerification = () => {
+  const [loading, setLoading] = useState(false);
+
+  const sendCode = async (email: string) => {
+    setLoading(true);
+    try {
+      const response = await sendEmailVerificationCode(email);
+      return response;
+    } catch (err: any) {
+      const errorMsg = err.message || 'Failed to send verification code';
+      showError('Error', errorMsg);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const verifyCode = async (email: string, code: string) => {
+    setLoading(true);
+    
+    try {
+      const result = await verifyEmail(email, code);
+      return result;
+    } catch (err: any) {
+      const errorMsg = err.message || 'Email verification failed';
+      showError('Error', errorMsg);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { sendCode, verifyCode, loading };
 };

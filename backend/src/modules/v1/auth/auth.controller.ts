@@ -58,7 +58,7 @@ export const sendEmailVerification = async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, message: 'Email is required' });
     }
 
-    await sendVerificationCode(email);
+    const code = await sendVerificationCode(email);
     
     await LogAction.info({
       action: "EMAIL_VERIFICATION_CODE_SENT",
@@ -80,7 +80,8 @@ export const sendEmailVerification = async (req: Request, res: Response) => {
     });
     res.status(200).json({ 
       success: true,
-      message: `Verification code sent to ${email}`
+      message: `Verification code sent to ${email}`,
+      id: email, // Return email as the ID for tracking
      });
   } catch (error: any) {
     await LogAction.error({

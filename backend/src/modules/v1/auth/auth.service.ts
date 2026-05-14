@@ -10,6 +10,9 @@ import {
   verifyVerificationCode,
   storePasswordResetCode,
   verifyPasswordResetCode,
+  markEmailAsValidated,
+  isEmailValidated,
+  deleteValidatedEmail,
 } from './auth.redis';
 
 const userRepo = AppDataSource.getRepository(User);
@@ -37,6 +40,12 @@ export const generateRefreshToken = (user: User): string => {
 }
 
 export const registerUser = async (data: RegisterDto): Promise<Partial<User>> => {
+  // 0. Check if email has been validated
+  const emailValidated = await isEmailValidated(data.email);
+  if (!emailValidated) {
+    throw new Error("Email must be verified before registration");
+  }
+
   // 1. Validate password
   validatePassword(data.password);
 
@@ -91,17 +100,15 @@ export const registerUser = async (data: RegisterDto): Promise<Partial<User>> =>
 
     const savedUser = await userRepo.save(user);
 
+    // 7. Delete validated email entry from Redis after successful registration
+    await deleteValidatedEmail(data.email);
+
     const { password: _, ...userWithoutPassword } = savedUser;
     return userWithoutPassword;
   }
 
 export const sendVerificationCode = async (email: string): Promise<string> => {
   try {
-    const user = await userRepo.findOne({ where: { email } });
-    if (!user) {
-      throw new Error('User not found');
-    }
-
     const code = generateVerificationCode();
 
     // Store code in Redis with 30-minute expiration
@@ -130,14 +137,8 @@ export const verifyUserEmail = async (email: string, code: string): Promise<void
       throw new Error('Invalid or expired verification code');
     }
 
-    // Find and update user status to active
-    const user = await userRepo.findOne({ where: { email } });
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    user.status = UserStatus.ACTIVE;
-    await userRepo.save(user);
+    // Mark email as validated for 30 minutes
+    await markEmailAsValidated(email);
 
     console.log(`✅ Email verified and user activated for ${email}`);
   } catch (error) {
