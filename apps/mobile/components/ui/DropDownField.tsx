@@ -10,6 +10,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import { TText } from './Themed';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface DropDownFieldProps {
   placeholder?: string;
@@ -110,6 +111,7 @@ const DropDownField: React.FC<DropDownFieldProps> = ({
         animationType="fade"
         onRequestClose={closeModal}
       >
+        <SafeAreaView style={{ flex: 1 }} edges={['bottom']} pointerEvents="box-none">
         <TouchableWithoutFeedback onPress={closeModal}>
           <View style={styles.modalOverlay} />
         </TouchableWithoutFeedback>
@@ -163,6 +165,7 @@ const DropDownField: React.FC<DropDownFieldProps> = ({
             style={[styles.gradient, { bottom: 0 }]}
           />
         </View>
+        </SafeAreaView>
       </Modal>
     </>
   );
@@ -181,7 +184,7 @@ const styles = StyleSheet.create({
   pickerText: {
     flex: 1,
     fontSize: 13,
-    fontFamily: 'Poppins',
+    fontFamily: 'Inter',
   },
   modalOverlay: {
     flex: 1,
@@ -214,12 +217,13 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 13,
-    fontFamily: 'Poppins',
+    fontFamily: 'Inter',
     opacity: 0.7,
   },
   optionTextSelected: {
     opacity: 1,
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'Baloo',
+    fontSize: 16,
   },
 });
 

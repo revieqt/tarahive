@@ -1,4 +1,6 @@
 import bcrypt from "bcrypt";
+import { randomUUID } from "crypto";
+import { usernameAdjectives } from "./auth.types";
 
 const SALT_ROUNDS = 10;
 
@@ -64,3 +66,22 @@ export async function comparePassword(password: string, hash: string): Promise<b
 export const generateVerificationCode = (): string => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
+
+/**
+ * Username Generator
+ */
+export function generateUsername(
+  firstName: string,
+): string {
+  if (!firstName) throw new Error("firstName is required");
+  if (!usernameAdjectives?.length) throw new Error("adjectives array cannot be empty");
+
+  const randomAdjective =
+    usernameAdjectives[Math.floor(Math.random() * usernameAdjectives.length)];
+
+  const cleanFirstName = firstName.trim().toLowerCase();
+
+  const uuidSuffix = randomUUID().split("-")[0];
+
+  return `${randomAdjective}_${cleanFirstName}_${uuidSuffix}`;
+}

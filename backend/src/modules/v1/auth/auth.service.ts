@@ -1,7 +1,7 @@
 import { AppDataSource } from "../../../config/postgres";
 import { User } from "../user/user.entity";
 import { Provider, UserStatus, UserType } from "../user/user.types";
-import { validatePassword, validateAge, hashPassword, generateVerificationCode, comparePassword } from "./auth.utils";
+import { validatePassword, validateAge, hashPassword, generateVerificationCode, comparePassword, generateUsername } from "./auth.utils";
 import { RegisterDto, LoginDto } from "./auth.types";
 import { addSendVerificationEmailJob, addSendPasswordResetEmailJob } from './auth.queue';
 import jwt from 'jsonwebtoken';
@@ -43,10 +43,6 @@ export const registerUser = async (data: RegisterDto): Promise<Partial<User>> =>
   // 2. Check if email already exists
   const existingEmail = await userRepo.findOne({ where: { email: data.email } });
   if (existingEmail) throw new Error("Email already registered");
-  
-  // 3. Check if username already exists
-  const existingUsername = await userRepo.findOne({ where: { username: data.username } });
-  if (existingUsername) throw new Error("Username already taken");
 
   // 4. Validate age (13 years old and above)
   validateAge(data.bdate);
@@ -59,13 +55,13 @@ export const registerUser = async (data: RegisterDto): Promise<Partial<User>> =>
     fname: data.fname,
     lname: data.lname,
     email: data.email,
-    username: data.username,
+    username: generateUsername(data.fname),
     password: hashedPassword,
     bdate: new Date(data.bdate),
     gender: data.gender,
     provider: Provider.EMAIL,
     type: UserType.TRAVELER,
-    status: UserStatus.PENDING,
+    status: UserStatus.ACTIVE,
     isProUser: false,
     expPoints: 0,
       interests: [],
@@ -95,7 +91,6 @@ export const registerUser = async (data: RegisterDto): Promise<Partial<User>> =>
 
     const savedUser = await userRepo.save(user);
 
-    // Return user without sensitive data
     const { password: _, ...userWithoutPassword } = savedUser;
     return userWithoutPassword;
   }

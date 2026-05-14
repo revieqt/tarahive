@@ -33,8 +33,8 @@ const LANGUAGE_FILES_DIR = `${FileSystem.cacheDirectory}locales/`;
 const DEFAULT_LANGUAGE_CODE = 'en';
 
 // Import default language data (English)
-import * as enCommon from '../../locales/en/common.json';
-import * as enAuth from '../../locales/en/auth.json';
+import * as enCommon from '../locales/en/common.json';
+import * as enAuth from '../locales/en/auth.json';
 
 const DEFAULT_LANGUAGE_DATA: LanguageData = {
   ...enCommon,

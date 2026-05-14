@@ -56,7 +56,7 @@ export default function Onboarding() {
     try {
       await AsyncStorage.setItem(ONBOARDING_KEY, "true");
     } catch (_) {}
-    router.replace("/auth/login");
+    router.replace("/login");
   };
 
   const isLastSlide = currentIndex === slideTemplates.length - 1;

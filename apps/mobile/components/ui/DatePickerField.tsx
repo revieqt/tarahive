@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { TText } from './Themed';
 import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 const ITEM_HEIGHT = 40;
 
 interface DatePickerProps {
@@ -158,62 +159,64 @@ const DatePickerField: React.FC<DatePickerProps> = ({
         visible={showPicker}
         onRequestClose={() => setShowPicker(false)}
       >
-        <TouchableWithoutFeedback onPress={() => setShowPicker(false)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={[styles.modalContainer, { backgroundColor }]}>
-                <LinearGradient
-                  colors={[backgroundColor, 'transparent']}
-                  style={[styles.gradient, { top: 0 }]}
-                />
-                <View style={styles.pickerContainer}>
-                  {/* Month */}
-                  <FlatList
-                    data={months}
-                    keyExtractor={(item) => item}
-                    style={styles.picker}
-                    snapToInterval={ITEM_HEIGHT}
-                    decelerationRate="fast"
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{paddingVertical: 20}}
-                    renderItem={(item) =>
-                      renderItem(item, months[selectedMonth ?? 0], (month: string) =>
-                        setSelectedMonth(months.indexOf(month))
-                      )
-                    }
+        <SafeAreaView style={{ flex: 1 }} edges={['bottom']} pointerEvents="box-none">
+          <TouchableWithoutFeedback onPress={() => setShowPicker(false)}>
+            <View style={styles.modalOverlay}>
+              <TouchableWithoutFeedback>
+                <View style={[styles.modalContainer, { backgroundColor }]}>
+                  <LinearGradient
+                    colors={[backgroundColor, 'transparent']}
+                    style={[styles.gradient, { top: 0 }]}
                   />
-                  {/* Day */}
-                  <FlatList
-                    data={days}
-                    keyExtractor={(item) => item.toString()}
-                    style={styles.picker}
-                    snapToInterval={ITEM_HEIGHT}
-                    contentContainerStyle={{paddingVertical: 20}}
-                    decelerationRate="fast"
-                    showsVerticalScrollIndicator={false}
-                    renderItem={(item) => renderItem(item, selectedDay, setSelectedDay)}
-                  />
+                  <View style={styles.pickerContainer}>
+                    {/* Month */}
+                    <FlatList
+                      data={months}
+                      keyExtractor={(item) => item}
+                      style={styles.picker}
+                      snapToInterval={ITEM_HEIGHT}
+                      decelerationRate="fast"
+                      showsVerticalScrollIndicator={false}
+                      contentContainerStyle={{paddingVertical: 20}}
+                      renderItem={(item) =>
+                        renderItem(item, months[selectedMonth ?? 0], (month: string) =>
+                          setSelectedMonth(months.indexOf(month))
+                        )
+                      }
+                    />
+                    {/* Day */}
+                    <FlatList
+                      data={days}
+                      keyExtractor={(item) => item.toString()}
+                      style={styles.picker}
+                      snapToInterval={ITEM_HEIGHT}
+                      contentContainerStyle={{paddingVertical: 20}}
+                      decelerationRate="fast"
+                      showsVerticalScrollIndicator={false}
+                      renderItem={(item) => renderItem(item, selectedDay, setSelectedDay)}
+                    />
 
-                  {/* Year */}
-                  <FlatList
-                    data={years}
-                    keyExtractor={(item) => item.toString()}
-                    style={styles.picker}
-                    snapToInterval={ITEM_HEIGHT}
-                    contentContainerStyle={{paddingVertical: 20}}
-                    decelerationRate="fast"
-                    showsVerticalScrollIndicator={false}
-                    renderItem={(item) => renderItem(item, selectedYear, setSelectedYear)}
+                    {/* Year */}
+                    <FlatList
+                      data={years}
+                      keyExtractor={(item) => item.toString()}
+                      style={styles.picker}
+                      snapToInterval={ITEM_HEIGHT}
+                      contentContainerStyle={{paddingVertical: 20}}
+                      decelerationRate="fast"
+                      showsVerticalScrollIndicator={false}
+                      renderItem={(item) => renderItem(item, selectedYear, setSelectedYear)}
+                    />
+                  </View>
+                  <LinearGradient
+                    colors={['transparent',backgroundColor ]}
+                    style={[styles.gradient, { bottom: 0 }]}
                   />
                 </View>
-                <LinearGradient
-                  colors={['transparent',backgroundColor ]}
-                  style={[styles.gradient, { bottom: 0 }]}
-                />
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </SafeAreaView>
       </Modal>
     </TouchableOpacity>
   );
@@ -237,7 +240,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     height: 48,
     backgroundColor: 'transparent',
-    fontFamily: 'Poppins',
+    fontFamily: 'Inter',
   },
   modalOverlay: {
     flex: 1,
@@ -273,7 +276,8 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   selectedText: {
-    fontFamily: 'PoppinsBold',
+    fontFamily: 'Baloo',
+    fontSize: 16,
     opacity: 1,
   },
   gradient: {

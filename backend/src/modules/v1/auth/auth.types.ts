@@ -3,7 +3,6 @@ export interface RegisterDto {
   lname?: string;
   email: string;
   password: string;
-  username: string;
   bdate: string;
   gender: string;
   device: {
@@ -28,3 +27,26 @@ export interface LoginDto {
     appVersion?: string;
   };
 }
+
+export const usernameAdjectives: string[] = [
+  "wandering",
+  "drifting",
+  "roaming",
+  "nomadic",
+  "restless",
+  "faraway",
+  "lost",
+  "hidden",
+  "endless",
+  "untamed",
+  "sunlit",
+  "windy",
+  "starlit",
+  "distant",
+  "coastal",
+  "mountainous",
+  "silent",
+  "ancient",
+  "wild",
+  "free"
+];

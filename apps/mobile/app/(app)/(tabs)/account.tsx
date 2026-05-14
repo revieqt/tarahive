@@ -104,17 +104,29 @@ export default function AccountScreen() {
         {/* Options */}
         <View style={styles.options}>
           <TText style={styles.optionsTitle}>
-            Customization
+            Personalization
           </TText>
+          <TouchableOpacity
+            onPress={() => router.push('/settings/theme')}
+            style={styles.optionsChild}>
+            <TIcon name='palette' size={15} />
+            <TText>App Theme</TText>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => router.push('/settings/language')}
+            style={styles.optionsChild}>
+            <TIcon name='translate' size={15} />
+            <TText>App Language</TText>
+          </TouchableOpacity>
           <TText style={styles.optionsTitle}>
             Privacy and Legal
           </TText>
           <TouchableOpacity
-            onPress={() => router.push('/account/settings-accountControl')}
+            onPress={() => router.push('/settings/request-logs')}
             style={[styles.optionsChild, !isConnected && {opacity: 0.5}]}
             disabled={!isConnected}>
             <TIcon name='key' size={15} />
-            <TText>Account Control</TText>
+            <TText>Request Activity Logs</TText>
           </TouchableOpacity>
 
           {/* <TouchableOpacity onPress={() => openDocument('privacyPolicy-mobileApp')}
