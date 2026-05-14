@@ -1,13 +1,11 @@
 import Button from '@/components/ui/Button';
 // import ProBadge from '@/components/custom/ProBadge';
 import { TIcon, TText, TView } from '@/components/ui/Themed';
-// import WebViewModal from '@/components/modals/WebViewModal';
-import { SUPPORT_FORM_URL} from '@/shared/constants/Config';
+import { SUPPORT_FORM_URL } from '@/shared/constants/Config';
 import { useSession } from '@/features/auth/context/SessionContext';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
-// import { renderProUpgrade } from '@/app/account/settings-pro';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
@@ -15,15 +13,13 @@ import { useInternetConnection } from '@/shared/utils/checkInternetConnection';
 import ProfileImage from '@/components/ui/ProfileImage';
 import { useQueryClient } from '@tanstack/react-query'
 import HiveBg from '@/components/common/HiveBg';
+import ProCard from '@/components/cards/ProCard';
 
 export default function AccountScreen() {
   const { session, clearSession } = useSession();
   const user = session?.user;
   const primaryColor = useThemeColor({}, 'primary');
   const queryClient = useQueryClient();
-  const [showPayment, setShowPayment] = useState(false);
-  const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
-  const [showWebModal, setShowWebModal] = useState<string | null>(null);
   const [devMode, setDevMode] = useState(false);
   const isConnected = useInternetConnection();
 
@@ -56,6 +52,16 @@ export default function AccountScreen() {
   };
 
   const fullName = [user?.fname, user?.lname].filter(Boolean).join(' ');
+
+  const handleWebView = (url: string, title: string) => () => {
+    router.push({
+      pathname: "/webview",
+      params: {
+        url: url,
+        title: title,
+      },
+    });
+  };
 
   const handleLogout = async () => {
     try {
@@ -100,12 +106,18 @@ export default function AccountScreen() {
             </View>
           </TouchableOpacity>
         </TView>
-        {/* {renderProUpgrade()} */}
-        {/* Options */}
+        
+        <ProCard/>
+
         <View style={styles.options}>
-          <TText style={styles.optionsTitle}>
-            Personalization
-          </TText>
+          <TText style={styles.optionsTitle}>Personalization</TText>
+
+            <TouchableOpacity
+              onPress={() => router.push('/settings/edit-profile')}
+              style={styles.optionsChild}>
+              <TIcon name='pen' size={15} />
+              <TText>Edit Profile</TText>
+            </TouchableOpacity>
           <TouchableOpacity
             onPress={() => router.push('/settings/theme')}
             style={styles.optionsChild}>
@@ -118,57 +130,51 @@ export default function AccountScreen() {
             <TIcon name='translate' size={15} />
             <TText>App Language</TText>
           </TouchableOpacity>
-          <TText style={styles.optionsTitle}>
-            Privacy and Legal
-          </TText>
-          <TouchableOpacity
-            onPress={() => router.push('/settings/request-logs')}
-            style={[styles.optionsChild, !isConnected && {opacity: 0.5}]}
-            disabled={!isConnected}>
-            <TIcon name='key' size={15} />
-            <TText>Request Activity Logs</TText>
-          </TouchableOpacity>
+          
+          { isConnected && <>
+              <TText style={styles.optionsTitle}>Privacy and Legal</TText>
 
-          {/* <TouchableOpacity onPress={() => openDocument('privacyPolicy-mobileApp')}
-            style={[styles.optionsChild, !isConnected && {opacity: 0.5}]}
-            disabled={!isConnected}>
-            <TIcon name='file-eye' size={15} />
-            <TText>Privacy Policy</TText>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => openDocument('terms-mobileApp')}
-            style={[styles.optionsChild, !isConnected && {opacity: 0.5}]}
-            disabled={!isConnected}>
-            <TIcon name='file-alert' size={15} />
-            <TText>Terms and Conditions</TText>
-          </TouchableOpacity> */}
+              <TouchableOpacity
+                onPress={() => router.push('/settings/request-logs')}
+                style={styles.optionsChild}>
+                <TIcon name='key' size={15} />
+                <TText>Request Activity Logs</TText>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleWebView('', "Privacy Policy")}
+                style={styles.optionsChild}>
+                <TIcon name='file-eye' size={15} />
+                <TText>Privacy Policy</TText>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleWebView('', "Terms and Conditions")}
+                style={styles.optionsChild}>
+                <TIcon name='file-alert' size={15} />
+                <TText>Terms and Conditions</TText>
+              </TouchableOpacity>
+            </>
+          }
+          
 
           <TText style={styles.optionsTitle}>
             Help and Support
           </TText>
-          {/* <TouchableOpacity onPress={() => openDocument('manual-mobileApp')}
+          <TouchableOpacity onPress={handleWebView(SUPPORT_FORM_URL, "App Manual")}
             style={[styles.optionsChild, !isConnected && {opacity: 0.5}]}
             disabled={!isConnected}>
             <TIcon name='file-find' size={15} />
             <TText>App Manual</TText>
-          </TouchableOpacity> */}
-          <TouchableOpacity onPress={() => router.push({
-            pathname: "/webview",
-            params: {
-              url: SUPPORT_FORM_URL,
-              title: "Support Form",
-            },
-          })}
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleWebView(SUPPORT_FORM_URL, "Contact Support")}
             style={[styles.optionsChild, !isConnected && {opacity: 0.5}]}
             disabled={!isConnected}>
             <TIcon name='headset' size={15} />
             <TText>Contact Support</TText>
           </TouchableOpacity>
-          {/* <TouchableOpacity onPress={() => openDocument('about')}
+          <TouchableOpacity onPress={handleWebView('', "About Tarahive")}
             style={[styles.optionsChild, !isConnected && {opacity: 0.5}]}
             disabled={!isConnected}>
             <TIcon name='file-find' size={15} />
-            <TText>About TaraG</TText>
-          </TouchableOpacity> */}
+            <TText>About Tarahive</TText>
+          </TouchableOpacity>
           
           
           <Pressable 
@@ -190,7 +196,7 @@ export default function AccountScreen() {
             delayLongPress={100}
           >
             <TIcon name='diversify' size={15} />
-            <TText>TaraG Version 2.0 {devMode ? ' (Dev Mode)' : ''}</TText>
+            <TText>Tarahive v1.0 {devMode ? ' (Dev Mode)' : ''}</TText>
           </Pressable>
 
           {devMode && (
@@ -220,19 +226,6 @@ export default function AccountScreen() {
         />
 
       </ScrollView>
-
-      {/* Support Modal */}
-      {/* <WebViewModal
-        visible={showWebModal != null}
-        onClose={() => setShowWebModal(null)}
-        uri={showWebModal === 'support' ? SUPPORT_FORM_URL : 'https://joshopsima.vercel.app'}
-      />
-
-      <WebViewModal
-        visible={showPayment}
-        onClose={() => setShowPayment(false)}
-        uri={paymentUrl || ""}
-      /> */}
       <LinearGradient
         colors={['transparent', primaryColor]}
         style={styles.gradient}
@@ -283,7 +276,6 @@ const styles = StyleSheet.create({
   optionsChild: {
     padding: 8,
     fontSize: 15,
-    width: '100%',
     flexDirection: 'row',
     gap: 10,
     alignItems: 'center',
