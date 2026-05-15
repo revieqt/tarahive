@@ -7,11 +7,11 @@ import { ThemeProvider } from '@/shared/context/ThemeContext';
 import * as SplashScreen from 'expo-splash-screen';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SessionProvider } from '@/features/auth/context/SessionContext';
-import { toastConfig } from "@/components/ui/Toast";
+import { LocationProvider } from '@/shared/context/DeviceContext';
+import { toastConfig } from "@/shared/components/ui/Toast";
 import Toast from "react-native-toast-message";
 import { LanguageProvider } from '@/shared/context/LanguageContext';
-import { TView } from '@/components/ui/Themed';
-import HiveBg from '@/components/common/HiveBg';
+import { TView } from '@/shared/components/ui/Themed';
 
 
 SplashScreen.preventAutoHideAsync();
@@ -30,8 +30,8 @@ const queryClient = new QueryClient({
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    Inter: require('../assets/fonts/Inter-VariableFont_opsz,wght.ttf'),
-    Baloo: require('../assets/fonts/Baloo2-ExtraBold.ttf'),
+    Inter: require('../shared/assets/fonts/Inter-VariableFont_opsz,wght.ttf'),
+    Baloo: require('../shared/assets/fonts/Baloo2-ExtraBold.ttf'),
   });
 
   useEffect(() => {
@@ -46,14 +46,16 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <LanguageProvider>
-          <SessionProvider>
-            <AppContent />
-            <Toast config={toastConfig} />
-          </SessionProvider>
-        </LanguageProvider>
-      </ThemeProvider>
+      <LocationProvider>
+        <ThemeProvider>
+          <LanguageProvider>
+            <SessionProvider>
+              <AppContent />
+              <Toast config={toastConfig} />
+            </SessionProvider>
+          </LanguageProvider>
+        </ThemeProvider>
+      </LocationProvider>
     </QueryClientProvider>
   );
 }

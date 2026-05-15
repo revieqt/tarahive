@@ -1,8 +1,8 @@
 import { StyleSheet, View, Platform, KeyboardAvoidingView, ScrollView, TouchableOpacity } from 'react-native';
-import { TText, TView, TIcon } from '@/components/ui/Themed';
-import Button from '@/components/ui/Button';
-import TextField from '@/components/ui/TextField';
-import PasswordField from '@/components/ui/PasswordField';
+import { TText, TView, TIcon } from '@/shared/components/ui/Themed';
+import Button from '@/shared/components/ui/Button';
+import TextField from '@/shared/components/ui/TextField';
+import PasswordField from '@/shared/components/ui/PasswordField';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';  
 import { useInternetConnection } from '@/shared/utils/checkInternetConnection';
@@ -10,7 +10,7 @@ import { useAuthLogin } from '@/features/auth/context/SessionContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import { showError, showInfo, showWarning } from '@/shared/services/toast.service';
-import LangButton from '@/components/common/LanguageButton';
+import LangButton from '@/shared/components/common/LanguageButton';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');

@@ -8,7 +8,7 @@ import {
 import Svg, { Polygon } from "react-native-svg";
 import { useThemeColor } from "@/shared/hooks/useThemeColor";
 
-interface LoadingProps {
+interface HiveLoadingProps {
   size?: number;
   color?: string;
   style?: ViewStyle;
@@ -49,7 +49,7 @@ const Hexagon = ({
   );
 };
 
-const Loading: React.FC<LoadingProps> = ({
+const HiveLoading: React.FC<HiveLoadingProps> = ({
   size = 30,
   color = "#F4B400",
   style,
@@ -135,4 +135,4 @@ const Loading: React.FC<LoadingProps> = ({
   );
 };
 
-export default Loading;
+export default HiveLoading;

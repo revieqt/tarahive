@@ -14,7 +14,7 @@ export const Colors = {
     icon: '#9BA1A6',
 
     primary: '#272829',
-    secondary: '#F59E0B',
-    accent: '#FF653F'
+    secondary: '#FF653F',
+    accent: '#F59E0B'
   },
 };

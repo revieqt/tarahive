@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { WebView } from "react-native-webview";
 import { useLocalSearchParams } from "expo-router";
-import { TView, TText } from "@/components/ui/Themed";
-import BackButton from "@/components/common/BackButton";
-import Loading from "@/components/common/Loading";
+import { TView, TText } from "@/shared/components/ui/Themed";
+import BackButton from "@/shared/components/common/BackButton";
+import HiveLoading from "@/shared/components/feedback/HiveLoading";
 
 export default function WebViewScreen() {
   const { url, title } = useLocalSearchParams<{
@@ -19,24 +19,22 @@ export default function WebViewScreen() {
       <View style={styles.header}>
         <BackButton/>
 
-        <TText numberOfLines={1}>
-          {title ?? "Web View"}
-        </TText>
+        <TText numberOfLines={1}>{title ?? "Web View"}</TText>
 
         <View style={{ width: 24 }} />
       </View>
 
       {loading && (
         <TView style={styles.loadingContainer}>
-          <Loading/>
+          <HiveLoading/>
         </TView>
       )}
-        <WebView
-            source={{ uri: url }}
-            onLoadStart={() => setLoading(true)}
-            onLoadEnd={() => setLoading(false)}
-            startInLoadingState
-        />
+      <WebView
+        source={{ uri: url }}
+        onLoadStart={() => setLoading(true)}
+        onLoadEnd={() => setLoading(false)}
+        startInLoadingState
+      />
     </TView>
   );
 }

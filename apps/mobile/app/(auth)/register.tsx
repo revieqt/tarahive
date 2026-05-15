@@ -1,9 +1,9 @@
-import Button from '@/components/ui/Button';
-import DatePickerField from '@/components/ui/DatePickerField';
-import DropDownField from '@/components/ui/DropDownField';
-import PasswordField from '@/components/ui/PasswordField';
-import TextField from '@/components/ui/TextField';
-import { TText, TView } from '@/components/ui/Themed';
+import Button from '@/shared/components/ui/Button';
+import DatePickerField from '@/shared/components/ui/DatePickerField';
+import DropDownField from '@/shared/components/ui/DropDownField';
+import PasswordField from '@/shared/components/ui/PasswordField';
+import TextField from '@/shared/components/ui/TextField';
+import { TText, TView } from '@/shared/components/ui/Themed';
 import { calculateAge } from '@/shared/utils/calculateAge';
 import { router } from 'expo-router';
 import React, { useRef, useState} from 'react';
@@ -11,11 +11,11 @@ import { KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, View, Ani
 import { GENDER_OPTIONS } from '@/shared/constants/Input';
 import { useRegister, useEmailVerification } from '@/features/auth/hooks/useRegister';
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
-import HiveBg from '@/components/common/HiveBg';
-import BackButton from '@/components/common/BackButton';
-import LangButton from '@/components/common/LanguageButton';
+import HiveBg from '@/shared/components/common/HiveBg';
+import BackButton from '@/shared/components/common/BackButton';
+import LangButton from '@/shared/components/common/LanguageButton';
 import { showError } from '@/shared/services/toast.service';
-import PasswordValidationCard from '@/components/cards/PasswordValidationCard';
+import PasswordValidationCard from '@/shared/components/cards/PasswordValidationCard';
 
 export default function RegisterScreen() {
   const [fname, setFname] = useState('');

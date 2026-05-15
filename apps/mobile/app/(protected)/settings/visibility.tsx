@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { View, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
-import { TIcon, TText, TView } from "@/components/ui/Themed";
+import { TIcon, TText, TView } from "@/shared/components/ui/Themed";
 import { LANGUAGES } from "@/shared/constants/Languages";
 import { useLanguage } from "@/shared/context/LanguageContext";
 import { useThemeColor } from "@/shared/hooks/useThemeColor";
 import { showError } from "@/shared/services/toast.service";
-import HiveBg from "@/components/common/HiveBg";
-import Header from "@/components/common/Header";
+import HiveBg from "@/shared/components/common/HiveBg";
+import Header from "@/shared/components/common/Header";
 
 export default function VisibilitySettingsScreen() {
   const { currentLanguage, setLanguage, isLoading } = useLanguage();

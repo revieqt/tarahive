@@ -1,5 +1,5 @@
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
-import { TIcon } from '@/components/ui/Themed';
+import { TIcon } from '@/shared/components/ui/Themed';
 import React, { useState } from 'react';
 import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 

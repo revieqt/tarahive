@@ -1,14 +1,14 @@
-import Button from '@/components/ui/Button';
-import { TText, TView } from '@/components/ui/Themed';
+import Button from '@/shared/components/ui/Button';
+import { TText, TView } from '@/shared/components/ui/Themed';
 import React, { useState } from 'react';
 import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
-import PasswordField from '@/components/ui/PasswordField';
+import PasswordField from '@/shared/components/ui/PasswordField';
 import { useSession, usePasswordUpdate } from '@/features/auth/context/SessionContext';
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import { router } from 'expo-router';
-import Header from '@/components/common/Header';
-import HiveBg from '@/components/common/HiveBg';
-import PasswordValidationCard from '@/components/cards/PasswordValidationCard';
+import Header from '@/shared/components/common/Header';
+import HiveBg from '@/shared/components/common/HiveBg';
+import PasswordValidationCard from '@/shared/components/cards/PasswordValidationCard';
 
 export default function ChangePasswordScreen() {
   const { session } = useSession();

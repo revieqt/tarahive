@@ -1,6 +1,6 @@
 import React from 'react';
 import { ViewStyle, View } from 'react-native';
-import { TText} from '@/components/ui/Themed';
+import { TText} from '@/shared/components/ui/Themed';
 import BackButton from './BackButton';
 
 interface HeaderProps {

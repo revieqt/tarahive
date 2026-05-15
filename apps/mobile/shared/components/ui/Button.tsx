@@ -1,7 +1,7 @@
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
-import { TText } from '@/components/ui/Themed';
+import { TText } from '@/shared/components/ui/Themed';
 import { LinearGradient } from 'expo-linear-gradient';
 
 interface ButtonProps {

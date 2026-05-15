@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
-import { TIcon} from '@/components/ui/Themed';
+import { TIcon} from '@/shared/components/ui/Themed';
 import { router } from 'expo-router';
 
 interface ButtonProps {

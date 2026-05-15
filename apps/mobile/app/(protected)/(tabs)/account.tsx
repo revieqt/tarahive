@@ -1,6 +1,6 @@
-import Button from '@/components/ui/Button';
+import Button from '@/shared/components/ui/Button';
 // import ProBadge from '@/components/custom/ProBadge';
-import { TIcon, TText, TView } from '@/components/ui/Themed';
+import { TIcon, TText, TView } from '@/shared/components/ui/Themed';
 import { SUPPORT_FORM_URL } from '@/Config';
 import { useSession } from '@/features/auth/context/SessionContext';
 import { router } from 'expo-router';
@@ -8,11 +8,11 @@ import React, { useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useInternetConnection } from '@/shared/utils/checkInternetConnection';
-import ProfileImage from '@/components/ui/ProfileImage';
+import ProfileImage from '@/shared/components/ui/ProfileImage';
 import { useQueryClient } from '@tanstack/react-query'
-import ProCard from '@/components/cards/ProCard';
+import ProCard from '@/shared/components/cards/ProCard';
 import { useLanguage } from '@/shared/context/LanguageContext';
-import HiveBg from '@/components/common/HiveBg';
+import HiveBg from '@/shared/components/common/HiveBg';
 
 export default function AccountScreen() {
   const { session, clearSession } = useSession();

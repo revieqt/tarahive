@@ -1,4 +1,4 @@
-import { TText, TView } from "@/components/ui/Themed";
+import { TText, TView } from "@/shared/components/ui/Themed";
 
 export default function MapsScreen() {
   return (

@@ -1,8 +1,8 @@
 import { router, Stack } from 'expo-router';
 import { StyleSheet, } from 'react-native';
-import { TIcon, TText, TView } from '@/components/ui/Themed';
-import HiveBg from '@/components/common/HiveBg';
-import Button from '@/components/ui/Button';
+import { TIcon, TText, TView } from '@/shared/components/ui/Themed';
+import HiveBg from '@/shared/components/common/HiveBg';
+import Button from '@/shared/components/ui/Button';
 
 export default function NotFoundScreen() {
 

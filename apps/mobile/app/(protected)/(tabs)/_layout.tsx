@@ -2,7 +2,7 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 import { Platform, Text } from 'react-native';
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
-import {TIcon} from '@/components/ui/Themed';
+import {TIcon} from '@/shared/components/ui/Themed';
 import { useLanguage } from '@/shared/context/LanguageContext';
 
 function TabBarLabel({ children, color }: { children: React.ReactNode; color: string }) {

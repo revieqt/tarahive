@@ -1,7 +1,7 @@
 // components/ui/ToastConfig.tsx
 
 import React from "react";
-import { TText, TView, TIcon } from "@/components/ui/Themed";
+import { TText, TView, TIcon } from "@/shared/components/ui/Themed";
 import { View } from "react-native";
 
 import { ToastConfig } from "react-native-toast-message";

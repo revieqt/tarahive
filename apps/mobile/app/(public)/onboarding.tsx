@@ -12,11 +12,11 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import { TView, TText } from "@/components/ui/Themed";
-import Button from "@/components/ui/Button";
-import LangButton from "@/components/common/LanguageButton";
+import { TView, TText } from "@/shared/components/ui/Themed";
+import Button from "@/shared/components/ui/Button";
+import LangButton from "@/shared/components/common/LanguageButton";
 import { useLanguage } from "@/shared/context/LanguageContext";
-import HiveBg from "@/components/common/HiveBg";
+import HiveBg from "@/shared/components/common/HiveBg";
 import { useThemeColor } from "@/shared/hooks/useThemeColor";
 import { ONBOARDING_KEY, slideTemplates, SlideItemProps } from "@/shared/constants/Onboarding";
 

@@ -2,7 +2,7 @@
 import React from "react";
 import { View, Switch as RNSwitch, StyleSheet } from "react-native";
 import { useThemeColor } from "@/shared/hooks/useThemeColor";
-import { TText } from "@/components/ui/Themed";
+import { TText } from "@/shared/components/ui/Themed";
 
 type SwitchProps = {
   label?: string;
