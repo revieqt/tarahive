@@ -8,7 +8,7 @@ import { calculateAge } from '@/shared/utils/calculateAge';
 import { router } from 'expo-router';
 import React, { useRef, useState} from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, View, Animated, Dimensions, StyleSheet } from 'react-native';
-import { GENDER_OPTIONS } from '@/Config';
+import { GENDER_OPTIONS } from '@/shared/constants/Input';
 import { useRegister, useEmailVerification } from '@/features/auth/hooks/useRegister';
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import HiveBg from '@/components/common/HiveBg';

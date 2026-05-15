@@ -3,12 +3,12 @@ import DatePickerField from '@/components/ui/DatePickerField';
 import DropDownField from '@/components/ui/DropDownField';
 import PasswordField from '@/components/ui/PasswordField';
 import TextField from '@/components/ui/TextField';
-import { TText, TView, TIcon } from '@/components/ui/Themed';
+import { TText, TView } from '@/components/ui/Themed';
 import { calculateAge } from '@/shared/utils/calculateAge';
 import { router } from 'expo-router';
 import React, { useRef, useState} from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, View, Animated, Dimensions, StyleSheet } from 'react-native';
-import { GENDER_OPTIONS } from '@/Config';
+import { GENDER_OPTIONS } from '@/shared/constants/Input';
 import { useRegister, useEmailVerification } from '@/features/auth/hooks/useRegister';
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import HiveBg from '@/components/common/HiveBg';
@@ -172,145 +172,131 @@ export default function RegisterScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={{ flex: 1, width: '100%' }}
-    >
-      <BackButton type='floating'/>
-      <LangButton/>
-      <View>
-        <HiveBg/>
-        <Animated.View 
-          style={{
-            width: screenWidth * 2,
-            flexDirection: 'row',
-            transform: [{ translateX: slideAnim }]
-          }}
-        >
-          <View style={{ height: screenHeight }}>
-            <ScrollView
-              ref={scrollRef}
-              style={{ width: screenWidth, padding: 16, zIndex: 2 }}
-              contentContainerStyle={{ paddingBottom: 30 }}
-              keyboardShouldPersistTaps="handled"
-            >
-              <View style={styles.headerContainer}>
-                <TText type="title">
-                  Join our Community!
-                </TText>
-                <TText>
-                  Only 13 years old and above are allowed to register
-                </TText>
-              </View>
+    <TView style={{flex: 1}}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1, width: '100%' }}
+      >
+        <BackButton type='floating'/>
+        <LangButton/>
+        <View>
+          <HiveBg/>
+          <Animated.View 
+            style={{
+              width: screenWidth * 2,
+              flexDirection: 'row',
+              transform: [{ translateX: slideAnim }]
+            }}
+          >
+            <View style={{ height: screenHeight }}>
+              <ScrollView
+                ref={scrollRef}
+                style={{ width: screenWidth, padding: 16, zIndex: 2 }}
+                contentContainerStyle={{ paddingBottom: 30 }}
+                keyboardShouldPersistTaps="handled"
+              >
+                <View style={styles.headerContainer}>
+                  <TText type="title">Join our Community!</TText>
+                  <TText>Only 13 years old and above are allowed to register</TText>
+                </View>
 
-              <TextField
-                placeholder="First Name"
-                value={fname}
-                onChangeText={setFname}
-                autoCapitalize="words"
-              />
+                <TextField
+                  placeholder="First Name"
+                  value={fname}
+                  onChangeText={setFname}
+                  autoCapitalize="words"
+                />
 
-              <TextField
-                placeholder="Last Name (optional)"
-                value={lname}
-                onChangeText={setLname}
-                autoCapitalize="words"
-              />
+                <TextField
+                  placeholder="Last Name (optional)"
+                  value={lname}
+                  onChangeText={setLname}
+                  autoCapitalize="words"
+                />
 
-              <DatePickerField
-                placeholder="Birthdate"
-                value={bdate}
-                onChange={setBdate}
-                maximumDate={new Date()}
-              />
+                <DatePickerField
+                  placeholder="Birthdate"
+                  value={bdate}
+                  onChange={setBdate}
+                  maximumDate={new Date()}
+                />
 
-              <DropDownField
-                placeholder="Gender"
-                value={gender}
-                onValueChange={setGender}
-                values={GENDER_OPTIONS}
-              />
+                <DropDownField
+                  placeholder="Gender"
+                  value={gender}
+                  onValueChange={setGender}
+                  values={GENDER_OPTIONS}
+                />
 
-              <TextField
-                placeholder="Email"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
+                <TextField
+                  placeholder="Email"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
 
-              <PasswordField
-                placeholder="Password"
-                value={password}
-                onChangeText={setPassword}
-              />
+                <PasswordField
+                  placeholder="Password"
+                  value={password}
+                  onChangeText={setPassword}
+                />
 
-              <PasswordField
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-              />
+                <PasswordField
+                  placeholder="Confirm Password"
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                />
 
-              <PasswordValidationCard password={password} confirmPassword={confirmPassword} withConfirmation/>
+                <PasswordValidationCard password={password} confirmPassword={confirmPassword} withConfirmation/>
 
-              <TouchableOpacity onPress={() => []}>
-                <TText style={styles.termsText}>
-                  By creating an account, you agree to our Terms of Service and Privacy Policy.
-                </TText>
-              </TouchableOpacity>
+                <TouchableOpacity onPress={() => []}>
+                  <TText style={styles.termsText}>By creating an account, you agree to our Terms of Service and Privacy Policy.</TText>
+                </TouchableOpacity>
+
+                <Button
+                  title={verificationLoading ? 'Sending Code...' : 'Create Account'}
+                  onPress={handleNext}
+                  type="primary"
+                  disabled={verificationLoading}
+                  buttonStyle={{marginTop: 16}}
+                />
+              </ScrollView>
+            </View>
+
+            {/* Second Page */}
+            <View style={{ height: screenHeight }}>
+              <ScrollView
+                style={{ width: screenWidth, padding: 16, zIndex: 2 }}
+                contentContainerStyle={{ paddingBottom: 30 }}
+                keyboardShouldPersistTaps="handled"
+              >
+                <View style={styles.headerContainer}>
+                  <TText type="title">Verify Your Email</TText>
+                  <TText>A verification code has been sent to {email}. Please enter it to continue.</TText>
+                </View>
+
+                <TextField
+                  placeholder="Enter verification code"
+                  value={verificationCode}
+                  onChangeText={setVerificationCode}
+                  autoCapitalize="none"
+                  keyboardType="default"
+                />
+              </ScrollView>
 
               <Button
-                title={verificationLoading ? 'Sending Code...' : 'Create Account'}
-                onPress={handleNext}
+                title={registerLoading ? 'Creating...' : 'Complete Registration'}
+                onPress={handleRegister}
                 type="primary"
-                disabled={verificationLoading}
-                buttonStyle={{marginTop: 16}}
+                disabled={!verificationCode || verificationLoading || registerLoading}
+                buttonStyle={styles.completeButton}
               />
-              
-            </ScrollView>
-          </View>
-
-
-          {/* Second Page */}
-          <View style={{ height: screenHeight }}>
-            <ScrollView
-              style={{ width: screenWidth, padding: 16, zIndex: 2 }}
-              contentContainerStyle={{ paddingBottom: 30 }}
-              keyboardShouldPersistTaps="handled"
-            >
-              <View style={styles.headerContainer}>
-                <TText type="title">
-                  Verify Your Email
-                </TText>
-                <TText>
-                  A verification code has been sent to {email}. Please enter it to continue.
-                </TText>
-              </View>
-
-              <TextField
-                placeholder="Enter verification code"
-                value={verificationCode}
-                onChangeText={setVerificationCode}
-                autoCapitalize="none"
-                keyboardType="default"
-              />
-
-              
-            </ScrollView>
-
-            <Button
-              title={registerLoading ? 'Creating...' : 'Complete Registration'}
-              onPress={handleRegister}
-              type="primary"
-              disabled={!verificationCode || verificationLoading || registerLoading}
-              buttonStyle={styles.completeButton}
-            />
-          </View>
-          
-        </Animated.View>
-        
-      </View>
-    </KeyboardAvoidingView>
+            </View>
+          </Animated.View>
+        </View>
+      </KeyboardAvoidingView>
+    </TView>
   );
 }
 

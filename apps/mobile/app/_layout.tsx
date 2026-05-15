@@ -11,6 +11,7 @@ import { toastConfig } from "@/components/ui/Toast";
 import Toast from "react-native-toast-message";
 import { LanguageProvider } from '@/shared/context/LanguageContext';
 import { TView } from '@/components/ui/Themed';
+import HiveBg from '@/components/common/HiveBg';
 
 
 SplashScreen.preventAutoHideAsync();

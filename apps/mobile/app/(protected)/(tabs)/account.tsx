@@ -10,9 +10,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useInternetConnection } from '@/shared/utils/checkInternetConnection';
 import ProfileImage from '@/components/ui/ProfileImage';
 import { useQueryClient } from '@tanstack/react-query'
-import HiveBg from '@/components/common/HiveBg';
 import ProCard from '@/components/cards/ProCard';
 import { useLanguage } from '@/shared/context/LanguageContext';
+import HiveBg from '@/components/common/HiveBg';
 
 export default function AccountScreen() {
   const { session, clearSession } = useSession();
@@ -73,13 +73,9 @@ export default function AccountScreen() {
   };
 
   return (
-    <TView style={{ flex: 1 }}>
+    <TView style={{flex: 1}}>
       <HiveBg />
-      <ScrollView
-        style={{ width: '100%', zIndex: 1000}}
-        contentContainerStyle={styles.container}
-        showsVerticalScrollIndicator={true}
-      >
+      <ScrollView contentContainerStyle={{padding: 16}} showsVerticalScrollIndicator={true}>
         <TView shadow color='primary' style={styles.header}>
           <TouchableOpacity
             style={styles.profileButton}
@@ -106,141 +102,97 @@ export default function AccountScreen() {
           </TouchableOpacity>
         </TView>
         
-        <ProCard/>
+        { isConnected && <ProCard/> }
 
         <View style={styles.options}>
           <TText style={styles.optionsTitle}>{t('account.personalization_title')}</TText>
           
           { isConnected && 
-            <TouchableOpacity
-              onPress={() => router.push('/settings/edit-profile')}
-              style={styles.optionsChild}>
+            <TouchableOpacity onPress={() => router.push('/settings/edit-profile')} style={styles.optionsChild}>
               <TIcon name='pen' size={15} />
               <TText>{t('account.edit_profile_button')}</TText>
             </TouchableOpacity>
           }
             
-          <TouchableOpacity
-            onPress={() => router.push('/settings/theme')}
-            style={styles.optionsChild}>
+          <TouchableOpacity onPress={() => router.push('/settings/theme')} style={styles.optionsChild}>
             <TIcon name='palette' size={15} />
             <TText>{t('account.theme_button')}</TText>
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => router.push('/settings/language')}
-            style={styles.optionsChild}>
+          <TouchableOpacity onPress={() => router.push('/settings/language')} style={styles.optionsChild}>
             <TIcon name='translate' size={15} />
             <TText>{t('account.language_button')}</TText>
           </TouchableOpacity>
           
           { isConnected && <>
-              <TText style={styles.optionsTitle}>{t('account.privacy_title')}</TText>
+            <TText style={styles.optionsTitle}>{t('account.privacy_title')}</TText>
 
-              <TouchableOpacity
-                onPress={() => router.push('/change-password')}
-                style={styles.optionsChild}>
-                <TIcon name='key' size={15} />
-                <TText>{t('account.change_password_button')}</TText>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => router.push('/settings/visibility')}
-                style={styles.optionsChild}>
-                <TIcon name='eye' size={15} />
-                <TText>{t('account.visibility_button')}</TText>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => router.push('/settings/request-logs')}
-                style={styles.optionsChild}>
-                <TIcon name='key' size={15} />
-                <TText>{t('account.logs_button')}</TText>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={handleWebView('', "Privacy Policy")}
-                style={styles.optionsChild}>
-                <TIcon name='file-eye' size={15} />
-                <TText>{t('account.privacy_button')}</TText>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={handleWebView('', "Terms and Conditions")}
-                style={styles.optionsChild}>
-                <TIcon name='file-alert' size={15} />
-                <TText>{t('account.terms_button')}</TText>
-              </TouchableOpacity>
-            </>
-          }
-          
+            <TouchableOpacity onPress={() => router.push('/change-password')} style={styles.optionsChild}>
+              <TIcon name='key' size={15} />
+              <TText>{t('account.change_password_button')}</TText>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push('/settings/visibility')} style={styles.optionsChild}>
+              <TIcon name='eye' size={15} />
+              <TText>{t('account.visibility_button')}</TText>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push('/settings/request-logs')} style={styles.optionsChild}>
+              <TIcon name='key' size={15} />
+              <TText>{t('account.logs_button')}</TText>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleWebView('', "Privacy Policy")} style={styles.optionsChild}>
+              <TIcon name='file-eye' size={15} />
+              <TText>{t('account.privacy_button')}</TText>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleWebView('', "Terms and Conditions")} style={styles.optionsChild}>
+              <TIcon name='file-alert' size={15} />
+              <TText>{t('account.terms_button')}</TText>
+            </TouchableOpacity>
 
-          <TText style={styles.optionsTitle}>
-            {t('account.help_title')}
-          </TText>
+            <TText style={styles.optionsTitle}>{t('account.help_title')}</TText>
 
-          { isConnected && <>
-            <TouchableOpacity onPress={handleWebView(SUPPORT_FORM_URL, "App Manual")}
-              style={styles.optionsChild}>
+            <TouchableOpacity onPress={handleWebView(SUPPORT_FORM_URL, "App Manual")} style={styles.optionsChild}>
               <TIcon name='file-find' size={15} />
               <TText>{t('account.manual_button')}</TText>
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleWebView(SUPPORT_FORM_URL, "Contact Support")}
-              style={styles.optionsChild}>
+            <TouchableOpacity onPress={handleWebView(SUPPORT_FORM_URL, "Contact Support")} style={styles.optionsChild}>
               <TIcon name='headset' size={15} />
               <TText>{t('account.support_button')}</TText>
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleWebView('', "About Tarahive")}
-              style={styles.optionsChild}>
+            <TouchableOpacity onPress={handleWebView('', "About Tarahive")} style={styles.optionsChild}>
               <TIcon name='file-find' size={15} />
               <TText>{t('account.about_button')}</TText>
             </TouchableOpacity>
-          </>}
 
-          
-          
-          
-          <Pressable 
-            onLongPress={() => {
-              const timer = setTimeout(() => {
-                setDevMode(!devMode);
-                Alert.alert(
-                  'Developer Mode', 
-                  devMode ? 'Developer mode disabled' : 'Developer mode enabled!'
-                );
-              }, 3000);
-              
-              return () => clearTimeout(timer);
-            }}
-            style={({ pressed }) => [
-              styles.optionsChild,
-              pressed && { opacity: 0.6 }
-            ]}
-            delayLongPress={100}
-          >
-            <TIcon name='diversify' size={15} />
-            <TText>Tarahive v1.0 {devMode ? ' (Dev Mode)' : ''}</TText>
-          </Pressable>
+            <Pressable 
+              onLongPress={() => {
+                const timer = setTimeout(() => setDevMode(!devMode), 3000);
+                return () => clearTimeout(timer);
+              }}
+              style={({ pressed }) => [
+                styles.optionsChild,
+                pressed && { opacity: 0.6 }
+              ]}
+              delayLongPress={100}
+            >
+              <TIcon name='diversify' size={15} />
+              <TText>Tarahive v1.0 {devMode ? ' (Dev Mode)' : ''}</TText>
+            </Pressable>
 
-          {devMode && (
-            <>
-              <TText style={styles.optionsTitle}>
-                Developer Tools
-              </TText>
-              <TouchableOpacity 
-                onPress={handleClearCache} 
-                style={styles.optionsChild}
-              >
-                <TIcon 
-                  name='layers-remove' 
-                  size={15} 
-                />
-                <TText>Clear Cache</TText>
+            {devMode && <>
+              <TText style={styles.optionsTitle}> {t('account.developer_title')} </TText>
+              <TouchableOpacity onPress={handleClearCache} style={styles.optionsChild}>
+                <TIcon name='layers-remove' size={15} />
+                <TText>{t('account.cache_button')}</TText>
               </TouchableOpacity>
-            </>
-          )}
+            </>}
+          </>}
         </View>
-        {/* Logout Button */}
+
         <Button
           title={t('account.logout_button')}
           onPress={handleLogout}
           type='primary'
           buttonStyle={styles.logoutButton}
         />
-
       </ScrollView>
     </TView>
   );
@@ -256,11 +208,6 @@ const styles = StyleSheet.create({
     marginVertical: 16,
     padding: 10,
     borderRadius: 15,
-  },
-  container: {
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    paddingHorizontal: 16,
   },
   profileButton: {
     flexDirection: 'row',

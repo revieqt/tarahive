@@ -29,7 +29,7 @@ export default function ProCard() {
         </View>
 
         <View>
-          <TText type='subtitle' style={{color: secondaryColor}}> Be a Certified Traveller </TText>
+          <TText type='subtitle' style={{color: secondaryColor, marginLeft:-6}}> Be a Certified Traveller </TText>
           <TText style={{ opacity: 0.7 }}>
             Upgrade to Pro Now!
           </TText>

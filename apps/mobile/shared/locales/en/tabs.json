@@ -20,6 +20,8 @@
     "manual_button": "User Manual",
     "support_button": "Contact Support",
     "about_button": "About the App",
+    "developer_title": "Developer Options",
+    "cache_button": "Clear Cache",
     "logout_button": "Logout"
   }
 }

@@ -92,27 +92,12 @@ export function TText({
     { light: lightColor, dark: darkColor },
     "text"
   );
-  const errorColor = useThemeColor(
-    { light: lightColor, dark: darkColor },
-    "error"
-  );
-  const warningColor = useThemeColor(
-    { light: lightColor, dark: darkColor },
-    "warning"
-  );
-  const successColor = useThemeColor(
-    { light: lightColor, dark: darkColor },
-    "success"
-  );
 
   return (
     <Text
       style={[
         { color },
         type === "default" && {fontFamily: "Inter",fontSize: 13,fontWeight: "500",},
-        type === "error" && {fontFamily: "Inter",fontSize: 13,fontWeight: "500", color: errorColor},
-        type === "warning" && {fontFamily: "Inter",fontSize: 13,fontWeight: "500", color: warningColor},
-        type === "success" && {fontFamily: "Inter",fontSize: 13,fontWeight: "500", color: successColor},
         type === "title" && {fontFamily: "Baloo",fontSize: 24,lineHeight: 38},
         type === "subtitle" && {fontFamily: "Inter",fontSize: 14,fontWeight: "600", letterSpacing: 3, textTransform: "uppercase"},
         style,

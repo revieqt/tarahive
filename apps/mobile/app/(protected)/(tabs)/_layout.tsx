@@ -59,11 +59,7 @@ export default function TabLayout() {
         options={{
           title: t('tabs.home_button'),
           tabBarIcon: ({ color, focused }) => (
-            <TIcon
-              name={focused ? 'home' : 'home-outline'}
-              size={22}
-              color={color}
-            />
+            <TIcon name={focused ? 'home' : 'home-outline'} size={22} color={color}/>
           ),
         }}
       />
@@ -72,11 +68,7 @@ export default function TabLayout() {
         options={{
           title: t('tabs.maps_button'),
           tabBarIcon: ({ color, focused }) => (
-            <TIcon
-              name={focused ? 'map' : 'map-outline'}
-              size={20}
-              color={color}
-            />
+            <TIcon name={focused ? 'map' : 'map-outline'} size={20} color={color}/>
           ),
         }}
       />
@@ -85,11 +77,7 @@ export default function TabLayout() {
         options={{
           title: t('tabs.explore_button'),
           tabBarIcon: ({ color, focused }) => (
-            <TIcon
-              name={focused ? 'compass' : 'compass-outline'}
-              size={20}
-              color={color}
-            />
+            <TIcon name={focused ? 'compass' : 'compass-outline'} size={20} color={color}/>
           ),
         }}
       />
@@ -98,11 +86,7 @@ export default function TabLayout() {
         options={{
           title: t('tabs.account_button'),
           tabBarIcon: ({ color, focused }) => (
-            <TIcon
-              name={focused ? 'account' : 'account-outline'}
-              size={22}
-              color={color}
-            />
+            <TIcon name={focused ? 'account' : 'account-outline'} size={22} color={color}/>
           ),
         }}
       />
