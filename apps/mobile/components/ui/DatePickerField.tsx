@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     paddingLeft: 16,
     paddingRight: 16,
     borderRadius: 15,
-    marginBottom: 15,
+    marginBottom: 8,
     borderWidth: 1,
     position: 'relative',
     minHeight: 48,

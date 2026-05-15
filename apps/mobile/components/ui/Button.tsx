@@ -30,7 +30,7 @@ const Button: React.FC<ButtonProps> = ({
   const isPrimary = type === 'primary';
 
   const buttonContent = isPrimary ? (
-    <TText style={[styles.primaryText, textStyle]} type='subtitle'>
+    <TText style={[styles.primaryText, textStyle]}>
       {loading ? <ActivityIndicator size="small" color="#fff" /> : title}
     </TText>
   ) : (
@@ -72,7 +72,7 @@ const Button: React.FC<ButtonProps> = ({
       disabled={disabled || loading}
     >
       {isPrimary ? (
-        <TText style={[styles.primaryText, textStyle]} type='subtitle'>
+        <TText style={[styles.primaryText, textStyle]}>
           {loading ? <ActivityIndicator size="small" color="#fff" /> : title}
         </TText>
       ) : (
@@ -98,14 +98,18 @@ const styles = StyleSheet.create({
     zIndex: 100,
   },
   outlineText: {
-    opacity: 0.8,
+    opacity: 0.7,
     fontSize: 14,
     textAlign: 'center',
+    fontFamily: 'Baloo',
+    letterSpacing: 1,
   },
   primaryText: {
     color: '#fff',
     fontSize: 14,
     textAlign: 'center',
+    fontFamily: 'Baloo',
+    letterSpacing: 1,
   },
 });
 

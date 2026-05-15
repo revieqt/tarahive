@@ -15,7 +15,6 @@ import HiveBg from '@/components/common/HiveBg';
 import BackButton from '@/components/common/BackButton';
 import LangButton from '@/components/common/LanguageButton';
 import { showError } from '@/shared/services/toast.service';
-import PasswordValidationCard from '@/components/cards/PasswordValidationCard';
 
 export default function RegisterScreen() {
   const [fname, setFname] = useState('');
@@ -196,7 +195,7 @@ export default function RegisterScreen() {
             >
               <View style={styles.headerContainer}>
                 <TText type="title">
-                  Join our Community!
+                  Forgot Your Password?
                 </TText>
                 <TText>
                   Only 13 years old and above are allowed to register
@@ -204,70 +203,33 @@ export default function RegisterScreen() {
               </View>
 
               <TextField
-                placeholder="First Name"
-                value={fname}
-                onChangeText={setFname}
-                autoCapitalize="words"
-              />
-
-              <TextField
-                placeholder="Last Name (optional)"
-                value={lname}
-                onChangeText={setLname}
-                autoCapitalize="words"
-              />
-
-              <DatePickerField
-                placeholder="Birthdate"
-                value={bdate}
-                onChange={setBdate}
-                maximumDate={new Date()}
-              />
-
-              <DropDownField
-                placeholder="Gender"
-                value={gender}
-                onValueChange={setGender}
-                values={GENDER_OPTIONS}
-              />
-
-              <TextField
                 placeholder="Email"
                 value={email}
                 onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
+                keyboardType='email-address'
+                autoCapitalize='none'
               />
 
-              <PasswordField
-                placeholder="Password"
-                value={password}
-                onChangeText={setPassword}
+              
+              
+            </ScrollView>
+
+            <View style={styles.completeButton}>
+              <Button
+                title='Resend Code'
+                onPress={handleNext}
+                disabled={verificationLoading}
               />
-
-              <PasswordField
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-              />
-
-              <PasswordValidationCard password={password} confirmPassword={confirmPassword} withConfirmation/>
-
-              <TouchableOpacity onPress={() => []}>
-                <TText style={styles.termsText}>
-                  By creating an account, you agree to our Terms of Service and Privacy Policy.
-                </TText>
-              </TouchableOpacity>
 
               <Button
                 title={verificationLoading ? 'Sending Code...' : 'Create Account'}
                 onPress={handleNext}
                 type="primary"
                 disabled={verificationLoading}
-                buttonStyle={{marginTop: 16}}
               />
-              
-            </ScrollView>
+            </View>
+
+            
           </View>
 
 
@@ -320,16 +282,11 @@ const styles = StyleSheet.create({
     bottom: 16,
     right: 16,
     left: 16,
-    zIndex: 100
+    zIndex: 100,
+    gap: 8
   },
   headerContainer: {
     marginTop: 40,
     marginBottom: 20
   },
-  termsText: {
-    textDecorationLine: 'underline',
-    textAlign: 'center',
-    marginTop: 16,
-    opacity: 0.7
-  }
 });

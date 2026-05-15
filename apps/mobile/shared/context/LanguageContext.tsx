@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system/legacy';
 import { LANGUAGES, LanguageItem } from '../constants/Languages';
+import { BACKEND_URL } from '@/Config';
 
 // Type definitions
 export interface LanguageData {
@@ -22,8 +23,6 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 // Storage keys
 const LANGUAGE_PREFERENCE_KEY = '@tarahive_language_preference';
 
-// Backend API configuration
-const BACKEND_URL = 'http://192.168.68.104:5000';
 const LOCALIZATION_ENDPOINT = '/v1/localization';
 
 // File system paths
@@ -35,10 +34,14 @@ const DEFAULT_LANGUAGE_CODE = 'en';
 // Import default language data (English)
 import * as enCommon from '../locales/en/common.json';
 import * as enAuth from '../locales/en/auth.json';
+import * as enTabs from '../locales/en/tabs.json';
+import * as enSettings from '../locales/en/settings.json';
 
 const DEFAULT_LANGUAGE_DATA: LanguageData = {
   ...enCommon,
   ...enAuth,
+  ...enTabs,
+  ...enSettings,
 };
 
 /**

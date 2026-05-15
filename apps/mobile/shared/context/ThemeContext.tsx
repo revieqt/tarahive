@@ -22,6 +22,19 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+export const getThemeInfo = (themeType: string) => {
+  switch (themeType) {
+    case THEME_TYPES.DEVICE:
+      return { icon: 'cellphone', name: 'Device Theme' };
+    case THEME_TYPES.LIGHT:
+      return { icon: 'white-balance-sunny', name: 'Light Mode' };
+    case THEME_TYPES.DARK:
+      return { icon: 'moon-waning-crescent', name: 'Dark Mode' };
+    default:
+      return { icon: 'palette', name: 'Theme' };
+  }
+};
+
 export const useTheme = (): ThemeContextType => {
   const context = useContext(ThemeContext);
   if (!context) {

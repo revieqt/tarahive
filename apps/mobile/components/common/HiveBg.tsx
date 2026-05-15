@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Svg, { G, Path } from 'react-native-svg';
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
+import { LinearGradient } from 'expo-linear-gradient';
 
 function flatHexPath(cx: number, cy: number, r: number): string {
   const pts: string[] = [];
@@ -55,6 +56,7 @@ function cellCenter(col: number, row: number): { cx: number; cy: number } {
 
 const HiveBg: React.FC = () => {
   const HEX_COLOR = useThemeColor({}, 'accent');
+  const primaryColor = useThemeColor({}, 'primary');
   return (
     <View style={styles.container} pointerEvents="none">
       <Svg
@@ -77,6 +79,11 @@ const HiveBg: React.FC = () => {
           })}
         </G>
       </Svg>
+
+      <LinearGradient
+        colors={['transparent', primaryColor]}
+        style={styles.gradient}
+      />
     </View>
   );
 };
@@ -91,7 +98,13 @@ const styles = StyleSheet.create({
   svg: {
     marginRight: '-15%',
     marginBottom: '-20%',
-
+  },
+  gradient: {
+    position: 'absolute',
+    height: 50,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
 });
 

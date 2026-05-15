@@ -3,6 +3,7 @@ import React from 'react';
 import { Platform, Text } from 'react-native';
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import {TIcon} from '@/components/ui/Themed';
+import { useLanguage } from '@/shared/context/LanguageContext';
 
 function TabBarLabel({ children, color }: { children: React.ReactNode; color: string }) {
   return (
@@ -23,7 +24,7 @@ function TabBarLabel({ children, color }: { children: React.ReactNode; color: st
 export default function TabLayout() {
   const primaryColor = useThemeColor({}, 'primary');
   const secondaryColor = useThemeColor({}, 'accent');
-
+  const { t } = useLanguage();
   return (
     <Tabs
       screenOptions={{
@@ -56,7 +57,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          title: 'Home',
+          title: t('tabs.home_button'),
           tabBarIcon: ({ color, focused }) => (
             <TIcon
               name={focused ? 'home' : 'home-outline'}
@@ -69,7 +70,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="maps"
         options={{
-          title: 'Maps',
+          title: t('tabs.maps_button'),
           tabBarIcon: ({ color, focused }) => (
             <TIcon
               name={focused ? 'map' : 'map-outline'}
@@ -82,7 +83,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Explore',
+          title: t('tabs.explore_button'),
           tabBarIcon: ({ color, focused }) => (
             <TIcon
               name={focused ? 'compass' : 'compass-outline'}
@@ -95,7 +96,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="account"
         options={{
-          title: 'Account',
+          title: t('tabs.account_button'),
           tabBarIcon: ({ color, focused }) => (
             <TIcon
               name={focused ? 'account' : 'account-outline'}

@@ -1,12 +1,14 @@
 import { Link, Stack } from 'expo-router';
 import { StyleSheet, } from 'react-native';
 import { TIcon, TText, TView } from '@/components/ui/Themed';
+import HiveBg from '@/components/common/HiveBg';
 
 export default function NotFoundScreen() {
   return (
     <>
       <Stack.Screen options={{ title: 'Oops!' }} />
       <TView style={styles.container}>
+        <HiveBg />
         <TIcon name="emoticon-sad" size={50}/>
         <TText type="title">This screen doesn't exist.</TText>
         <Link href="/">

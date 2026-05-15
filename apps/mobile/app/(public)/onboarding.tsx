@@ -30,7 +30,7 @@ function SlideItem({ item, index, translateFn }: SlideItemProps) {
 
       <View style={styles.textBlock}>
         <TText type='title' style={styles.title}>{translateFn(item.titleKey)}</TText>
-        <TText style={styles.subtitle}>{translateFn(item.subtitleKey)}</TText>
+        <TText style={styles.subtitle} type='subtitle'>{translateFn(item.subtitleKey)}</TText>
         <TText style={styles.description}>
           {translateFn(item.descriptionKey)}
         </TText>
@@ -149,10 +149,6 @@ const styles = StyleSheet.create({
     fontSize: 30,
   },
   subtitle: {
-    fontSize: 13,
-    fontWeight: "600",
-    letterSpacing: 3,
-    textTransform: "uppercase",
     marginBottom: 25,
   },
   description: {

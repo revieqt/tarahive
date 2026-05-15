@@ -114,7 +114,7 @@ export function TText({
         type === "warning" && {fontFamily: "Inter",fontSize: 13,fontWeight: "500", color: warningColor},
         type === "success" && {fontFamily: "Inter",fontSize: 13,fontWeight: "500", color: successColor},
         type === "title" && {fontFamily: "Baloo",fontSize: 24,lineHeight: 38},
-        type === "subtitle" && {fontFamily: "Baloo",fontSize: 16,},
+        type === "subtitle" && {fontFamily: "Inter",fontSize: 14,fontWeight: "600", letterSpacing: 3, textTransform: "uppercase"},
         style,
       ]}
       {...props}

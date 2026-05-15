@@ -1,0 +1,25 @@
+{
+  "tabs": {
+    "home_button": "Home",
+    "maps_button": "Maps",
+    "explore_button": "Explore",
+    "account_button": "Account"
+  },
+  "account": {
+    "personalization_title": "Personalization",
+    "edit_profile_button": "Edit Profile",
+    "theme_button": "App Theme",
+    "language_button": "App Language",
+    "privacy_title": "Privacy",
+    "change_password_button": "Change Password",
+    "visibility_button": "Visibility Settings",
+    "logs_button": "Activity Logs",
+    "privacy_button": "Privacy Policy",
+    "terms_button": "Terms and Conditions",
+    "help_title": "Help and Support",
+    "manual_button": "User Manual",
+    "support_button": "Contact Support",
+    "about_button": "About the App",
+    "logout_button": "Logout"
+  }
+}

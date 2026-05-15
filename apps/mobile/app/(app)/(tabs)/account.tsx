@@ -7,21 +7,20 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import { useInternetConnection } from '@/shared/utils/checkInternetConnection';
 import ProfileImage from '@/components/ui/ProfileImage';
 import { useQueryClient } from '@tanstack/react-query'
 import HiveBg from '@/components/common/HiveBg';
 import ProCard from '@/components/cards/ProCard';
+import { useLanguage } from '@/shared/context/LanguageContext';
 
 export default function AccountScreen() {
   const { session, clearSession } = useSession();
   const user = session?.user;
-  const primaryColor = useThemeColor({}, 'primary');
   const queryClient = useQueryClient();
   const [devMode, setDevMode] = useState(false);
   const isConnected = useInternetConnection();
+  const { t } = useLanguage();
 
   const handleClearCache = async () => {
     Alert.alert(
@@ -67,7 +66,7 @@ export default function AccountScreen() {
     try {
       await queryClient.clear();
       await clearSession();
-      router.replace('/auth/login');
+      router.replace('/login');
     } catch (err) {
       Alert.alert('Logout Failed', 'An error occurred while logging out.');
     }
@@ -110,71 +109,88 @@ export default function AccountScreen() {
         <ProCard/>
 
         <View style={styles.options}>
-          <TText style={styles.optionsTitle}>Personalization</TText>
-
+          <TText style={styles.optionsTitle}>{t('account.personalization_title')}</TText>
+          
+          { isConnected && 
             <TouchableOpacity
               onPress={() => router.push('/settings/edit-profile')}
               style={styles.optionsChild}>
               <TIcon name='pen' size={15} />
-              <TText>Edit Profile</TText>
+              <TText>{t('account.edit_profile_button')}</TText>
             </TouchableOpacity>
+          }
+            
           <TouchableOpacity
             onPress={() => router.push('/settings/theme')}
             style={styles.optionsChild}>
             <TIcon name='palette' size={15} />
-            <TText>App Theme</TText>
+            <TText>{t('account.theme_button')}</TText>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => router.push('/settings/language')}
             style={styles.optionsChild}>
             <TIcon name='translate' size={15} />
-            <TText>App Language</TText>
+            <TText>{t('account.language_button')}</TText>
           </TouchableOpacity>
           
           { isConnected && <>
-              <TText style={styles.optionsTitle}>Privacy and Legal</TText>
+              <TText style={styles.optionsTitle}>{t('account.privacy_title')}</TText>
 
+              <TouchableOpacity
+                onPress={() => router.push('/change-password')}
+                style={styles.optionsChild}>
+                <TIcon name='key' size={15} />
+                <TText>{t('account.change_password_button')}</TText>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => router.push('/settings/visibility')}
+                style={styles.optionsChild}>
+                <TIcon name='eye' size={15} />
+                <TText>{t('account.visibility_button')}</TText>
+              </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => router.push('/settings/request-logs')}
                 style={styles.optionsChild}>
                 <TIcon name='key' size={15} />
-                <TText>Request Activity Logs</TText>
+                <TText>{t('account.logs_button')}</TText>
               </TouchableOpacity>
               <TouchableOpacity onPress={handleWebView('', "Privacy Policy")}
                 style={styles.optionsChild}>
                 <TIcon name='file-eye' size={15} />
-                <TText>Privacy Policy</TText>
+                <TText>{t('account.privacy_button')}</TText>
               </TouchableOpacity>
               <TouchableOpacity onPress={handleWebView('', "Terms and Conditions")}
                 style={styles.optionsChild}>
                 <TIcon name='file-alert' size={15} />
-                <TText>Terms and Conditions</TText>
+                <TText>{t('account.terms_button')}</TText>
               </TouchableOpacity>
             </>
           }
           
 
           <TText style={styles.optionsTitle}>
-            Help and Support
+            {t('account.help_title')}
           </TText>
-          <TouchableOpacity onPress={handleWebView(SUPPORT_FORM_URL, "App Manual")}
-            style={[styles.optionsChild, !isConnected && {opacity: 0.5}]}
-            disabled={!isConnected}>
-            <TIcon name='file-find' size={15} />
-            <TText>App Manual</TText>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleWebView(SUPPORT_FORM_URL, "Contact Support")}
-            style={[styles.optionsChild, !isConnected && {opacity: 0.5}]}
-            disabled={!isConnected}>
-            <TIcon name='headset' size={15} />
-            <TText>Contact Support</TText>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleWebView('', "About Tarahive")}
-            style={[styles.optionsChild, !isConnected && {opacity: 0.5}]}
-            disabled={!isConnected}>
-            <TIcon name='file-find' size={15} />
-            <TText>About Tarahive</TText>
-          </TouchableOpacity>
+
+          { isConnected && <>
+            <TouchableOpacity onPress={handleWebView(SUPPORT_FORM_URL, "App Manual")}
+              style={styles.optionsChild}>
+              <TIcon name='file-find' size={15} />
+              <TText>{t('account.manual_button')}</TText>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleWebView(SUPPORT_FORM_URL, "Contact Support")}
+              style={styles.optionsChild}>
+              <TIcon name='headset' size={15} />
+              <TText>{t('account.support_button')}</TText>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleWebView('', "About Tarahive")}
+              style={styles.optionsChild}>
+              <TIcon name='file-find' size={15} />
+              <TText>{t('account.about_button')}</TText>
+            </TouchableOpacity>
+          </>}
+
+          
           
           
           <Pressable 
@@ -219,17 +235,13 @@ export default function AccountScreen() {
         </View>
         {/* Logout Button */}
         <Button
-          title='Logout'
+          title={t('account.logout_button')}
           onPress={handleLogout}
           type='primary'
           buttonStyle={styles.logoutButton}
         />
 
       </ScrollView>
-      <LinearGradient
-        colors={['transparent', primaryColor]}
-        style={styles.gradient}
-      />
     </TView>
   );
 }
@@ -284,12 +296,5 @@ const styles = StyleSheet.create({
   logoutButton: {
     width: '100%',
     marginVertical: 20,
-  },
-  gradient: {
-    position: 'absolute',
-    height: 50,
-    left: 0,
-    right: 0,
-    bottom: 0,
   },
 });

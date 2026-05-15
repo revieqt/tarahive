@@ -2,59 +2,23 @@ import { TouchableOpacity } from "react-native";
 import { TIcon, TText, TView } from "@/components/ui/Themed";
 import { StyleSheet, Animated, Modal } from "react-native";
 import { useState } from "react";
-import { useTheme } from "@/shared/context/ThemeContext";
-import { useColorScheme, useThemeColor } from "@/shared/hooks/useThemeColor";
+import { useTheme, getThemeInfo } from "@/shared/context/ThemeContext";
+import { useThemeColor } from "@/shared/hooks/useThemeColor";
 import HiveBg from "@/components/common/HiveBg";
 import Header from "@/components/common/Header";
 
 export default function LanguageSettingsScreen() {
   const { theme: selectedTheme, setTheme, THEME_TYPES } = useTheme();
-  const deviceColorScheme = useColorScheme();
   const [showThemeModal, setShowThemeModal] = useState(false);
   const [transitioningTheme, setTransitioningTheme] = useState<string>('');
   const [modalAnimation] = useState(new Animated.Value(0));
   const [slideAnimation] = useState(new Animated.Value(300));
   const [iconAnimation] = useState(new Animated.Value(0));
   const [rotationAnimation] = useState(new Animated.Value(0));
-  const backgroundColor = useThemeColor({}, 'primary');
+  const primaryColor = useThemeColor({}, 'primary');
+  const backgroundColor = useThemeColor({}, 'background');
   const accentColor = useThemeColor({}, 'accent');
-  
-  const getThemeColors = (themeType: string) => {
-    switch (themeType) {
-      case THEME_TYPES.LIGHT:
-        return {
-          overlay: 'rgba(244,244,244,.95)',
-          icon: '#FFB74D',
-          contentBg: '#FFFFFF'
-        };
-      case THEME_TYPES.DARK:
-        return {
-          overlay: 'rgba(2,13,25,.95)',
-          icon: '#C0C0C0',
-          contentBg: '#001C30'
-        };
-      case THEME_TYPES.DEVICE:
-        if (deviceColorScheme === 'light') {
-          return {
-            overlay: 'rgba(244,244,244,.95)',
-            icon: '#FFB74D',
-            contentBg: '#FFFFFF'
-          };
-        } else {
-          return {
-            overlay: 'rgba(2,13,25,.95)',
-            icon: '#C0C0C0',
-            contentBg: '#001C30'
-          };
-        }
-      default:
-        return {
-          overlay: 'rgba(0, 0, 0, 0.9)',
-          icon: '#007AFF',
-          contentBg: '#1C1C1E'
-        };
-    }
-  };
+  const themeInfo = getThemeInfo(transitioningTheme);
 
   const handleThemeSelect = async (themeType: string) => {
     try {
@@ -116,22 +80,6 @@ export default function LanguageSettingsScreen() {
     }
   };
 
-  const getThemeInfo = (themeType: string) => {
-    switch (themeType) {
-      case THEME_TYPES.DEVICE:
-        return { icon: 'cellphone', name: 'Device Theme' };
-      case THEME_TYPES.LIGHT:
-        return { icon: 'white-balance-sunny', name: 'Light Mode' };
-      case THEME_TYPES.DARK:
-        return { icon: 'moon-waning-crescent', name: 'Dark Mode' };
-      default:
-        return { icon: 'palette', name: 'Theme' };
-    }
-  };
-
-  const themeInfo = getThemeInfo(transitioningTheme);
-  const themeColors = getThemeColors(transitioningTheme);
-
   return(
     <>
       <Modal
@@ -144,8 +92,7 @@ export default function LanguageSettingsScreen() {
           style={[
             styles.themeModalOverlay,
             {
-              backgroundColor: themeColors.overlay,
-              opacity: modalAnimation,
+              backgroundColor: backgroundColor + '99',
             }
           ]}
         >
@@ -177,18 +124,10 @@ export default function LanguageSettingsScreen() {
                 }]
               }}
             >
-              <TIcon 
-                name={themeInfo.icon} 
-                size={80} 
-                color={themeColors.icon} 
-              />
+              <TIcon name={themeInfo.icon} size={80} />
             </Animated.View>
-            <TText style={{ marginTop: 20 }}>
-              Switching to
-            </TText>
-            <TText type="title">
-              {themeInfo.name}
-            </TText>
+            <TText style={{ marginTop: 20 }}> Switching to </TText>
+            <TText type="title"> {themeInfo.name} </TText>
           </Animated.View>
         </Animated.View>
       </Modal>
@@ -198,7 +137,7 @@ export default function LanguageSettingsScreen() {
         <Header title="App Theme" subtitle="Use the theme you prefer for the app." />
         <TouchableOpacity 
             key="device" 
-            style={[styles.themeOption, { backgroundColor }]}
+            style={[styles.themeOption, { backgroundColor: primaryColor }]}
             onPress={() => handleThemeSelect(THEME_TYPES.DEVICE)}
           >
             <TIcon  name='cellphone' size={20} />
@@ -209,7 +148,7 @@ export default function LanguageSettingsScreen() {
           </TouchableOpacity>
           <TouchableOpacity 
             key="light" 
-            style={[styles.themeOption, { backgroundColor }]}
+            style={[styles.themeOption, { backgroundColor: primaryColor }]}
             onPress={() => handleThemeSelect(THEME_TYPES.LIGHT)}
           >
             <TIcon name='white-balance-sunny' size={20} />
@@ -220,7 +159,7 @@ export default function LanguageSettingsScreen() {
           </TouchableOpacity>
           <TouchableOpacity 
             key="dark" 
-            style={[styles.themeOption, { backgroundColor }]}
+            style={[styles.themeOption, { backgroundColor: primaryColor }]}
             onPress={() => handleThemeSelect(THEME_TYPES.DARK)}
           >
             <TIcon name='moon-waning-crescent' size={20} />
