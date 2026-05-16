@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { BACKEND_URL } from '@/Config';
 
-const API_URL = `${BACKEND_URL}/api/weather`;
+const API_URL = `${BACKEND_URL}/v1/weather`;
 
 export interface WeatherData {
   temperature: number | null;

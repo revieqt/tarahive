@@ -5,13 +5,6 @@ import { useLocation } from '@/shared/context/DeviceContext';
 import { useCurrentWeather } from '@/shared/hooks/useWeather';
 import Skeleton from '@/shared/components/ui/Skeleton';
 
-interface WeatherCardProps {
-  city?: string;
-  latitude?: number;
-  longitude?: number;
-  date?: string;
-}
-
 const getWeatherImage = (weatherCode: number): any => {
   if (weatherCode === 0) {
     return require('@/shared/assets/images/weather-sunny-min.png');
@@ -31,7 +24,7 @@ const getWeatherImage = (weatherCode: number): any => {
   return require('@/shared/assets/images/weather-sunny-min.png');
 };
 
-export default function WeatherCard({ latitude, longitude, date, city }: WeatherCardProps) {
+export default function WeatherCard() {
   const locationData = useLocation();
 
   const displayCity = locationData.city || locationData.suburb || locationData.region || locationData.state || 'Your Location';
@@ -43,9 +36,9 @@ export default function WeatherCard({ latitude, longitude, date, city }: Weather
 
   const showLoading = isLoading || (locationData.loading && !displayWeather);
 
-  // if (showLoading) {
+  if (showLoading) {
     return (
-      <TView color='primary' style={[styles.locationContent, { height: 193 }]}>
+      <TView color='primary' style={[styles.locationContent, { height: 185 }]}>
         <Skeleton style={styles.descLoading}/>
         <Skeleton style={styles.locationLoading}/>
         <Skeleton style={styles.weatherTypeLoading}/>
@@ -74,77 +67,77 @@ export default function WeatherCard({ latitude, longitude, date, city }: Weather
         </View>
       </TView>
     );
-  // }
+  }
 
-  // return (
-  //   <TView color='primary' style={styles.locationContent}>
-  //     <View>
-  //       <TText style={{ opacity: 0.5, fontSize: 12 }}>
-  //         You're currently at
-  //       </TText>
-  //       <TText type='subtitle' style={{ fontSize: 16 }}>
-  //         {displayCity}
-  //       </TText>
+  return (
+    <TView color='primary' style={styles.locationContent}>
+      <View style={{ gap: 3}}>
+        <TText style={{ opacity: 0.5, fontSize: 12 }}>
+          You're currently at
+        </TText>
+        <TText type='subtitle' style={{ fontSize: 16 }}>
+          {displayCity}
+        </TText>
         
-  //       <TText style={{ opacity: 0.5, fontSize: 12 }}>
-  //         {displayWeather?.weatherType || 'No data'}
-  //       </TText>
+        <TText style={{ opacity: 0.5, fontSize: 12 }}>
+          {displayWeather?.weatherType || 'No data'}
+        </TText>
 
-  //       {displayWeather && (
-  //         <Image
-  //           source={getWeatherImage(displayWeather.weatherCode)}
-  //           style={styles.weatherImage}
-  //           resizeMode="contain"
-  //         />
-  //       )}
+        {displayWeather && (
+          <Image
+            source={getWeatherImage(displayWeather.weatherCode)}
+            style={styles.weatherImage}
+            resizeMode="contain"
+          />
+        )}
         
-  //       <View style={styles.weatherDetailsContainer}>
-  //         <View style={styles.weather}>
-  //           <TIcon name='thermometer' size={20} color='#B36B6B' />
-  //           <TText style={{ marginTop: 5 }}>
-  //             {displayWeather?.temperature !== null && displayWeather?.temperature !== undefined
-  //               ? `${Math.round(displayWeather.temperature)}°C`
-  //               : 'N/A'}
-  //           </TText>
-  //           <TText style={styles.weatherLabel}>Heat</TText>
-  //         </View>
-  //         <View style={styles.weather}>
-  //           <TIcon name='cloud' size={20} color='#5A7D9A' />
-  //           <TText style={{ marginTop: 5 }}>
-  //             {displayWeather?.precipitation !== null && displayWeather?.precipitation !== undefined
-  //               ? `${displayWeather.precipitation}mm`
-  //               : 'N/A'}
-  //           </TText>
-  //           <TText style={styles.weatherLabel}>Rain</TText>
-  //         </View>
-  //         <View style={styles.weather}>
-  //           <TIcon name='water' size={20} color='#5A7D9A' />
-  //           <TText style={{ marginTop: 5 }}>
-  //             {displayWeather?.humidity !== null && displayWeather?.humidity !== undefined
-  //               ? `${displayWeather.humidity.toFixed(0)}%`
-  //               : 'N/A'}
-  //           </TText>
-  //           <TText style={styles.weatherLabel}>Humid</TText>
-  //         </View>
-  //         <View style={styles.weather}>
-  //           <TIcon name='fan' size={20} color='#5A7D9A' />
-  //           <TText style={{ marginTop: 5 }}>
-  //             {displayWeather?.windSpeed !== null && displayWeather?.windSpeed !== undefined
-  //               ? `${Math.round(displayWeather.windSpeed)}km/h`
-  //               : 'N/A'}
-  //           </TText>
-  //           <TText style={styles.weatherLabel}>Wind</TText>
-  //         </View>
-  //       </View>
+        <View style={styles.weatherDetailsContainer}>
+          <View style={styles.weather}>
+            <TIcon name='thermometer' size={20} color='#B36B6B' />
+            <TText style={{ marginTop: 5 }}>
+              {displayWeather?.temperature !== null && displayWeather?.temperature !== undefined
+                ? `${Math.round(displayWeather.temperature)}°C`
+                : 'N/A'}
+            </TText>
+            <TText style={styles.weatherLabel}>Heat</TText>
+          </View>
+          <View style={styles.weather}>
+            <TIcon name='cloud' size={20} color='#5A7D9A' />
+            <TText style={{ marginTop: 5 }}>
+              {displayWeather?.precipitation !== null && displayWeather?.precipitation !== undefined
+                ? `${displayWeather.precipitation}mm`
+                : 'N/A'}
+            </TText>
+            <TText style={styles.weatherLabel}>Rain</TText>
+          </View>
+          <View style={styles.weather}>
+            <TIcon name='water' size={20} color='#5A7D9A' />
+            <TText style={{ marginTop: 5 }}>
+              {displayWeather?.humidity !== null && displayWeather?.humidity !== undefined
+                ? `${displayWeather.humidity.toFixed(0)}%`
+                : 'N/A'}
+            </TText>
+            <TText style={styles.weatherLabel}>Humid</TText>
+          </View>
+          <View style={styles.weather}>
+            <TIcon name='fan' size={20} color='#5A7D9A' />
+            <TText style={{ marginTop: 5 }}>
+              {displayWeather?.windSpeed !== null && displayWeather?.windSpeed !== undefined
+                ? `${Math.round(displayWeather.windSpeed)}km/h`
+                : 'N/A'}
+            </TText>
+            <TText style={styles.weatherLabel}>Wind</TText>
+          </View>
+        </View>
 
-  //       {error && (
-  //         <TText style={{ opacity: 0.5, marginTop: 10, textAlign: 'center', fontSize: 12, color: '#ff6b6b' }}>
-  //           {error instanceof Error ? error.message : 'Failed to load weather data'}
-  //         </TText>
-  //       )}
-  //     </View>
-  //   </TView>
-  // );
+        {error && (
+          <TText style={{ opacity: 0.5, marginTop: 10, textAlign: 'center', fontSize: 12, color: '#ff6b6b' }}>
+            {error instanceof Error ? error.message : 'Failed to load weather data'}
+          </TText>
+        )}
+      </View>
+    </TView>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -172,6 +165,7 @@ const styles = StyleSheet.create({
   weatherLabel: {
     fontSize: 9,
     opacity: 0.5,
+    marginTop: 5,
   },
   weatherImage: {
     position: 'absolute',

@@ -40,9 +40,6 @@ export default function WebViewScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   header: {
     zIndex: 10,
     height: 50,
