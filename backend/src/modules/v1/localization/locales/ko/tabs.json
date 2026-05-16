@@ -1,0 +1,27 @@
+{
+  "tabs": {
+    "home_button": "홈",
+    "maps_button": "지도",
+    "explore_button": "탐색",
+    "account_button": "계정"
+  },
+  "account": {
+    "personalization_title": "개인 설정",
+    "edit_profile_button": "프로필 편집",
+    "theme_button": "앱 테마",
+    "language_button": "앱 언어",
+    "privacy_title": "개인정보",
+    "change_password_button": "비밀번호 변경",
+    "visibility_button": "표시 설정",
+    "logs_button": "활동 로그",
+    "privacy_button": "개인정보 처리방침",
+    "terms_button": "이용약관",
+    "help_title": "도움말 및 지원",
+    "manual_button": "사용자 매뉴얼",
+    "support_button": "고객 지원 문의",
+    "about_button": "앱 정보",
+    "developer_title": "개발자 옵션",
+    "cache_button": "캐시 삭제",
+    "logout_button": "로그아웃"
+  }
+}

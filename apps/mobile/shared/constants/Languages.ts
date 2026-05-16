@@ -25,16 +25,4 @@ export const LANGUAGES: LanguageItem[] = [
     nativeName: "한국어",
     flag: "🇰🇷",
   },
-  {
-    code: "ja",
-    name: "Japanese",
-    nativeName: "日本語",
-    flag: "🇯🇵",
-  },
-  {
-    code: "zh",
-    name: "Chinese",
-    nativeName: "中文",
-    flag: "🇨🇳",
-  },
 ];

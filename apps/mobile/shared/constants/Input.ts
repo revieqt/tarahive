@@ -38,11 +38,26 @@ export const DEFAULT_AREA_CODES = [
 ];
 
 export const GENDER_OPTIONS = [
-  { label: 'Male', value: 'male' },
-  { label: 'Female', value: 'female' },
-  { label: 'Non-binary', value: 'non_binary' },
-  { label: 'Prefer not to say', value: 'prefer_not_to_say' },
-  { label: 'Other', value: 'other' },
+  { label: 'common.genders.male', value: 'male' },
+  { label: 'common.genders.female', value: 'female' },
+  { label: 'common.genders.non_binary', value: 'non_binary' },
+  { label: 'common.genders.prefer_not_to_say', value: 'prefer_not_to_say' },
+  { label: 'common.genders.other', value: 'other' },
+];
+
+export const MONTH_OPTIONS = [
+  { label: 'common.months.january', value: 'january' },
+  { label: 'common.months.february', value: 'february' },
+  { label: 'common.months.march', value: 'march' },
+  { label: 'common.months.april', value: 'april' },
+  { label: 'common.months.may', value: 'may' },
+  { label: 'common.months.june', value: 'june' },
+  { label: 'common.months.july', value: 'july' },
+  { label: 'common.months.august', value: 'august' },
+  { label: 'common.months.september', value: 'september' },
+  { label: 'common.months.october', value: 'october' },
+  { label: 'common.months.november', value: 'november' },
+  { label: 'common.months.december', value: 'december' },
 ];
 
 export const INTEREST_OPTIONS = [

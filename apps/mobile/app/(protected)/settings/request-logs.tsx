@@ -10,12 +10,14 @@ import Button from '@/shared/components/ui/Button';
 import { router } from 'expo-router';
 import HiveBg from '@/shared/components/common/HiveBg';
 import Header from '@/shared/components/common/Header';
+import { useLanguage } from '@/shared/context/LanguageContext';
 
 export default function RequestLogsScreen() {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   // const { requestUserLogs, isLoading, error } = useUser();
   const router = useRouter();
+  const { t } = useLanguage();
 
 //   const handleRequestLogs = async () => {
 //     try {
@@ -35,23 +37,23 @@ export default function RequestLogsScreen() {
 //   };
 
   return (
-    <TView style={styles.container} color='primary'>
+    <TView style={styles.container}>
       
         <HiveBg/>
-        <Header title="Request Activity Logs" subtitle="Select a date range to request your activity logs." />  
+        <Header title={t("settings.logs.title")} subtitle={t("settings.logs.subtitle")} />  
 
         <DatePickerField
-            placeholder="Start Date"
+            placeholder={t("settings.logs.start_date")}
             value={startDate}
             onChange={setStartDate}
           />
         <DatePickerField
-            placeholder="End Date"
+            placeholder={t("settings.logs.end_date")}
             value={endDate}
             onChange={setEndDate}
           />
       <Button
-        title="Request Logs"
+        title={t("common.common.continue")}
         buttonStyle={styles.requestButton}
         onPress={() => []}
         type="primary"

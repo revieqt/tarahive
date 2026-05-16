@@ -11,6 +11,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import { TText } from './Themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLanguage } from '@/shared/context/LanguageContext';
 
 interface DropDownFieldProps {
   placeholder?: string;
@@ -31,7 +32,7 @@ const DropDownField: React.FC<DropDownFieldProps> = ({
 }) => {
   const backgroundColor = useThemeColor({}, 'primary');
   const textColor = useThemeColor({}, 'text');
-
+  const { t } = useLanguage();
   const [focused, setFocused] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -99,7 +100,7 @@ const DropDownField: React.FC<DropDownFieldProps> = ({
               { color: value ? textColor : '#999' },
             ]}
           >
-            {displayLabel}
+            {t(displayLabel)}
           </TText>
         </View>
       </TouchableWithoutFeedback>
@@ -152,7 +153,7 @@ const DropDownField: React.FC<DropDownFieldProps> = ({
                       { color: textColor },
                     ]}
                   >
-                    {item.label}
+                    {t(item.label)}
                   </TText>
                 </Pressable>
               );

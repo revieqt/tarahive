@@ -27,7 +27,7 @@ export default function LanguageSettingsScreen() {
   return (
     <TView style={styles.container}>
       <HiveBg />
-      <Header title={t("settings.language_title")} subtitle={t("settings.language_subtitle")} />
+      <Header title={t("settings.language.title")} subtitle={t("settings.language.subtitle")} />
 
       <ScrollView style={styles.languageList}>
         {LANGUAGES.map((language) => (

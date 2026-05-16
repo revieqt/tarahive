@@ -1,5 +1,6 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useTheme as useThemeHook, ThemeType, THEME_TYPES } from '@/shared/hooks/useTheme';
+import { useLanguage } from './LanguageContext';
 
 type ThemeContextType = {
   theme: ThemeType;
@@ -23,13 +24,14 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const getThemeInfo = (themeType: string) => {
+  const { t } = useLanguage();
   switch (themeType) {
     case THEME_TYPES.DEVICE:
-      return { icon: 'cellphone', name: 'Device Theme' };
+      return { icon: 'cellphone', name: t('settings.theme.device') };
     case THEME_TYPES.LIGHT:
-      return { icon: 'white-balance-sunny', name: 'Light Mode' };
+      return { icon: 'white-balance-sunny', name: t('settings.theme.light') };
     case THEME_TYPES.DARK:
-      return { icon: 'moon-waning-crescent', name: 'Dark Mode' };
+      return { icon: 'moon-waning-crescent', name: t('settings.theme.dark') };
     default:
       return { icon: 'palette', name: 'Theme' };
   }

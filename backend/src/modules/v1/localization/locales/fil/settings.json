@@ -1,0 +1,24 @@
+{
+  "theme": {
+    "title": "Tema ng App",
+    "subtitle": "Gamitin ang temang gusto mo. Maaari mo itong baguhin anumang oras.",
+    "switch_prompt": "Lumilipat sa",
+    "device": "Default ng Device",
+    "light": "Maliwanag",
+    "dark": "Madilim"
+  },
+  "language": {
+    "title": "Wika ng App",
+    "subtitle": "Piliin ang wikang nais mong gamitin sa app."
+  },
+  "visibility": {
+    "title": "Visibility ng Profile",
+    "subtitle": "Kontrolin kung sino ang makakakita sa iyong profile at aktibidad."
+  },
+  "logs": {
+    "title": "Humiling ng Security Logs",
+    "subtitle": "Pumili ng saklaw ng petsa upang hilingin ang iyong security logs.",
+    "start_date": "Petsa ng Pagsisimula",
+    "end_date": "Petsa ng Pagtatapos"
+  }
+}

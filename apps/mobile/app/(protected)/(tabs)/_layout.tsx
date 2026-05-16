@@ -57,7 +57,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          title: t('tabs.home_button'),
+          title: t('tabs.tabs.home_button'),
           tabBarIcon: ({ color, focused }) => (
             <TIcon name={focused ? 'home' : 'home-outline'} size={22} color={color}/>
           ),
@@ -66,7 +66,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="maps"
         options={{
-          title: t('tabs.maps_button'),
+          title: t('tabs.tabs.maps_button'),
           tabBarIcon: ({ color, focused }) => (
             <TIcon name={focused ? 'map' : 'map-outline'} size={20} color={color}/>
           ),
@@ -75,7 +75,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="explore"
         options={{
-          title: t('tabs.explore_button'),
+          title: t('tabs.tabs.explore_button'),
           tabBarIcon: ({ color, focused }) => (
             <TIcon name={focused ? 'compass' : 'compass-outline'} size={20} color={color}/>
           ),
@@ -84,7 +84,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="account"
         options={{
-          title: t('tabs.account_button'),
+          title: t('tabs.tabs.account_button'),
           tabBarIcon: ({ color, focused }) => (
             <TIcon name={focused ? 'account' : 'account-outline'} size={22} color={color}/>
           ),

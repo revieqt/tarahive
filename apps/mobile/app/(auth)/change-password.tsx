@@ -9,6 +9,7 @@ import { router } from 'expo-router';
 import Header from '@/shared/components/common/Header';
 import HiveBg from '@/shared/components/common/HiveBg';
 import PasswordValidationCard from '@/shared/components/cards/PasswordValidationCard';
+import { useLanguage } from '@/shared/context/LanguageContext';
 
 export default function ChangePasswordScreen() {
   const { session } = useSession();
@@ -20,6 +21,7 @@ export default function ChangePasswordScreen() {
   const [showAlert, setShowAlert] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const accentColor = useThemeColor({}, 'accent');
+  const { t } = useLanguage();
 
   const handleUpdatePassword = async () => {
     if (!session?.user?.id || !session.accessToken) {
@@ -52,27 +54,27 @@ export default function ChangePasswordScreen() {
   }
 
   return (
-    <View style={{flex: 1}}>
+    <TView style={{flex: 1}}>
       <HiveBg />
       <KeyboardAvoidingView
         style={{padding: 16}}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         
-        <Header title="Change Password" subtitle="Update your account password securely." />
+        <Header title={t('auth.change_password.title')} subtitle={t('auth.change_password.subtitle')} />
 
         <PasswordField
-          placeholder="Old Password"
+          placeholder={t('auth.change_password.current_password')}
           value={oldPassword}
           onChangeText={setOldPassword}
         />
         <PasswordField
-          placeholder="New Password"
+          placeholder={t('auth.change_password.new_password')}
           value={newPassword}
           onChangeText={setNewPassword}
         />
         <PasswordField
-          placeholder="Confirm Password"
+          placeholder={t('auth.change_password.confirm_password')}
           value={confirmPassword}
           onChangeText={setConfirmPassword}
         />
@@ -80,13 +82,14 @@ export default function ChangePasswordScreen() {
       </KeyboardAvoidingView>
 
       <Button
-        title={isLoading ? 'Updating...' : 'Update Password'}
+        title={t('auth.change_password.change_button')}
         onPress={handleUpdatePassword}
         type="primary"
         buttonStyle={styles.updateButton}
+        loading={isLoading}
         disabled={isLoading || !oldPassword || !newPassword || !confirmPassword}
       />
-    </View>
+    </TView>
   );
 }
 

@@ -1,5 +1,7 @@
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
-import React, { useState, useEffect } from 'react';
+import { useLanguage } from '@/shared/context/LanguageContext';
+import { MONTH_OPTIONS } from '@/shared/constants/Input';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   FlatList,
   Modal,
@@ -26,11 +28,6 @@ interface DatePickerProps {
   style?: any;
 }
 
-const months = [
-  'January', 'Febuary', 'March', 'April', 'May', 'June',
-  'Julu', 'August', 'September', 'October', 'November', 'December'
-];
-
 const DatePickerField: React.FC<DatePickerProps> = ({
   placeholder,
   value,
@@ -44,6 +41,13 @@ const DatePickerField: React.FC<DatePickerProps> = ({
 }) => {
   const backgroundColor = useThemeColor({}, 'primary');
   const textColor = useThemeColor({}, 'text');
+  const { t } = useLanguage();
+
+  // Create months array from MONTH_OPTIONS using translations
+  const months = useMemo(
+    () => MONTH_OPTIONS.map((option) => t(option.label)),
+    [t]
+  );
 
   const [showPicker, setShowPicker] = useState(false);
   const [isFocused, setIsFocused] = useState(false);

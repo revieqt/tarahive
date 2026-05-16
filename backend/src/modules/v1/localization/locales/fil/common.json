@@ -1,0 +1,27 @@
+{
+  "common": {
+    "welcome": "Maligayang pagdating sa Tarahive",
+    "continue": "Magpatuloy"
+  },
+  "months": {
+    "january": "Enero",
+    "february": "Pebrero",
+    "march": "Marso",
+    "april": "Abril",
+    "may": "Mayo",
+    "june": "Hunyo",
+    "july": "Hulyo",
+    "august": "Agosto",
+    "september": "Setyembre",
+    "october": "Oktubre",
+    "november": "Nobyembre",
+    "december": "Disyembre"
+  },
+  "genders": {
+    "male": "Lalaki",
+    "female": "Babae",
+    "non_binary": "Hindi binaryo",
+    "prefer_not_to_say": "Mas gustong hindi sabihin",
+    "other": "Iba pa"
+  }
+}

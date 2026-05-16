@@ -6,6 +6,7 @@ import { useTheme, getThemeInfo } from "@/shared/context/ThemeContext";
 import { useThemeColor } from "@/shared/hooks/useThemeColor";
 import HiveBg from "@/shared/components/common/HiveBg";
 import Header from "@/shared/components/common/Header";
+import { useLanguage } from "@/shared/context/LanguageContext";
 
 export default function LanguageSettingsScreen() {
   const { theme: selectedTheme, setTheme, THEME_TYPES } = useTheme();
@@ -19,6 +20,7 @@ export default function LanguageSettingsScreen() {
   const backgroundColor = useThemeColor({}, 'background');
   const accentColor = useThemeColor({}, 'accent');
   const themeInfo = getThemeInfo(transitioningTheme);
+  const { t } = useLanguage();
 
   const handleThemeSelect = async (themeType: string) => {
     try {
@@ -126,7 +128,7 @@ export default function LanguageSettingsScreen() {
             >
               <TIcon name={themeInfo.icon} size={80} />
             </Animated.View>
-            <TText style={{ marginTop: 20 }}> Switching to </TText>
+            <TText style={{ marginTop: 20 }}> {t('settings.theme.switch_prompt')} </TText>
             <TText type="title"> {themeInfo.name} </TText>
           </Animated.View>
         </Animated.View>
@@ -134,14 +136,14 @@ export default function LanguageSettingsScreen() {
 
       <TView style={styles.container}>
         <HiveBg />
-        <Header title="App Theme" subtitle="Use the theme you prefer for the app." />
+        <Header title={t('settings.theme.title')} subtitle={t('settings.theme.subtitle')} />
         <TouchableOpacity 
             key="device" 
             style={[styles.themeOption, { backgroundColor: primaryColor }]}
             onPress={() => handleThemeSelect(THEME_TYPES.DEVICE)}
           >
             <TIcon  name='cellphone' size={20} />
-            <TText style={styles.themeOptionText}>Device Theme</TText>
+            <TText style={styles.themeOptionText}> {t('settings.theme.device')} </TText>
             {selectedTheme === THEME_TYPES.DEVICE && (
               <TIcon name='check' size={20} color={accentColor} />
             )}
@@ -152,7 +154,7 @@ export default function LanguageSettingsScreen() {
             onPress={() => handleThemeSelect(THEME_TYPES.LIGHT)}
           >
             <TIcon name='white-balance-sunny' size={20} />
-            <TText style={styles.themeOptionText}>Light Mode</TText>
+            <TText style={styles.themeOptionText}> {t('settings.theme.light')} </TText>
             {selectedTheme === THEME_TYPES.LIGHT && (
               <TIcon name='check' size={20} color={accentColor} />
             )}
@@ -163,7 +165,7 @@ export default function LanguageSettingsScreen() {
             onPress={() => handleThemeSelect(THEME_TYPES.DARK)}
           >
             <TIcon name='moon-waning-crescent' size={20} />
-            <TText style={styles.themeOptionText}>Dark Mode</TText>
+            <TText style={styles.themeOptionText}> {t('settings.theme.dark')} </TText>
             {selectedTheme === THEME_TYPES.DARK && (
               <TIcon name='check' size={20} color={accentColor} />
             )}

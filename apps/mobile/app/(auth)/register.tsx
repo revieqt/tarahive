@@ -17,6 +17,7 @@ import LangButton from '@/shared/components/common/LanguageButton';
 import { showError } from '@/shared/services/toast.service';
 import PasswordValidationCard from '@/shared/components/cards/PasswordValidationCard';
 import { useLanguage } from '@/shared/context/LanguageContext';
+import CodeInput from '@/shared/components/ui/CodeInput';
 
 export default function RegisterScreen() {
   const [fname, setFname] = useState('');
@@ -275,26 +276,32 @@ export default function RegisterScreen() {
                 keyboardShouldPersistTaps="handled"
               >
                 <View style={styles.headerContainer}>
-                  <TText type="title">Verify Your Email</TText>
-                  <TText>A verification code has been sent to {email}. Please enter it to continue.</TText>
+                  <TText type="title">{t("auth.verify_email.title")}</TText>
+                  <TText>{t("auth.verify_email.subtitle")} {email}</TText>
                 </View>
 
-                <TextField
-                  placeholder="Enter verification code"
+                <CodeInput
                   value={verificationCode}
                   onChangeText={setVerificationCode}
-                  autoCapitalize="none"
-                  keyboardType="default"
+                  characters={6}
+                  type="numeric"
                 />
               </ScrollView>
 
-              <Button
-                title={registerLoading ? 'Creating...' : 'Complete Registration'}
-                onPress={handleRegister}
-                type="primary"
-                disabled={!verificationCode || verificationLoading || registerLoading}
-                buttonStyle={styles.completeButton}
-              />
+              <View style={styles.completeButton}>
+                <Button
+                  title={t("auth.verify_email.resend_prompt")}
+                  onPress={handleNext}
+                  disabled={verificationLoading}
+                />
+
+                <Button
+                  title={t("auth.register.register_button")}
+                  onPress={handleRegister}
+                  type="primary"
+                  disabled={!verificationCode || verificationLoading || registerLoading}
+                />
+              </View>
             </View>
           </Animated.View>
         </View>
@@ -309,7 +316,8 @@ const styles = StyleSheet.create({
     bottom: 16,
     right: 16,
     left: 16,
-    zIndex: 100
+    zIndex: 100,
+    gap: 8,
   },
   headerContainer: {
     marginTop: 40,

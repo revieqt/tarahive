@@ -1,32 +1,43 @@
-// import { TText, TView, TIcon } from '@/components/ui/Themed';
-// import React, { useState } from 'react';
-// import { KeyboardAvoidingView, Platform, StyleSheet,TouchableOpacity,View, ScrollView, ActivityIndicator, Modal } from 'react-native';
-// // import { useSession } from '@/context/SessionContext';
-// import Switch from '@/components/ui/Switch';
-// import { router } from 'expo-router';
-// import { LinearGradient } from 'expo-linear-gradient';
-// import Button from '@/components/ui/Button';
-// import ProfileImage from '@/components/ui/ProfileImage';
+import { TText, TView, TIcon } from '@/shared/components/ui/Themed';
+import React, { useState } from 'react';
+import { KeyboardAvoidingView, Platform, StyleSheet,TouchableOpacity,View, ScrollView, ActivityIndicator, Modal } from 'react-native';
+// import { useSession } from '@/context/SessionContext';
+import Switch from '@/shared/components/ui/Switch';
+import { router } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
+import Button from '@/shared/components/ui/Button';
+import ProfileImage from '@/shared/components/ui/ProfileImage';
 // import InputModal from '@/components/modals/InputModal';
-// // import { updateStringUserData, updateBooleanUserData, uploadProfileImage, updateUserLikes } from '@/services/userService';
-// // import { CustomAlert } from '@/components/Alert';
-// import * as ImagePicker from 'expo-image-picker';
-// // import ToggleButton from '@/components/ToggleButton';
-// // import { LIKES } from '@/shared/constants/Config';
-// import { SafeAreaView } from 'react-native-safe-area-context';
-// import { useThemeColor } from '@/shared/hooks/useThemeColor';
+// import { updateStringUserData, updateBooleanUserData, uploadProfileImage, updateUserLikes } from '@/services/userService';
+// import { CustomAlert } from '@/components/Alert';
+import * as ImagePicker from 'expo-image-picker';
+// import ToggleButton from '@/components/ToggleButton';
+// import { LIKES } from '@/shared/constants/Config';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useThemeColor } from '@/shared/hooks/useThemeColor';
+import Header from '@/shared/components/common/Header';
+import HiveBg from '@/shared/components/common/HiveBg';
 
-// export default function EditProfileSettingsScreen() {
+const Fields = [
+  { label: 'Username', value: 'username', onPress: () => [] },
+  { label: 'First Name', value: 'fname', onPress: () => [] },
+  { label: 'Last Name', value: 'lname', onPress: () => [] },
+  { label: 'Bio', value: 'bio', onPress: () => [] },
+  { label: 'Contact Number', value: 'contactNumber', onPress: () => [] },
+  { label: 'Interests', value: 'interests', onPress: () => [] },
+];
+
+export default function EditProfileSettingsScreen() {
 //   const { session, updateSession } = useSession();
 //   const user = session?.user;
-//   const primaryColor = useThemeColor({}, 'primary');
-//   const accentColor = useThemeColor({}, 'accent');
-//   const [modalVisible, setModalVisible] = useState(false);
-//   const [currentField, setCurrentField] = useState<'fname' | 'lname' | 'bio' | 'contactNumber' | null>(null);
-//   const [loading, setLoading] = useState(false);
-//   const [alertVisible, setAlertVisible] = useState(false);
-//   const [alertConfig, setAlertConfig] = useState<{ title: string; message: string; icon: string }>({ title: '', message: '', icon: 'information-circle-outline' });
-//   const [likesModalVisible, setLikesModalVisible] = useState(false);
+  const primaryColor = useThemeColor({}, 'primary');
+  const accentColor = useThemeColor({}, 'accent');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [currentField, setCurrentField] = useState<'fname' | 'lname' | 'bio' | 'contactNumber' | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertConfig, setAlertConfig] = useState<{ title: string; message: string; icon: string }>({ title: '', message: '', icon: 'information-circle-outline' });
+  const [likesModalVisible, setLikesModalVisible] = useState(false);
 //   const [selectedLikes, setSelectedLikes] = useState<string[]>(user?.likes || []);
 
 //   const handleOpenModal = (field: 'fname' | 'lname' | 'bio' | 'contactNumber') => {
@@ -178,284 +189,80 @@
 //     }
 //   };
 
-//   return (
-//     <ThemedView style={{flex: 1}}>
-//       <GradientBlobs/>
-//       <KeyboardAvoidingView
-//         style={{}}
-//         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-//       >
-//         <ScrollView>
-//           <View style={{padding: 16}}>
-//             <BackButton />
-//             <ThemedText type='title'>
-//               Account Control
-//             </ThemedText>
-//             <ThemedText>
-//               Manage your account and privacy settings.
-//             </ThemedText>
-//           </View>
-
-//           <ThemedView color='primary' style={styles.sectionContainer}>
-//             <TouchableOpacity style={styles.profileImageContainer} onPress={handleProfileImagePick} disabled={loading}>
-//               <ProfileImage imagePath={user?.profileImage} />
-//               <LinearGradient
-//                 colors={['transparent', '#000']}
-//                 style={styles.profileImageGradient}
-//               >
-//                 {loading ? (
-//                   <ActivityIndicator size="small" color="white" />
-//                 ) : (
-//                   <ThemedIcons name='pencil' size={20} color='white'/>
-//                 )}
-//               </LinearGradient>
-//             </TouchableOpacity>
-//             <View style={styles.sectionChild}>
-//               <View>
-//                 <ThemedText>{user?.fname}</ThemedText>
-//                 <ThemedText style={styles.sectionChildDescription}>First Name</ThemedText>
-//               </View>
-//               <TouchableOpacity onPress={() => handleOpenModal('fname')}>
-//                 <ThemedIcons name='pencil' size={20} />
-//               </TouchableOpacity>
-//             </View>
-//             <View style={styles.sectionChild}>
-//               <View>
-//                 <ThemedText>{user?.lname || 'N/A'}</ThemedText>
-//                 <ThemedText style={styles.sectionChildDescription}>Last Name</ThemedText>
-//               </View>
-//               <TouchableOpacity onPress={() => handleOpenModal('lname')}>
-//                 <ThemedIcons name='pencil' size={20} />
-//               </TouchableOpacity>
-//             </View>
-//             <View style={styles.sectionChild}>
-//               <View>
-//                 <ThemedText>{user?.bio|| 'N/A'}</ThemedText>
-//                 <ThemedText style={styles.sectionChildDescription}>Bio</ThemedText>
-//               </View>
-//               <TouchableOpacity onPress={() => handleOpenModal('bio')}>
-//                 <ThemedIcons name='pencil' size={20} />
-//               </TouchableOpacity>
-//             </View>
-//             <View style={styles.sectionChild}>
-//               <View>
-//                 <ThemedText>{user?.contactNumber || 'N/A'}</ThemedText>
-//                 <ThemedText style={styles.sectionChildDescription}>Contact Number</ThemedText>
-//               </View>
-//               <TouchableOpacity onPress={() => handleOpenModal('contactNumber')}>
-//                 <ThemedIcons name='pencil' size={20} />
-//               </TouchableOpacity>
-//             </View>
-//             <View style={styles.sectionChild}>
-//               <View>
-//                 <ThemedText>{user?.likes && user.likes.length > 0 ? user.likes.join(', ') : 'N/A'}</ThemedText>
-//                 <ThemedText style={styles.sectionChildDescription}>Likes</ThemedText>
-//               </View>
-//               <TouchableOpacity onPress={() => setLikesModalVisible(true)}>
-//                 <ThemedIcons name='pencil' size={20} />
-//               </TouchableOpacity>
-//             </View>
-//           </ThemedView>
-
-//           <ThemedView color='primary' style={styles.sectionContainer}>
-//             <ThemedText style={styles.sectionTitle}>
-//               Security Settings
-//             </ThemedText>
-//             <TouchableOpacity style={styles.sectionChild} onPress={()=> router.push('/auth/changePassword')}>
-//               <View>
-//                 <ThemedText>Change Password</ThemedText>
-//                 <ThemedText style={styles.sectionChildDescription}>Update Password Regularly</ThemedText>
-//               </View>
-//               <ThemedIcons name='chevron-right' size={20} />
-//             </TouchableOpacity>
-//             <Switch
-//               key="2fa"
-//               label="Two-Factor Authentication"
-//               description="Email Verification on every login"
-//               value={user?.securitySettings?.is2FAEnabled || false}
-//               onValueChange={(value) => handleBooleanUpdate('securitySettings.is2FAEnabled', value)}
-//             />
-//           </ThemedView>
-
-//           <ThemedView color='primary' style={styles.sectionContainer}>
-//             <ThemedText style={styles.sectionTitle}>
-//               Visibility Settings
-//             </ThemedText>
-//             <Switch
-//               key="private"
-//               label="Public Visibility"
-//               description={user?.visibilitySettings?.isProfilePublic ? 'Public' : 'Private'}
-//               value={user?.visibilitySettings?.isProfilePublic || false}
-//               onValueChange={(value) => handleBooleanUpdate('visibilitySettings.isProfilePublic', value)}
-//             />
-
-//             <View style={!user?.visibilitySettings?.isProfilePublic && {opacity: 0.5, pointerEvents: 'none'}}>
-//               <Switch
-//               key="personal"
-//               label="Show Personal Info"
-//               description={user?.visibilitySettings?.isPersonalInfoPublic ? 'Public' : 'Hidden'}
-//               value={user?.visibilitySettings?.isPersonalInfoPublic || false}
-//               onValueChange={(value) => handleBooleanUpdate('visibilitySettings.isPersonalInfoPublic', value)}/>
-//               <Switch
-//               key="travel"
-//               label="Show Travel Info"
-//               description={user?.visibilitySettings?.isTravelInfoPublic ? 'Public' : 'Hidden'}
-//               value={user?.visibilitySettings?.isTravelInfoPublic || false}
-//               onValueChange={(value) => handleBooleanUpdate('visibilitySettings.isTravelInfoPublic', value)}
-//               />
-//             </View>
-//           </ThemedView>
-          
-//           <ThemedView color='primary' style={styles.sectionContainer}>
+  return (
+    <TView style={{flex: 1}}>
+      <HiveBg />
+      <KeyboardAvoidingView
+        style={{}}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView contentContainerStyle={{padding: 16}}>
+          <Header title="Edit Profile" subtitle="Update your personal information and settings" />
             
-//             <ThemedText style={styles.sectionTitle}>
-//               Data Control
-//             </ThemedText>
-//             <TouchableOpacity style={styles.sectionChild} onPress={()=> router.push('/account/requestLogs')}>
-//               <View>
-//                 <ThemedText>Request Account Logs</ThemedText>
-//                 <ThemedText style={styles.sectionChildDescription}>View your account activity and data</ThemedText>
-//               </View>
-//               <ThemedIcons name='chevron-right' size={20} />
-//             </TouchableOpacity>
-//           </ThemedView>
-//         </ScrollView>
-//       </KeyboardAvoidingView>
+            <TouchableOpacity style={styles.profileImageContainer} onPress={() => {}} disabled={loading}>
+              <ProfileImage/>
+              <LinearGradient
+                colors={['transparent', '#000']}
+                style={styles.profileImageGradient}
+              >
+                {loading ? <ActivityIndicator size="small" color="white" /> : <TIcon name='pencil' size={20} color='white'/>}
+              </LinearGradient>
+            </TouchableOpacity>
 
-//       <InputModal
-//         visible={modalVisible}
-//         onClose={() => {
-//           setModalVisible(false);
-//           setCurrentField(null);
-//         }}
-//         onSubmit={handleStringUpdate}
-//         type={currentField === 'contactNumber' ? 'contactNumber' : 'text'}
-//         initialValue={
-//           currentField === 'fname' ? user?.fname || '' :
-//           currentField === 'lname' ? user?.lname || '' :
-//           currentField === 'bio' ? user?.bio || '' :
-//           currentField === 'contactNumber' ? user?.contactNumber || '' : ''
-//         }
-//         placeholder={
-//           currentField === 'fname' ? 'John' :
-//           currentField === 'lname' ? 'Doe' :
-//           currentField === 'bio' ? 'My bio' :
-//           currentField === 'contactNumber' ? '09123456789' : ''
-//         }
-//         description={
-//           currentField === 'fname' ? 'Enter first name' :
-//           currentField === 'lname' ? 'Enter last name' :
-//           currentField === 'bio' ? 'Enter bio' :
-//           currentField === 'contactNumber' ? 'Enter contact number' : ''
-//         }
-//         label={
-//           currentField === 'fname' ? 'First Name' :
-//           currentField === 'lname' ? 'Last Name' :
-//           currentField === 'bio' ? 'Bio' :
-//           currentField === 'contactNumber' ? 'Contact Number' : ''
-//         }
-//       />
+            {Fields.map(field => (
+              <TView key={field.value} style={styles.sectionContainer} color='primary'>
+                <View>
+                    <TText>{field.value}</TText>
+                    <TText style={styles.sectionChildDescription}>{field.label}</TText>
+                </View>
+                <TouchableOpacity onPress={field.onPress} disabled={loading}>
+                    <TIcon name='pencil' size={20} />
+                </TouchableOpacity>
+              </TView>
+            ))}
+            
+        </ScrollView>
+      </KeyboardAvoidingView>
 
-//       <Modal
-//         visible={likesModalVisible}
-//         transparent={true}
-//         animationType="slide"
-//         onRequestClose={() => setLikesModalVisible(false)}
-//       >
-//         <SafeAreaView style={{ flex: 1, backgroundColor: primaryColor }} edges={['top', 'bottom']}>
-//           <ThemedView style={{ flex: 1 }} color='primary'>
-//             <View style={{ padding: 16 }}>
-//               <TouchableOpacity onPress={() => setLikesModalVisible(false)}>
-//                 <ThemedIcons name="arrow-left" size={22} />
-//               </TouchableOpacity>
-//               <ThemedText type='title' style={{ marginBottom: 10, marginTop: 10 }}>
-//                 Update Interests
-//               </ThemedText>
-//               <ThemedText style={{ opacity: 0.9 }}>
-//                 Select your interests to personalize your experience
-//               </ThemedText>
-//             </View>
+    </TView>
+  );
+}
 
-//             <ScrollView style={{ flex: 1, paddingHorizontal: 16 }} showsVerticalScrollIndicator={false}>
-//               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, paddingVertical: 20 }}>
-//                 {LIKES.map((interest) => (
-//                   <ToggleButton
-//                     key={interest}
-//                     value={interest}
-//                     label={interest}
-//                     initialSelected={selectedLikes.includes(interest)}
-//                     onToggle={handleLikeToggle}
-//                     textStyle={{ fontSize: 12 }}
-//                     buttonStyle={{ paddingVertical: 5, paddingHorizontal: 14, borderRadius: 50 }}
-//                   />
-//                 ))}
-//               </View>
-//             </ScrollView>
-//             <Button
-//               title={loading ? 'Saving...' : 'Save Interests'}
-//               onPress={handleSaveLikes}
-//               type="primary"
-//               disabled={loading}
-//               buttonStyle={{ marginHorizontal: 16, marginBottom: 80 }}
-//             />
-//             <Wave style={{ position: 'absolute', bottom: 0, left: 0, right: 0, opacity: .7 }} color={accentColor} height={70} />
-//           </ThemedView>
-//         </SafeAreaView>
-        
-//       </Modal>
-
-//       <CustomAlert
-//         visible={alertVisible}
-//         title={alertConfig.title}
-//         message={alertConfig.message}
-//         onClose={() => setAlertVisible(false)}
-//         fadeAfter={3000}
-//       />
-//     </ThemedView>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   sectionContainer:{
-//     padding: 16,
-//     marginTop: 10,
-//   },
-//   profileImageContainer:{
-//     width: '50%',
-//     aspectRatio: 1,
-//     alignSelf: 'center',
-//     borderRadius: 1000,
-//     marginVertical: 10,
-//     overflow: 'hidden',
-//   },
-//   profileImageGradient:{
-//     position: 'absolute',
-//     bottom: 0,
-//     left: 0,
-//     right: 0,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     height: '30%',
-//   },
-//   sectionTitle: {
-//     marginBottom: 10,
-//     borderBottomWidth: 1,
-//     borderBottomColor: '#ccc4',
-//     paddingBottom: 5,
-//     fontSize: 14,
-//   },
-//   sectionChild:{
-//     flexDirection: 'row',
-//     paddingBottom: 5,
-//     alignItems: 'center',
-//     justifyContent: 'space-between',
-//   },
-//   sectionChildDescription:{
-//     fontSize: 12,
-//     opacity: 0.7,
-//   },
-//   deleteButton:{
-//     marginTop: 10,
-//     backgroundColor: '#ff4d4d',
-//   },
-// });
+const styles = StyleSheet.create({
+  sectionContainer:{
+    borderRadius: 15,
+    padding: 10,
+    marginBottom: 8,
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  profileImageContainer:{
+    width: '50%',
+    aspectRatio: 1,
+    alignSelf: 'center',
+    borderRadius: 1000,
+    marginVertical: 16,
+    overflow: 'hidden',
+  },
+  profileImageGradient:{
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '30%',
+  },
+  sectionTitle: {
+    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc4',
+    paddingBottom: 5,
+    fontSize: 14,
+  },
+  sectionChildDescription:{
+    fontSize: 12,
+    opacity: 0.7,
+  },
+});

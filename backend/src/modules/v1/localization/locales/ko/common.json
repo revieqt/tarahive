@@ -1,6 +1,27 @@
 {
   "common": {
-    "welcome": "타라하이브에 오신 걸 환영합니다",
-    "continue": "계속하다"
+    "welcome": "Tarahive에 오신 것을 환영합니다",
+    "continue": "계속"
+  },
+  "months": {
+    "january": "1월",
+    "february": "2월",
+    "march": "3월",
+    "april": "4월",
+    "may": "5월",
+    "june": "6월",
+    "july": "7월",
+    "august": "8월",
+    "september": "9월",
+    "october": "10월",
+    "november": "11월",
+    "december": "12월"
+  },
+  "genders": {
+    "male": "남성",
+    "female": "여성",
+    "non_binary": "논바이너리",
+    "prefer_not_to_say": "밝히고 싶지 않음",
+    "other": "기타"
   }
 }

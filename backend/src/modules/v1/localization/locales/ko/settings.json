@@ -1,0 +1,24 @@
+{
+  "theme": {
+    "title": "앱 테마",
+    "subtitle": "원하는 테마를 사용하세요. 언제든지 나중에 변경할 수 있습니다.",
+    "switch_prompt": "다음으로 변경 중",
+    "device": "기기 기본 설정",
+    "light": "라이트 모드",
+    "dark": "다크 모드"
+  },
+  "language": {
+    "title": "앱 언어",
+    "subtitle": "앱에서 사용할 언어를 선택하세요."
+  },
+  "visibility": {
+    "title": "프로필 공개 설정",
+    "subtitle": "누가 내 프로필과 활동을 볼 수 있는지 설정하세요."
+  },
+  "logs": {
+    "title": "보안 로그 요청",
+    "subtitle": "보안 로그를 요청할 날짜 범위를 선택하세요.",
+    "start_date": "시작 날짜",
+    "end_date": "종료 날짜"
+  }
+}

@@ -9,6 +9,12 @@ const DEFAULT_TIMEOUT = 15000;
 const DEFAULT_RETRIES = 3;
 const DEFAULT_RETRY_DELAY = 1000;
 
+let defaultLanguage = "en";
+
+export function setApiLanguage(languageCode: string) {
+  defaultLanguage = languageCode;
+}
+
 async function fetchWithTimeout(
   url: string,
   options: RequestInit,
@@ -65,7 +71,7 @@ async function request<T>(
       {
         headers: {
           "Content-Type": "application/json",
-          "Accept-Language": "en",
+          "Accept-Language": defaultLanguage,
           ...(token
             ? { Authorization: `Bearer ${token}`, }
             : {}),

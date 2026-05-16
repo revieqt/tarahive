@@ -2,5 +2,26 @@
   "common": {
     "welcome": "Welcome to Tarahive",
     "continue": "Continue"
+  },
+  "months": {
+    "january": "January",
+    "february": "February",
+    "march": "March",
+    "april": "April",
+    "may": "May",
+    "june": "June",
+    "july": "July",
+    "august": "August",
+    "september": "September",
+    "october": "October",
+    "november": "November",
+    "december": "December"
+  },
+  "genders": {
+    "male": "Male",
+    "female": "Female",
+    "non_binary": "Non-binary",
+    "prefer_not_to_say": "Prefer not to say",
+    "other": "Other"
   }
 }
