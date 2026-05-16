@@ -20,7 +20,8 @@ export async function getWeatherController(req: Request, res: Response) {
       cityStr,
       parseFloat(latStr),
       parseFloat(lonStr),
-      dateStr
+      dateStr,
+      res.locals.lang,
     );
 
     return res.json(weather);

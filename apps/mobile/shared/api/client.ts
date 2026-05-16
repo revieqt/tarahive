@@ -65,10 +65,9 @@ async function request<T>(
       {
         headers: {
           "Content-Type": "application/json",
+          "Accept-Language": "en",
           ...(token
-            ? {
-                Authorization: `Bearer ${token}`,
-              }
+            ? { Authorization: `Bearer ${token}`, }
             : {}),
           ...headers,
         },

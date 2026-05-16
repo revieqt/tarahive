@@ -1,13 +1,15 @@
 import { Router } from 'express';
-import { LocalizationController } from './localization.controller';
+import {
+  getTranslationsHandler,
+  getAllTranslationsHandler,
+} from './localization.controller';
 
 const router = Router();
-const controller = new LocalizationController();
 
 // single namespace
-router.get('/:lang/:namespace', controller.getTranslations.bind(controller));
+router.get('/:lang/:namespace', getTranslationsHandler);
 
 // ALL namespaces for a language
-router.get('/:lang', controller.getAllTranslations.bind(controller));
+router.get('/:lang', getAllTranslationsHandler);
 
 export default router;

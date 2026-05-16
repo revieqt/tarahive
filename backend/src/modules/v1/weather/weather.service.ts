@@ -1,50 +1,52 @@
 import fetch from 'node-fetch';
 import { WeatherData, OpenMeteoDailyResponse } from './weather.types';
 import redis from '../../../config/redis';
+import { t } from '../localization/localization.service'; // 1. add import
 
-const weatherCodeMap: Record<number, string> = {
-  0: 'Clear sky',
-  1: 'Mainly clear',
-  2: 'Partly cloudy',
-  3: 'Cloudy',
-  45: 'Fog',
-  48: 'Depositing rime fog',
-  51: 'Light Drizzle',
-  53: 'Moderate Drizzle',
-  55: 'Heavy Drizzle',
-  56: 'Light Freezing Drizzle',
-  57: 'Heavy Freezing Drizzle',
-  61: 'Slight Rain',
-  63: 'Moderate Rain',
-  65: 'Heavy Rain',
-  66: 'Light Freezing Rain',
-  67: 'Heavy Freezing Rain',
-  71: 'Slight Snow fall',
-  73: 'Moderate Snow fall',
-  75: 'Heavy Snow fall',
-  77: 'Snow grains',
-  80: 'Slight Rain showers',
-  81: 'Moderate Rain showers',
-  82: 'Violent Rain showers',
-  85: 'Slight Snow showers',
-  86: 'Heavy Snow showers',
-  95: 'Thunderstorm',
-  96: 'Thunderstorm with slight hail',
-  99: 'Thunderstorm with heavy hail',
+const weatherCodeKeyMap: Record<number, string> = {  // 2. rename map + swap values to keys
+  0:  'weather.conditions.clear_sky',
+  1:  'weather.conditions.mainly_clear',
+  2:  'weather.conditions.partly_cloudy',
+  3:  'weather.conditions.cloudy',
+  45: 'weather.conditions.fog',
+  48: 'weather.conditions.depositing_rime_fog',
+  51: 'weather.conditions.light_drizzle',
+  53: 'weather.conditions.moderate_drizzle',
+  55: 'weather.conditions.heavy_drizzle',
+  56: 'weather.conditions.light_freezing_drizzle',
+  57: 'weather.conditions.heavy_freezing_drizzle',
+  61: 'weather.conditions.slight_rain',
+  63: 'weather.conditions.moderate_rain',
+  65: 'weather.conditions.heavy_rain',
+  66: 'weather.conditions.light_freezing_rain',
+  67: 'weather.conditions.heavy_freezing_rain',
+  71: 'weather.conditions.slight_snow_fall',
+  73: 'weather.conditions.moderate_snow_fall',
+  75: 'weather.conditions.heavy_snow_fall',
+  77: 'weather.conditions.snow_grains',
+  80: 'weather.conditions.slight_rain_showers',
+  81: 'weather.conditions.moderate_rain_showers',
+  82: 'weather.conditions.violent_rain_showers',
+  85: 'weather.conditions.slight_snow_showers',
+  86: 'weather.conditions.heavy_snow_showers',
+  95: 'weather.conditions.thunderstorm',
+  96: 'weather.conditions.thunderstorm_slight_hail',
+  99: 'weather.conditions.thunderstorm_heavy_hail',
 };
 
 export async function getWeather(
   city: string,
   latitude: number,
   longitude: number,
-  date?: string
+  date?: string,
+  lang: string = 'en',
 ) {
   try {
     const today = new Date();
     const targetDate = date || today.toISOString().split('T')[0];
 
     const normalizedCity = city.toLowerCase();
-    const key = `weather:${normalizedCity}:${targetDate}`;
+    const key = `weather:${normalizedCity}:${targetDate}:${lang}`;
 
     // Check Redis cache first
     const cached = await redis.get(key);
@@ -77,9 +79,9 @@ export async function getWeather(
       humidity: averageHumidity,
       precipitation: data.daily.precipitation_sum[dayIndex] ?? null,
       weatherCode: data.daily.weathercode[dayIndex] ?? null,
-      weatherType:
+      weatherType:                                    // 3b. wrap with t()
         data.daily.weathercode[dayIndex] != null
-          ? weatherCodeMap[data.daily.weathercode[dayIndex]] ?? null
+          ? t(weatherCodeKeyMap[data.daily.weathercode[dayIndex]], lang) ?? null
           : null,
     };
 
