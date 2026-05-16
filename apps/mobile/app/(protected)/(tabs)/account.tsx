@@ -11,7 +11,6 @@ import ProfileImage from '@/shared/components/ui/ProfileImage';
 import ProCard from '@/shared/components/cards/ProCard';
 import { useLanguage } from '@/shared/context/LanguageContext';
 import { useDev } from '@/shared/hooks/useDev';
-import HiveBg from '@/shared/components/common/HiveBg';
 import NoInternetCard from '@/shared/components/cards/NoInternetCard';
 
 const SettingsOption = ({ icon, label, onPress }: { icon: string; label: string; onPress: () => void }) => (
@@ -45,7 +44,6 @@ export default function AccountScreen() {
 
   return (
     <TView style={{flex: 1}}>
-      <HiveBg />
       <ScrollView contentContainerStyle={{padding: 16}} showsVerticalScrollIndicator={true}>
         <TView shadow color='primary' style={styles.header}>
           <TouchableOpacity

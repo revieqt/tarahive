@@ -4,6 +4,9 @@ import { TText, TView, TIcon } from '@/shared/components/ui/Themed';
 import { useLocation } from '@/shared/context/LocationContext';
 import { useCurrentWeather } from '@/shared/hooks/useWeather';
 import Skeleton from '@/shared/components/ui/Skeleton';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useThemeColor } from '@/shared/hooks/useThemeColor';
+import HiveBg from '../common/HiveBg';
 
 const getWeatherImage = (weatherCode: number): any => {
   if (weatherCode === 0) {
@@ -24,8 +27,10 @@ const getWeatherImage = (weatherCode: number): any => {
   return require('@/shared/assets/images/weather-sunny-min.png');
 };
 
-export default function WeatherCard() {
+export default function HomeHeaderCard() {
   const locationData = useLocation();
+  const secondaryColor = useThemeColor({}, 'secondary');
+  const accentColor = useThemeColor({}, 'accent');
 
   const displayCity = locationData.city || locationData.suburb || locationData.region || locationData.state || 'Your Location';
   const { data: displayWeather, isLoading, error } = useCurrentWeather(
@@ -36,9 +41,11 @@ export default function WeatherCard() {
 
   const showLoading = isLoading || (locationData.loading && !displayWeather);
 
-  if (showLoading) {
-    return (
-      <TView color='primary' style={[styles.locationContent, { height: 185 }]}>
+  return (
+    <LinearGradient colors={[accentColor,secondaryColor]} style={styles.locationContent}>
+      <HiveBg flipHorizontal/>
+      <HiveBg/>
+      {showLoading ? <>
         <Skeleton style={styles.descLoading}/>
         <Skeleton style={styles.locationLoading}/>
         <Skeleton style={styles.weatherTypeLoading}/>
@@ -65,90 +72,86 @@ export default function WeatherCard() {
             <Skeleton style={styles.weatherLabelLoading}/>
           </View>
         </View>
-      </TView>
-    );
-  }
-
-  return (
-    <TView color='primary' style={styles.locationContent}>
-      <View style={{ gap: 3}}>
-        <TText style={{ opacity: 0.5, fontSize: 12 }}>
-          You're currently at
-        </TText>
-        <TText type='subtitle' style={{ fontSize: 16 }}>
-          {displayCity}
-        </TText>
-        
-        <TText style={{ opacity: 0.5, fontSize: 12 }}>
-          {displayWeather?.weatherType || 'No data'}
-        </TText>
-
-        {displayWeather && (
-          <Image
-            source={getWeatherImage(displayWeather.weatherCode)}
-            style={styles.weatherImage}
-            resizeMode="contain"
-          />
-        )}
-        
-        <View style={styles.weatherDetailsContainer}>
-          <View style={styles.weather}>
-            <TIcon name='thermometer' size={20} color='#B36B6B' />
-            <TText style={{ marginTop: 5 }}>
-              {displayWeather?.temperature !== null && displayWeather?.temperature !== undefined
-                ? `${Math.round(displayWeather.temperature)}°C`
-                : 'N/A'}
-            </TText>
-            <TText style={styles.weatherLabel}>Heat</TText>
-          </View>
-          <View style={styles.weather}>
-            <TIcon name='cloud' size={20} color='#5A7D9A' />
-            <TText style={{ marginTop: 5 }}>
-              {displayWeather?.precipitation !== null && displayWeather?.precipitation !== undefined
-                ? `${displayWeather.precipitation}mm`
-                : 'N/A'}
-            </TText>
-            <TText style={styles.weatherLabel}>Rain</TText>
-          </View>
-          <View style={styles.weather}>
-            <TIcon name='water' size={20} color='#5A7D9A' />
-            <TText style={{ marginTop: 5 }}>
-              {displayWeather?.humidity !== null && displayWeather?.humidity !== undefined
-                ? `${displayWeather.humidity.toFixed(0)}%`
-                : 'N/A'}
-            </TText>
-            <TText style={styles.weatherLabel}>Humid</TText>
-          </View>
-          <View style={styles.weather}>
-            <TIcon name='fan' size={20} color='#5A7D9A' />
-            <TText style={{ marginTop: 5 }}>
-              {displayWeather?.windSpeed !== null && displayWeather?.windSpeed !== undefined
-                ? `${Math.round(displayWeather.windSpeed)}km/h`
-                : 'N/A'}
-            </TText>
-            <TText style={styles.weatherLabel}>Wind</TText>
-          </View>
-        </View>
-
-        {error && (
-          <TText style={{ opacity: 0.5, marginTop: 10, textAlign: 'center', fontSize: 12, color: '#ff6b6b' }}>
-            {error instanceof Error ? error.message : 'Failed to load weather data'}
+      </> : <>
+        <View style={{ gap: 3}}>
+          <TText style={{ opacity: 0.5, fontSize: 12 }}>
+            You're currently at
           </TText>
-        )}
-      </View>
-    </TView>
+          <TText type='subtitle' style={{ color: '#fff', fontSize: 17 }}>
+            {displayCity}
+          </TText>
+          
+          <TText style={{ opacity: 0.5, fontSize: 12 }}>
+            {displayWeather?.weatherType || 'No data'}
+          </TText>
+
+          {displayWeather && (
+            <Image
+              source={getWeatherImage(displayWeather.weatherCode)}
+              style={styles.weatherImage}
+              resizeMode='cover'
+            />
+          )}
+          
+          <View style={styles.weatherDetailsContainer}>
+            <View style={styles.weather}>
+              <TIcon name='thermometer' size={20} color='#fff' />
+              <TText style={styles.weatherValue}>
+                {displayWeather?.temperature !== null && displayWeather?.temperature !== undefined
+                  ? `${Math.round(displayWeather.temperature)}°C`
+                  : 'N/A'}
+              </TText>
+              <TText style={styles.weatherLabel}>Heat</TText>
+            </View>
+            <View style={styles.weather}>
+              <TIcon name='cloud' size={20} color='#fff' />
+              <TText style={styles.weatherValue}>
+                {displayWeather?.precipitation !== null && displayWeather?.precipitation !== undefined
+                  ? `${displayWeather.precipitation}mm`
+                  : 'N/A'}
+              </TText>
+              <TText style={styles.weatherLabel}>Rain</TText>
+            </View>
+            <View style={styles.weather}>
+              <TIcon name='water' size={20} color='#fff' />
+              <TText style={styles.weatherValue}>
+                {displayWeather?.humidity !== null && displayWeather?.humidity !== undefined
+                  ? `${displayWeather.humidity.toFixed(0)}%`
+                  : 'N/A'}
+              </TText>
+              <TText style={styles.weatherLabel}>Humid</TText>
+            </View>
+            <View style={styles.weather}>
+              <TIcon name='fan' size={20} color='#fff' />
+              <TText style={styles.weatherValue}>
+                {displayWeather?.windSpeed !== null && displayWeather?.windSpeed !== undefined
+                  ? `${Math.round(displayWeather.windSpeed)}km/h`
+                  : 'N/A'}
+              </TText>
+              <TText style={styles.weatherLabel}>Wind</TText>
+            </View>
+          </View>
+
+          {error && (
+            <TText style={{ opacity: 0.5, marginTop: 10, textAlign: 'center', fontSize: 12, color: '#ff6b6b' }}>
+              {error instanceof Error ? error.message : 'Failed to load weather data'}
+            </TText>
+          )}
+        </View>
+      </>}
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   locationContent: {
     width: '100%',
-    padding: 14,
-    borderRadius: 10,
+    padding: 16,
     overflow: 'hidden',
     marginBottom: 15,
     borderWidth: 1,
     borderColor: 'transparent',
+    height: 275,
   },
   weatherDetailsContainer: {
     justifyContent: 'space-between',
@@ -162,6 +165,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '23%',
   },
+  weatherValue: {
+    marginTop: 5,
+  },
   weatherLabel: {
     fontSize: 9,
     opacity: 0.5,
@@ -169,9 +175,9 @@ const styles = StyleSheet.create({
   },
   weatherImage: {
     position: 'absolute',
-    top: '-15%',
-    right: '-30%',
-    width: '75%',
+    top: '-13%',
+    right: '-15%',
+    width: '40%',
     height: '75%',
     zIndex: 1000,
   },

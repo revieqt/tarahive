@@ -54,11 +54,21 @@ function cellCenter(col: number, row: number): { cx: number; cy: number } {
   return { cx, cy };
 }
 
-const HiveBg: React.FC = () => {
+interface HiveBgProps {
+  flipHorizontal?: boolean;
+}
+
+const HiveBg: React.FC<HiveBgProps> = ({ flipHorizontal = false }) => {
   const HEX_COLOR = useThemeColor({}, 'accent');
   const primaryColor = useThemeColor({}, 'primary');
   return (
-    <View style={styles.container} pointerEvents="none">
+    <View
+      style={[
+        styles.container,
+        flipHorizontal && { transform: [{ scaleX: -1 }] },
+      ]}
+      pointerEvents="none"
+    >
       <Svg
         width={canvasW}
         height={canvasH}
