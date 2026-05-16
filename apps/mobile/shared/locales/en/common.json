@@ -1,6 +1,7 @@
 {
   "common": {
     "welcome": "Welcome to Tarahive",
+    "cancel": "Cancel",
     "continue": "Continue"
   },
   "months": {
@@ -27,5 +28,9 @@
   "no_internet": {
     "title": "No Internet Connection",
     "description": "You are using Tarahive in offline mode. Some features may be limited until you reconnect to the internet."
+  },
+  "dev": {
+    "cache_clear_title": "Clear Cache",
+    "cache_clear_subtitle": "This will clear all cached data and log you out. Continue?"
   }
 }

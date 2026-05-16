@@ -4,31 +4,26 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useSession } from '@/features/auth/context/SessionContext';
 import { Dialog } from '@/shared/services/dialog.service';
 import { useCallback } from 'react';
+import { useLanguage } from '@/shared/context/LanguageContext';
 
 export function useDev() {
   const queryClient = useQueryClient();
   const { clearSession } = useSession();
-
+  const { t } = useLanguage();
   const clearCache = useCallback(async () => {
+    
     Dialog.confirm(
-      'Clear Cache',
-      'This will clear all cached data and log you out. Continue?',
+      t('common.dev.cache_clear_title'),
+      t('common.dev.cache_clear_subtitle'),
       {
-        confirmText: 'Clear',
-        cancelText: 'Cancel',
+        confirmText: t('common.common.continue'),
+        cancelText: t('common.common.cancel'),
         destructive: true,
         onConfirm: async () => {
           try {
-            // Clear AsyncStorage
             await AsyncStorage.clear();
-
-            // Clear TanStack QueryClient cache
             queryClient.clear();
-
-            // Clear session
             await clearSession();
-
-            // Redirect to login
             router.replace('/login');
           } catch (error) {
             console.error('Failed to clear cache:', error);

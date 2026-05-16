@@ -5,11 +5,9 @@ import { SUPPORT_FORM_URL } from '@/Config';
 import { useSession } from '@/features/auth/context/SessionContext';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Pressable, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useInternetConnection } from '@/shared/utils/checkInternetConnection';
 import ProfileImage from '@/shared/components/ui/ProfileImage';
-import { useQueryClient } from '@tanstack/react-query'
 import ProCard from '@/shared/components/cards/ProCard';
 import { useLanguage } from '@/shared/context/LanguageContext';
 import { useDev } from '@/shared/hooks/useDev';
@@ -30,7 +28,7 @@ export default function AccountScreen() {
   const { session } = useSession();
   const user = session?.user;
   const [devMode, setDevMode] = useState(false);
-  const isConnected = !useInternetConnection();
+  const isConnected = useInternetConnection();
   const { t } = useLanguage();
   const { clearCache } = useDev();
   const fullName = [user?.fname, user?.lname].filter(Boolean).join(' ');
