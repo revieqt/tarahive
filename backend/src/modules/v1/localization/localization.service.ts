@@ -37,6 +37,29 @@ export async function getAllTranslations(
   return result;
 }
 
+export async function getPreloadTranslations(
+  lang: string,
+): Promise<Record<string, any>> {
+  const langPath = path.join(localesPath, lang);
+  if (!fs.existsSync(langPath)) {
+    throw new Error(`Language ${lang} not found`);
+  }
+
+  const namespaces = ['common', 'auth', 'settings', 'tabs'];
+  const result: Record<string, any> = {};
+
+  for (const namespace of namespaces) {
+    try {
+      result[namespace] = await getTranslations(lang, namespace);
+    } catch (err: any) {
+      // If a namespace doesn't exist, use empty object
+      result[namespace] = {};
+    }
+  }
+
+  return result;
+}
+
 // ─── Language detection ───────────────────────────────────────────────────────
 
 const SUPPORTED_LANGS = fs.existsSync(localesPath)

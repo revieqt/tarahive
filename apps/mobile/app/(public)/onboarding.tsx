@@ -118,7 +118,7 @@ export default function Onboarding() {
 
         {isLastSlide && (
           <Button
-            title={t("common.continue")}
+            title={t("common.common.continue")}
             onPress={handleContinue}
             type="primary"
             buttonStyle={styles.continueBtn}

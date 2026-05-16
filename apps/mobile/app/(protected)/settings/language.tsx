@@ -9,7 +9,7 @@ import HiveBg from "@/shared/components/common/HiveBg";
 import Header from "@/shared/components/common/Header";
 
 export default function LanguageSettingsScreen() {
-  const { currentLanguage, setLanguage, isLoading } = useLanguage();
+  const { currentLanguage, setLanguage, loading, t } = useLanguage();
   const [selectedLanguage, setSelectedLanguage] = useState(currentLanguage.code);
   const backgroundColor = useThemeColor({}, 'primary');
   const checkColor = useThemeColor({}, 'secondary');
@@ -27,7 +27,7 @@ export default function LanguageSettingsScreen() {
   return (
     <TView style={styles.container}>
       <HiveBg />
-      <Header title="Languages" subtitle="Use the language you prefer for the app." />
+      <Header title={t("settings.language_title")} subtitle={t("settings.language_subtitle")} />
 
       <ScrollView style={styles.languageList}>
         {LANGUAGES.map((language) => (
@@ -38,7 +38,7 @@ export default function LanguageSettingsScreen() {
               { backgroundColor },
             ]}
             onPress={() => handleLanguageSelect(language.code)}
-            disabled={isLoading}
+            disabled={loading}
           >
             <View style={styles.languageInfo}>
               <TText style={styles.flag}>{language.flag}</TText>
@@ -47,10 +47,10 @@ export default function LanguageSettingsScreen() {
                 <TText style={styles.nativeName}>{language.nativeName}</TText>
               </View>
             </View>
-            {selectedLanguage === language.code && !isLoading && (
+            {selectedLanguage === language.code && !loading && (
               <TIcon name="check" color={checkColor} size={20}/>
             )}
-            {selectedLanguage === language.code && isLoading && (
+            {selectedLanguage === language.code && loading && (
               <ActivityIndicator size="small" />
             )}
           </TouchableOpacity>

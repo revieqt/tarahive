@@ -16,6 +16,7 @@ import BackButton from '@/shared/components/common/BackButton';
 import LangButton from '@/shared/components/common/LanguageButton';
 import { showError } from '@/shared/services/toast.service';
 import PasswordValidationCard from '@/shared/components/cards/PasswordValidationCard';
+import { useLanguage } from '@/shared/context/LanguageContext';
 
 export default function RegisterScreen() {
   const [fname, setFname] = useState('');
@@ -33,6 +34,7 @@ export default function RegisterScreen() {
   const [currentPage, setCurrentPage] = useState(0);
   const screenWidth = Dimensions.get('window').width;
   const screenHeight = Dimensions.get('window').height;
+  const { t } = useLanguage();
 
   // Initialize hooks
   const { register, loading: registerLoading } = useRegister();
@@ -196,40 +198,40 @@ export default function RegisterScreen() {
                 keyboardShouldPersistTaps="handled"
               >
                 <View style={styles.headerContainer}>
-                  <TText type="title">Join our Community!</TText>
-                  <TText>Only 13 years old and above are allowed to register</TText>
+                  <TText type="title">{t("auth.register.title")}</TText>
+                  <TText>{t("auth.register.subtitle")}</TText>
                 </View>
 
                 <TextField
-                  placeholder="First Name"
+                  placeholder={t("auth.register.fname")}
                   value={fname}
                   onChangeText={setFname}
                   autoCapitalize="words"
                 />
 
                 <TextField
-                  placeholder="Last Name (optional)"
+                  placeholder={t("auth.register.lname")}
                   value={lname}
                   onChangeText={setLname}
                   autoCapitalize="words"
                 />
 
                 <DatePickerField
-                  placeholder="Birthdate"
+                  placeholder={t("auth.register.bdate")}
                   value={bdate}
                   onChange={setBdate}
                   maximumDate={new Date()}
                 />
 
                 <DropDownField
-                  placeholder="Gender"
+                  placeholder={t("auth.register.gender")}
                   value={gender}
                   onValueChange={setGender}
                   values={GENDER_OPTIONS}
                 />
 
                 <TextField
-                  placeholder="Email"
+                  placeholder={t("auth.register.email")}
                   value={email}
                   onChangeText={setEmail}
                   keyboardType="email-address"
@@ -237,13 +239,13 @@ export default function RegisterScreen() {
                 />
 
                 <PasswordField
-                  placeholder="Password"
+                  placeholder={t("auth.register.password")}
                   value={password}
                   onChangeText={setPassword}
                 />
 
                 <PasswordField
-                  placeholder="Confirm Password"
+                  placeholder={t("auth.register.confirm_password")}
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
                 />
@@ -251,13 +253,14 @@ export default function RegisterScreen() {
                 <PasswordValidationCard password={password} confirmPassword={confirmPassword} withConfirmation/>
 
                 <TouchableOpacity onPress={() => []}>
-                  <TText style={styles.termsText}>By creating an account, you agree to our Terms of Service and Privacy Policy.</TText>
+                  <TText style={styles.termsText}>{t("auth.register.terms_prompt")}</TText>
                 </TouchableOpacity>
 
                 <Button
-                  title={verificationLoading ? 'Sending Code...' : 'Create Account'}
+                  title={t("common.common.continue")}
                   onPress={handleNext}
                   type="primary"
+                  loading={verificationLoading}
                   disabled={verificationLoading}
                   buttonStyle={{marginTop: 16}}
                 />

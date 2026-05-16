@@ -1,9 +1,6 @@
-// localization/i18n.middleware.ts
-
 import { Request, Response, NextFunction } from 'express';
 import { detectLanguage, t as translate } from '../modules/v1/localization/localization.service';
 
-// Extend Express's res.locals type so TypeScript knows what's on it
 declare global {
   namespace Express {
     interface Locals {

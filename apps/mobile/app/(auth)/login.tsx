@@ -11,6 +11,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import { showError, showInfo, showWarning } from '@/shared/services/toast.service';
 import LangButton from '@/shared/components/common/LanguageButton';
+import { useLanguage } from '@/shared/context/LanguageContext';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -20,6 +21,7 @@ export default function LoginScreen() {
   const isConnected = useInternetConnection();
   const secondaryColor = useThemeColor({}, 'accent');
   const primaryColor = useThemeColor({}, 'primary');
+  const { t } = useLanguage();
   
   // Use the auth hooks
   const { login, loading, error } = useAuthLogin();
@@ -85,10 +87,8 @@ export default function LoginScreen() {
           bounces={false}
         >
           <TView style={styles.headerContainer} color='secondary'>
-            <TText type='title' style={{color: '#fff'}}>Smart Plans</TText>
-            <TText style={{color: '#fff'}}>
-              Safer Journeys, Travel with TaraG!
-            </TText>
+            <TText type='title' style={{color: '#fff'}}>{t("auth.login.title")}</TText>
+            <TText type='subtitle' style={{color: '#fff'}}>{t("auth.login.subtitle")}</TText>
           </TView>
 
           <View style={styles.contentContainer}>
@@ -97,7 +97,7 @@ export default function LoginScreen() {
               style={styles.formGradient}
             >
               <TextField
-                placeholder="Email / Username"
+                placeholder={t("auth.login.email")}
                 value={email}
                 onChangeText={setEmail}
                 onFocus={() => setFocusedInput('email')}
@@ -108,7 +108,7 @@ export default function LoginScreen() {
               />
 
               <PasswordField
-                placeholder="Password"
+                placeholder={t("auth.login.password")}
                 value={password}
                 onChangeText={setPassword}
                 onFocus={() => setFocusedInput('password')}
@@ -124,12 +124,12 @@ export default function LoginScreen() {
                 onPress={() => router.push('/forgot-password')}
               >
                 <TText style={{ textAlign: 'right', opacity: .7}}>
-                  Forgot Password?
+                  {t("auth.login.forgot_password_prompt")}
                 </TText>
               </TouchableOpacity>
               
               <Button
-                title={loading ? 'Logging in...' : 'Login'}
+                title={t("auth.login.login_button")}
                 // onPress={handleLogin}
                 onPress={() => router.push('(tabs)/home')}
                 type="primary"
@@ -144,7 +144,7 @@ export default function LoginScreen() {
               <TouchableOpacity
                 onPress={() => router.push('/register')}
               >
-                <TText style={{textAlign: 'center', marginTop: 10, opacity: .7}}>Dont have an account yet? Register</TText>
+                <TText style={{textAlign: 'center', marginTop: 10, opacity: .7}}>{t("auth.login.register_prompt")}</TText>
               </TouchableOpacity>
             </TView>
           </View>

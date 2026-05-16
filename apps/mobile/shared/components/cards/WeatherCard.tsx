@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import { TText, TView, TIcon } from '@/shared/components/ui/Themed';
-import { useLocation } from '@/shared/context/DeviceContext';
+import { useLocation } from '@/shared/context/LocationContext';
 import { useCurrentWeather } from '@/shared/hooks/useWeather';
 import Skeleton from '@/shared/components/ui/Skeleton';
 

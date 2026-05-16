@@ -7,7 +7,7 @@ import { ThemeProvider } from '@/shared/context/ThemeContext';
 import * as SplashScreen from 'expo-splash-screen';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SessionProvider } from '@/features/auth/context/SessionContext';
-import { LocationProvider } from '@/shared/context/DeviceContext';
+import { LocationProvider } from '@/shared/context/LocationContext';
 import { toastConfig } from "@/shared/components/ui/Toast";
 import Toast from "react-native-toast-message";
 import { LanguageProvider } from '@/shared/context/LanguageContext';

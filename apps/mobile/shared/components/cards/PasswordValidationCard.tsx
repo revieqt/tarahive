@@ -2,6 +2,7 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import { useThemeColor } from "@/shared/hooks/useThemeColor";
 import { TText, TIcon } from "../ui/Themed";
+import { useLanguage } from "@/shared/context/LanguageContext";
 
 interface PasswordValidationCardProps {
   password: string;
@@ -14,6 +15,7 @@ export default function PasswordValidationCard({
   confirmPassword, 
   withConfirmation,
 }: PasswordValidationCardProps) {
+  const { t } = useLanguage();
   const accentColor = useThemeColor({}, 'accent');
   const isValidLength = password.length >= 6;
   const hasUppercase = /[A-Z]/.test(password);
@@ -26,33 +28,33 @@ export default function PasswordValidationCard({
     <View style={styles.container}>
       <View style={styles.row}>
         <TIcon name={isValidLength ? "check-circle" : "close"} color={isValidLength ? accentColor : undefined} size={16}/>
-        <TText style={styles.text}>must be at least 8 characters long</TText>
+        <TText style={styles.text}>{t("auth.change_password.validation1")}</TText>
       </View>
 
       <View style={styles.row}>
         <TIcon name={hasUppercase ? "check-circle" : "close"} color={hasUppercase ? accentColor : undefined} size={16}/>
-        <TText style={styles.text}>has at least one uppercase letter</TText>
+        <TText style={styles.text}>{t("auth.change_password.validation2")}</TText>
       </View>
 
       <View style={styles.row}>
         <TIcon name={hasLowercase ? "check-circle" : "close"} color={hasLowercase ? accentColor : undefined} size={16}/>
-        <TText style={styles.text}>has at least one lowercase letter</TText>
+        <TText style={styles.text}>{t("auth.change_password.validation3")}</TText>
       </View>
 
       <View style={styles.row}>
         <TIcon name={hasNumber ? "check-circle" : "close"} color={hasNumber ? accentColor : undefined} size={16}/>
-        <TText style={styles.text}>has at least one number</TText>
+        <TText style={styles.text}>{t("auth.change_password.validation4")}</TText>
       </View>
 
       <View style={styles.row}>
         <TIcon name={hasSpecialChar ? "check-circle" : "close"} color={hasSpecialChar ? accentColor : undefined} size={16}/>
-        <TText style={styles.text}>has at least one special character</TText>
+        <TText style={styles.text}>{t("auth.change_password.validation5")}</TText>
       </View>
 
       {withConfirmation && (
         <View style={styles.row}>
           <TIcon name={passwordsMatch ? "check-circle" : "close"} color={passwordsMatch ? accentColor : undefined} size={16}/>
-          <TText style={styles.text}>passwords match</TText>
+          <TText style={styles.text}>{t("auth.change_password.validation6")}</TText>
         </View>
       )}
     </View>
