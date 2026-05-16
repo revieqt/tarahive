@@ -23,5 +23,9 @@
     "non_binary": "Hindi binaryo",
     "prefer_not_to_say": "Mas gustong hindi sabihin",
     "other": "Iba pa"
+  },
+  "no_internet": {
+    "title": "Walang Koneksyon sa Internet",
+    "description": "Ginagamit mo ang Tarahive sa offline mode. Maaaring limitado ang ilang mga feature hanggang sa muli kang makakonekta sa internet."
   }
 }

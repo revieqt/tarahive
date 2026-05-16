@@ -1,6 +1,6 @@
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import { ThemeProvider } from '@/shared/context/ThemeContext';
@@ -10,9 +10,10 @@ import { SessionProvider } from '@/features/auth/context/SessionContext';
 import { LocationProvider } from '@/shared/context/LocationContext';
 import { toastConfig } from "@/shared/components/ui/Toast";
 import Toast from "react-native-toast-message";
+import { Dialog, type DialogState, INITIAL_STATE } from "@/shared/components/ui/Dialog";
+import { Dialog as DialogService } from "@/shared/services/dialog.service";
 import { LanguageProvider } from '@/shared/context/LanguageContext';
 import { TView } from '@/shared/components/ui/Themed';
-
 
 SplashScreen.preventAutoHideAsync();
 
@@ -44,6 +45,19 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
+  const [dialogState, setDialogState] = useState<DialogState>(INITIAL_STATE);
+ 
+  // Wire the service to this component's state setter once on mount
+  useEffect(() => {
+    DialogService._subscribe(setDialogState);
+    DialogService._setDismissCallback(handleDismiss);
+    // No cleanup needed — the root layout lives for the app's lifetime
+  }, []);
+ 
+  const handleDismiss = useCallback(() => {
+    setDialogState((prev) => ({ ...prev, visible: false }));
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <LocationProvider>
@@ -52,6 +66,7 @@ export default function RootLayout() {
             <SessionProvider>
               <AppContent />
               <Toast config={toastConfig} />
+              <Dialog state={dialogState} onDismiss={handleDismiss} />
             </SessionProvider>
           </LanguageProvider>
         </ThemeProvider>

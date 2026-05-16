@@ -150,6 +150,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     marginBottom: 25,
+    textAlign: "center",
   },
   description: {
     opacity: 0.7,

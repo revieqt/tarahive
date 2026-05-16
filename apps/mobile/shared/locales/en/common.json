@@ -23,5 +23,9 @@
     "non_binary": "Non-binary",
     "prefer_not_to_say": "Prefer not to say",
     "other": "Other"
+  },
+  "no_internet": {
+    "title": "No Internet Connection",
+    "description": "You are using Tarahive in offline mode. Some features may be limited until you reconnect to the internet."
   }
 }

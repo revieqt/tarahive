@@ -88,7 +88,7 @@ export default function LoginScreen() {
         >
           <TView style={styles.headerContainer} color='secondary'>
             <TText type='title' style={{color: '#fff'}}>{t("auth.login.title")}</TText>
-            <TText type='subtitle' style={{color: '#fff'}}>{t("auth.login.subtitle")}</TText>
+            <TText type='subtitle' style={{color: '#fff', textAlign: 'center'}}>{t("auth.login.subtitle")}</TText>
           </TView>
 
           <View style={styles.contentContainer}>

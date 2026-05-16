@@ -12,7 +12,9 @@ import ProfileImage from '@/shared/components/ui/ProfileImage';
 import { useQueryClient } from '@tanstack/react-query'
 import ProCard from '@/shared/components/cards/ProCard';
 import { useLanguage } from '@/shared/context/LanguageContext';
+import { useDev } from '@/shared/hooks/useDev';
 import HiveBg from '@/shared/components/common/HiveBg';
+import NoInternetCard from '@/shared/components/cards/NoInternetCard';
 
 const SettingsOption = ({ icon, label, onPress }: { icon: string; label: string; onPress: () => void }) => (
   <TouchableOpacity onPress={onPress} style={styles.optionsChild}>
@@ -28,8 +30,9 @@ export default function AccountScreen() {
   const { session } = useSession();
   const user = session?.user;
   const [devMode, setDevMode] = useState(false);
-  const isConnected = useInternetConnection();
+  const isConnected = !useInternetConnection();
   const { t } = useLanguage();
+  const { clearCache } = useDev();
   const fullName = [user?.fname, user?.lname].filter(Boolean).join(' ');
 
   const handleWebView = (url: string, title: string) => () => {
@@ -72,7 +75,7 @@ export default function AccountScreen() {
           </TouchableOpacity>
         </TView>
         
-        { isConnected && <ProCard/> }
+        { isConnected ? <ProCard/> : <NoInternetCard/> }
 
         <View style={styles.options}>
           <TText style={styles.optionsTitle}>{t('tabs.account.personalization_title')}</TText>
@@ -89,7 +92,7 @@ export default function AccountScreen() {
           <SettingsOption icon='translate' label={t('tabs.account.language_button')}
             onPress={() => router.push('/settings/language')}
           />
-          
+
           { isConnected && <>
             <TText style={styles.optionsTitle}>{t('tabs.account.privacy_title')}</TText>
 
@@ -121,6 +124,8 @@ export default function AccountScreen() {
               onPress={handleWebView(SUPPORT_FORM_URL, t('tabs.account.about_button'))}
             />
 
+          </>}
+
             <Pressable 
               onLongPress={() => {
                 const timer = setTimeout(() => setDevMode(!devMode), 3000);
@@ -142,10 +147,10 @@ export default function AccountScreen() {
             {devMode && <>
               <TText style={styles.optionsTitle}> {t('tabs.account.developer_title')} </TText>
               <SettingsOption icon='layers-remove' label={t('tabs.account.cache_button')}
-                onPress={() => {}}
+                onPress={clearCache}
               />
             </>}
-          </>}
+          
         </View>
 
         <Button
