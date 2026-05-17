@@ -1,11 +1,14 @@
 import { TText, TView, TIcon } from '@/shared/components/ui/Themed';
-import { useSession } from '@/features/auth/context/SessionContext';
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { Dimensions, ScrollView, StyleSheet, TouchableOpacity, View, Animated, Image } from 'react-native';
+import TextField from '@/shared/components/ui/TextField';
+import { Dimensions, ScrollView, StyleSheet, TouchableOpacity, View, Animated, Image, TextInput } from 'react-native';
 import { useInternetConnection } from '@/shared/utils/checkInternetConnection';
 import HomeHeaderCard from '@/shared/components/cards/HomeHeaderCard';
+import { useState, useEffect } from 'react';
+import { useLanguage } from '@/shared/context/LanguageContext';
+import { TARA_AI_SUGGESTIONS } from '@/shared/constants/Tara';
 
 const HomeOptions = [
   { icon: 'map-marker-radius', label: 'Routes', route: '/routes/routes' },
@@ -18,19 +21,60 @@ export default function HomeScreen() {
   const isConnected = useInternetConnection();
   const backgroundColor = useThemeColor({}, 'background');
   const primaryColor = useThemeColor({}, 'primary');
+  const textColor = useThemeColor({}, 'text');
   const accentColor = useThemeColor({}, 'accent');
   const secondaryColor = useThemeColor({}, 'secondary');
+  const [searchAi, setSearchAi] = useState('');
+  const { t } = useLanguage();
+
+  useEffect(() => {
+    // Select a random suggestion
+    const randomSuggestion = TARA_AI_SUGGESTIONS[Math.floor(Math.random() * TARA_AI_SUGGESTIONS.length)];
+    
+    // Typing animation
+    let currentIndex = 0;
+    const typingInterval = setInterval(() => {
+      if (currentIndex < randomSuggestion.length) {
+        setSearchAi(randomSuggestion.slice(0, currentIndex + 1));
+        currentIndex++;
+      } else {
+        clearInterval(typingInterval);
+      }
+    }, 50); // Adjust speed (ms per character)
+
+    return () => clearInterval(typingInterval);
+  }, []);
   return (
     <TView style={{ flex: 1 }}>
       <HomeHeaderCard />
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.menuContainer}>
           <LinearGradient colors={['transparent', backgroundColor, backgroundColor]} style={styles.menuGradient}/>
+          <View style={styles.searchContainer}>
+            <View style={[styles.searchFieldContainer, styles.shadow, {backgroundColor: primaryColor}]}>
+              <TextInput
+                value={searchAi}
+                onChangeText={setSearchAi}
+                autoCapitalize="words"
+                style={[styles.searchField, {color: textColor}]}
+              />
+
+              <TouchableOpacity>
+                <TIcon name='send' size={18} color={searchAi ? secondaryColor : '#ccc4'}/>
+              </TouchableOpacity>
+            </View>
+            
+
+            <TouchableOpacity style={[styles.notificationButton, styles.shadow,{backgroundColor: primaryColor}]}>
+              <TIcon name='bell' size={20} color={textColor}/>
+            </TouchableOpacity>
+          </View>
+          
           <View style={styles.menu}>
             {HomeOptions.map((option, index) => (
               <TouchableOpacity
                 key={index}
-                style={[styles.menuOptions, {backgroundColor: primaryColor}]}
+                style={[styles.menuOptions,styles.shadow, {backgroundColor: primaryColor}]}
                 onPress={() => router.push(option.route)}
                 disabled={option.requiresConnection && !isConnected}
               >
@@ -43,64 +87,51 @@ export default function HomeScreen() {
 
         <TView style={styles.gridContainer}>
           <TouchableOpacity 
-            onPress={() => router.push({
-              pathname: '/ai/ai-chat',
-            })}
-            activeOpacity={0.8}
+            onPress={() => router.push('/ai/ai-chat')}
+            style={[styles.gridChildContainer, styles.leftGridContainer, styles.shadow, {backgroundColor: primaryColor}]}
           >
-            <TView color='primary' shadow style={[styles.gridChildContainer, styles.leftGridContainer]}>
-              <TText style={{opacity: .5, fontSize: 10}}>Meet your AI buddy</TText>
-              <TText style={{opacity: .85, fontSize: 16}}>Tara</TText>
+            <TText style={{opacity: .5, fontSize: 10}}>Meet your AI buddy</TText>
+            <TText style={{opacity: .85, fontSize: 16}}>Tara</TText>
+            <LinearGradient
+              colors={[accentColor+'60', 'transparent']}
+              start={{ x: 1, y: 0 }}
+              end={{ x: 0, y: 0 }}
+              style={styles.gridCircle}
+              pointerEvents="none"
+            />
+            <Image source={require('@/shared/assets/images/icon.png')} style={styles.aiImage} />
+          </TouchableOpacity>
+          <View style={[styles.gridChildContainer, {gap: '4%'}]}>
+            <TouchableOpacity 
+              onPress={() => router.push('/(tabs)/explore')}
+              style={[styles.rightGridContainer, styles.shadow, {backgroundColor: primaryColor}]}
+            >
+              <TText style={{opacity: .5, fontSize: 10}}>Seamless group</TText>
+              <TText style={{opacity: .85}}>Rooms</TText>
               <LinearGradient
                 colors={[accentColor+'60', 'transparent']}
                 start={{ x: 1, y: 0 }}
                 end={{ x: 0, y: 0 }}
-                style={styles.gridCircle}
+                style={styles.rightGridCircle}
                 pointerEvents="none"
               />
-              <Image source={require('@/shared/assets/images/icon.png')} style={styles.aiImage} />
-            </TView>
-          </TouchableOpacity>
-          <View style={[styles.gridChildContainer, {gap: '4%'}]}>
-            <TView color='primary' shadow style={styles.rightGridContainer}>
-              <TouchableOpacity 
-              onPress={() => router.push({
-                pathname: '/(tabs)/explore',
-              })}
-              activeOpacity={0.8} style={{flex:1, padding: 12}}
-              >
-                <TText style={{opacity: .5, fontSize: 10}}>Seamless group</TText>
-                <TText style={{opacity: .85}}>Rooms</TText>
-                <LinearGradient
-                  colors={[accentColor+'60', 'transparent']}
-                  start={{ x: 1, y: 0 }}
-                  end={{ x: 0, y: 0 }}
-                  style={styles.rightGridCircle}
-                  pointerEvents="none"
-                />
-                <Image source={require('@/shared/assets/images/slide4-img.png')} style={styles.rightGridImage} />
-              </TouchableOpacity>
-            </TView>
-            <TView color='primary' shadow style={styles.rightGridContainer}>
+              <Image source={require('@/shared/assets/images/slide4-img.png')} style={styles.rightGridImage} />
+            </TouchableOpacity>
             <TouchableOpacity 
-              onPress={() => router.push({
-                pathname: '/(tabs)/explore',
-                params: { tab: '1' }
-              })}
-              activeOpacity={0.8} style={{flex: 1, padding: 12}}
+              onPress={() => router.push('/(tabs)/explore')}
+              style={[styles.rightGridContainer, styles.shadow, {backgroundColor: primaryColor}]}
             >
-                <TText style={{opacity: .5, fontSize: 10}}>Meet new friends with</TText>
-                <TText style={{opacity: .85}}>TaraBuddy</TText>
-                <LinearGradient
-                  colors={[accentColor+'60', 'transparent']}
-                  start={{ x: 1, y: 0 }}
-                  end={{ x: 0, y: 0 }}
-                  style={styles.rightGridCircle}
-                  pointerEvents="none"
-                />
-                <Image source={require('@/shared/assets/images/slide3-img.png')} style={styles.rightGridImage} />
-              </TouchableOpacity>
-            </TView>
+              <TText style={{opacity: .5, fontSize: 10}}>Meet new friends with</TText>
+              <TText style={{opacity: .85}}>TaraBuddy</TText>
+              <LinearGradient
+                colors={[accentColor+'60', 'transparent']}
+                start={{ x: 1, y: 0 }}
+                end={{ x: 0, y: 0 }}
+                style={styles.rightGridCircle}
+                pointerEvents="none"
+              />
+              <Image source={require('@/shared/assets/images/slide3-img.png')} style={styles.rightGridImage} />
+            </TouchableOpacity>
           </View>
         </TView>
       </ScrollView>
@@ -117,14 +148,44 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     zIndex: 5,
-    paddingTop: 130,
+    paddingTop: 190,
   },
   menuContainer:{
     position: 'relative',
     zIndex: 100,
   },
+  searchContainer:{
+    flexDirection: 'row',
+    gap: 6,
+    paddingHorizontal: 16,
+    marginBottom: 10,
+    zIndex: 1000,
+    opacity: .9,
+  },
+  searchFieldContainer:{
+    flex: 1,
+    height: 40,
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingRight: 10,
+  },
+  searchField:{
+    fontFamily: 'Inter',
+    fontSize: 11,
+    paddingHorizontal: 12,
+    flex: 1,
+  },
+  notificationButton:{
+    height: 40,
+    aspectRatio: 1,
+    borderRadius: 10,
+    backgroundColor: '#ccc7',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   menuGradient: {
-    height: 120,
+    height: 160,
     position: 'absolute',
     bottom: 0,
     left: 0,
@@ -137,7 +198,6 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'space-between',
     marginBottom: 10,
-    marginTop: 60,
     zIndex: 2000,
     paddingHorizontal: 16,
   },
@@ -150,9 +210,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingTop: 5,
     zIndex: 1002,
+  },
+  shadow:{
     shadowColor: '#000',
     shadowOffset: {
-      width: 0,      height: 1,
+      width: 0,
+      height: 1,
     },
     shadowOpacity: 0.22,
     shadowRadius: 2.22,
@@ -172,7 +235,7 @@ const styles = StyleSheet.create({
     zIndex: 100,
   },
   gridChildContainer:{
-    width: Dimensions.get('window').width * 0.445,
+    width: Dimensions.get('window').width * 0.45,
     aspectRatio: 1,
     borderRadius: 12,
   },
@@ -188,7 +251,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#ccc0'
+    borderColor: '#ccc0',
+    padding: 12,
   },
   gridCircle:{
     height: '150%',

@@ -65,7 +65,7 @@ export default function Skeleton({
 
 const styles = StyleSheet.create({
   skeleton: {
-    backgroundColor: "#ccc6",
+    backgroundColor: "#ccc7",
     overflow: "hidden",
   },
 });
