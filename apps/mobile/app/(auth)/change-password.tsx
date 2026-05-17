@@ -57,7 +57,7 @@ export default function ChangePasswordScreen() {
     <TView style={{flex: 1}}>
       <HiveBg />
       <KeyboardAvoidingView
-        style={{padding: 16}}
+        style={{padding: '3%'}}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         

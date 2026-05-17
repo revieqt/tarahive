@@ -189,7 +189,7 @@ export default function RegisterScreen() {
           <View style={{ height: screenHeight }}>
             <ScrollView
               ref={scrollRef}
-              style={{ width: screenWidth, padding: 16, zIndex: 2 }}
+              style={{ width: screenWidth, padding: '3%', zIndex: 2 }}
               contentContainerStyle={{ paddingBottom: 30 }}
               keyboardShouldPersistTaps="handled"
             >

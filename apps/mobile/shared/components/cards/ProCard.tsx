@@ -49,7 +49,7 @@ export default function ProCard() {
 const styles = StyleSheet.create({
   container: {
     borderRadius: 15,
-    padding: 16,
+    padding: 10,
     overflow: "hidden",
     marginBottom: 8,
     gap: 16,

@@ -33,7 +33,7 @@ export default function HomeHeaderCard() {
   const accentColor = useThemeColor({}, 'accent');
 
   const displayCity = locationData.city || locationData.suburb || locationData.region || locationData.state || 'Your Location';
-  const { data: displayWeather, isLoading, error } = useCurrentWeather(
+  const { data: displayWeather, isLoading } = useCurrentWeather(
     locationData.latitude,
     locationData.longitude,
     displayCity
@@ -131,12 +131,6 @@ export default function HomeHeaderCard() {
               <TText style={styles.weatherLabel}>Wind</TText>
             </View>
           </View>
-
-          {error && (
-            <TText style={{ opacity: 0.5, marginTop: 10, textAlign: 'center', fontSize: 12, color: '#ff6b6b' }}>
-              {error instanceof Error ? error.message : 'Failed to load weather data'}
-            </TText>
-          )}
         </View>
       </>}
     </LinearGradient>
@@ -151,7 +145,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderWidth: 1,
     borderColor: 'transparent',
-    height: 275,
+    height: 300,
   },
   weatherDetailsContainer: {
     justifyContent: 'space-between',

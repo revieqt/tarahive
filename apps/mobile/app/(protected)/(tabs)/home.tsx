@@ -2,8 +2,7 @@ import { TText, TView, TIcon } from '@/shared/components/ui/Themed';
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import TextField from '@/shared/components/ui/TextField';
-import { Dimensions, ScrollView, StyleSheet, TouchableOpacity, View, Animated, Image, TextInput } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View, Image, TextInput } from 'react-native';
 import { useInternetConnection } from '@/shared/utils/checkInternetConnection';
 import HomeHeaderCard from '@/shared/components/cards/HomeHeaderCard';
 import { useState, useEffect } from 'react';
@@ -28,10 +27,7 @@ export default function HomeScreen() {
   const { t } = useLanguage();
 
   useEffect(() => {
-    // Select a random suggestion
     const randomSuggestion = TARA_AI_SUGGESTIONS[Math.floor(Math.random() * TARA_AI_SUGGESTIONS.length)];
-    
-    // Typing animation
     let currentIndex = 0;
     const typingInterval = setInterval(() => {
       if (currentIndex < randomSuggestion.length) {
@@ -40,7 +36,7 @@ export default function HomeScreen() {
       } else {
         clearInterval(typingInterval);
       }
-    }, 50); // Adjust speed (ms per character)
+    }, 50);
 
     return () => clearInterval(typingInterval);
   }, []);
@@ -90,6 +86,57 @@ export default function HomeScreen() {
             onPress={() => router.push('/ai/ai-chat')}
             style={[styles.gridChildContainer, styles.leftGridContainer, styles.shadow, {backgroundColor: primaryColor}]}
           >
+            <View style={{padding: 12}}>
+              <TText style={{opacity: .5, fontSize: 10}}>Meet your AI buddy</TText>
+              <TText style={{opacity: .85, fontSize: 16}}>Tara</TText>
+            </View>
+            
+            <LinearGradient
+              colors={[accentColor+'60', 'transparent']}
+              start={{ x: 1, y: 0 }}
+              end={{ x: 0, y: 0 }}
+              style={styles.gridCircle}
+              pointerEvents="none"
+            />
+            <Image source={require('@/shared/assets/images/icon.png')} style={styles.aiImage} />
+          </TouchableOpacity>
+          <View
+            style={[styles.gridChildContainer, styles.leftGridContainer]}>
+            <TouchableOpacity 
+              onPress={() => router.push('/(tabs)/explore')}
+              style={[styles.rightGridContainer, styles.shadow, {backgroundColor: primaryColor}]}
+            >
+              <TText style={{opacity: .5, fontSize: 10}}>Seamless group</TText>
+              <TText style={{opacity: .85}}>Rooms</TText>
+              <LinearGradient
+                colors={[accentColor+'60', 'transparent']}
+                start={{ x: 1, y: 0 }}
+                end={{ x: 0, y: 0 }}
+                style={styles.rightGridCircle}
+                pointerEvents="none"
+              />
+              <Image source={require('@/shared/assets/images/slide4-img.png')} style={styles.rightGridImage} />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              onPress={() => router.push('/(tabs)/explore')}
+              style={[styles.rightGridContainer, styles.shadow, {backgroundColor: primaryColor}]}
+            >
+              <TText style={{opacity: .5, fontSize: 10}}>Meet new friends with</TText>
+              <TText style={{opacity: .85}}>TaraBuddy</TText>
+              <LinearGradient
+                colors={[accentColor+'60', 'transparent']}
+                start={{ x: 1, y: 0 }}
+                end={{ x: 0, y: 0 }}
+                style={styles.rightGridCircle}
+                pointerEvents="none"
+              />
+              <Image source={require('@/shared/assets/images/slide3-img.png')} style={styles.rightGridImage} />
+            </TouchableOpacity>
+          </View>
+          {/* <TouchableOpacity 
+            onPress={() => router.push('/ai/ai-chat')}
+            style={[styles.gridChildContainer, styles.leftGridContainer, styles.shadow, {backgroundColor: primaryColor}]}
+          >
             <TText style={{opacity: .5, fontSize: 10}}>Meet your AI buddy</TText>
             <TText style={{opacity: .85, fontSize: 16}}>Tara</TText>
             <LinearGradient
@@ -132,7 +179,7 @@ export default function HomeScreen() {
               />
               <Image source={require('@/shared/assets/images/slide3-img.png')} style={styles.rightGridImage} />
             </TouchableOpacity>
-          </View>
+          </View> */}
         </TView>
       </ScrollView>
       {/* <SidebarAlerts /> */}
@@ -148,7 +195,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     zIndex: 5,
-    paddingTop: 190,
+    paddingTop: 185,
   },
   menuContainer:{
     position: 'relative',
@@ -157,8 +204,8 @@ const styles = StyleSheet.create({
   searchContainer:{
     flexDirection: 'row',
     gap: 6,
-    paddingHorizontal: 16,
-    marginBottom: 10,
+    paddingHorizontal: '3%',
+    marginBottom: '2%',
     zIndex: 1000,
     opacity: .9,
   },
@@ -169,6 +216,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingRight: 10,
+    overflow: 'hidden'
   },
   searchField:{
     fontFamily: 'Inter',
@@ -185,7 +233,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   menuGradient: {
-    height: 160,
+    height: '90%',
     position: 'absolute',
     bottom: 0,
     left: 0,
@@ -197,12 +245,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: '100%',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    marginBottom: '2%',
     zIndex: 2000,
-    paddingHorizontal: 16,
+    paddingHorizontal: '3%',
+    gap: '2%',
   },
   menuOptions:{
-    width: Dimensions.get('window').width * 0.215,
+    flex: 1,
     aspectRatio: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -222,7 +271,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   menuOptionText:{
-    fontSize: 10,
+    fontSize: 9,
     marginTop: 5,
     opacity: 0.6,
   },
@@ -231,23 +280,23 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 16,
-    paddingHorizontal: 16,
+    paddingHorizontal: '3%',
     zIndex: 100,
+    gap: '2%',
   },
   gridChildContainer:{
-    width: Dimensions.get('window').width * 0.45,
+    flex: 1,
     aspectRatio: 1,
     borderRadius: 12,
+    gap: '5%',
   },
   leftGridContainer:{
-    padding: 14,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#ccc0'
   },
   rightGridContainer:{
-    height: '48%',
-    width: '100%',
+    flex: 1,
     borderRadius: 12,
     overflow: 'hidden',
     borderWidth: 1,

@@ -42,7 +42,7 @@ export default function LoginScreen() {
       
       if (result.user.status === 'pending') {
         router.push({
-          pathname: '/auth/verifyEmail' as any,
+          justifyContent: '/auth/verifyEmail' as any,
           params: { email: result.user.email }
         });
         return;
@@ -51,7 +51,7 @@ export default function LoginScreen() {
       // Check if 2FA is enabled
       if (result.user.securitySettings?.is2FAEnabled) {
         router.push({
-          pathname: '/auth/verifyEmail' as any,
+          justifyContent: '/auth/verifyEmail' as any,
           params: { 
             email: result.user.email, 
             is2FA: 'true',

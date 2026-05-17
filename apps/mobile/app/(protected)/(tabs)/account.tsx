@@ -34,7 +34,7 @@ export default function AccountScreen() {
 
   const handleWebView = (url: string, title: string) => () => {
     router.push({
-      pathname: "/webview",
+      justifyContent: "/webview",
       params: {
         url: url,
         title: title,
@@ -44,13 +44,13 @@ export default function AccountScreen() {
 
   return (
     <TView style={{flex: 1}}>
-      <ScrollView contentContainerStyle={{padding: 16}} showsVerticalScrollIndicator={true}>
+      <ScrollView contentContainerStyle={{padding: '3%'}} showsVerticalScrollIndicator={true}>
         <TView shadow color='primary' style={styles.header}>
           <TouchableOpacity
             style={styles.profileButton}
             onPress={() =>
               router.push({
-                pathname: '/account/[id]',
+                justifyContent: '/account/[id]',
                 params: { id: user?.id },
               })
             }
@@ -85,11 +85,12 @@ export default function AccountScreen() {
           <SettingsOption icon='palette' label={t('tabs.account.theme_button')}
             onPress={() => router.push('/settings/theme')}
           />
-          <SettingsOption icon='translate' label={t('tabs.account.language_button')}
-            onPress={() => router.push('/settings/language')}
-          />
 
           { isConnected && <>
+            <SettingsOption icon='translate' label={t('tabs.account.language_button')}
+              onPress={() => router.push('/settings/language')}
+            />
+          
             <TText style={styles.optionsTitle}>{t('tabs.account.privacy_title')}</TText>
 
             <SettingsOption icon='key' label={t('tabs.account.change_password_button')}

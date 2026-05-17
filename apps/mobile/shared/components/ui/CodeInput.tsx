@@ -99,7 +99,6 @@ const CodeInput: React.FC<CodeInputProps> = ({
         })}
       </View>
 
-      {/* Hidden Actual Input */}
       <TextInput
         ref={inputRef}
         value={value}
