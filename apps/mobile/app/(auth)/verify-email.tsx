@@ -17,10 +17,9 @@ import LangButton from '@/shared/components/common/LanguageButton';
 import { showError } from '@/shared/services/toast.service';
 import PasswordValidationCard from '@/shared/components/cards/PasswordValidationCard';
 import { useLanguage } from '@/shared/context/LanguageContext';
-import CodeInput from '@/shared/components/ui/CodeInputField';
-import Header from '@/shared/components/common/Header';
+import CodeInputField from '@/shared/components/ui/CodeInputField';
 
-export default function RegisterScreen() {
+export default function VerifyEmailScreen() {
   const [fname, setFname] = useState('');
   const [lname, setLname] = useState('');
   const [bdate, setBdate] = useState<Date | null>(null);
@@ -181,74 +180,131 @@ export default function RegisterScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={{ flex: 1, width: '100%' }}
       >
+        <BackButton type='floating'/>
         <LangButton/>
-        <HiveBg/>
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{padding: 16}}>
-          <Header title={t("auth.register.title")} subtitle={t("auth.register.subtitle")}/>
-        
-          <TextField
-            placeholder={t("auth.register.fname")}
-            value={fname}
-            onChangeText={setFname}
-            autoCapitalize="words"
-          />
+        <View>
+          <HiveBg/>
+          <Animated.View 
+            style={{
+              width: screenWidth * 2,
+              flexDirection: 'row',
+              transform: [{ translateX: slideAnim }]
+            }}
+          >
+            <View style={{ height: screenHeight }}>
+              <ScrollView
+                ref={scrollRef}
+                style={{ width: screenWidth, padding: 16, zIndex: 2 }}
+                contentContainerStyle={{ paddingBottom: 30 }}
+                keyboardShouldPersistTaps="handled"
+              >
+                <View style={styles.headerContainer}>
+                  <TText type="title">{t("auth.register.title")}</TText>
+                  <TText>{t("auth.register.subtitle")}</TText>
+                </View>
 
-          <TextField
-            placeholder={t("auth.register.lname")}
-            value={lname}
-            onChangeText={setLname}
-            autoCapitalize="words"
-          />
+                <TextField
+                  placeholder={t("auth.register.fname")}
+                  value={fname}
+                  onChangeText={setFname}
+                  autoCapitalize="words"
+                />
 
-          <DatePickerField
-            placeholder={t("auth.register.bdate")}
-            value={bdate}
-            onChange={setBdate}
-            maximumDate={new Date()}
-          />
+                <TextField
+                  placeholder={t("auth.register.lname")}
+                  value={lname}
+                  onChangeText={setLname}
+                  autoCapitalize="words"
+                />
 
-          <DropDownField
-            placeholder={t("auth.register.gender")}
-            value={gender}
-            onValueChange={setGender}
-            values={GENDER_OPTIONS}
-          />
+                <DatePickerField
+                  placeholder={t("auth.register.bdate")}
+                  value={bdate}
+                  onChange={setBdate}
+                  maximumDate={new Date()}
+                />
 
-          <TextField
-            placeholder={t("auth.register.email")}
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
+                <DropDownField
+                  placeholder={t("auth.register.gender")}
+                  value={gender}
+                  onValueChange={setGender}
+                  values={GENDER_OPTIONS}
+                />
 
-          <PasswordField
-            placeholder={t("auth.register.password")}
-            value={password}
-            onChangeText={setPassword}
-          />
+                <TextField
+                  placeholder={t("auth.register.email")}
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
 
-          <PasswordField
-            placeholder={t("auth.register.confirm_password")}
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-          />
+                <PasswordField
+                  placeholder={t("auth.register.password")}
+                  value={password}
+                  onChangeText={setPassword}
+                />
 
-          <PasswordValidationCard password={password} confirmPassword={confirmPassword} withConfirmation/>
+                <PasswordField
+                  placeholder={t("auth.register.confirm_password")}
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                />
 
-          <TouchableOpacity onPress={() => []}>
-            <TText style={styles.termsText}>{t("auth.register.terms_prompt")}</TText>
-          </TouchableOpacity>
+                <PasswordValidationCard password={password} confirmPassword={confirmPassword} withConfirmation/>
 
-          <Button
-            title={t("common.common.continue")}
-            onPress={handleNext}
-            type="primary"
-            loading={verificationLoading}
-            disabled={verificationLoading}
-            buttonStyle={{marginTop: 16}}
-          />
-        </ScrollView>
+                <TouchableOpacity onPress={() => []}>
+                  <TText style={styles.termsText}>{t("auth.register.terms_prompt")}</TText>
+                </TouchableOpacity>
+
+                <Button
+                  title={t("common.common.continue")}
+                  onPress={handleNext}
+                  type="primary"
+                  loading={verificationLoading}
+                  disabled={verificationLoading}
+                  buttonStyle={{marginTop: 16}}
+                />
+              </ScrollView>
+            </View>
+
+            {/* Second Page */}
+            <View style={{ height: screenHeight }}>
+              <ScrollView
+                style={{ width: screenWidth, padding: 16, zIndex: 2 }}
+                contentContainerStyle={{ paddingBottom: 30 }}
+                keyboardShouldPersistTaps="handled"
+              >
+                <View style={styles.headerContainer}>
+                  <TText type="title">{t("auth.verify_email.title")}</TText>
+                  <TText>{t("auth.verify_email.subtitle")} {email}</TText>
+                </View>
+
+                <CodeInputField
+                  value={verificationCode}
+                  onChangeText={setVerificationCode}
+                  characters={6}
+                  type="numeric"
+                />
+              </ScrollView>
+
+              <View style={styles.completeButton}>
+                <Button
+                  title={t("auth.verify_email.resend_prompt")}
+                  onPress={handleNext}
+                  disabled={verificationLoading}
+                />
+
+                <Button
+                  title={t("auth.register.register_button")}
+                  onPress={handleRegister}
+                  type="primary"
+                  disabled={!verificationCode || verificationLoading || registerLoading}
+                />
+              </View>
+            </View>
+          </Animated.View>
+        </View>
       </KeyboardAvoidingView>
     </TView>
   );

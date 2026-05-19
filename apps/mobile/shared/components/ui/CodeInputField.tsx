@@ -9,7 +9,7 @@ import {
   ViewStyle,
 } from 'react-native';
 
-interface CodeInputProps {
+interface CodeInputFieldProps {
   value: string;
   onChangeText: (text: string) => void;
   characters: number;
@@ -18,7 +18,7 @@ interface CodeInputProps {
   autoFocus?: boolean;
 }
 
-const CodeInput: React.FC<CodeInputProps> = ({
+const CodeInputField: React.FC<CodeInputFieldProps> = ({
   value,
   onChangeText,
   characters,
@@ -151,4 +151,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CodeInput;
+export default CodeInputField;
