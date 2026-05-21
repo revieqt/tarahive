@@ -12,12 +12,10 @@ import { GENDER_OPTIONS } from '@/shared/constants/Input';
 import { useRegister, useEmailVerification } from '@/features/auth/hooks/useRegister';
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import HiveBg from '@/shared/components/common/HiveBg';
-import BackButton from '@/shared/components/common/BackButton';
 import LangButton from '@/shared/components/common/LanguageButton';
 import { showError } from '@/shared/services/toast.service';
 import PasswordValidationCard from '@/shared/components/cards/PasswordValidationCard';
 import { useLanguage } from '@/shared/context/LanguageContext';
-import CodeInput from '@/shared/components/ui/CodeInputField';
 import Header from '@/shared/components/common/Header';
 
 export default function RegisterScreen() {
@@ -242,7 +240,8 @@ export default function RegisterScreen() {
 
           <Button
             title={t("common.common.continue")}
-            onPress={handleNext}
+            // onPress={handleNext}
+            onPress={() => router.push('/verify-email')}
             type="primary"
             loading={verificationLoading}
             disabled={verificationLoading}
@@ -262,10 +261,6 @@ const styles = StyleSheet.create({
     left: 16,
     zIndex: 100,
     gap: 8,
-  },
-  headerContainer: {
-    marginTop: 40,
-    marginBottom: 20
   },
   termsText: {
     textDecorationLine: 'underline',

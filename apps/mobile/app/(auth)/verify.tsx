@@ -9,7 +9,7 @@ import { useLanguage } from '@/shared/context/LanguageContext';
 import CodeInputField from '@/shared/components/ui/CodeInputField';
 import Header from '@/shared/components/common/Header';
 
-export default function VerifyEmailScreen() {
+export default function VerifyScreen() {
   const [verificationCode, setVerificationCode] = useState('');
   const { t } = useLanguage();
   const { sendCode, verifyCode, loading: verificationLoading } = useEmailVerification();
@@ -33,7 +33,7 @@ export default function VerifyEmailScreen() {
           />
         </ScrollView>
 
-        <View style={styles.completeButton}>
+        <View style={styles.buttonsContainer}>
           <Button
             title={t("auth.verify_email.resend_prompt")}
             onPress={() => []}
@@ -53,7 +53,7 @@ export default function VerifyEmailScreen() {
 }
 
 const styles = StyleSheet.create({
-  completeButton:{
+  buttonsContainer:{
     position: 'absolute',
     bottom: 16,
     right: 16,
