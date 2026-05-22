@@ -3,9 +3,9 @@ import { compareHashedOTP, hashOTP } from './auth.utils';
 
 const VERIFICATION_CODE_EXPIRATION = 30 * 60; // 30 minutes in seconds
 const VERIFICATION_CODE_PREFIX = 'verification_code:';
-const VALIDATED_EMAIL_PREFIX = 'validated_';
 const TWO_FA_CODE_PREFIX = '2fa_code:';
 const PASSWORD_RESET_CODE_PREFIX = 'password_reset_code:';
+const PENDING_REGISTRATION_PREFIX = 'pending_register:';
 
 /**
  * Store email verification code in Redis
@@ -221,61 +221,79 @@ export const verifyPasswordResetCode = async (
 };
 
 /**
- * Mark email as validated after successful verification
+ * Store pending user registration data in Redis
  * @param email - User email
- * @returns Promise that resolves when email is marked as validated
+ * @param userData - User registration data (with hashed password)
+ * @returns Promise that resolves when data is stored
  */
-export const markEmailAsValidated = async (email: string): Promise<void> => {
+export const storePendingRegistration = async (
+  email: string,
+  userData: any
+): Promise<void> => {
   try {
-    const key = `${VALIDATED_EMAIL_PREFIX}${email}`;
-    console.log(`📝 Marking email as validated with key: ${key}`);
+    const key = `${PENDING_REGISTRATION_PREFIX}${email}`;
+    const jsonData = JSON.stringify(userData);
+
+    console.log(`📝 Storing pending registration with key: ${key}`);
+    console.log(`   Email: ${email}`);
     console.log(`   Expiration: ${VERIFICATION_CODE_EXPIRATION} seconds (30 minutes)`);
-    
-    const result = await redis.setex(key, VERIFICATION_CODE_EXPIRATION, '1');
-    
-    console.log(`✅ Email marked as validated for ${email}`);
+
+    const result = await redis.setex(
+      key,
+      VERIFICATION_CODE_EXPIRATION,
+      jsonData
+    );
+
+    console.log(`✅ Pending registration stored for ${email}`);
     console.log(`   Redis response:`, result);
   } catch (error) {
-    console.error(`❌ Error marking email as validated for ${email}:`, error);
+    console.error(
+      `❌ Error storing pending registration for ${email}:`,
+      error
+    );
     throw error;
   }
 };
 
 /**
- * Check if email is validated
+ * Get pending user registration data from Redis
  * @param email - User email
- * @returns Promise that resolves to true if email is validated
+ * @returns User registration data or null if not found
  */
-export const isEmailValidated = async (email: string): Promise<boolean> => {
+export const getPendingRegistration = async (email: string): Promise<any | null> => {
   try {
-    const key = `${VALIDATED_EMAIL_PREFIX}${email}`;
-    const result = await redis.get(key);
-    
-    if (result) {
-      console.log(`✅ Email is validated: ${email}`);
-      return true;
+    const key = `${PENDING_REGISTRATION_PREFIX}${email}`;
+    const data = await redis.get(key);
+
+    if (!data) {
+      console.warn(`⚠️ No pending registration found for ${email}`);
+      return null;
     }
-    
-    console.warn(`⚠️ Email is not validated: ${email}`);
-    return false;
+
+    const userData = JSON.parse(data);
+    console.log(`✅ Pending registration retrieved for ${email}`);
+    return userData;
   } catch (error) {
-    console.error(`❌ Error checking if email is validated for ${email}:`, error);
+    console.error(
+      `❌ Error retrieving pending registration for ${email}:`,
+      error
+    );
     throw error;
   }
 };
 
 /**
- * Delete validated email entry (after successful registration)
+ * Delete pending user registration data from Redis
  * @param email - User email
  * @returns Promise that resolves when entry is deleted
  */
-export const deleteValidatedEmail = async (email: string): Promise<void> => {
+export const deletePendingRegistration = async (email: string): Promise<void> => {
   try {
-    const key = `${VALIDATED_EMAIL_PREFIX}${email}`;
+    const key = `${PENDING_REGISTRATION_PREFIX}${email}`;
     await redis.del(key);
-    console.log(`✅ Validated email entry deleted for ${email}`);
+    console.log(`✅ Pending registration deleted for ${email}`);
   } catch (error) {
-    console.error(`❌ Error deleting validated email entry for ${email}:`, error);
+    console.error(`❌ Error deleting pending registration for ${email}:`, error);
     throw error;
   }
 };

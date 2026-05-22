@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { registerUser, sendVerificationCode, verifyUserEmail, loginUser, updatePassword } from './auth.service';
+import { registerUser, sendVerificationCode, verifyUserEmail } from './auth.service';
 import { LogAction } from '../audit/audit.service';
 
 interface AuthRequest extends Request {
@@ -11,19 +11,17 @@ interface AuthRequest extends Request {
 
 /**
  * POST /auth/register
- * Register a new user
+ * Register a new user - stores pending registration data and sends verification code
  */
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
-    const user = await registerUser(req.body);
+    const result = await registerUser(req.body);
 
     await LogAction.info({
-      userId: user.id,
-      action: "USER_REGISTERED",
+      action: "USER_REGISTRATION_INITIATED",
       module: "auth",
-      description: `New user registered: ${user.email}`,
+      description: `User registration initiated for ${result.email}`,
       resourceType: "user",
-      resourceId: user.id,
       success: true,
       ip: req.ip,
       platform: req.body.device?.type,
@@ -38,14 +36,46 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       },
     });
     
-    res.status(201).json({
+    res.status(200).json({
       success: true,
-      message: 'User registered successfully',
+      message: res.locals.t('auth.register.registration_initiated'),
+      email: result.email,
+      nextStep: 'email-verification',
     });
   } catch (error: any) {
+    const errorMsg = error.message || 'Registration failed';
+    let localizationKey = 'auth.register.registration_failed';
+
+    if (errorMsg.includes('Email already registered')) {
+      localizationKey = 'auth.register.email_already_registered';
+    } else if (errorMsg.includes('Password') || errorMsg.includes('password')) {
+      localizationKey = 'auth.register.password_invalid';
+    } else if (errorMsg.includes('13 years old')) {
+      localizationKey = 'auth.register.age_error';
+    }
+
+    await LogAction.error({
+      action: "USER_REGISTRATION_FAILED",
+      module: "auth",
+      description: `User registration failed: ${errorMsg}`,
+      resourceType: "user",
+      success: false,
+      ip: req.ip,
+      platform: req.body.device?.type,
+      device: {
+        deviceId: req.body.device?.deviceId,
+        brand: req.body.device?.brand,
+        model: req.body.device?.model,
+        os: req.body.device?.os,
+      },
+      appInfo: {
+        appVersion: req.body.device?.appVersion,
+      },
+    });
+    
     res.status(400).json({
       success: false,
-      message: error.message || 'Registration failed',
+      message: res.locals.t(localizationKey),
     });
   }
 };
@@ -55,7 +85,10 @@ export const sendEmailVerification = async (req: Request, res: Response) => {
   try {
     
     if (!email) {
-      return res.status(400).json({ success: false, message: 'Email is required' });
+      return res.status(400).json({ 
+        success: false, 
+        message: res.locals.t('auth.verify_email.required_fields'),
+      });
     }
 
     const code = await sendVerificationCode(email);
@@ -63,7 +96,7 @@ export const sendEmailVerification = async (req: Request, res: Response) => {
     await LogAction.info({
       action: "EMAIL_VERIFICATION_CODE_SENT",
       module: "auth",
-      description: `Verification code sent to ${email}`,
+      description: `Verification code sent (or resent) to ${email}`,
       resourceType: "user",
       success: true,
       ip: req.ip,
@@ -80,14 +113,14 @@ export const sendEmailVerification = async (req: Request, res: Response) => {
     });
     res.status(200).json({ 
       success: true,
-      message: `Verification code sent to ${email}`,
-      id: email, // Return email as the ID for tracking
+      message: res.locals.t('auth.verify_email.code_sent'),
+      email: email,
      });
   } catch (error: any) {
     await LogAction.error({
       action: "EMAIL_VERIFICATION_CODE_FAILED",
       module: "auth",
-      description: `Verification code sent to ${email}`,
+      description: `Failed to send verification code to ${email}`,
       resourceType: "user",
       success: false,
       ip: req.ip,
@@ -104,7 +137,7 @@ export const sendEmailVerification = async (req: Request, res: Response) => {
     });
     res.status(500).json({ 
       success: false,
-      message: error.message || 'Failed to send verification code'
+      message: error.message || res.locals.t('auth.verify_email.code_sent'),
      });
   }
 };
@@ -114,16 +147,21 @@ export const verifyEmail = async (req: Request, res: Response) => {
   try {
     
     if (!email || !code) {
-      return res.status(400).json({ success: false, message: 'Email and code are required' });
+      return res.status(400).json({ 
+        success: false, 
+        message: res.locals.t('auth.verify_email.required_fields'),
+      });
     }
 
-    await verifyUserEmail(email, code);
+    const user = await verifyUserEmail(email, code);
 
     await LogAction.info({
+      userId: user.id,
       action: "EMAIL_VERIFICATION_SUCCESS",
       module: "auth",
-      description: `Email verified for ${email}`,
+      description: `Email verified and user created for ${email}`,
       resourceType: "user",
+      resourceId: user.id,
       success: true,
       ip: req.ip,
       platform: device?.type,
@@ -137,232 +175,51 @@ export const verifyEmail = async (req: Request, res: Response) => {
         appVersion: device?.appVersion,
       },
     });
+    
     res.status(200).json({ 
       success: true,
-      message: 'Email verified successfully' 
+      message: res.locals.t('auth.verify_email.success'),
+      user,
     });
   } catch (error: any) {
     const errorMsg = error.message || 'Failed to verify email';
-    if (
-      errorMsg.includes('Invalid') ||
-      errorMsg.includes('expired')
-    ) {
-      await LogAction.error({
-        action: "EMAIL_VERIFICATION_FAILED",
-        module: "auth",
-        description: `Failed to verify email ${email}`,
-        resourceType: "user",
-        success: false,
-        ip: req.ip,
-        platform: device?.type,
-        device: {
-          deviceId: device?.deviceId,
-          brand: device?.brand,
-          model: device?.model,
-          os: device?.os,
-        },
-        appInfo: {
-          appVersion: device?.appVersion,
-        },
-      });
-      return res
-        .status(400)
-        .json({ success: false, message: 'Invalid or expired verification code' });
-    }
-    res.status(500).json({ success: false, message: errorMsg });
-  }
-};
+    let localizationKey = 'auth.verify_email.invalid_code';
 
-/**
- * POST /auth/login
- * Login a user
- */
-export const login = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const result = await loginUser(req.body);
-
-    if (result.success) {
-      await LogAction.info({
-        userId: result.user?.id,
-        action: "USER_LOGGED_IN",
-        module: "auth",
-        description: `User logged in: ${result.user?.email}`,
-        resourceType: "user",
-        resourceId: result.user?.id,
-        success: true,
-        ip: req.ip,
-        platform: req.body.device?.type,
-        device: {
-          deviceId: req.body.device?.deviceId,
-          brand: req.body.device?.brand,
-          model: req.body.device?.model,
-          os: req.body.device?.os,
-        },
-        appInfo: {
-          appVersion: req.body.device?.appVersion,
-        },
-      });
-    } else {
-      await LogAction.error({
-        action: "USER_LOGIN_FAILED",
-        module: "auth",
-        description: `Login failed for ${req.body.identifier}: ${result.message}`,
-        resourceType: "user",
-        success: false,
-        ip: req.ip,
-        platform: req.body.device?.type,
-        device: {
-          deviceId: req.body.device?.deviceId,
-          brand: req.body.device?.brand,
-          model: req.body.device?.model,
-          os: req.body.device?.os,
-        },
-        appInfo: {
-          appVersion: req.body.device?.appVersion,
-        },
-      });
+    if (errorMsg.includes('No pending registration')) {
+      localizationKey = 'auth.verify_email.no_pending_registration';
+    } else if (errorMsg.includes('Invalid') || errorMsg.includes('expired')) {
+      localizationKey = 'auth.verify_email.invalid_code';
     }
 
-    res.status(200).json(result);
-  } catch (error: any) {
     await LogAction.error({
-      action: "USER_LOGIN_ERROR",
+      action: "EMAIL_VERIFICATION_FAILED",
       module: "auth",
-      description: `Login error for ${req.body.identifier}: ${error.message}`,
+      description: `Failed to verify email ${email}: ${errorMsg}`,
       resourceType: "user",
       success: false,
       ip: req.ip,
-      platform: req.body.device?.type,
+      platform: device?.type,
       device: {
-        deviceId: req.body.device?.deviceId,
-        brand: req.body.device?.brand,
-        model: req.body.device?.model,
-        os: req.body.device?.os,
+        deviceId: device?.deviceId,
+        brand: device?.brand,
+        model: device?.model,
+        os: device?.os,
       },
       appInfo: {
-        appVersion: req.body.device?.appVersion,
+        appVersion: device?.appVersion,
       },
     });
-
-    res.status(400).json({
-      success: false,
-      message: error.message || 'Login failed',
-    });
-  }
-};
-
-/**
- * POST /auth/change-password
- * Change user password
- */
-export const changePassword = async (req: AuthRequest, res: Response) => {
-  const { oldPassword, newPassword, confirmPassword, device } = req.body;
-  const userId = req.user?.id;
-  try {
-    if (!userId) {
-      return res.status(401).json({ error: 'Authentication required' });
-    }
-
-    if (!oldPassword || !newPassword || !confirmPassword) {
-      return res.status(400).json({ error: 'All password fields are required' });
-    }
-
-    // Password strength validation
-    if (newPassword.length < 8) {
-      return res.status(400).json({ error: 'New password must be at least 8 characters long' });
-    }
-
-    await updatePassword(userId, oldPassword, newPassword, confirmPassword);
-
-    await LogAction.info({
-      userId: userId,
-      action: "PASSWORD_UPDATE_SUCCESS",
-      module: "auth",
-      description: `User updated password: ${req.user?.email}`,
-      resourceType: "user",
-      resourceId: userId,
-      success: true,
-      ip: req.ip,
-      platform: req.body.device?.type,
-      device: {
-        deviceId: req.body.device?.deviceId,
-        brand: req.body.device?.brand,
-        model: req.body.device?.model,
-        os: req.body.device?.os,
-      },
-      appInfo: {
-        appVersion: req.body.device?.appVersion,
-      },
-    });
-    res.status(200).json({ success: true, message: 'Password updated successfully' });
-  } catch (error: any) {
-    if (error.message === 'New passwords do not match') {
-      await LogAction.info({
-        userId: userId,
-        action: "PASSWORD_UPDATE_ATTEMPT_FAILED",
-        module: "auth",
-        description: `User updated password: ${req.user?.email}`,
-        resourceType: "user",
-        resourceId: userId,
-        success: false,
-        ip: req.ip,
-        platform: req.body.device?.type,
-        device: {
-          deviceId: req.body.device?.deviceId,
-          brand: req.body.device?.brand,
-          model: req.body.device?.model,
-          os: req.body.device?.os,
-        },
-        appInfo: {
-          appVersion: req.body.device?.appVersion,
-        },
+    
+    if (errorMsg.includes('Invalid') || errorMsg.includes('expired') || errorMsg.includes('No pending registration')) {
+      return res.status(400).json({ 
+        success: false, 
+        message: res.locals.t(localizationKey),
       });
-
-      return res.status(400).json({ success: false, message: 'New passwords do not match' });
     }
-    if (error.message === 'Current password is incorrect') {
-      await LogAction.info({
-        userId: userId,
-        action: "PASSWORD_UPDATE_ATTEMPT_FAILED",
-        module: "auth",
-        description: `Current password is incorrect`,
-        resourceType: "user",
-        resourceId: userId,
-        success: false,
-        ip: req.ip,
-        platform: req.body.device?.type,
-        device: {
-          deviceId: req.body.device?.deviceId,
-          brand: req.body.device?.brand,
-          model: req.body.device?.model,
-          os: req.body.device?.os,
-        },
-        appInfo: {
-          appVersion: req.body.device?.appVersion,
-        },
-      });
-      return res.status(401).json({ success: false, message: 'Current password is incorrect' });
-    }
-    await LogAction.info({
-      userId: userId,
-      action: "PASSWORD_UPDATE_FAILED",
-      module: "auth",
-      description: `Failed to update password: ${error.message}`,
-      resourceType: "user",
-      resourceId: userId,
-      success: false,
-      ip: req.ip,
-      platform: req.body.device?.type,
-      device: {
-        deviceId: req.body.device?.deviceId,
-        brand: req.body.device?.brand,
-        model: req.body.device?.model,
-        os: req.body.device?.os,
-      },
-      appInfo: {
-        appVersion: req.body.device?.appVersion,
-      },
+    
+    res.status(500).json({ 
+      success: false, 
+      message: res.locals.t(localizationKey),
     });
-    res.status(500).json({ success: false, message: error.message || 'Failed to update password' });
   }
 };

@@ -4,48 +4,20 @@ import { Provider, UserStatus, UserType } from "../user/user.types";
 import { validatePassword, validateAge, hashPassword, generateVerificationCode, comparePassword, generateUsername } from "./auth.utils";
 import { RegisterDto, LoginDto } from "./auth.types";
 import { addSendVerificationEmailJob, addSendPasswordResetEmailJob } from './auth.queue';
-import jwt from 'jsonwebtoken';
+import { generateAccessToken, generateRefreshToken } from "./token.service";
 import {
   storeVerificationCode,
   verifyVerificationCode,
   storePasswordResetCode,
   verifyPasswordResetCode,
-  markEmailAsValidated,
-  isEmailValidated,
-  deleteValidatedEmail,
+  storePendingRegistration,
+  getPendingRegistration,
+  deletePendingRegistration,
 } from './auth.redis';
 
 const userRepo = AppDataSource.getRepository(User);
 
-export const generateAccessToken = (user: User): string => {
-  const secretKey = process.env.JWT_SECRET || 'default_secret';
-  const userId = (user.id as any).toString();
-  const accessToken = jwt.sign(
-    { id: userId, email: user.email },
-    secretKey,
-    { expiresIn: '1h' }
-  );
-  return accessToken;
-}
-
-export const generateRefreshToken = (user: User): string => {
-  const secretKey = process.env.JWT_SECRET || 'default_secret';
-  const userId = (user.id as any).toString();
-  const refreshToken = jwt.sign(
-    { id: userId , email: user.email },
-    secretKey,
-    { expiresIn: '14d' }
-  );
-  return refreshToken;
-}
-
-export const registerUser = async (data: RegisterDto): Promise<Partial<User>> => {
-  // 0. Check if email has been validated
-  const emailValidated = await isEmailValidated(data.email);
-  if (!emailValidated) {
-    throw new Error("Email must be verified before registration");
-  }
-
+export const registerUser = async (data: RegisterDto): Promise<{ success: boolean; message: string; email: string }> => {
   // 1. Validate password
   validatePassword(data.password);
 
@@ -53,26 +25,80 @@ export const registerUser = async (data: RegisterDto): Promise<Partial<User>> =>
   const existingEmail = await userRepo.findOne({ where: { email: data.email } });
   if (existingEmail) throw new Error("Email already registered");
 
-  // 4. Validate age (13 years old and above)
+  // 3. Validate age (13 years old and above)
   validateAge(data.bdate);
 
-  // 5. Hash password
+  // 4. Hash password
   const hashedPassword = await hashPassword(data.password);
 
-  // 6. Create user
-  const user = userRepo.create({
+  // 5. Store only user-provided data in Redis (expires in 30 minutes)
+  const pendingUserData = {
     fname: data.fname,
     lname: data.lname,
     email: data.email,
-    username: generateUsername(data.fname),
     password: hashedPassword,
     bdate: new Date(data.bdate),
     gender: data.gender,
-    provider: Provider.EMAIL,
-    type: UserType.TRAVELER,
-    status: UserStatus.ACTIVE,
-    isProUser: false,
-    expPoints: 0,
+    device: data.device,
+  };
+
+  await storePendingRegistration(data.email, pendingUserData);
+
+  // 6. Trigger verification code sending
+  await sendVerificationCode(data.email);
+
+  return {
+    success: true,
+    message: 'Registration initiated. Please verify your email to complete registration.',
+    email: data.email,
+  };
+};
+
+export const sendVerificationCode = async (email: string): Promise<string> => {
+  try {
+    const code = generateVerificationCode();
+
+    // Store code in Redis with 30-minute expiration
+    await storeVerificationCode(email, code);
+
+    // Queue the email job to send the code
+    await addSendVerificationEmailJob({email, code});
+
+    return code;
+  } catch (error) {
+    console.error('Error sending verification code:', error);
+    throw error;
+  }
+};
+
+export const verifyUserEmail = async (email: string, code: string): Promise<Partial<User>> => {
+  try {
+    // 1. Verify the code against Redis
+    const isValid = await verifyVerificationCode(email, code);
+
+    if (!isValid) throw new Error('Invalid or expired verification code');
+
+    // 2. Retrieve pending registration data from Redis
+    const pendingUserData = await getPendingRegistration(email);
+
+    if (!pendingUserData) {
+      throw new Error('No pending registration found. Please register again.');
+    }
+
+    // 3. Create user in database with pending data + default values
+    const user = userRepo.create({
+      fname: pendingUserData.fname,
+      lname: pendingUserData.lname,
+      email: pendingUserData.email,
+      username: generateUsername(pendingUserData.fname),
+      password: pendingUserData.password,
+      bdate: pendingUserData.bdate,
+      gender: pendingUserData.gender,
+      provider: Provider.EMAIL,
+      type: UserType.TRAVELER,
+      status: UserStatus.ACTIVE, // Activate user after verification
+      isProUser: false,
+      expPoints: 0,
       interests: [],
       safetyState: {
         isInAnEmergency: false,
@@ -95,144 +121,21 @@ export const registerUser = async (data: RegisterDto): Promise<Partial<User>> =>
           isTaraBuddyEnabled: false,
         },
       },
-      device: [data.device],
+      device: [pendingUserData.device],
     });
 
     const savedUser = await userRepo.save(user);
 
-    // 7. Delete validated email entry from Redis after successful registration
-    await deleteValidatedEmail(data.email);
+    // 4. Delete pending registration from Redis
+    await deletePendingRegistration(email);
 
+    // 5. Return user without password
     const { password: _, ...userWithoutPassword } = savedUser;
+
+    console.log(`✅ Email verified and user created for ${email}`);
     return userWithoutPassword;
-  }
-
-export const sendVerificationCode = async (email: string): Promise<string> => {
-  try {
-    const code = generateVerificationCode();
-
-    // Store code in Redis with 30-minute expiration
-    await storeVerificationCode(email, code);
-
-    // Queue the email job to send the code
-    await addSendVerificationEmailJob({
-      email,
-      code,
-    });
-
-    console.log(`📧 Verification code generated and queued for ${email}`);
-    return code;
-  } catch (error) {
-    console.error('Error sending verification code:', error);
-    throw error;
-  }
-};
-
-export const verifyUserEmail = async (email: string, code: string): Promise<void> => {
-  try {
-    // Verify the code against Redis
-    const isValid = await verifyVerificationCode(email, code);
-
-    if (!isValid) {
-      throw new Error('Invalid or expired verification code');
-    }
-
-    // Mark email as validated for 30 minutes
-    await markEmailAsValidated(email);
-
-    console.log(`✅ Email verified and user activated for ${email}`);
   } catch (error) {
     console.error('Error verifying email:', error);
-    throw error;
-  }
-};
-
-export const loginUser = async (data: LoginDto): Promise<{
-  success: boolean;
-  message: string;
-  nextStep?: string;
-  accessToken?: string;
-  refreshToken?: string;
-  user?: Partial<User>;
-  email?: string;
-}> => {
-  // Find user by email or username and explicitly include the password hash
-  const user = await userRepo
-    .createQueryBuilder('user')
-    .addSelect('user.password')
-    .where('user.email = :identifier', { identifier: data.identifier })
-    .orWhere('user.username = :identifier', { identifier: data.identifier })
-    .getOne();
-
-  if (!user) throw new Error('Invalid username or password');
-  if (!user.password) throw new Error('Invalid username or password');
-
-  const isPasswordValid = await comparePassword(data.password, user.password);
-  if (!isPasswordValid) throw new Error('Invalid username or password');
-
-  // Check user status
-  if (user.status === UserStatus.ACTIVE) {
-    // Generate tokens
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
-
-    // Return user without password
-    const { password: _, ...userWithoutPassword } = user;
-
-    return {
-      success: true,
-      message: 'Login successful',
-      nextStep: 'home',
-      accessToken,
-      refreshToken,
-      user: userWithoutPassword,
-    };
-  } else if (user.status === UserStatus.PENDING) {
-    return {
-      success: false,
-      message: 'You need to verify your email first before you continue.',
-      nextStep: 'email-verification',
-      email: user.email,
-    };
-  } else if (user.status === UserStatus.BANNED) {
-    return {
-      success: false,
-      message: 'You are currently banned',
-      nextStep: 'login',
-    };
-  }
-
-  throw new Error('Account status unknown');
-};
-
-export const updatePassword = async (
-  userId: string, 
-  oldPassword: string,
-  newPassword: string,
-  confirmPassword: string
-): Promise<void> => {
-  try {
-    // Find user and explicitly include password hash
-    const user = await userRepo
-      .createQueryBuilder('user')
-      .addSelect('user.password')
-      .where('user.id = :userId', { userId })
-      .getOne();
-
-    if (!user) throw new Error('User not found');
-    // Verify passwords match
-    if (newPassword !== confirmPassword) throw new Error('New passwords do not match');
-    // Validate new password strength
-    validatePassword(newPassword);
-    // Verify old password
-    if (!user.password) throw new Error('Current password is incorrect');
-    const isValidPassword = await comparePassword(oldPassword, user.password);
-    if (!isValidPassword) throw new Error('Current password is incorrect');
-
-    const hashedPassword = await hashPassword(newPassword);
-    user.password = hashedPassword;
-    await userRepo.save(user);
-  } catch (error) {
     throw error;
   }
 };
