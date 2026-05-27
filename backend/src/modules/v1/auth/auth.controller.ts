@@ -40,7 +40,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       success: true,
       message: res.locals.t('auth.register.registration_initiated'),
       email: result.email,
-      nextStep: 'email-verification',
+      nextStep: 'verify',
     });
   } catch (error: any) {
     const errorMsg = error.message || 'Registration failed';

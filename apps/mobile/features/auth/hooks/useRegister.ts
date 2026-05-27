@@ -1,11 +1,12 @@
-import { registerUser, sendEmailVerificationCode, verifyEmail } from '@/features/auth/services/register.service';
-import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { registerUser } from '@/features/auth/services/auth.service';
 import { calculateAge } from '@/shared/utils/calculateAge';
-import { RegisterRequest } from '@/features/auth/services/register.service';
-import { showError } from '@/shared/services/toast.service';
+import { RegisterRequest } from '@/features/auth/services/auth.service';
+import { showError, showInfo } from '@/shared/services/toast.service';
+import { useDeviceInfo } from '@/shared/hooks/useDeviceInfo';
 
 export const useRegister = () => {
-  const [loading, setLoading] = useState(false);
+  const deviceInfo = useDeviceInfo();
 
   const validate = (data: RegisterRequest) => {
     if (
@@ -27,58 +28,30 @@ export const useRegister = () => {
 
     if (!emailRegex.test(data.email)) throw new Error('Invalid email');
 
-    if (data.password.length < 6) throw new Error('Password too short');
+    if (data.password.length < 6) throw new Error('Password must be at least 6 characters');
   };
 
-  const register = async (data: RegisterRequest) => {
-    setLoading(true);
-
-    try {
+  const mutation = useMutation({
+    mutationFn: async (data: RegisterRequest) => {
       validate(data);
-      return await registerUser(data);
-    } finally {
-      setLoading(false);
-    }
-  };
+      return await registerUser({
+        ...data,
+        device: deviceInfo.isLoaded ? deviceInfo : undefined,
+      });
+    },
+    onError: (error: any) => {
+      const errorMsg = error.message || 'Registration failed';
+      showError('Registration Error', errorMsg);
+    },
+    onSuccess: (data) => {
+      showInfo('Success', data.message);
+    },
+  });
 
   return {
-    register,
-    loading,
+    register: mutation.mutate,
+    registerAsync: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    isError: mutation.isError,
   };
-};
-
-
-export const useEmailVerification = () => {
-  const [loading, setLoading] = useState(false);
-
-  const sendCode = async (email: string) => {
-    setLoading(true);
-    try {
-      const response = await sendEmailVerificationCode(email);
-      return response;
-    } catch (err: any) {
-      const errorMsg = err.message || 'Failed to send verification code';
-      showError('Error', errorMsg);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const verifyCode = async (email: string, code: string) => {
-    setLoading(true);
-    
-    try {
-      const result = await verifyEmail(email, code);
-      return result;
-    } catch (err: any) {
-      const errorMsg = err.message || 'Email verification failed';
-      showError('Error', errorMsg);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { sendCode, verifyCode, loading };
 };
