@@ -4,8 +4,8 @@ export enum Provider {
 }
 
 export enum UserStatus {
-  PENDING = "pending",
   ACTIVE = "active",
+  SUSPENDED = "suspended",
   BANNED = "banned",
 }
 

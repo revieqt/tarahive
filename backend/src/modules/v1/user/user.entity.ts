@@ -64,7 +64,7 @@ export class User {
   @Column({ type: "varchar" })
   type!: UserType;
 
-  @Column({ type: "enum", enum: UserStatus, default: UserStatus.PENDING })
+  @Column({ type: "enum", enum: UserStatus, default: UserStatus.ACTIVE})
   status!: UserStatus;
 
   @Column({ type: "boolean", default: false })
