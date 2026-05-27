@@ -182,4 +182,11 @@ export class User {
 
   @UpdateDateColumn({ name: "updated_on" })
   updatedOn!: Date;
+
+  // ======================
+  // SECURITY / SESSION CONTROL
+  // ======================
+
+  @Column({ type: "int", default: 1 })
+  tv!: number;
 }

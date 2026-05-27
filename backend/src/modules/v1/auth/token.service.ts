@@ -4,7 +4,6 @@ import { UserStatus } from '../user/user.types';
 
 export const generateAccessToken = (user: User): string => {
   const secretKey = process.env.ACCESS_TOKEN_SECRET || 'default_secret';
-  const userId = (user.id as any).toString();
   let statusField = "";
   
   switch(user.status){
@@ -21,8 +20,8 @@ export const generateAccessToken = (user: User): string => {
 
   const accessToken = jwt.sign(
     { 
-      sub: userId,
-      tv: 1, //temporary
+      sub: (user.id as any).toString(),
+      tv: user.tv,
       st: statusField,
     },
     secretKey,
@@ -33,11 +32,10 @@ export const generateAccessToken = (user: User): string => {
 
 export const generateRefreshToken = (user: User): string => {
   const secretKey = process.env.REFRESH_TOKEN_SECRET || 'default_secret';
-  const userId = (user.id as any).toString();
   const refreshToken = jwt.sign(
     { 
-      sub: userId,
-      tv: 1, //temporary
+      sub: (user.id as any).toString(),
+      tv: user.tv,
     },
     secretKey,
     { expiresIn: '14d' }
