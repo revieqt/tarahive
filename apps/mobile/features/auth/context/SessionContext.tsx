@@ -1,400 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, ReactNode, useContext, useEffect, useState, useRef } from 'react';
 import { BACKEND_URL } from '@/Config';
-import { 
-  loginUser, 
-  registerUser, 
-  sendEmailVerificationCode, 
-  send2FACode,
-  verifyEmail, 
-  verify2FA,
-  sendPasswordResetCode,
-  verifyPasswordResetCode,
-  resetPassword,
-  updatePassword
-} from '@/features/auth/services/auth.service';
-import { useDeviceInfo } from '@/shared/hooks/useDeviceInfo';
 
-// ============================================================================
-// 🔐 AUTH HOOKS - Following architecture: screen > hook > service > backend
-// ============================================================================
-
-/**
- * Hook for user login
- * Handles device info, session update, and token management
- */
-export const useAuthLogin = () => {
-  const deviceInfo = useDeviceInfo();
-  const { updateSession } = useSession();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const login = async (identifier: string, password: string) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      if (!deviceInfo.isLoaded) {
-        throw new Error('Device info not yet loaded');
-      }
-
-      const result = await loginUser(identifier, password, deviceInfo);
-      
-      // Transform user data for storage
-      const userData = {
-        id: result.user._id,
-        fname: result.user.fname,
-        lname: result.user.lname,
-        username: result.user.username,
-        email: result.user.email,
-        bdate: new Date(result.user.bdate),
-        gender: result.user.gender,
-        contactNumber: result.user.contactNumber,
-        profileImage: result.user.profileImage,
-        likes: result.user.likes || [],
-        isProUser: result.user.isProUser,
-        bio: result.user.bio || '',
-        status: result.user.status,
-        type: result.user.type,
-        expPoints: result.user.expPoints,
-        createdOn: new Date(result.user.createdOn),
-        isFirstLogin: result.user.isFirstLogin,
-        safetyState: result.user.safetyState,
-        visibilitySettings: result.user.visibilitySettings,
-        securitySettings: result.user.securitySettings,
-        taraBuddySettings: result.user.taraBuddySettings,
-      };
-
-      await updateSession({
-        user: userData,
-        accessToken: result.accessToken,
-        refreshToken: result.refreshToken,
-      });
-
-      return result;
-    } catch (err: any) {
-      const errorMsg = err.message || 'Login failed';
-      setError(errorMsg);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { login, loading, error };
-};
-
-/**
- * Hook for user registration
- * Handles device info and sends registration request
- */
-export const useAuthRegister = () => {
-  const deviceInfo = useDeviceInfo();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const register = async (userData: {
-    fname: string;
-    lname?: string;
-    bdate: string;
-    gender: string;
-    contactNumber?: string;
-    username: string;
-    email: string;
-    password: string;
-  }) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      if (!deviceInfo.isLoaded) {
-        throw new Error('Device info not yet loaded');
-      }
-
-      const result = await registerUser(userData, deviceInfo);
-      return result;
-    } catch (err: any) {
-      const errorMsg = err.message || 'Registration failed';
-      setError(errorMsg);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { register, loading, error };
-};
-
-/**
- * Hook for sending email verification code
- * Handles device info and verification code request
- */
-export const useEmailVerification = () => {
-  const deviceInfo = useDeviceInfo();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const sendCode = async (email: string) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      if (!deviceInfo.isLoaded) {
-        throw new Error('Device info not yet loaded');
-      }
-
-      const response = await sendEmailVerificationCode(email, deviceInfo);
-      return response;
-    } catch (err: any) {
-      const errorMsg = err.message || 'Failed to send verification code';
-      setError(errorMsg);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { sendCode, loading, error };
-};
-
-/**
- * Hook for sending 2FA code
- * Handles device info and sends 2FA code (different endpoint than email verification)
- */
-export const use2FACodeSending = () => {
-  const deviceInfo = useDeviceInfo();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const sendCode = async (email: string) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      if (!deviceInfo.isLoaded) {
-        throw new Error('Device info not yet loaded');
-      }
-
-      const response = await send2FACode(email, deviceInfo);
-      return response;
-    } catch (err: any) {
-      const errorMsg = err.message || 'Failed to send 2FA code';
-      setError(errorMsg);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { sendCode, loading, error };
-};
-
-/**
- * Hook for verifying email with code
- * Handles device info and email verification
- */
-export const useEmailCodeVerification = () => {
-  const deviceInfo = useDeviceInfo();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const verify = async (email: string, code: string) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      if (!deviceInfo.isLoaded) {
-        throw new Error('Device info not yet loaded');
-      }
-
-      const result = await verifyEmail(email, code, deviceInfo);
-      return result;
-    } catch (err: any) {
-      const errorMsg = err.message || 'Email verification failed';
-      setError(errorMsg);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { verify, loading, error };
-};
-
-/**
- * Hook for verifying 2FA code
- * Handles device info and 2FA verification
- */
-export const useEmail2FAVerification = () => {
-  const deviceInfo = useDeviceInfo();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const verify = async (email: string, code: string) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      if (!deviceInfo.isLoaded) {
-        throw new Error('Device info not yet loaded');
-      }
-
-      const result = await verify2FA(email, code, deviceInfo);
-      return result;
-    } catch (err: any) {
-      const errorMsg = err.message || '2FA verification failed';
-      setError(errorMsg);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { verify, loading, error };
-};
-
-/**
- * Hook for resetting password
- * Handles device info and password reset
- */
-export const usePasswordReset = () => {
-  const deviceInfo = useDeviceInfo();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const reset = async (identifier: string, newPassword: string) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      if (!deviceInfo.isLoaded) {
-        throw new Error('Device info not yet loaded');
-      }
-
-      const result = await resetPassword(identifier, newPassword, deviceInfo);
-      return result;
-    } catch (err: any) {
-      const errorMsg = err.message || 'Password reset failed';
-      setError(errorMsg);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { reset, loading, error };
-};
-
-/**
- * Hook for updating password for authenticated users
- * Handles device info and password update
- */
-export const usePasswordUpdate = () => {
-  const deviceInfo = useDeviceInfo();
-  const { session } = useSession();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const update = async (oldPassword: string, newPassword: string, confirmPassword: string) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      if (!deviceInfo.isLoaded) {
-        throw new Error('Device info not yet loaded');
-      }
-
-      if (!session?.user?.id || !session?.accessToken) {
-        throw new Error('User not authenticated');
-      }
-
-      const result = await updatePassword({
-        userId: session.user.id,
-        oldPassword,
-        newPassword,
-        confirmPassword,
-        accessToken: session.accessToken,
-        device: deviceInfo,
-      });
-      return result;
-    } catch (err: any) {
-      const errorMsg = err.message || 'Password update failed';
-      setError(errorMsg);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { update, loading, error };
-};
-
-/**
- * Hook for sending password reset code
- * Handles device info and code sending
- */
-export const usePasswordResetCodeSending = () => {
-  const deviceInfo = useDeviceInfo();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const sendCode = async (email: string) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      if (!deviceInfo.isLoaded) {
-        throw new Error('Device info not yet loaded');
-      }
-
-      const result = await sendPasswordResetCode(email, deviceInfo);
-      return result;
-    } catch (err: any) {
-      const errorMsg = err.message || 'Failed to send password reset code';
-      setError(errorMsg);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { sendCode, loading, error };
-};
-
-/**
- * Hook for verifying password reset code and resetting password
- * Handles device info and password reset
- */
-export const usePasswordResetCodeVerification = () => {
-  const deviceInfo = useDeviceInfo();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const verify = async (email: string, code: string, newPassword: string) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      if (!deviceInfo.isLoaded) {
-        throw new Error('Device info not yet loaded');
-      }
-
-      const result = await verifyPasswordResetCode(email, code, newPassword, deviceInfo);
-      return result;
-    } catch (err: any) {
-      const errorMsg = err.message || 'Password reset failed';
-      setError(errorMsg);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { verify, loading, error };
-};
-
-// ============================================================================
-// 🧑‍💻 User type
 export type User = {
   id: string;
   fname: string;
@@ -406,34 +13,58 @@ export type User = {
   contactNumber?: string;
   profileImage?: string;
   isProUser: boolean;
-  bio?: string;
+  bio: string;
   status: string;
   type: string;
+  provider: string;
   createdOn: Date;
   updatedOn?: Date;
   isFirstLogin: boolean;
   expPoints: number;
-  likes: string[];
+  interests: string[];
   safetyState: {
     isInAnEmergency: boolean;
-    emergencyType: string;
-    emergencyContact?: string;
+    emergencyType?: string;
+    emergencyNote?: string;
+    emergencyContact?: {
+      email?: string;
+      phone?: string;
+    };
+    lastKnownLocation?: {
+      locationName: string;
+      latitude: number;
+      longitude: number;
+    };
   };
-  visibilitySettings: {
-    isProfilePublic: boolean;
-    isTravelInfoPublic: boolean;
-    isPersonalInfoPublic: boolean;
+  settings: {
+    visibility: {
+      isProfilePublic: boolean;
+      isPersonalInfoPublic: boolean;
+      isTravelInfoPublic: boolean;
+    };
+    personalization: {
+      pushNotifications: boolean;
+      locationSharing: boolean;
+    };
+    security: {
+      is2FAEnabled: boolean;
+    };
+    taraBuddy: {
+      isTaraBuddyEnabled: boolean;
+      preferredGender?: string;
+      preferredDistance?: number;
+      preferredAgeRange?: number[];
+      preferredZodiac?: string[];
+    };
   };
-  securitySettings: {
-    is2FAEnabled: boolean;
-  };
-  taraBuddySettings: {
-    isTaraBuddyEnabled: boolean;
-    preferredGender?: string;
-    preferredDistance?: number;
-    preferredAgeRange?: number[];
-    preferredZodiac?: string[];
-  };
+  device: Array<{
+    deviceId: string;
+    brand: string;
+    model: string;
+    os: string;
+    type: string;
+    appVersion?: string;
+  }>;
 };
 
 // 🧠 SessionData

@@ -1,33 +1,9 @@
 import { api } from '@/shared/api/client';
-import { DeviceInfo } from '@/shared/hooks/useDeviceInfo';
 import { formatDeviceInfo } from '@/shared/utils/deviceFormatter';
+import { DeviceInfo } from '@/shared/hooks/useDeviceInfo';
+import { RegisterRequest, RegisterResponse, VerificationResponse, LoginRequest, LoginResponse } from '../types/auth.types';
 
 const API_URL = '/v1/auth';
-
-export interface RegisterRequest {
-  fname: string;
-  lname?: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  bdate: string;
-  gender: string;
-  device?: DeviceInfo;
-}
-
-export interface RegisterResponse {
-  success: boolean;
-  message: string;
-  email: string;
-  nextStep?: string;
-}
-
-export interface VerificationResponse {
-  success: boolean;
-  message: string;
-  email?: string;
-  user?: any;
-}
 
 /**
  * Register a new user
@@ -77,4 +53,21 @@ export const verifyEmail = async (
   };
 
   return await api.post<VerificationResponse>(`${API_URL}/verify`, payload);
+};
+
+/**
+ * Login user with email/username and password
+ */
+export const loginUser = async (
+  identifier: string,
+  password: string,
+  device?: DeviceInfo
+): Promise<LoginResponse> => {
+  const payload = {
+    identifier,
+    password,
+    device: device ? formatDeviceInfo(device) : undefined,
+  };
+
+  return await api.post<LoginResponse>(`${API_URL}/login`, payload);
 };

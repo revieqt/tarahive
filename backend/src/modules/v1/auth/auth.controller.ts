@@ -1,13 +1,6 @@
 import { Request, Response } from 'express';
-import { registerUser, sendVerificationCode, verifyUserEmail } from './auth.service';
+import { registerUser, sendVerificationCode, verifyUserEmail, loginUser } from './auth.service';
 import { LogAction } from '../audit/audit.service';
-
-interface AuthRequest extends Request {
-  user?: {
-    id?: string;
-    email: string;
-  };
-}
 
 /**
  * POST /auth/register
@@ -219,6 +212,91 @@ export const verifyEmail = async (req: Request, res: Response) => {
     
     res.status(500).json({ 
       success: false, 
+      message: res.locals.t(localizationKey),
+    });
+  }
+};
+
+/**
+ * POST /auth/login
+ * Authenticate user and return access/refresh tokens
+ */
+export const login = async (req: Request, res: Response): Promise<void> => {
+  const { identifier, password, device } = req.body;
+  try {
+    if (!identifier || !password) {
+      return void res.status(400).json({
+        success: false,
+        message: res.locals.t('auth.login_auth.required_fields'),
+      });
+    }
+
+    const result = await loginUser(req.body);
+
+    await LogAction.info({
+      userId: result.user.id,
+      action: "USER_LOGIN_SUCCESS",
+      module: "auth",
+      description: `User login successful: ${identifier}`,
+      resourceType: "user",
+      resourceId: result.user.id,
+      success: true,
+      ip: req.ip,
+      platform: device?.type,
+      device: {
+        deviceId: device?.deviceId,
+        brand: device?.brand,
+        model: device?.model,
+        os: device?.os,
+      },
+      appInfo: {
+        appVersion: device?.appVersion,
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: res.locals.t('auth.login_auth.success'),
+      user: result.user,
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+    });
+  } catch (error: any) {
+    const errorMsg = error.message || 'Login failed';
+    let localizationKey = 'auth.login_auth.invalid_credentials';
+    let statusCode = 400;
+
+    if (errorMsg.includes('User account not found')) {
+      localizationKey = 'auth.login_auth.user_not_found';
+    } else if (errorMsg.includes('Account suspended')) {
+      localizationKey = 'auth.login_auth.account_suspended';
+    } else if (errorMsg.includes('is inactive')) {
+      localizationKey = 'auth.login_auth.user_inactive';
+    } else if (errorMsg.includes('Invalid') || errorMsg.includes('password')) {
+      localizationKey = 'auth.login_auth.invalid_credentials';
+    }
+
+    await LogAction.warn({
+      action: "USER_LOGIN_FAILED",
+      module: "auth",
+      description: `User login failed: ${errorMsg}`,
+      resourceType: "user",
+      success: false,
+      ip: req.ip,
+      platform: device?.type,
+      device: {
+        deviceId: device?.deviceId,
+        brand: device?.brand,
+        model: device?.model,
+        os: device?.os,
+      },
+      appInfo: {
+        appVersion: device?.appVersion,
+      },
+    });
+
+    res.status(statusCode).json({
+      success: false,
       message: res.locals.t(localizationKey),
     });
   }

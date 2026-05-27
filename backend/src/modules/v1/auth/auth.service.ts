@@ -139,3 +139,48 @@ export const verifyUserEmail = async (email: string, code: string): Promise<Part
     throw error;
   }
 };
+
+export const loginUser = async (data: LoginDto): Promise<{ user: Partial<User>; accessToken: string; refreshToken: string }> => {
+  try {
+    // 1. Search for user by identifier (email or username), include password
+    const user = await userRepo.findOne({
+      where: [{ email: data.identifier },{ username: data.identifier },],
+      select: ['id', 'fname', 'lname', 'email', 'username', 'password', 'bdate', 'gender', 'status', 'provider', 'type', 'isProUser', 'bio', 'profileImage', 'contactNumber', 'expPoints', 'interests', 'safetyState', 'settings', 'device', 'createdOn', 'updatedOn', 'tv'],
+    });
+
+    if (!user) throw new Error('User account not found');
+
+    // 2. Verify password
+    if (!user.password) throw new Error('Invalid email or password');
+
+    const isPasswordValid = await comparePassword(data.password, user.password);
+    if (!isPasswordValid) throw new Error('Invalid email or password');
+
+    // 3. Check user status (must be 'active')
+    if (user.status !== UserStatus.ACTIVE) {
+      if (user.status === UserStatus.SUSPENDED) {
+        throw new Error('Account suspended');
+      } else if (user.status === UserStatus.BANNED) {
+        throw new Error('Account banned');
+      }
+      throw new Error('User account is inactive');
+    }
+
+    // 4. Generate tokens
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+
+    // 5. Return user without password and tokens
+    const { password: _, ...userWithoutPassword } = user;
+
+    console.log(`✅ User logged in: ${user.email}`);
+    return {
+      user: userWithoutPassword,
+      accessToken,
+      refreshToken,
+    };
+  } catch (error) {
+    console.error('Error during login:', error);
+    throw error;
+  }
+};

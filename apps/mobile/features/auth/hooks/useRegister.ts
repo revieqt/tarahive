@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { registerUser } from '@/features/auth/services/auth.service';
 import { calculateAge } from '@/shared/utils/calculateAge';
-import { RegisterRequest } from '@/features/auth/services/auth.service';
+import { RegisterRequest } from '@/features/auth/types/auth.types';
 import { showError, showInfo } from '@/shared/services/toast.service';
 import { useDeviceInfo } from '@/shared/hooks/useDeviceInfo';
 

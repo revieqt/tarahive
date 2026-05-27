@@ -3,6 +3,7 @@ import ProBadge from '@/shared/components/common/ProBadge';
 import { TIcon, TText, TView } from '@/shared/components/ui/Themed';
 import { SUPPORT_FORM_URL } from '@/Config';
 import { useSession } from '@/features/auth/context/SessionContext';
+import { useLogout } from '@/features/auth/hooks/useLogout';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
@@ -26,6 +27,7 @@ const SettingsOption = ({ icon, label, onPress }: { icon: string; label: string;
 export default function AccountScreen() {
   const { session } = useSession();
   const user = session?.user;
+  const { logout } = useLogout();
   const [devMode, setDevMode] = useState(false);
   const isConnected = useInternetConnection();
   const { t } = useLanguage();
@@ -34,12 +36,21 @@ export default function AccountScreen() {
 
   const handleWebView = (url: string, title: string) => () => {
     router.push({
-      justifyContent: "/webview",
+      pathname: "/webview" as any,
       params: {
         url: url,
         title: title,
       },
-    });
+    } as any);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.replace('/(auth)/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   return (
@@ -50,9 +61,9 @@ export default function AccountScreen() {
             style={styles.profileButton}
             onPress={() =>
               router.push({
-                justifyContent: '/account/[id]',
+                pathname: '/account/[id]',
                 params: { id: user?.id },
-              })
+              } as any)
             }
           >
             <View style={styles.profileImage}>
@@ -152,7 +163,7 @@ export default function AccountScreen() {
 
         <Button
           title={t('tabs.account.logout_button')}
-          onPress={() => router.replace('/login')}
+          onPress={handleLogout}
           type='primary'
           buttonStyle={styles.logoutButton}
         />
@@ -160,6 +171,7 @@ export default function AccountScreen() {
     </TView>
   );
 }
+
 
 const styles = StyleSheet.create({
   header: {

@@ -1,7 +1,7 @@
 import Button from '@/shared/components/ui/Button';
 import { TText, TView } from '@/shared/components/ui/Themed';
 import React, { useState, useEffect} from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, View, StyleSheet } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useEmailVerification } from '@/features/auth/hooks/useEmailVerification';
 import HiveBg from '@/shared/components/common/HiveBg';
 import LangButton from '@/shared/components/common/LanguageButton';
@@ -82,14 +82,7 @@ export default function VerifyScreen() {
         <HiveBg/>
         <LangButton/>
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{padding: 16}}>
-          <Header title={t("auth.verify_email.title")} subtitle={t("auth.verify_email.subtitle")}/>
-        
-          {email && (
-            <View style={styles.emailContainer}>
-              <TText style={styles.emailLabel}>{t("auth.verify_email.email_label") || "Email"}</TText>
-              <TText style={styles.emailValue}>{email}</TText>
-            </View>
-          )}
+          <Header title={t("auth.verify_email.title")} subtitle={t("auth.verify_email.subtitle") + email}/>
         
           <CodeInputField
             value={verificationCode}
@@ -100,16 +93,18 @@ export default function VerifyScreen() {
         </ScrollView>
 
         <View style={styles.buttonsContainer}>
-          <Button
-            title={
-              isResendDisabled && cooldownTime > 0
-                ? `${t("auth.verify_email.resend_prompt")} (${formatCooldownTime(cooldownTime)})`
-                : t("auth.verify_email.resend_prompt")
-            }
+          <TouchableOpacity
             onPress={handleResend}
-            disabled={isResendDisabled}
-            loading={isSendingCode}
-          />
+            disabled={isResendDisabled || isSendingCode}
+          >
+            <TText style={{ opacity: isResendDisabled ? 0.5 : 1, textAlign: 'center' }}>
+              {
+                isResendDisabled && cooldownTime > 0
+                  ? `Email resent. You can request another one in ${formatCooldownTime(cooldownTime)}`
+                  : t("auth.verify_email.resend_prompt")
+              }
+            </TText>
+          </TouchableOpacity>
 
           <Button
             title={t("auth.verify_email.verify_button") || t("auth.register.register_button")}
@@ -117,6 +112,7 @@ export default function VerifyScreen() {
             type="primary"
             disabled={isVerifyDisabled}
             loading={isVerifying}
+            buttonStyle={{ width: '100%' }}
           />
         </View>
       </KeyboardAvoidingView>
@@ -131,7 +127,8 @@ const styles = StyleSheet.create({
     right: 16,
     left: 16,
     zIndex: 100,
-    gap: 8,
+    gap: 16,
+    alignItems: 'center',
   },
   emailContainer: {
     marginBottom: 24,

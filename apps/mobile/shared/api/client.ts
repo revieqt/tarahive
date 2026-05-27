@@ -4,6 +4,7 @@ import { ApiError, NetworkError, TimeoutError } from "./errors";
 import { ApiRequestOptions } from "./types";
 import { buildQueryString, shouldRetry, sleep } from "./utils";
 import { BACKEND_URL } from "@/Config";
+import { getAccessToken } from "@/features/auth/services/token.service";
 
 const DEFAULT_TIMEOUT = 15000;
 const DEFAULT_RETRIES = 3;
@@ -63,8 +64,7 @@ async function request<T>(
   const url = `${BACKEND_URL}${endpoint}${queryString}`;
 
   try {
-    // Optional token injection
-    const token = null;
+    const token = await getAccessToken().catch(() => null);
 
     const response = await fetchWithTimeout(
       url,
