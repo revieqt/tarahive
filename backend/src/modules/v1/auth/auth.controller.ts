@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { registerUser, sendVerificationCode, verifyUserEmail, loginUser } from './auth.service';
+import { registerUser, sendVerificationCode, verifyUserEmail, loginUser, updatePassword } from './auth.service';
 import { LogAction } from '../audit/audit.service';
+import { AuthRequest } from './auth.types';
 
 /**
  * POST /auth/register
@@ -299,5 +300,104 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       success: false,
       message: res.locals.t(localizationKey),
     });
+  }
+};
+
+export const changePassword = async (req: AuthRequest, res: Response) => {
+  const { oldPassword, newPassword, confirmPassword, device } = req.body;
+  const userId = req.user?.sub;
+  try {
+    if (!userId) return res.status(401).json({ error: 'Authentication required' });
+
+    if (!oldPassword || !newPassword || !confirmPassword) return res.status(400).json({ error: 'All password fields are required' });
+    
+    if (newPassword.length < 6) return res.status(400).json({ error: 'New password must be at least 6 characters long' });
+    
+    await LogAction.info({
+      userId: userId,
+      action: "PASSWORD_UPDATE_SUCCESS",
+      module: "auth",
+      description: `Password updated successfully for user: ${userId}`,
+      resourceType: "user",
+      resourceId: userId,
+      success: true,
+      ip: req.ip,
+      platform: device?.type,
+      device: {
+        deviceId: device?.deviceId,
+        brand: device?.brand,
+        model: device?.model,
+        os: device?.os,
+      },
+      appInfo: {
+        appVersion: device?.appVersion,
+      },
+    });
+    
+    await updatePassword(userId, oldPassword, newPassword, confirmPassword);
+    
+    res.status(200).json({ message: 'Password updated successfully' });
+  } catch (error: any) {
+    if (error.message === 'New passwords do not match') {
+      await LogAction.warn({
+        action: "PASSWORD_UPDATE_FAILED",
+        module: "auth",
+        description: `New passwords do not match for user: ${req.body.userId}`,
+        resourceType: "user",
+        success: false,
+        ip: req.ip,
+        platform: device?.type,
+        device: {
+          deviceId: device?.deviceId,
+          brand: device?.brand,
+          model: device?.model,
+          os: device?.os,
+        },
+        appInfo: {
+          appVersion: device?.appVersion,
+        },
+      });
+      return res.status(400).json({ error: 'New passwords do not match' });
+    }
+    if (error.message === 'Current password is incorrect') {
+      await LogAction.warn({
+        action: "PASSWORD_UPDATE_FAILED",
+        module: "auth",
+        description: `Current password is incorrect for user: ${req.body.userId}`,
+        resourceType: "user",
+        success: false,
+        ip: req.ip,
+        platform: device?.type,
+        device: {
+          deviceId: device?.deviceId,
+          brand: device?.brand,
+          model: device?.model,
+          os: device?.os,
+        },
+        appInfo: {
+          appVersion: device?.appVersion,
+        },
+      });
+      return res.status(401).json({ error: 'Current password is incorrect' });
+    }
+    await LogAction.warn({
+        action: "PASSWORD_UPDATE_FAILED",
+        module: "auth",
+        description: `Failed to update password for user: ${req.body.userId}`,
+        resourceType: "user",
+        success: false,
+        ip: req.ip,
+        platform: device?.type,
+        device: {
+          deviceId: device?.deviceId,
+          brand: device?.brand,
+          model: device?.model,
+          os: device?.os,
+        },
+        appInfo: {
+          appVersion: device?.appVersion,
+        },
+      });
+    res.status(500).json({ error: error.message || 'Failed to update password' });
   }
 };

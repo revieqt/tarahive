@@ -5,10 +5,8 @@ import TextField from '@/shared/components/ui/TextField';
 import PasswordField from '@/shared/components/ui/PasswordField';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';  
-import { useInternetConnection } from '@/shared/utils/checkInternetConnection';
 import { useLogin } from '@/features/auth/hooks/useLogin';
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
-import { showWarning } from '@/shared/services/toast.service';
 import LangButton from '@/shared/components/common/LanguageButton';
 import { useLanguage } from '@/shared/context/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -18,24 +16,14 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
   const router = useRouter();
-  const isConnected = useInternetConnection();
   const primaryColor = useThemeColor({}, 'primary');
   const { t } = useLanguage();
-  
-  // Use the login mutation
   const { login, isPending } = useLogin();
 
   const handleLogin = () => {
-    if (!isConnected) {
-      showWarning('No Internet', 'Please check your connection');
-      return;
-    }
-
     login(
       { identifier: email, password },
-      {
-        onSuccess: () => {
-          // Redirect to home on success
+      { onSuccess: () => {
           router.replace('/(protected)/(tabs)/home');
         },
       }

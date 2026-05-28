@@ -18,20 +18,15 @@ import {
 const userRepo = AppDataSource.getRepository(User);
 
 export const registerUser = async (data: RegisterDto): Promise<{ success: boolean; message: string; email: string }> => {
-  // 1. Validate password
   validatePassword(data.password);
 
-  // 2. Check if email already exists
   const existingEmail = await userRepo.findOne({ where: { email: data.email } });
   if (existingEmail) throw new Error("Email already registered");
 
-  // 3. Validate age (13 years old and above)
   validateAge(data.bdate);
 
-  // 4. Hash password
   const hashedPassword = await hashPassword(data.password);
 
-  // 5. Store only user-provided data in Redis (expires in 30 minutes)
   const pendingUserData = {
     fname: data.fname,
     lname: data.lname,
@@ -44,7 +39,6 @@ export const registerUser = async (data: RegisterDto): Promise<{ success: boolea
 
   await storePendingRegistration(data.email, pendingUserData);
 
-  // 6. Trigger verification code sending
   await sendVerificationCode(data.email);
 
   return {
@@ -58,10 +52,8 @@ export const sendVerificationCode = async (email: string): Promise<string> => {
   try {
     const code = generateVerificationCode();
 
-    // Store code in Redis with 30-minute expiration
     await storeVerificationCode(email, code);
 
-    // Queue the email job to send the code
     await addSendVerificationEmailJob({email, code});
 
     return code;
@@ -73,19 +65,14 @@ export const sendVerificationCode = async (email: string): Promise<string> => {
 
 export const verifyUserEmail = async (email: string, code: string): Promise<Partial<User>> => {
   try {
-    // 1. Verify the code against Redis
     const isValid = await verifyVerificationCode(email, code);
 
     if (!isValid) throw new Error('Invalid or expired verification code');
 
-    // 2. Retrieve pending registration data from Redis
     const pendingUserData = await getPendingRegistration(email);
 
-    if (!pendingUserData) {
-      throw new Error('No pending registration found. Please register again.');
-    }
+    if (!pendingUserData) throw new Error('No pending registration found. Please register again.');
 
-    // 3. Create user in database with pending data + default values
     const user = userRepo.create({
       fname: pendingUserData.fname,
       lname: pendingUserData.lname,
@@ -96,7 +83,7 @@ export const verifyUserEmail = async (email: string, code: string): Promise<Part
       gender: pendingUserData.gender,
       provider: Provider.EMAIL,
       type: UserType.TRAVELER,
-      status: UserStatus.ACTIVE, // Activate user after verification
+      status: UserStatus.ACTIVE,
       isProUser: false,
       expPoints: 0,
       interests: [],
@@ -123,13 +110,10 @@ export const verifyUserEmail = async (email: string, code: string): Promise<Part
       },
       device: [pendingUserData.device],
     });
-
     const savedUser = await userRepo.save(user);
 
-    // 4. Delete pending registration from Redis
     await deletePendingRegistration(email);
 
-    // 5. Return user without password
     const { password: _, ...userWithoutPassword } = savedUser;
 
     console.log(`✅ Email verified and user created for ${email}`);
@@ -142,7 +126,6 @@ export const verifyUserEmail = async (email: string, code: string): Promise<Part
 
 export const loginUser = async (data: LoginDto): Promise<{ user: Partial<User>; accessToken: string; refreshToken: string }> => {
   try {
-    // 1. Search for user by identifier (email or username), include password
     const user = await userRepo.findOne({
       where: [{ email: data.identifier },{ username: data.identifier },],
       select: ['id', 'fname', 'lname', 'email', 'username', 'password', 'bdate', 'gender', 'status', 'provider', 'type', 'isProUser', 'bio', 'profileImage', 'contactNumber', 'expPoints', 'interests', 'safetyState', 'settings', 'device', 'createdOn', 'updatedOn', 'tv'],
@@ -150,13 +133,11 @@ export const loginUser = async (data: LoginDto): Promise<{ user: Partial<User>; 
 
     if (!user) throw new Error('User account not found');
 
-    // 2. Verify password
     if (!user.password) throw new Error('Invalid email or password');
 
     const isPasswordValid = await comparePassword(data.password, user.password);
     if (!isPasswordValid) throw new Error('Invalid email or password');
 
-    // 3. Check user status (must be 'active')
     if (user.status !== UserStatus.ACTIVE) {
       if (user.status === UserStatus.SUSPENDED) {
         throw new Error('Account suspended');
@@ -166,14 +147,11 @@ export const loginUser = async (data: LoginDto): Promise<{ user: Partial<User>; 
       throw new Error('User account is inactive');
     }
 
-    // 4. Generate tokens
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
 
-    // 5. Return user without password and tokens
     const { password: _, ...userWithoutPassword } = user;
 
-    console.log(`✅ User logged in: ${user.email}`);
     return {
       user: userWithoutPassword,
       accessToken,
@@ -181,6 +159,28 @@ export const loginUser = async (data: LoginDto): Promise<{ user: Partial<User>; 
     };
   } catch (error) {
     console.error('Error during login:', error);
+    throw error;
+  }
+};
+
+export const updatePassword = async (
+  userId: string, 
+  oldPassword: string,
+  newPassword: string,
+  confirmPassword: string
+): Promise<void> => {
+  try {
+    if (newPassword !== confirmPassword) throw new Error('New passwords do not match');
+
+    const user = await userRepo.findOne({ where: { id: userId }, select: ['password'] });
+    if (!user) throw new Error('User not found');
+
+    const isValidPassword = await comparePassword(oldPassword, user.password!);
+    if (!isValidPassword) throw new Error('Current password is incorrect');
+
+    user.password = await hashPassword(newPassword);
+    await userRepo.save(user);
+  } catch (error) {
     throw error;
   }
 };

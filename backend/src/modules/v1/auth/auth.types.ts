@@ -1,3 +1,13 @@
+import { Request } from "express";
+
+export interface AuthRequest extends Request {
+  user?: {
+    sub: string;
+    tv: any;
+    st: string;
+  };
+}
+
 export interface RegisterDto {
   fname: string;
   lname?: string;
