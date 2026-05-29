@@ -3,13 +3,8 @@ import { loginUser } from '@/features/auth/services/auth.service';
 import { useDeviceInfo } from '@/shared/hooks/useDeviceInfo';
 import { useSession } from '@/features/auth/context/SessionContext';
 import { showError, showInfo } from '@/shared/services/toast.service';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LoginResponse } from '../types/auth.types';
-
-const TOKEN_KEYS = {
-  ACCESS_TOKEN: '@tarahive_access_token',
-  REFRESH_TOKEN: '@tarahive_refresh_token',
-};
+import { saveAccessToken, saveRefreshToken } from '../services/token.service';
 
 export const useLogin = () => {
   const deviceInfo = useDeviceInfo();
@@ -17,7 +12,6 @@ export const useLogin = () => {
 
   const mutation = useMutation({
     mutationFn: async (variables: { identifier: string; password: string }) => {
-      // Validation
       if (!variables.identifier || !variables.password) {
         throw new Error('Email and password are required');
       }
@@ -58,15 +52,11 @@ export const useLogin = () => {
           device: response.user.device || [],
         };
 
-        // Save tokens to AsyncStorage (temporary - use securestore in future)
-        await AsyncStorage.setItem(TOKEN_KEYS.ACCESS_TOKEN, response.accessToken);
-        await AsyncStorage.setItem(TOKEN_KEYS.REFRESH_TOKEN, response.refreshToken);
+        await saveAccessToken(response.accessToken);
+        await saveRefreshToken(response.refreshToken);
 
-        // Update SessionContext
         await updateSession({
           user: userData,
-          accessToken: response.accessToken,
-          refreshToken: response.refreshToken,
         });
 
         showInfo('Success', response.message || 'Login successful');

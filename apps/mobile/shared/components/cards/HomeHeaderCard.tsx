@@ -43,8 +43,8 @@ export default function HomeHeaderCard() {
 
   return (
     <LinearGradient colors={[accentColor,secondaryColor]} style={styles.locationContent}>
-      <HiveBg flipHorizontal/>
-      <HiveBg/>
+      <HiveBg flipHorizontal blur={false}/>
+      <HiveBg blur={false}/>
       {showLoading ? <>
         <Skeleton style={styles.descLoading}/>
         <Skeleton style={styles.locationLoading}/>

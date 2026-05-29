@@ -1,4 +1,4 @@
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { TIcon, TText, TView } from "@/shared/components/ui/Themed";
 import { StyleSheet, Animated, Modal } from "react-native";
 import { useState } from "react";
@@ -201,5 +201,5 @@ const styles = StyleSheet.create({
     },
     themeOptionText: {
       flex: 1,
-    }
+    },
   });

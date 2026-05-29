@@ -306,6 +306,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 export const changePassword = async (req: AuthRequest, res: Response) => {
   const { oldPassword, newPassword, confirmPassword, device } = req.body;
   const userId = req.user?.sub;
+  const tokenVersion = req.user?.tv;
   try {
     if (!userId) return res.status(401).json({ error: 'Authentication required' });
 
@@ -334,9 +335,14 @@ export const changePassword = async (req: AuthRequest, res: Response) => {
       },
     });
     
-    await updatePassword(userId, oldPassword, newPassword, confirmPassword);
+    const result = await updatePassword(userId, tokenVersion, oldPassword, newPassword, confirmPassword);
     
-    res.status(200).json({ message: 'Password updated successfully' });
+    res.status(200).json({ 
+      success: true,
+      message: 'Password updated successfully',
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+    });
   } catch (error: any) {
     if (error.message === 'New passwords do not match') {
       await LogAction.warn({
@@ -357,7 +363,10 @@ export const changePassword = async (req: AuthRequest, res: Response) => {
           appVersion: device?.appVersion,
         },
       });
-      return res.status(400).json({ error: 'New passwords do not match' });
+      return res.status(400).json({ 
+        success: false,
+        message: 'New passwords do not match' 
+      });
     }
     if (error.message === 'Current password is incorrect') {
       await LogAction.warn({
@@ -378,7 +387,10 @@ export const changePassword = async (req: AuthRequest, res: Response) => {
           appVersion: device?.appVersion,
         },
       });
-      return res.status(401).json({ error: 'Current password is incorrect' });
+      return res.status(401).json({ 
+        success: false,
+        message: 'Current password is incorrect',
+      });
     }
     await LogAction.warn({
         action: "PASSWORD_UPDATE_FAILED",
@@ -398,6 +410,9 @@ export const changePassword = async (req: AuthRequest, res: Response) => {
           appVersion: device?.appVersion,
         },
       });
-    res.status(500).json({ error: error.message || 'Failed to update password' });
+    res.status(500).json({ 
+      success: false,
+      message: error.message || 'Failed to update password' 
+    });
   }
 };

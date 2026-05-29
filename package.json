@@ -1,0 +1,10 @@
+{
+  "name": "tarahive-root",
+  "private": true,
+  "scripts": {
+    "install:app": "npm install --prefix apps/mobile",
+    "docker:up": "docker compose up -d",
+    "docker:sh": "docker compose exec backend sh",
+    "setup": "npm run docker:up && npm run install:app"
+  }
+}

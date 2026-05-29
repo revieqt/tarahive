@@ -25,7 +25,7 @@ export const BackButton: React.FC<BackButtonProps> = ({ style, type = 'default',
         style={[{ position: 'absolute', top: 16, left: 13, zIndex: 1000, padding: 8}, style]}
         activeOpacity={0.7}
       >
-        <TIcon name="arrow-left" size={22} color={color}/>
+        <TIcon name="chevron-left" size={22} color={color}/>
       </TouchableOpacity>
     );
   }
@@ -58,10 +58,10 @@ export const BackButton: React.FC<BackButtonProps> = ({ style, type = 'default',
   return (
     <TouchableOpacity
       onPress={handlePress}
-      style={[{ padding: 8, backgroundColor: 'transparent' }, style]}
+      style={[{ padding: 8,marginLeft: -8, backgroundColor: 'transparent' }, style]}
       activeOpacity={0.7}
     >
-      <TIcon name="arrow-left" size={22} color={color} />
+      <TIcon name="chevron-left" size={25} color={color} />
     </TouchableOpacity>
   );
 };

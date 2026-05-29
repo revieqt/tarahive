@@ -1,292 +1,176 @@
 import Button from '@/shared/components/ui/Button';
-import DatePickerField from '@/shared/components/ui/DatePickerField';
-import DropDownField from '@/shared/components/ui/DropDownField';
-import PasswordField from '@/shared/components/ui/PasswordField';
-import TextField from '@/shared/components/ui/TextField';
-import { TText, TView, TIcon } from '@/shared/components/ui/Themed';
-import { calculateAge } from '@/shared/utils/calculateAge';
-import { router } from 'expo-router';
-import React, { useRef, useState} from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, View, Animated, Dimensions, StyleSheet } from 'react-native';
-import { GENDER_OPTIONS } from '@/shared/constants/Input';
-import { useRegister, useEmailVerification } from '@/features/auth/hooks/useRegister';
-import { useThemeColor } from '@/shared/hooks/useThemeColor';
+import { TText, TView } from '@/shared/components/ui/Themed';
+import React, { useState, useEffect} from 'react';
+import { KeyboardAvoidingView, Platform, ScrollView, View, StyleSheet, TouchableOpacity } from 'react-native';
+import { useEmailVerification } from '@/features/auth/hooks/useEmailVerification';
 import HiveBg from '@/shared/components/common/HiveBg';
-import BackButton from '@/shared/components/common/BackButton';
 import LangButton from '@/shared/components/common/LanguageButton';
-import { showError } from '@/shared/services/toast.service';
+import { useLanguage } from '@/shared/context/LanguageContext';
+import CodeInputField from '@/shared/components/ui/CodeInputField';
+import Header from '@/shared/components/common/Header';
+import { router } from 'expo-router';
+import TextField from '@/shared/components/ui/TextField';
 
-export default function RegisterScreen() {
-  const [fname, setFname] = useState('');
-  const [lname, setLname] = useState('');
-  const [bdate, setBdate] = useState<Date | null>(null);
-  const [gender, setGender] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+const RESEND_COOLDOWN_MS = 3 * 60 * 1000;
+
+export default function ForgotPasswordScreen() {
   const [verificationCode, setVerificationCode] = useState('');
-  const [emailVerified, setEmailVerified] = useState(false);
-  const [verificationId, setVerificationId] = useState<string | null>(null);
-  const [errorMsg, setErrorMsg] = useState('');
-  const scrollRef = useRef<ScrollView>(null);
-  const [currentPage, setCurrentPage] = useState(0);
-  const screenWidth = Dimensions.get('window').width;
-  const screenHeight = Dimensions.get('window').height;
+  const [cooldownTime, setCooldownTime] = useState(0);
+  const [ email, setEmail] = useState('');
+  const { t } = useLanguage();
+  
+  const {
+    sendCode,
+    verifyCode,
+    isSendingCode,
+    isVerifying,
+  } = useEmailVerification();
 
-  // Initialize hooks
-  const { register, loading: registerLoading } = useRegister();
-  const { sendCode, verifyCode, loading: verificationLoading } = useEmailVerification();
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
 
-  // Animation states
-  const slideAnim = useRef(new Animated.Value(0)).current;
-  const accentColor = useThemeColor({}, 'accent');
-
-  // Check if first page is complete
-  const validateFirstPage = () => {
-    if (!fname || !bdate || !gender) return false;
-    const age = bdate ? calculateAge(bdate) : 0;
-    if (age < 13) return false;
-    return true;
-  };
-
-  const handleNext = async () => {
-    try {
-      setErrorMsg('');
-      
-      if (!validateFirstPage()) {
-        showError('Validation Error', 'Please complete all required fields and ensure you are at least 13 years old.');
-        return;
-      }
-
-      if (!email) {
-        showError('Validation Error', 'Email is required');
-        return;
-      }
-
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        showError('Validation Error', 'Invalid email format');
-        return;
-      }
-
-      if (!password || !confirmPassword) {
-        showError('Validation Error', 'Password fields are required');
-        return;
-      }
-
-      if (password !== confirmPassword) {
-        showError('Validation Error', 'Passwords do not match');
-        return;
-      }
-
-      if (password.length < 6) {
-        showError('Validation Error', 'Password must be at least 6 characters long');
-        return;
-      }
-
-      // If email is not yet verified, send verification code
-      if (!emailVerified) {
-        const response = await sendCode(email);
-        if (response) {
-          setVerificationId(response.id);
-        }
-      }
-      
-      // Clear verification code and move to verification page
-      setVerificationCode('');
-      Animated.timing(slideAnim, {
-        toValue: -screenWidth,
-        duration: 300,
-        useNativeDriver: true,
-      }).start(() => {
-        setCurrentPage(1);
-      });
-    } catch (err: any) {
-      // Error already shown by hook via toast
+    if (cooldownTime > 0) {
+      interval = setInterval(() => {
+        setCooldownTime((prev) => Math.max(0, prev - 1000));
+      }, 1000);
     }
-  };
 
-  const handleBack = () => {
-    setVerificationCode('');
-    Animated.timing(slideAnim, {
-      toValue: 0,
-      duration: 300,
-      useNativeDriver: true,
-    }).start(() => {
-      setCurrentPage(0);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [cooldownTime]);
+
+  const handleResend = () => {
+    if (!email) return;
+
+    sendCode(email, {
+      onSuccess: () => {
+        setCooldownTime(RESEND_COOLDOWN_MS);
+      },
     });
   };
 
-  const handleRegister = async () => {
-    try {
-      setErrorMsg('');
+  const handleVerify = () => {
+    if (!email || !verificationCode) return;
 
-      if (!verificationCode) {
-        showError('Validation Error', 'Please enter the verification code');
-        return;
-      }
-
-      // Verify the email code (hook will show toast on error)
-      const verified = await verifyCode(email, verificationCode);
-      if (!verified) {
-        showError('Verification Failed', 'Invalid verification code');
-        return;
-      }
-
-      // If verification is successful, proceed with registration
-      setEmailVerified(true);
-      
-      const response = await register({
-        fname,
-        lname: lname || undefined,
-        bdate: bdate!.toISOString(),
-        gender,
-        email,
-        password,
-        confirmPassword,
-        isVerified: true,
-      });
-
-      if (response) {
-        showError('Success', 'Account created successfully! Redirecting to login...');
-        setTimeout(() => {
+    verifyCode(
+      { email, code: verificationCode },
+      {
+        onSuccess: () => {
+          setVerificationCode('');
           router.replace('/(auth)/login');
-        }, 1500);
+        },
       }
-    } catch (err: any) {
-      // Registration failed, but email is already verified
-      // Show error and go back to form
-      showError('Registration Failed', err.message || 'Failed to create account');
-      
-      // Go back to first page
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start(() => {
-        setCurrentPage(0);
-      });
-      // Email is already verified, so next time they click continue, it won't resend
-    }
+    );
   };
 
+  const formatCooldownTime = (ms: number) => {
+    const seconds = Math.floor((ms / 1000) % 60);
+    const minutes = Math.floor((ms / 1000 / 60) % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  const isResendDisabled = cooldownTime > 0 || isSendingCode;
+  const isVerifyDisabled = !verificationCode || isVerifying;
+
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={{ flex: 1, width: '100%' }}
-    >
-      <BackButton type='floating'/>
-      <LangButton/>
-      <View>
+    <TView style={{flex: 1}}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1, width: '100%' }}
+      >
         <HiveBg/>
-        <Animated.View 
-          style={{
-            width: screenWidth * 2,
-            flexDirection: 'row',
-            transform: [{ translateX: slideAnim }]
-          }}
-        >
-          <View style={{ height: screenHeight }}>
-            <ScrollView
-              ref={scrollRef}
-              style={{ width: screenWidth, padding: '3%', zIndex: 2 }}
-              contentContainerStyle={{ paddingBottom: 30 }}
-              keyboardShouldPersistTaps="handled"
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{padding: 16}}>
+          <Header 
+            title={email ? t("auth.verify_email.title") : "Forgot Password"} 
+            subtitle={email ? t("auth.verify_email.subtitle") + email : "Use your email to receive a verification code."}
+          />
+
+          { email ? (
+            <CodeInputField
+              value={verificationCode}
+              onChangeText={setVerificationCode}
+              characters={6}
+              type="numeric"
+            />
+          ):(
+            <TextField
+              placeholder="Enter your email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          )}
+        
+          
+        </ScrollView>
+
+        <View style={styles.buttonsContainer}>
+          {email ? <>
+            <TouchableOpacity
+              onPress={handleResend}
+              disabled={isResendDisabled || isSendingCode}
             >
-              <View style={styles.headerContainer}>
-                <TText type="title">
-                  Forgot Your Password?
-                </TText>
-                <TText>
-                  Only 13 years old and above are allowed to register
-                </TText>
-              </View>
-
-              <TextField
-                placeholder="Email"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType='email-address'
-                autoCapitalize='none'
-              />
-
-              
-              
-            </ScrollView>
-
-            <View style={styles.completeButton}>
-              <Button
-                title='Resend Code'
-                onPress={handleNext}
-                disabled={verificationLoading}
-              />
-
-              <Button
-                title={verificationLoading ? 'Sending Code...' : 'Create Account'}
-                onPress={handleNext}
-                type="primary"
-                disabled={verificationLoading}
-              />
-            </View>
-
-            
-          </View>
-
-
-          {/* Second Page */}
-          <View style={{ height: screenHeight }}>
-            <ScrollView
-              style={{ width: screenWidth, padding: 16, zIndex: 2 }}
-              contentContainerStyle={{ paddingBottom: 30 }}
-              keyboardShouldPersistTaps="handled"
-            >
-              <View style={styles.headerContainer}>
-                <TText type="title">
-                  Verify Your Email
-                </TText>
-                <TText>
-                  A verification code has been sent to {email}. Please enter it to continue.
-                </TText>
-              </View>
-
-              <TextField
-                placeholder="Enter verification code"
-                value={verificationCode}
-                onChangeText={setVerificationCode}
-                autoCapitalize="none"
-                keyboardType="default"
-              />
-
-              
-            </ScrollView>
+              <TText style={{ opacity: isResendDisabled ? 0.5 : 1, textAlign: 'center' }}>
+                {
+                  isResendDisabled && cooldownTime > 0
+                    ? `Email resent. You can request another one in ${formatCooldownTime(cooldownTime)}`
+                    : t("auth.verify_email.resend_prompt")
+                }
+              </TText>
+            </TouchableOpacity>
 
             <Button
-              title={registerLoading ? 'Creating...' : 'Complete Registration'}
-              onPress={handleRegister}
+              title={t("auth.verify_email.verify_button") || t("auth.register.register_button")}
+              onPress={handleVerify}
               type="primary"
-              disabled={!verificationCode || verificationLoading || registerLoading}
-              buttonStyle={styles.completeButton}
+              disabled={isVerifyDisabled}
+              loading={isVerifying}
+              buttonStyle={{ width: '100%' }}
             />
-          </View>
+          </>
+          :(
+            <Button
+              title={t("auth.verify_email.verify_button") || t("auth.register.register_button")}
+              onPress={handleVerify}
+              type="primary"
+              disabled={isVerifyDisabled}
+              loading={isVerifying}
+              buttonStyle={{ width: '100%' }}
+            />
+          )}
           
-        </Animated.View>
-        
-      </View>
-    </KeyboardAvoidingView>
+        </View>
+      </KeyboardAvoidingView>
+    </TView>
   );
 }
 
 const styles = StyleSheet.create({
-  completeButton:{
+  buttonsContainer:{
     position: 'absolute',
     bottom: 16,
     right: 16,
     left: 16,
     zIndex: 100,
-    gap: 8
+    gap: 16,
+    alignItems: 'center',
   },
-  headerContainer: {
-    marginTop: 40,
-    marginBottom: 20
+  emailContainer: {
+    marginBottom: 24,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    opacity: 0.8,
+  },
+  emailLabel: {
+    fontSize: 12,
+    opacity: 0.7,
+    marginBottom: 4,
+  },
+  emailValue: {
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

@@ -18,9 +18,14 @@ import {
 const userRepo = AppDataSource.getRepository(User);
 
 export const registerUser = async (data: RegisterDto): Promise<{ success: boolean; message: string; email: string }> => {
+  if (!data.fname || !data.fname.trim()) throw new Error('First name is required');
+
+  if (!data.email || !data.email.trim()) throw new Error('Email is required');
+  
   validatePassword(data.password);
 
   const existingEmail = await userRepo.findOne({ where: { email: data.email } });
+
   if (existingEmail) throw new Error("Email already registered");
 
   validateAge(data.bdate);
@@ -28,9 +33,9 @@ export const registerUser = async (data: RegisterDto): Promise<{ success: boolea
   const hashedPassword = await hashPassword(data.password);
 
   const pendingUserData = {
-    fname: data.fname,
-    lname: data.lname,
-    email: data.email,
+    fname: data.fname.trim(),
+    lname: data.lname?.trim() || null,
+    email: data.email.trim(),
     password: hashedPassword,
     bdate: new Date(data.bdate),
     gender: data.gender,
@@ -72,10 +77,12 @@ export const verifyUserEmail = async (email: string, code: string): Promise<Part
     const pendingUserData = await getPendingRegistration(email);
 
     if (!pendingUserData) throw new Error('No pending registration found. Please register again.');
+    
+    if (!pendingUserData.fname || !pendingUserData.fname.trim()) throw new Error('First name is required to complete registration');
 
     const user = userRepo.create({
-      fname: pendingUserData.fname,
-      lname: pendingUserData.lname,
+      fname: pendingUserData.fname.trim(),
+      lname: pendingUserData.lname?.trim() || null,
       email: pendingUserData.email,
       username: generateUsername(pendingUserData.fname),
       password: pendingUserData.password,
@@ -165,21 +172,33 @@ export const loginUser = async (data: LoginDto): Promise<{ user: Partial<User>; 
 
 export const updatePassword = async (
   userId: string, 
+  tokenVersion: number,
   oldPassword: string,
   newPassword: string,
   confirmPassword: string
-): Promise<void> => {
+): Promise<{ accessToken: string; refreshToken: string }> => {
   try {
     if (newPassword !== confirmPassword) throw new Error('New passwords do not match');
 
-    const user = await userRepo.findOne({ where: { id: userId }, select: ['password'] });
+    const user = await userRepo.findOne({ where: { id: userId }, select: ['password', 'tv'] });
     if (!user) throw new Error('User not found');
+
+    if (user.tv !== tokenVersion) throw new Error('Invalid token version');
 
     const isValidPassword = await comparePassword(oldPassword, user.password!);
     if (!isValidPassword) throw new Error('Current password is incorrect');
 
     user.password = await hashPassword(newPassword);
+    user.tv += 1;
     await userRepo.save(user);
+
+    const accessToken = await generateAccessToken(user);
+    const refreshToken = await generateRefreshToken(user);
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   } catch (error) {
     throw error;
   }
