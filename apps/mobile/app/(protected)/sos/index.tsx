@@ -154,20 +154,15 @@ export default function SOSSection(){
                     key={type.id}
                     style={[
                       styles.emergencyTypeButton,
-                      selectedEmergencyType === type.id && { backgroundColor: accentColor }
+                      selectedEmergencyType === type.id && { backgroundColor: accentColor+'50' }
                     ]}
                     onPress={() => setSelectedEmergencyType(type.id)}
                   >
                     <TIcon
                       name={type.icon} 
                       size={30} 
-                      color={selectedEmergencyType === type.id ? 'white' : undefined}
                     />
-                    <TText 
-                      style={[
-                        selectedEmergencyType === type.id && { color: 'white' }, { textAlign: 'center', fontSize: 10 }
-                      ]}
-                    >
+                    <TText style={[{ textAlign: 'center', fontSize: 10 }]}>
                       {type.label}
                     </TText>
                   </TouchableOpacity>

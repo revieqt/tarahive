@@ -12,7 +12,7 @@ import { TARA_AI_SUGGESTIONS } from '@/shared/constants/Tara';
 const HomeOptions = [
   { icon: 'map-marker-radius', label: 'Routes', route: '/routes/routes' },
   { icon: 'calendar', label: 'Itineraries', route: '/itineraries/itineraries' },
-  { icon: 'shield-plus', label: 'Safety', route: '/safety' },
+  { icon: 'shield-plus', label: 'Safety', route: '/sos' },
   { icon: 'qrcode-scan', label: 'Scan QR', route: '/camera/qr-scan', requiresConnection: true },
 ];
 
@@ -83,7 +83,7 @@ export default function HomeScreen() {
 
         <TView style={styles.gridContainer}>
           <TouchableOpacity 
-            onPress={() => router.push('/ai/ai-chat')}
+            onPress={() => router.push('/veehive')}
             style={[styles.gridChildContainer, styles.leftGridContainer, styles.shadow, {backgroundColor: primaryColor}]}
           >
             <View style={{padding: 12}}>
@@ -133,53 +133,6 @@ export default function HomeScreen() {
               <Image source={require('@/shared/assets/images/slide3-img.png')} style={styles.rightGridImage} />
             </TouchableOpacity>
           </View>
-          {/* <TouchableOpacity 
-            onPress={() => router.push('/ai/ai-chat')}
-            style={[styles.gridChildContainer, styles.leftGridContainer, styles.shadow, {backgroundColor: primaryColor}]}
-          >
-            <TText style={{opacity: .5, fontSize: 10}}>Meet your AI buddy</TText>
-            <TText style={{opacity: .85, fontSize: 16}}>Tara</TText>
-            <LinearGradient
-              colors={[accentColor+'60', 'transparent']}
-              start={{ x: 1, y: 0 }}
-              end={{ x: 0, y: 0 }}
-              style={styles.gridCircle}
-              pointerEvents="none"
-            />
-            <Image source={require('@/shared/assets/images/icon.png')} style={styles.aiImage} />
-          </TouchableOpacity>
-          <View style={[styles.gridChildContainer, {gap: '4%'}]}>
-            <TouchableOpacity 
-              onPress={() => router.push('/(tabs)/explore')}
-              style={[styles.rightGridContainer, styles.shadow, {backgroundColor: primaryColor}]}
-            >
-              <TText style={{opacity: .5, fontSize: 10}}>Seamless group</TText>
-              <TText style={{opacity: .85}}>Rooms</TText>
-              <LinearGradient
-                colors={[accentColor+'60', 'transparent']}
-                start={{ x: 1, y: 0 }}
-                end={{ x: 0, y: 0 }}
-                style={styles.rightGridCircle}
-                pointerEvents="none"
-              />
-              <Image source={require('@/shared/assets/images/slide4-img.png')} style={styles.rightGridImage} />
-            </TouchableOpacity>
-            <TouchableOpacity 
-              onPress={() => router.push('/(tabs)/explore')}
-              style={[styles.rightGridContainer, styles.shadow, {backgroundColor: primaryColor}]}
-            >
-              <TText style={{opacity: .5, fontSize: 10}}>Meet new friends with</TText>
-              <TText style={{opacity: .85}}>TaraBuddy</TText>
-              <LinearGradient
-                colors={[accentColor+'60', 'transparent']}
-                start={{ x: 1, y: 0 }}
-                end={{ x: 0, y: 0 }}
-                style={styles.rightGridCircle}
-                pointerEvents="none"
-              />
-              <Image source={require('@/shared/assets/images/slide3-img.png')} style={styles.rightGridImage} />
-            </TouchableOpacity>
-          </View> */}
         </TView>
       </ScrollView>
       {/* <SidebarAlerts /> */}
