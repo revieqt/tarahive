@@ -12,13 +12,7 @@ import BackButton from '@/shared/components/common/BackButton';
 // import ProcessModal from '@/components/modals/ProcessModal';
 import LocationPickerModal, { LocationItemWithAddress } from '@/shared/components/modals/LocationPickerModal';
 import RoundButton from '@/shared/components/ui/RoundButton';
-
-const ITINERARY_TYPES = [
-  { label: 'Solo', value: 'Solo' },
-  { label: 'Group', value: 'Group' },
-  { label: 'Family', value: 'Family' },
-  { label: 'Business', value: 'Business' },
-];
+import { ITINERARY_TYPES } from '@/shared/constants/Itinerary';
 
 interface DailyLocation {
   date: Date | null;
