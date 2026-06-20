@@ -11,7 +11,7 @@ import { TARA_AI_SUGGESTIONS } from '@/shared/constants/Tara';
 
 const HomeOptions = [
   { icon: 'map-marker-radius', label: 'Routes', route: '/routes/routes' },
-  { icon: 'calendar', label: 'Itineraries', route: '/itineraries/itineraries' },
+  { icon: 'calendar', label: 'Itineraries', route: '/itinerary' },
   { icon: 'shield-plus', label: 'Safety', route: '/sos' },
   { icon: 'qrcode-scan', label: 'Scan QR', route: '/camera/qr-scan', requiresConnection: true },
 ];

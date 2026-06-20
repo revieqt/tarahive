@@ -85,36 +85,6 @@ function AppContent() {
           screenOptions={{ headerShown: false }}
           initialRouteName={"index"}
         />
-          {/* <Stack.Screen name="onboarding" />
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="auth/login" />
-          <Stack.Screen name="auth/register" />
-          <Stack.Screen name="settings/language" />
-          <Stack.Screen name="document-view" />
-          <Stack.Screen name="auth/login" />
-          <Stack.Screen name="auth/register" />
-          <Stack.Screen name="auth/forgotPassword" />
-          <Stack.Screen name="auth/verifyEmail" />
-          <Stack.Screen name="auth/changePassword" />
-          <Stack.Screen name="account/firstLogin" />
-          <Stack.Screen name="account/[id]" />
-          <Stack.Screen name="account/settings-accountControl" />
-          <Stack.Screen name="routes/routes" />
-          <Stack.Screen name="routes/routes-create" />
-          <Stack.Screen name="itineraries/itineraries" />
-          <Stack.Screen name="itineraries/itineraries-form" />
-          <Stack.Screen name="itineraries/[id]" />
-          <Stack.Screen name="safety/safety" />
-          <Stack.Screen name="rooms/rooms" />
-          <Stack.Screen name="rooms/rooms-create" />
-          <Stack.Screen name="rooms/rooms-chat" />
-          <Stack.Screen name="rooms/rooms-join" />
-          <Stack.Screen name="rooms/[id]" />
-          <Stack.Screen name="camera/qr-scan" />
-          <Stack.Screen name="ai/ai-chat" />
-          <Stack.Screen name="ai/ai-itinerary" />
-          <Stack.Screen name="+not-found" />
-        </Stack> */}
       </TView>
     </SafeAreaView>
   );

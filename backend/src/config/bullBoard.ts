@@ -4,7 +4,7 @@ import { ExpressAdapter } from "@bull-board/express";
 
 const serverAdapter = new ExpressAdapter();
 
-serverAdapter.setBasePath("/admin/queues");
+serverAdapter.setBasePath("/queues");
 
 createBullBoard({
   queues: [

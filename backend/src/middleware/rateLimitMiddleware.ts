@@ -17,7 +17,7 @@ const sensitivityConfig: Record<Sensitivity, { windowMs: number; max: number }> 
   },
   SENSITIVE: {
     windowMs: 60 * 1000,
-    max: 3,
+    max: 1,
   },
 };
 
