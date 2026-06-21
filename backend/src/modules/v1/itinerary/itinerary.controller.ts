@@ -3,6 +3,7 @@ import {
   createItineraryService,
   getItineraryService,
   getAllUserItinerariesService,
+  deleteItineraryService,
 } from './itinerary.service';
 import { CreateItineraryRequest } from './itinerary.types';
 
@@ -16,7 +17,7 @@ interface AuthRequest extends Request {
 
 /**
  * Create a new itinerary
- * POST /api/itinerary/create
+ * POST /v1/itinerary/create
  */
 export const createItinerary = async (req: AuthRequest, res: Response) => {
   try {
@@ -95,7 +96,7 @@ export const createItinerary = async (req: AuthRequest, res: Response) => {
 
 /**
  * Get a specific itinerary by ID
- * GET /api/itinerary/:id
+ * GET /v1/itinerary/:id
  */
 export const getItinerary = async (req: AuthRequest, res: Response) => {
   try {
@@ -135,7 +136,7 @@ export const getItinerary = async (req: AuthRequest, res: Response) => {
 
 /**
  * Get all user itineraries
- * GET /api/itinerary
+ * GET /v1/itinerary
  */
 export const getAllUserItineraries = async (req: AuthRequest, res: Response) => {
   try {
@@ -161,5 +162,37 @@ export const getAllUserItineraries = async (req: AuthRequest, res: Response) => 
       message: 'Internal server error',
       error: error instanceof Error ? error.message : 'Unknown error',
     });
+  }
+};
+
+/**
+ * Delete an itinerary
+ * DELETE /v1/itinerary/delete/:itineraryID
+ */
+export const deleteItinerary = async (req: AuthRequest, res: Response) => {
+  try {
+    console.log('🟡 deleteItinerary - req.user:', req.user);
+    const { itineraryID } = req.params;
+    const itineraryIDStr = (Array.isArray(itineraryID) ? itineraryID[0] : itineraryID) as string;
+
+    if (!itineraryIDStr) {
+      return res.status(400).json({ message: 'Itinerary ID is required' });
+    }
+
+    await deleteItineraryService(itineraryIDStr);
+
+    res.status(200).json({
+      message: 'Itinerary deleted successfully',
+    });
+  } catch (error) {
+    console.error('❌ Error deleting itinerary:', error);
+    if (error instanceof Error && error.message === 'Itinerary not found') {
+      return res.status(404).json({ message: 'Itinerary not found' });
+    }
+    res.status(500).json({
+      message: 'Internal server error',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+
   }
 };

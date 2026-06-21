@@ -4,7 +4,7 @@ import {
   CreateItineraryRequest,
 } from './itinerary.types';
 
-
+const itineraryRepository = AppDataSource.getRepository(Itinerary);
 
 export const createItineraryService = async (
   userId: string,
@@ -17,9 +17,6 @@ export const createItineraryService = async (
       'Data:',
       itineraryData
     );
-
-    const itineraryRepository =
-      AppDataSource.getRepository(Itinerary);
 
     const itinerary = itineraryRepository.create({
       user: userId as any,
@@ -63,9 +60,6 @@ export const getItineraryService = async (
       'for user:',
       userId
     );
-
-    const itineraryRepository =
-      AppDataSource.getRepository(Itinerary);
 
     const itinerary = await itineraryRepository
       .createQueryBuilder('itinerary')
@@ -111,9 +105,6 @@ export const getAllUserItinerariesService = async (
       userId
     );
 
-    const itineraryRepository =
-      AppDataSource.getRepository(Itinerary);
-
     const itineraries = await itineraryRepository
       .createQueryBuilder('itinerary')
       .select([
@@ -141,6 +132,27 @@ export const getAllUserItinerariesService = async (
       '❌ Error retrieving user itineraries:',
       error
     );
+    throw error;
+  }
+};
+
+/**
+ * Delete an itinerary
+ */
+export const deleteItineraryService = async (itineraryID: string): Promise<void> => {
+  try {
+    console.log('🟡 deleteItineraryService - Deleting itinerary:', itineraryID);
+
+    const deletedItinerary = await itineraryRepository.delete(itineraryID);
+
+    if (!deletedItinerary.affected) {
+      console.log('❌ Itinerary not found:', itineraryID);
+      throw new Error('Itinerary not found');
+    }
+
+    console.log('✅ Itinerary deleted successfully:', itineraryID);
+  } catch (error) {
+    console.error('❌ Error deleting itinerary:', error);
     throw error;
   }
 };
