@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { View, StyleSheet, Modal, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
+import { View, StyleSheet, Modal, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Dimensions } from "react-native";
 import TextField from '@/shared/components/ui/TextField';
 import { TText, TIcon, TView } from '@/shared/components/ui/Themed';
 import Button from '@/shared/components/ui/Button';
@@ -76,43 +76,52 @@ export default function SOSSection(){
   return (
     <>
       <BackButton type='floating' color='#fff'/>
-      <LinearGradient colors={gradientColors} style={styles.container}>
+      <LinearGradient colors={gradientColors} style={styles.background}>
         <HiveBg flipHorizontal/>
         <HiveBg/>
-        
-
-        <View style={styles.titleContainer}>
-          {isSOSActive ? (
-            <>
-              <TText type='title' style={{color: '#fff'}}>SOS in Progress!</TText>
-              <TText type='subtitle' style={{color: '#fff'}}>SOS: On</TText>
-            </>
-          ) : (
-            <>
-              <TText type='title' style={{color: '#fff'}}>All Clear!</TText>
-              <TText type='subtitle' style={{color: '#fff'}}>SOS: Off</TText>
-            </>
-          )}
-        </View>
-
-        <SOSButton 
-          state={isSOSActive ? 'active' : 'notActive'}
-          onPressIn={handleLongPressStart}
-          onPressOut={handleLongPressEnd}
-          disabled={false}
-        />
-
-        <View style={styles.titleContainer}>
-          <TText type='subtitle'>☝️</TText>
-          {isLongPressing ? (
-            <TText style={{color: '#fff'}}>Hold for {isSOSActive ? 'deactivation' : 'activation'}...</TText>
-          ) : isSOSActive ? (
-            <TText style={{color: '#fff'}}>Long-press to End SOS</TText>
-          ) : (
-            <TText style={{color: '#fff'}}>Long-press to Activate SOS</TText>
-          )}
-        </View>
       </LinearGradient>
+        <ScrollView>
+          <View style={styles.headerContainer}>
+            <View style={styles.titleContainer}>
+              {isSOSActive ? (
+                <>
+                  <TText type='title' style={{color: '#fff'}}>SOS in Progress!</TText>
+                  <TText type='subtitle' style={{color: '#fff'}}>SOS: On</TText>
+                </>
+              ) : (
+                <>
+                  <TText type='title' style={{color: '#fff'}}>All Clear!</TText>
+                  <TText type='subtitle' style={{color: '#fff'}}>SOS: Off</TText>
+                </>
+              )}
+            </View>
+
+            <SOSButton 
+              state={isSOSActive ? 'active' : 'notActive'}
+              onPressIn={handleLongPressStart}
+              onPressOut={handleLongPressEnd}
+              disabled={false}
+            />
+
+            <View style={styles.titleContainer}>
+              <TText type='subtitle'>☝️</TText>
+              {isLongPressing ? (
+                <TText style={{color: '#fff'}}>Hold for {isSOSActive ? 'deactivation' : 'activation'}...</TText>
+              ) : isSOSActive ? (
+                <TText style={{color: '#fff'}}>Long-press to End SOS</TText>
+              ) : (
+                <TText style={{color: '#fff'}}>Long-press to Activate SOS</TText>
+              )}
+            </View>
+          </View>
+
+          <TView style={styles.messageContainer}>
+
+          </TView>
+          
+        </ScrollView>
+        
+      
 
       <Modal
         animationType="slide"
@@ -197,11 +206,25 @@ export default function SOSSection(){
 };
 
 const styles = StyleSheet.create({
-  container:{
+  background:{
     flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  headerContainer:{
+    height: Dimensions.get('window').height - 100,
     justifyContent: 'center',
     alignItems: 'center',
     gap: 40,
+    backgroundColor: 'red',
+  },
+  messageContainer:{
+    padding: 16,
+    marginHorizontal: '3%',
+    borderRadius: 12,
   },
   titleContainer:{
     justifyContent: 'center',
