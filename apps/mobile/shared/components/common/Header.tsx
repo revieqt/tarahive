@@ -70,7 +70,7 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, style, type = 'default
         <View style={styles.hiveContainer}>
           <HiveBg fade={false}/>
         </View>
-        <BackButton color='white' style={{ position: 'absolute', top: 5, left: 10 }} />
+        <BackButton color='white' style={{ position: 'absolute', top: 5, left: 10, zIndex: 10 }} />
 
         <View style={{marginHorizontal: '3%', gap: 4, justifyContent: 'center', flex: 1, alignItems: 'center', marginTop: -16}}>
           {title && 

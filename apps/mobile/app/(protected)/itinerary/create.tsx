@@ -13,6 +13,8 @@ import BackButton from '@/shared/components/common/BackButton';
 import LocationPickerModal, { LocationItemWithAddress } from '@/shared/components/modals/LocationPickerModal';
 import RoundButton from '@/shared/components/ui/RoundButton';
 import { ITINERARY_TYPES } from '@/shared/constants/Itinerary';
+import Header from '@/shared/components/common/Header';
+import { formatDateToString } from '@/shared/utils/formatDateToString';
 
 interface DailyLocation {
   date: Date | null;
@@ -59,7 +61,7 @@ export default function CreateItineraryScreen() {
   const [currentDayIdx, setCurrentDayIdx] = useState<number | null>(null);
   const [editingLocationIdx, setEditingLocationIdx] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
-  
+
   // Drag and drop state
   const [draggedLocationKey, setDraggedLocationKey] = useState<string | null>(null);
   const [draggedItem, setDraggedItem] = useState<{ dayIdx: number | null; locIdx: number } | null>(null);
@@ -76,12 +78,12 @@ export default function CreateItineraryScreen() {
         setDescription(itineraryData.description || '');
         setType(itineraryData.type || 'Solo');
         setPlanDaily(itineraryData.planDaily || false);
-        
+
         // Check if this is a repeat action (no startDate/endDate means repeat)
         const isRepeat = !itineraryData.startDate && !itineraryData.endDate;
         setIsRepeatMode(isRepeat);
         setIsEditMode(!isRepeat); // Only edit mode if not repeat
-        
+
         if (itineraryData.startDate) {
           setStartDate(new Date(itineraryData.startDate));
         }
@@ -141,12 +143,13 @@ export default function CreateItineraryScreen() {
 
   // Handle mutation success
   useEffect(() => {
-    if (createItineraryMutation.isSuccess) {
+    if (createItineraryMutation.isSuccess && createItineraryMutation.data) {
+      const itineraryId = createItineraryMutation.data.id;
       setTimeout(() => {
-        router.replace(`/itineraries/${createItineraryMutation.data._id}`);
+        router.replace(`/itinerary/${itineraryId}`);
       }, 1500);
     }
-  }, [createItineraryMutation.isSuccess, router]);
+  }, [createItineraryMutation.isSuccess, createItineraryMutation.data, router]);
 
   const addLocationToDay = (dayIdx: number, loc: LocationItemWithAddress) => {
     const dayDate = autoDailyLocations[dayIdx]?.date;
@@ -236,15 +239,15 @@ export default function CreateItineraryScreen() {
         if (draggedLocationKey && draggedItem) {
           dragY.setValue(gestureState.dy);
           const threshold = 40;
-          
+
           // Check if we've passed a new swap threshold (cumulative)
           const currentThreshold = lastSwapThreshold.current + threshold;
           const absoluteDy = Math.abs(gestureState.dy);
-          
+
           if (absoluteDy > currentThreshold) {
             const currentLocIdx = draggedItem.locIdx;
             const currentDayIdx = draggedItem.dayIdx;
-            
+
             if (gestureState.dy > 0) {
               // Dragging down
               if (currentLocIdx < totalLocations - 1) {
@@ -290,25 +293,24 @@ export default function CreateItineraryScreen() {
       title: title.trim(),
       description: description.trim(),
       type,
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
+      startDate,
+      endDate,
       planDaily,
       locations: planDaily
         ? autoDailyLocations
-            .filter(d => d.locations.length > 0)
-            .map((d) => ({
-              date: d.date ? d.date.toISOString() : '',
-              locations: d.locations,
-            }))
+          .filter(d => d.locations.length > 0)
+          .map((d) => ({
+            date: d.date ? d.date.toISOString() : '',
+            locations: d.locations,
+          }))
         : locations,
-    };
-
-    try {
-      await createItineraryMutation.mutateAsync(itineraryData as any);
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : `Failed to ${isRepeatMode ? 'repeat' : isEditMode ? 'update' : 'create'} itinerary`;
-      setErrorMessage(errorMsg);
     }
+
+    // The hook handles validation and error notifications, just pass the data
+    createItineraryMutation.createAsync(itineraryData as any).catch((error) => {
+      // Additional error handling if needed, though hook also shows toast
+      console.error('Itinerary creation error:', error);
+    });
   };
 
 
@@ -367,162 +369,160 @@ export default function CreateItineraryScreen() {
   };
 
   return (
-    <TView color='primary' style={{ flex: 1 }}>
+    <TView style={{ flex: 1 }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
       >
         <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-          <TView style={{paddingBottom: 50, overflow: 'hidden'}}>
-            <BackButton style={{ marginTop: 20, marginLeft: 10 }}/>
-            <TextField placeholder="Title" value={title} onChangeText={setTitle} 
-              style={{ fontFamily: 'Baloo', fontSize: 27, borderColor: 'transparent', marginBottom: 0, height: 60, backgroundColor: 'transparent'}}
+          <TView style={{ paddingBottom: 50, overflow: 'hidden' }}>
+            <Header type='minor' title={title || 'New Itinerary'} subtitle="Plan your next adventure" />
+            <TextField placeholder="Title" value={title} onChangeText={setTitle}
+              style={{ fontFamily: 'Baloo', fontSize: 27, borderColor: 'transparent', marginBottom: 0, height: 60, backgroundColor: 'transparent' }}
             />
-            <TextField placeholder="Add a Description" value={description} onChangeText={setDescription} 
-              style={{ borderColor: 'transparent',backgroundColor: 'transparent', minHeight: 60, height: descriptionHeight, textAlignVertical: 'top'}}
+            <TextField placeholder="Add a Description" value={description} onChangeText={setDescription}
+              style={{ borderColor: 'transparent', backgroundColor: 'transparent', minHeight: 60, height: descriptionHeight, textAlignVertical: 'top' }}
               multiline
               onContentSizeChange={e => setDescriptionHeight(e.nativeEvent.contentSize.height)}
             />
-            <View style={{paddingHorizontal: 16, marginBottom: 10}}>
+            <View style={{ paddingHorizontal: '3%' }}>
               <DropDownField
                 placeholder="Type"
                 value={type}
                 onValueChange={setType}
                 values={ITINERARY_TYPES}
-                style={{backgroundColor: 'transparent', fontFamily: 'PoppinsRegular'}}
+                style={{ backgroundColor: 'transparent', fontFamily: 'PoppinsRegular' }}
               />
-              
-              <View style={styles.rowBetween}>
-                <DatePickerField
-                  placeholder="Start Date"
-                  value={startDate}
-                  onChange={setStartDate}
-                  minimumDate={isEditMode ? undefined : new Date()}
-                  maximumDate={endDate || undefined}
-                  style={{flex: 2, backgroundColor: 'transparent'}}
-                />
-                <DatePickerField
-                  placeholder="End Date"
-                  value={endDate}
-                  onChange={setEndDate}
-                  minimumDate={startDate || (isEditMode ? undefined : new Date())}
-                  style={{flex: 2, backgroundColor: 'transparent'}}
-                />
-              </View>
+
+              <DatePickerField
+                placeholder="Start Date"
+                value={startDate}
+                onChange={setStartDate}
+                minimumDate={isEditMode ? undefined : new Date()}
+                maximumDate={endDate || undefined}
+                style={{ backgroundColor: 'transparent' }}
+              />
+              <DatePickerField
+                placeholder="End Date"
+                value={endDate}
+                onChange={setEndDate}
+                minimumDate={startDate || (isEditMode ? undefined : new Date())}
+                style={{ backgroundColor: 'transparent' }}
+              />
 
               {numDays > 1 && (
-                <Switch
-                  key="planDaily"
-                  label="Plan Daily?"
-                  description={planDaily ? 'Yes' : 'No'}
-                  value={planDaily}
-                  onValueChange={(value) => {
-                    setPlanDaily(value);
-                    setDailyLocations([]);
-                  }}
-                />
-              )}
-            </View>
-            <TView color='primary' style={styles.bottomOverlay}/>
-          </TView>
-          
+                <View style={styles.switchContainer}>
+                  <Switch
+                    key="planDaily"
+                    label="Plan Daily?"
+                    description={planDaily ? 'Yes' : 'No'}
+                    value={planDaily}
+                    onValueChange={(value) => {
+                      setPlanDaily(value);
+                      setDailyLocations([]);
+                    }}
+                  />
+                </View>
 
-          <View style={styles.locationContainer}>
-            {planDaily ? (
-              <>
-                {autoDailyLocations.map((day, dayIdx) => (
-                  <View key={dayIdx} style={styles.dayBlock}>
-                    <View style={styles.rowBetween}>
-                      <View style={{flex: 1, marginTop: 5}}>
-                        <TText type='subtitle' style={{fontSize: 16}}>Day {dayIdx + 1}</TText>
-                        <TText style={{opacity: 0.5, marginBottom: 10, fontSize: 12}}>({day.date?.toDateString()})</TText>
-                      </View>
-                      <TouchableOpacity style={styles.addLocationButton} onPress={() => openLocationModal(dayIdx)}>
-                        <TIcon name='plus' size={15} color='#00CAFF'/>
-                        <TText style={{color: '#00CAFF', fontSize: 12}}>Add Location</TText>
-                      </TouchableOpacity>
-                    </View>
-                    {day.locations.map((loc, locIdx) => {
-                      const locationKey = getLocationKey(dayIdx, locIdx);
-                      const isDragged = draggedLocationKey === locationKey;
-                      const responder = createLocationResponder(dayIdx, locIdx, day.locations.length);
-                      
-                      return (
-                        <Animated.View 
-                          key={locIdx} 
-                          style={[
-                            styles.locationRow, 
-                            isDragged && {backgroundColor: '#00CAFF30', borderRadius: 8, padding: 8},
-                            {transform: isDragged ? [{translateY: dragY}] : [{translateY: 0}]}
-                          ]}
-                          {...responder.panHandlers}
-                        >
-                            <TouchableOpacity 
-                            style={{ flex: 1, marginBottom: 10 }}
-                            onPress={() => openEditLocationModal(dayIdx, locIdx, loc)}
-                            onLongPress={() => handleDragStart(dayIdx, locIdx)}
+              )}
+
+              <View style={{ marginTop: 8 }}>
+                {planDaily ? (
+                  <>
+                    {autoDailyLocations.map((day, dayIdx) => (
+                      <TView key={dayIdx} style={styles.dayBlock} color='primary'>
+                        <View style={styles.dayHeader}>
+                          <TView style={styles.dayBadge} color='secondary'>
+                            <TText>{dayIdx + 1}</TText>
+                          </TView>
+                          <TText>{formatDateToString(day.date || new Date())}</TText>
+                        </View>
+
+
+
+                        {day.locations.map((loc, locIdx) => {
+                          const locationKey = getLocationKey(dayIdx, locIdx);
+                          const isDragged = draggedLocationKey === locationKey;
+                          const responder = createLocationResponder(dayIdx, locIdx, day.locations.length);
+
+                          return (
+                            <Animated.View
+                              key={locIdx}
+                              style={[
+                                styles.locationRow,
+                                isDragged && { backgroundColor: '#00CAFF30', borderRadius: 8, padding: 8 },
+                                { transform: isDragged ? [{ translateY: dragY }] : [{ translateY: 0 }] }
+                              ]}
+                              {...responder.panHandlers}
                             >
-                            <TText style={{opacity: isDragged ? 1 : 0.9}}>{loc.locationName}</TText>
-                            {loc.note ? (
-                                <TText style={{opacity: isDragged ? 0.7 : .5}}>{loc.note}</TText>
-                            ) : null}
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => removeLocation(dayIdx, locIdx)}>
-                              <TIcon name='close' size={20}/>
-                            </TouchableOpacity>
-                        </Animated.View>
-                      );
-                    })}
-                  </View>
-                ))}
-              </>
-            ) : (
-              <>
-                <View style={styles.rowBetween}>
-                    <TText type='subtitle' style={{fontSize: 16}}>Locations</TText>
-                  <TouchableOpacity style={styles.addLocationButton} onPress={() => openLocationModal(null)}>
-                    <TIcon name='plus' size={15} color='#00CAFF'/>
-                    <TText style={{color: '#00CAFF', fontSize: 12}}>Add Location</TText>
-                  </TouchableOpacity>
-                </View>
-                <View style={{marginTop: 16}}>
-                    {locations.map((loc, idx) => {
-                      const locationKey = getLocationKey(null, idx);
-                      const isDragged = draggedLocationKey === locationKey;
-                      const responder = createLocationResponder(null, idx, locations.length);
-                      
-                      return (
-                        <Animated.View 
-                          key={idx} 
-                          style={[
-                            styles.locationRow, 
-                            isDragged && {backgroundColor: '#00CAFF30', borderRadius: 8, padding: 8},
-                            {transform: isDragged ? [{translateY: dragY}] : [{translateY: 0}]}
-                          ]}
-                          {...responder.panHandlers}
-                        >
-                          <TouchableOpacity 
-                            style={{ flex: 1, marginBottom: 15 }}
-                            onPress={() => openEditLocationModal(null, idx, loc)}
-                            onLongPress={() => handleDragStart(null, idx)}
+                              <TouchableOpacity
+                                style={{ flex: 1, marginBottom: 10 }}
+                                onPress={() => openEditLocationModal(dayIdx, locIdx, loc)}
+                                onLongPress={() => handleDragStart(dayIdx, locIdx)}
+                              >
+                                <TText style={{ opacity: isDragged ? 1 : 0.9 }}>{loc.locationName}</TText>
+                                {loc.note ? (
+                                  <TText style={{ opacity: isDragged ? 0.7 : .5 }}>{loc.note}</TText>
+                                ) : null}
+                              </TouchableOpacity>
+                              <TouchableOpacity onPress={() => removeLocation(dayIdx, locIdx)}>
+                                <TIcon name='close' size={20} />
+                              </TouchableOpacity>
+                            </Animated.View>
+                          );
+                        })}
+                        <TouchableOpacity style={styles.addLocationButton} onPress={() => openLocationModal(dayIdx)}>
+                          <TIcon name='plus' size={15} />
+                          <TText style={{ opacity: 0.7, fontSize: 12 }}>Add Location</TText>
+                        </TouchableOpacity>
+                      </TView>
+                    ))}
+                  </>
+                ) : (
+                  <TView style={styles.dayBlock} color='primary'>
+                      {locations.map((loc, idx) => {
+                        const locationKey = getLocationKey(null, idx);
+                        const isDragged = draggedLocationKey === locationKey;
+                        const responder = createLocationResponder(null, idx, locations.length);
+
+                        return (
+                          <Animated.View
+                            key={idx}
+                            style={[
+                              styles.locationRow,
+                              isDragged && { backgroundColor: '#00CAFF30', borderRadius: 8, padding: 8 },
+                              { transform: isDragged ? [{ translateY: dragY }] : [{ translateY: 0 }] }
+                            ]}
+                            {...responder.panHandlers}
                           >
-                            <TText style={{opacity: isDragged ? 1 : 0.9}}>{loc.locationName}</TText>
-                            {loc.note ? (
-                              <TText style={{opacity: isDragged ? 0.7 : .5}}>{loc.note}</TText>
-                            ) : null}
-                          </TouchableOpacity>
-                          <TouchableOpacity onPress={() => removeLocation(null, idx)}>
-                            <TIcon name='close' size={20}/>
-                          </TouchableOpacity>
-                        </Animated.View>
-                      );
-                    })}
-                </View>
-                
-              </>
-            )}
-          </View>
+                            <TouchableOpacity
+                              style={{ flex: 1, marginBottom: 15 }}
+                              onPress={() => openEditLocationModal(null, idx, loc)}
+                              onLongPress={() => handleDragStart(null, idx)}
+                            >
+                              <TText style={{ opacity: isDragged ? 1 : 0.9 }}>{loc.locationName}</TText>
+                              {loc.note ? (
+                                <TText style={{ opacity: isDragged ? 0.7 : .5 }}>{loc.note}</TText>
+                              ) : null}
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => removeLocation(null, idx)}>
+                              <TIcon name='close' size={20} />
+                            </TouchableOpacity>
+                          </Animated.View>
+                        );
+                      })}
+                    <TouchableOpacity style={styles.addLocationButton} onPress={() => openLocationModal(null)}>
+                      <TIcon name='plus' size={15} />
+                      <TText style={{ opacity: 0.7, fontSize: 12 }}>Add Location</TText>
+                    </TouchableOpacity>
+                  </TView>
+                )}
+              </View>
+
+
+            </View>
+          </TView>
         </ScrollView>
       </KeyboardAvoidingView>
 
@@ -558,49 +558,62 @@ const styles = StyleSheet.create({
   container: {
     paddingBottom: 40,
   },
-  rowBetween: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 10,
+  switchContainer: {
+    borderWidth: 1,
+    borderColor: '#ccc4',
+    borderRadius: 15,
+    padding: 10,
   },
-  bottomOverlay:{
-   position: 'absolute',
-   bottom:-2,
-   left: 0,
-   right: 0,
-   height: 20,
-   borderTopLeftRadius: 200,
-   borderTopRightRadius: 200,
-   borderWidth: 1,
-   borderColor: '#ccc4',
-   borderBottomWidth: 0,
+  bottomOverlay: {
+    position: 'absolute',
+    bottom: -2,
+    left: 0,
+    right: 0,
+    height: 20,
+    borderTopLeftRadius: 200,
+    borderTopRightRadius: 200,
+    borderWidth: 1,
+    borderColor: '#ccc4',
+    borderBottomWidth: 0,
   },
   dayBlock: {
-    marginBottom: 16
+    marginBottom: 8,
+    padding: '3%',
+    borderRadius: 10,
+  },
+  dayBadge: {
+    padding: 8,
+    aspectRatio: 1,
+    borderRadius: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dayHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+    marginBottom: 10,
   },
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingRight: 10
   },
-  addLocationButton:{
-    borderColor: '#00CAFF',
+  addLocationButton: {
+    borderColor: '#ccc4',
     borderWidth: 1,
-    padding: 7,
-    borderRadius: 100,
+    padding: 10,
+    borderRadius: 6,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     gap: 5,
+    borderStyle: 'dashed',
   },
-  cubeButton:{
+  cubeButton: {
     position: 'absolute',
     bottom: 20,
     right: 20
-  },
-  locationContainer:{
-    paddingHorizontal: 16,
   },
 
 });

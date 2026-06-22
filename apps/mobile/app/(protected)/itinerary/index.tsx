@@ -41,10 +41,11 @@ export default function ItineraryScreen() {
           <TText style={[styles.cardBubbleText, { opacity: 0.7 }]}>{item.type}</TText>
         </TView>
       </View>
-
-      <TText style={styles.cardDescription} numberOfLines={1}>
-        {item.description}
-      </TText>
+      {item.description && (
+        <TText style={styles.cardDescription} numberOfLines={1}>
+          {item.description}
+        </TText>
+      )}
     </TouchableOpacity>
   );
 
@@ -133,6 +134,7 @@ const styles = StyleSheet.create({
   cardDescription: {
     fontSize: 12,
     opacity: 0.6,
+    marginTop: 4,
   },
   dateText: {
     fontSize: 12,
@@ -141,7 +143,6 @@ const styles = StyleSheet.create({
   cardTabs: {
     flexDirection: 'row',
     gap: 4,
-    marginBottom: 4,
   },
   cardBubble: {
     paddingHorizontal: 10,

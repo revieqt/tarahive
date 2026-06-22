@@ -1,9 +1,11 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createItinerary } from '@/features/itinerary/services/itineraryService';
 import { showError, showSuccess } from '@/shared/services/toast.service';
 import { CreateItineraryRequest, Itinerary } from '../types/itineraryTypes';
 
 export const useCreateItinerary = () => {
+  const queryClient = useQueryClient();
+
   const mutation = useMutation({
     mutationFn: async (data: CreateItineraryRequest) => {
       // Validation
@@ -36,6 +38,8 @@ export const useCreateItinerary = () => {
 
     onSuccess: (data: Itinerary) => {
       showSuccess('Success', `Itinerary "${data.title}" created successfully`);
+      // Invalidate all user itineraries queries (all status filters)
+      queryClient.invalidateQueries({ queryKey: ['user-itineraries'] });
     },
 
     onError: (error: any) => {

@@ -194,9 +194,17 @@ export default function LocationPickerModal({
 
   // ─── Autocomplete selection ───────────────────────────────────────────────────
 
-  const handleLocationSelect = (loc: LocationItem) => {
+  const handleLocationSelect = async (loc: LocationItem) => {
     setModalLocationName(loc.locationName ?? '');
-    setModalLocationData(loc);
+    
+    // If location doesn't have address, fetch it via reverse geocoding
+    if (loc.latitude && loc.longitude && (!loc.address || Object.keys(loc.address).length === 0)) {
+      const { address } = await reverseGeocode(loc.latitude, loc.longitude);
+      setModalLocationData({ ...loc, address });
+    } else {
+      setModalLocationData(loc);
+    }
+    
     if (loc.latitude && loc.longitude) {
       panMapTo(loc.latitude, loc.longitude);
     }
