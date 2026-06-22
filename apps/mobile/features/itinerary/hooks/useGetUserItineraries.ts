@@ -1,14 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { getAllUserItineraries } from '@/features/itinerary/services/itineraryService';
 import { showError } from '@/shared/services/toast.service';
-import { Itinerary } from '../types/itinerary.types';
+import { Itinerary } from '../types/itineraryTypes';
 
-export const useGetUserItineraries = () => {
+export const useGetUserItineraries = (status: string = 'active') => {
   const query = useQuery({
-    queryKey: ['user-itineraries'],
+    queryKey: ['user-itineraries', status],
     queryFn: async () => {
       try {
-        return await getAllUserItineraries();
+        return await getAllUserItineraries(status);
       } catch (error: any) {
         const errorMsg = error?.message || 'Failed to fetch itineraries';
         showError('Fetch Error', errorMsg);

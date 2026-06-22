@@ -1,10 +1,7 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React from 'react';
 import {
   ViewStyle,
   View,
-  ScrollView,
-  ScrollViewProps,
-  Animated,
   StyleSheet,
 } from 'react-native';
 import { TText, TView } from '@/shared/components/ui/Themed';
@@ -39,7 +36,7 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, style, type = 'default
         </View>
         <BackButton color='white' style={{ position: 'absolute', top: 10, left: 10 }} />
 
-        <View style={{marginHorizontal: '3%', marginTop: 50}}>
+        <View style={{marginHorizontal: '3%', marginTop: 55}}>
           {title && 
             <TText type="title"
               style={{ color: 'white'}}

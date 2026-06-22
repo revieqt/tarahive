@@ -136,7 +136,7 @@ export const getItinerary = async (req: AuthRequest, res: Response) => {
 
 /**
  * Get all user itineraries
- * GET /v1/itinerary
+ * GET /v1/itinerary?status=active|done|cancelled
  */
 export const getAllUserItineraries = async (req: AuthRequest, res: Response) => {
   try {
@@ -148,7 +148,10 @@ export const getAllUserItineraries = async (req: AuthRequest, res: Response) => 
       return res.status(401).json({ success: false, message: 'User not authenticated' });
     }
 
-    const itineraries = await getAllUserItinerariesService(userID);
+    // Get status from query parameter (defaults to 'active' if not provided)
+    const status = req.query.status as string | undefined;
+
+    const itineraries = await getAllUserItinerariesService(userID, status);
 
     res.status(200).json({
       success: true,

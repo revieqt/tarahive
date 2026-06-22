@@ -4,15 +4,18 @@ import {
   CreateItineraryRequest,
   ItineraryResponse,
   AllItinerariesResponse,
-} from '../types/itinerary.types';
+} from '../types/itineraryTypes';
 
 const API_URL = '/v1/itinerary';
 
 /**
  * Get all user itineraries
+ * @param status - Filter by status: 'active' (default), 'done', or 'cancelled'
  */
-export const getAllUserItineraries = async (): Promise<Itinerary[]> => {
-  const response = await api.get<AllItinerariesResponse>(`${API_URL}/`);
+export const getAllUserItineraries = async (status: string = 'active'): Promise<Itinerary[]> => {
+  const response = await api.get<AllItinerariesResponse>(`${API_URL}/`, {
+    params: { status },
+  });
   return response.data || [];
 };
 

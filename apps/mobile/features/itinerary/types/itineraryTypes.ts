@@ -58,3 +58,16 @@ export interface AllItinerariesResponse {
   message: string;
   data: Itinerary[];
 }
+
+export const getStatusColor = (status: string): string => {
+  switch (status) {
+    case 'active':
+      return '#2196F3';
+    case 'cancelled':
+      return '#F44336';
+    case 'done':
+      return '#4CAF50';
+    default:
+      return '#000000';
+  }
+};

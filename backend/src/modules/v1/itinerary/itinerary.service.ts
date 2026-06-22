@@ -97,12 +97,16 @@ export const getItineraryService = async (
 };
 
 export const getAllUserItinerariesService = async (
-  userId: string
+  userId: string,
+  status?: string
 ): Promise<Itinerary[]> => {
   try {
+    const statusFilter = status || ItineraryStatus.ACTIVE;
     console.log(
-      '🟡 getAllUserItinerariesService - Fetching all itineraries for user:',
-      userId
+      '🟡 getAllUserItinerariesService - Fetching itineraries for user:',
+      userId,
+      'with status:',
+      statusFilter
     );
 
     const itineraries = await itineraryRepository
@@ -117,6 +121,7 @@ export const getAllUserItinerariesService = async (
         'itinerary.status',
       ])
       .where('itinerary.user.id = :userId', { userId })
+      .andWhere('itinerary.status = :status', { status: statusFilter })
       .orderBy('itinerary.createdOn', 'DESC')
       .getMany();
 

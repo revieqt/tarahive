@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getItineraryById } from '@/features/itinerary/services/itineraryService';
 import { showError } from '@/shared/services/toast.service';
-import { Itinerary } from '../types/itinerary.types';
+import { Itinerary } from '../types/itineraryTypes';
 
 export const useGetItinerary = (id: string | null) => {
   const query = useQuery({

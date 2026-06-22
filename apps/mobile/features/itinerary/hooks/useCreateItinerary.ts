@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { createItinerary } from '@/features/itinerary/services/itineraryService';
 import { showError, showSuccess } from '@/shared/services/toast.service';
-import { CreateItineraryRequest, Itinerary } from '../types/itinerary.types';
+import { CreateItineraryRequest, Itinerary } from '../types/itineraryTypes';
 
 export const useCreateItinerary = () => {
   const mutation = useMutation({
