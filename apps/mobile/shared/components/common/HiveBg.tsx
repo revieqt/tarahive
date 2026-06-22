@@ -93,12 +93,14 @@ interface HiveBgProps {
   flipHorizontal?: boolean;
   blur?: boolean;
   blurAmount?: number;
+  fade?: boolean;
 }
 
 const HiveBg: React.FC<HiveBgProps> = ({
   flipHorizontal = false,
   blur = true,
   blurAmount = 2,
+  fade = true,
 }) => {
   const HEX_COLOR = useThemeColor({}, 'accent');
   const primaryColor = useThemeColor({}, 'primary');
@@ -133,10 +135,12 @@ const HiveBg: React.FC<HiveBgProps> = ({
         </G>
       </Svg>
 
-      <LinearGradient
-        colors={['transparent', primaryColor]}
-        style={styles.gradient}
-      />
+      {fade && (
+        <LinearGradient
+          colors={['transparent', primaryColor]}
+          style={styles.gradient}
+        />
+      )}
     </View>
   );
 };
