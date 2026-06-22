@@ -18,13 +18,19 @@ export interface Location {
   latitude: number;
   longitude: number;
   locationName: string;
-  address?: Address;
-  note?: string;
+  address: Address;
+  note: string;
 }
 
 export interface DailyItinerary {
-  date: Date;
+  date: string;
   locations: Location[];
+}
+
+export interface UserItinerary {
+  id: string;
+  username: string;
+  isProUser: boolean;
 }
 
 export interface Itinerary {
@@ -32,9 +38,15 @@ export interface Itinerary {
   title: string;
   type: string;
   description: string;
-  startDate: Date;
-  endDate: Date;
-  status: ItineraryStatus;
+  startDate: string;
+  endDate: string;
+  planDaily: boolean;
+  locations: Location[] | DailyItinerary[];
+  status: 'active' | 'cancelled' | 'done';
+  createdOn: string;
+  updatedOn: string;
+  isPrivate: boolean;
+  user?: UserItinerary; // Optional - included when viewing individual itinerary
 }
 
 export interface CreateItineraryRequest {
@@ -62,7 +74,7 @@ export interface AllItinerariesResponse {
 export const getStatusColor = (status: string): string => {
   switch (status) {
     case 'active':
-      return '#2196F3';
+      return '#FF653F';
     case 'cancelled':
       return '#F44336';
     case 'done':
