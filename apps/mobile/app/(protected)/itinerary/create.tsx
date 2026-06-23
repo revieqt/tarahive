@@ -6,7 +6,7 @@ import { TView, TText, TIcon } from '@/shared/components/ui/Themed';
 import { useCreateItinerary } from '@/features/itinerary/hooks/useCreateItinerary';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState, useRef } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TouchableOpacity, View, PanResponder, Animated } from 'react-native';
+import { TextInput, Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TouchableOpacity, View, PanResponder, Animated } from 'react-native';
 import Switch from '@/shared/components/ui/Switch';
 import BackButton from '@/shared/components/common/BackButton';
 // import ProcessModal from '@/components/modals/ProcessModal';
@@ -15,6 +15,7 @@ import RoundButton from '@/shared/components/ui/RoundButton';
 import { ITINERARY_TYPES } from '@/shared/constants/Itinerary';
 import Header from '@/shared/components/common/Header';
 import { formatDateToString } from '@/shared/utils/formatDateToString';
+import { useThemeColor } from '@/shared/hooks/useThemeColor';
 
 interface DailyLocation {
   date: Date | null;
@@ -41,6 +42,7 @@ export default function CreateItineraryScreen() {
   const params = useLocalSearchParams();
   const createItineraryMutation = useCreateItinerary();
   const [descriptionHeight, setDescriptionHeight] = useState(60);
+  const textColor = useThemeColor({}, 'text');
 
   // State for edit mode
   const [isEditMode, setIsEditMode] = useState(false);
@@ -378,15 +380,16 @@ export default function CreateItineraryScreen() {
         <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
           <TView style={{ paddingBottom: 50, overflow: 'hidden' }}>
             <Header type='minor' title={title || 'New Itinerary'} subtitle="Plan your next adventure" />
-            <TextField placeholder="Title" value={title} onChangeText={setTitle}
-              style={{ fontFamily: 'Baloo', fontSize: 27, borderColor: 'transparent', marginBottom: 0, height: 60, backgroundColor: 'transparent' }}
-            />
-            <TextField placeholder="Add a Description" value={description} onChangeText={setDescription}
-              style={{ borderColor: 'transparent', backgroundColor: 'transparent', minHeight: 60, height: descriptionHeight, textAlignVertical: 'top' }}
-              multiline
-              onContentSizeChange={e => setDescriptionHeight(e.nativeEvent.contentSize.height)}
-            />
+
             <View style={{ paddingHorizontal: '3%' }}>
+              <TextInput placeholder="Title" value={title} onChangeText={setTitle}
+                style={[styles.titleInput, { color: title ? textColor : '#ccc8' }]}
+              />
+              <TextInput placeholder="Add a Description" value={description} onChangeText={setDescription}
+                style={[styles.descriptionInput, { color: description ? textColor : '#ccc8', height: Math.max(60, descriptionHeight) }]}
+                multiline
+                onContentSizeChange={e => setDescriptionHeight(e.nativeEvent.contentSize.height)}
+              />
               <DropDownField
                 placeholder="Type"
                 value={type}
@@ -481,37 +484,37 @@ export default function CreateItineraryScreen() {
                   </>
                 ) : (
                   <TView style={styles.dayBlock} color='primary'>
-                      {locations.map((loc, idx) => {
-                        const locationKey = getLocationKey(null, idx);
-                        const isDragged = draggedLocationKey === locationKey;
-                        const responder = createLocationResponder(null, idx, locations.length);
+                    {locations.map((loc, idx) => {
+                      const locationKey = getLocationKey(null, idx);
+                      const isDragged = draggedLocationKey === locationKey;
+                      const responder = createLocationResponder(null, idx, locations.length);
 
-                        return (
-                          <Animated.View
-                            key={idx}
-                            style={[
-                              styles.locationRow,
-                              isDragged && { backgroundColor: '#00CAFF30', borderRadius: 8, padding: 8 },
-                              { transform: isDragged ? [{ translateY: dragY }] : [{ translateY: 0 }] }
-                            ]}
-                            {...responder.panHandlers}
+                      return (
+                        <Animated.View
+                          key={idx}
+                          style={[
+                            styles.locationRow,
+                            isDragged && { backgroundColor: '#00CAFF30', borderRadius: 8, padding: 8 },
+                            { transform: isDragged ? [{ translateY: dragY }] : [{ translateY: 0 }] }
+                          ]}
+                          {...responder.panHandlers}
+                        >
+                          <TouchableOpacity
+                            style={{ flex: 1, marginBottom: 15 }}
+                            onPress={() => openEditLocationModal(null, idx, loc)}
+                            onLongPress={() => handleDragStart(null, idx)}
                           >
-                            <TouchableOpacity
-                              style={{ flex: 1, marginBottom: 15 }}
-                              onPress={() => openEditLocationModal(null, idx, loc)}
-                              onLongPress={() => handleDragStart(null, idx)}
-                            >
-                              <TText style={{ opacity: isDragged ? 1 : 0.9 }}>{loc.locationName}</TText>
-                              {loc.note ? (
-                                <TText style={{ opacity: isDragged ? 0.7 : .5 }}>{loc.note}</TText>
-                              ) : null}
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => removeLocation(null, idx)}>
-                              <TIcon name='close' size={20} />
-                            </TouchableOpacity>
-                          </Animated.View>
-                        );
-                      })}
+                            <TText style={{ opacity: isDragged ? 1 : 0.9 }}>{loc.locationName}</TText>
+                            {loc.note ? (
+                              <TText style={{ opacity: isDragged ? 0.7 : .5 }}>{loc.note}</TText>
+                            ) : null}
+                          </TouchableOpacity>
+                          <TouchableOpacity onPress={() => removeLocation(null, idx)}>
+                            <TIcon name='close' size={20} />
+                          </TouchableOpacity>
+                        </Animated.View>
+                      );
+                    })}
                     <TouchableOpacity style={styles.addLocationButton} onPress={() => openLocationModal(null)}>
                       <TIcon name='plus' size={15} />
                       <TText style={{ opacity: 0.7, fontSize: 12 }}>Add Location</TText>
@@ -558,11 +561,30 @@ const styles = StyleSheet.create({
   container: {
     paddingBottom: 40,
   },
+  titleInput: {
+    fontFamily: 'Baloo',
+    fontSize: 27,
+    borderColor: 'transparent',
+    marginBottom: 0,
+    height: 60,
+    backgroundColor: 'transparent',
+    marginHorizontal: 5
+  },
+  descriptionInput: {
+    borderColor: 'transparent',
+    backgroundColor: 'transparent',
+    fontFamily: 'Inter',
+    fontSize: 13,
+    textAlignVertical: 'top',
+    marginHorizontal: 5,
+    marginBottom: 16
+  },
   switchContainer: {
     borderWidth: 1,
     borderColor: '#ccc4',
     borderRadius: 15,
     padding: 10,
+    paddingHorizontal: 16,
   },
   bottomOverlay: {
     position: 'absolute',

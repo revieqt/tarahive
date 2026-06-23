@@ -74,7 +74,7 @@ export interface AllItinerariesResponse {
 export const getStatusColor = (status: string): string => {
   switch (status) {
     case 'active':
-      return '#FF653F';
+      return 'orange';
     case 'cancelled':
       return '#F44336';
     case 'done':

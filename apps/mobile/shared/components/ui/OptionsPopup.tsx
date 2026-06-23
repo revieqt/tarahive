@@ -2,9 +2,17 @@ import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { useRef, useState } from 'react';
 import { Animated, Easing, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { TIcon, TText } from './Themed';
+
+interface Option {
+  label: string;
+  iconName: string;
+  iconColor?: string;
+  onPress?: () => void;
+}
 
 interface OptionsProps {
-  options?: React.ReactNode[];
+  options?: Option[];
   style?: ViewStyle | ViewStyle[];
   disabled?: boolean;
   children?: React.ReactNode;
@@ -34,6 +42,11 @@ const Options: React.FC<OptionsProps> = ({ options = [], style, children, disabl
     }).start(() => setVisible(false));
   };
 
+  const handleOptionPress = (option: Option) => {
+    option.onPress?.();
+    handleClose();
+  };
+
   const translateY = slideAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [100, 0], // Slide up from 100px below
@@ -55,9 +68,10 @@ const Options: React.FC<OptionsProps> = ({ options = [], style, children, disabl
           <Pressable style={styles.overlay} onPress={handleClose}>
             <Animated.View style={[styles.menu, { backgroundColor: primaryColor, transform: [{ translateY }] }]}>
               {options.map((option, index) => (
-                <View key={index} style={styles.menuItem}>
-                  {option}
-                </View>
+                <TouchableOpacity key={index} style={styles.menuItem} onPress={() => handleOptionPress(option)}>
+                  <TIcon name={option.iconName} color={option.iconColor} size={20} />
+                  <TText>{option.label}</TText>
+                </TouchableOpacity>
               ))}
             </Animated.View>
           </Pressable>
@@ -93,8 +107,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 13,
     paddingHorizontal: 16,
-    gap: 15
+    gap: 15,
+    width: '100%',
 
+  },
+  menuLabel: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#000',
   },
   icon: {
     marginRight: 12,

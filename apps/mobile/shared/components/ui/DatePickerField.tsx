@@ -1,19 +1,20 @@
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import { useLanguage } from '@/shared/context/LanguageContext';
 import { MONTH_OPTIONS } from '@/shared/constants/Input';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
+  Animated,
   FlatList,
   Modal,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import { TText } from './Themed';
+import { TIcon, TText } from './Themed';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 const ITEM_HEIGHT = 40;
 
 interface DatePickerProps {
@@ -41,24 +42,29 @@ const DatePickerField: React.FC<DatePickerProps> = ({
 }) => {
   const backgroundColor = useThemeColor({}, 'primary');
   const textColor = useThemeColor({}, 'text');
+  const placeholderColor = useThemeColor({ light: '#aaa', dark: '#888' }, 'icon');
+  const floatedLabelColor = useThemeColor({ light: '#888', dark: '#999' }, 'icon');
   const { t } = useLanguage();
 
-  // Create months array from MONTH_OPTIONS using translations
-  const months = useMemo(
-    () => MONTH_OPTIONS.map((option) => t(option.label)),
-    [t]
-  );
+  const allMonths = useMemo(() => MONTH_OPTIONS.map((o) => t(o.label)), [t]);
 
   const [showPicker, setShowPicker] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const focused = isFocusedProp !== undefined ? isFocusedProp : isFocused;
 
-  // Local state for spinner values
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
 
-  // Initialize state from value prop when component mounts or value changes
+  // FlatList refs for arrow scrolling
+  const monthRef = useRef<FlatList<any>>(null);
+  const dayRef = useRef<FlatList<any>>(null);
+  const yearRef = useRef<FlatList<any>>(null);
+  const monthOffset = useRef(0);
+  const dayOffset = useRef(0);
+  const yearOffset = useRef(0);
+
+  // Initialize from value
   useEffect(() => {
     if (value) {
       setSelectedDay(value.getDate());
@@ -67,69 +73,195 @@ const DatePickerField: React.FC<DatePickerProps> = ({
     }
   }, [value]);
 
+  // ── Date range helpers ──────────────────────────────────────────────────────
+
   const minYear = minimumDate ? minimumDate.getFullYear() : 1950;
   const maxYear = maximumDate ? maximumDate.getFullYear() : new Date().getFullYear() + 50;
   const years = Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i);
 
-  const daysInMonth = selectedMonth !== null && selectedYear !== null
-    ? new Date(selectedYear, selectedMonth + 1, 0).getDate()
-    : 31;
-  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+  // Months available for the selected year
+  const months = useMemo(() => {
+    if (selectedYear === null) return allMonths;
+    return allMonths.filter((_, idx) => {
+      if (minimumDate && selectedYear === minimumDate.getFullYear() && idx < minimumDate.getMonth()) return false;
+      if (maximumDate && selectedYear === maximumDate.getFullYear() && idx > maximumDate.getMonth()) return false;
+      return true;
+    });
+  }, [allMonths, selectedYear, minimumDate, maximumDate]);
 
-  // Handle auto-change on click
+  // Days available for the selected year + month
+  const days = useMemo(() => {
+    const yr = selectedYear ?? new Date().getFullYear();
+    const mo = selectedMonth ?? 0;
+    const total = new Date(yr, mo + 1, 0).getDate();
+    return Array.from({ length: total }, (_, i) => i + 1).filter((d) => {
+      if (minimumDate && yr === minimumDate.getFullYear() && mo === minimumDate.getMonth() && d < minimumDate.getDate()) return false;
+      if (maximumDate && yr === maximumDate.getFullYear() && mo === maximumDate.getMonth() && d > maximumDate.getDate()) return false;
+      return true;
+    });
+  }, [selectedYear, selectedMonth, minimumDate, maximumDate]);
+
+  // Clamp selections when ranges shrink
+  useEffect(() => {
+    if (selectedMonth !== null && !months.includes(allMonths[selectedMonth])) {
+      const firstValidIdx = allMonths.indexOf(months[0]);
+      setSelectedMonth(firstValidIdx >= 0 ? firstValidIdx : null);
+    }
+  }, [months]);
+
+  useEffect(() => {
+    if (selectedDay !== null && !days.includes(selectedDay)) {
+      setSelectedDay(days[0] ?? null);
+    }
+  }, [days]);
+
+  // Fire onChange when all three are set
   useEffect(() => {
     if (selectedDay !== null && selectedMonth !== null && selectedYear !== null) {
-      const selectedDate = new Date(selectedYear, selectedMonth, selectedDay);
-
-      let finalDate = selectedDate;
-      if (minimumDate && selectedDate < minimumDate) finalDate = minimumDate;
-      if (maximumDate && selectedDate > maximumDate) finalDate = maximumDate;
-
-      onChange(finalDate);
+      let date = new Date(selectedYear, selectedMonth, selectedDay);
+      if (minimumDate && date < minimumDate) date = new Date(minimumDate);
+      if (maximumDate && date > maximumDate) date = new Date(maximumDate);
+      onChange(date);
     }
   }, [selectedDay, selectedMonth, selectedYear]);
 
-  const handleFocus = () => {
-    setIsFocused(true);
-    onFocus && onFocus();
+  // ── Floating label animation ────────────────────────────────────────────────
 
-    // If user opens picker for the first time (no date yet), set current date
+  const isFloated = focused || !!value;
+  const floatAnim = useRef(new Animated.Value(isFloated ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.timing(floatAnim, {
+      toValue: isFloated ? 1 : 0,
+      duration: 180,
+      useNativeDriver: false,
+    }).start();
+  }, [isFloated]);
+
+  const labelTop = floatAnim.interpolate({ inputRange: [0, 1], outputRange: [16, 8] });
+  const labelFontSize = floatAnim.interpolate({ inputRange: [0, 1], outputRange: [13, 9] });
+  const labelColor = floatAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [placeholderColor as string, floatedLabelColor as string],
+  });
+
+  // ── Handlers ────────────────────────────────────────────────────────────────
+
+  const handleOpen = () => {
     if (selectedDay === null || selectedMonth === null || selectedYear === null) {
       const now = new Date();
       setSelectedDay(now.getDate());
       setSelectedMonth(now.getMonth());
       setSelectedYear(now.getFullYear());
     }
-
+    setIsFocused(true);
+    onFocus && onFocus();
     setShowPicker(true);
   };
 
-  const handleBlur = () => {
+  const handleClose = () => {
+    setShowPicker(false);
     setIsFocused(false);
     onBlur && onBlur();
   };
 
-  const renderItem = (item: any, selected: any, setSelected: any) => (
-    <TouchableOpacity onPress={() => setSelected(item.item)}>
-      <View style={styles.item}>
-        <TText style={[styles.itemText, item.item === selected && styles.selectedText]}>
-          {item.item}
-        </TText>
-      </View>
-    </TouchableOpacity>
-  );
+  const scrollBy = (
+    ref: React.RefObject<FlatList<any> | null>,
+    offsetRef: React.MutableRefObject<number>,
+    direction: 'up' | 'down'
+  ) => {
+    const next =
+      direction === 'up'
+        ? Math.max(0, offsetRef.current - ITEM_HEIGHT)
+        : offsetRef.current + ITEM_HEIGHT;
+    ref.current?.scrollToOffset({ offset: next, animated: true });
+    offsetRef.current = next;
+  };
+
+  // ── Display ─────────────────────────────────────────────────────────────────
 
   const formattedDisplay =
     value && selectedDay !== null
-      ? `${months[value.getMonth()]} ${value.getDate()}, ${value.getFullYear()}`
+      ? `${allMonths[value.getMonth()]} ${value.getDate()}, ${value.getFullYear()}`
       : '';
 
-  const formattedValue =
-    value && selectedDay !== null
-      ? `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(
-          value.getDate()
-        ).padStart(2, '0')}`
-      : '';
+  // ── Spinner column ───────────────────────────────────────────────────────────
+
+  const SpinnerColumn = ({
+    data,
+    selected,
+    onSelect,
+    listRef,
+    offsetRef,
+  }: {
+    data: any[];
+    selected: any;
+    onSelect: (item: any) => void;
+    listRef: React.RefObject<FlatList<any> | null>;
+    offsetRef: React.MutableRefObject<number>;
+  }) => (
+    <View style={styles.spinnerColumn}>
+      {/* Up arrow */}
+      <TouchableOpacity
+        style={styles.arrowButton}
+        onPress={() => scrollBy(listRef, offsetRef, 'up')}
+        activeOpacity={0.7}
+      >
+        <TIcon name="chevron-up" size={16} color={textColor} />
+      </TouchableOpacity>
+
+      {/* Gradient top */}
+      <LinearGradient
+        colors={[backgroundColor, 'transparent']}
+        style={[styles.gradient, { top: 36 }]}
+        pointerEvents="none"
+      />
+
+      <FlatList
+        ref={listRef}
+        data={data}
+        keyExtractor={(item) => item.toString()}
+        style={styles.picker}
+        snapToInterval={ITEM_HEIGHT}
+        decelerationRate="fast"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingVertical: 20 }}
+        onScroll={(e) => { offsetRef.current = e.nativeEvent.contentOffset.y; }}
+        scrollEventThrottle={16}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => onSelect(item)}>
+            <View style={styles.item}>
+              <TText
+                style={[
+                  styles.itemText,
+                  { color: textColor },
+                  item === selected && styles.selectedText,
+                ]}
+              >
+                {item}
+              </TText>
+            </View>
+          </TouchableOpacity>
+        )}
+      />
+
+      {/* Gradient bottom */}
+      <LinearGradient
+        colors={['transparent', backgroundColor]}
+        style={[styles.gradient, { bottom: 36 }]}
+        pointerEvents="none"
+      />
+
+      {/* Down arrow */}
+      <TouchableOpacity
+        style={styles.arrowButton}
+        onPress={() => scrollBy(listRef, offsetRef, 'down')}
+        activeOpacity={0.7}
+      >
+        <TIcon name="chevron-down" size={16} color={textColor} />
+      </TouchableOpacity>
+    </View>
+  );
 
   return (
     <TouchableOpacity
@@ -139,87 +271,68 @@ const DatePickerField: React.FC<DatePickerProps> = ({
         { borderColor: focused ? '#ccc' : '#ccc4', borderWidth: 1 },
         style,
       ]}
-      onPress={handleFocus}
+      onPress={handleOpen}
       activeOpacity={0.7}
     >
-      <TextInput
-        value={formattedDisplay || ''}
-        style={[
-          styles.input,
-          { color: textColor, textAlignVertical: 'center', paddingTop: 0, paddingBottom: 0 },
-        ]}
-        placeholder={placeholder}
-        placeholderTextColor={useThemeColor({ light: '#aaa', dark: '#888' }, 'icon')}
-        editable={false}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
+      {/* Floating label */}
+      <Animated.Text
+        style={[styles.floatingLabel, { top: labelTop, fontSize: labelFontSize, color: labelColor }]}
+        numberOfLines={1}
         pointerEvents="none"
-      />
+      >
+        {placeholder}
+      </Animated.Text>
+
+      {/* Display value */}
+      <TText
+        style={[
+          styles.displayText,
+          { color: formattedDisplay ? textColor : 'transparent', paddingTop: isFloated ? 12 : 0 },
+        ]}
+      >
+        {formattedDisplay || ' '}
+      </TText>
 
       {/* Spinner Modal */}
       <Modal
         transparent
         animationType="fade"
         visible={showPicker}
-        onRequestClose={() => setShowPicker(false)}
+        onRequestClose={handleClose}
       >
         <SafeAreaView style={{ flex: 1 }} edges={['bottom']} pointerEvents="box-none">
-          <TouchableWithoutFeedback onPress={() => setShowPicker(false)}>
-            <View style={styles.modalOverlay}>
-              <TouchableWithoutFeedback>
-                <View style={[styles.modalContainer, { backgroundColor }]}>
-                  <LinearGradient
-                    colors={[backgroundColor, 'transparent']}
-                    style={[styles.gradient, { top: 0 }]}
-                  />
-                  <View style={styles.pickerContainer}>
-                    {/* Month */}
-                    <FlatList
-                      data={months}
-                      keyExtractor={(item) => item}
-                      style={styles.picker}
-                      snapToInterval={ITEM_HEIGHT}
-                      decelerationRate="fast"
-                      showsVerticalScrollIndicator={false}
-                      contentContainerStyle={{paddingVertical: 20}}
-                      renderItem={(item) =>
-                        renderItem(item, months[selectedMonth ?? 0], (month: string) =>
-                          setSelectedMonth(months.indexOf(month))
-                        )
-                      }
-                    />
-                    {/* Day */}
-                    <FlatList
-                      data={days}
-                      keyExtractor={(item) => item.toString()}
-                      style={styles.picker}
-                      snapToInterval={ITEM_HEIGHT}
-                      contentContainerStyle={{paddingVertical: 20}}
-                      decelerationRate="fast"
-                      showsVerticalScrollIndicator={false}
-                      renderItem={(item) => renderItem(item, selectedDay, setSelectedDay)}
-                    />
-
-                    {/* Year */}
-                    <FlatList
-                      data={years}
-                      keyExtractor={(item) => item.toString()}
-                      style={styles.picker}
-                      snapToInterval={ITEM_HEIGHT}
-                      contentContainerStyle={{paddingVertical: 20}}
-                      decelerationRate="fast"
-                      showsVerticalScrollIndicator={false}
-                      renderItem={(item) => renderItem(item, selectedYear, setSelectedYear)}
-                    />
-                  </View>
-                  <LinearGradient
-                    colors={['transparent',backgroundColor ]}
-                    style={[styles.gradient, { bottom: 0 }]}
-                  />
-                </View>
-              </TouchableWithoutFeedback>
-            </View>
+          <TouchableWithoutFeedback onPress={handleClose}>
+            <View style={styles.modalOverlay} />
           </TouchableWithoutFeedback>
+
+          <View style={[styles.modalContainer, { backgroundColor }]}>
+            <View style={styles.pickerContainer}>
+              {/* Month */}
+              <SpinnerColumn
+                data={months}
+                selected={selectedMonth !== null ? allMonths[selectedMonth] : null}
+                onSelect={(m: string) => setSelectedMonth(allMonths.indexOf(m))}
+                listRef={monthRef}
+                offsetRef={monthOffset}
+              />
+              {/* Day */}
+              <SpinnerColumn
+                data={days}
+                selected={selectedDay}
+                onSelect={setSelectedDay}
+                listRef={dayRef}
+                offsetRef={dayOffset}
+              />
+              {/* Year */}
+              <SpinnerColumn
+                data={years}
+                selected={selectedYear}
+                onSelect={setSelectedYear}
+                listRef={yearRef}
+                offsetRef={yearOffset}
+              />
+            </View>
+          </View>
         </SafeAreaView>
       </Modal>
     </TouchableOpacity>
@@ -239,37 +352,60 @@ const styles = StyleSheet.create({
     minHeight: 48,
     height: 48,
   },
-  input: {
+  floatingLabel: {
+    position: 'absolute',
+    left: 16,
+    right: 16,
+    fontFamily: 'Inter',
+  },
+  displayText: {
     flex: 1,
     fontSize: 13,
-    height: 48,
-    backgroundColor: 'transparent',
     fontFamily: 'Inter',
   },
   modalOverlay: {
     flex: 1,
-    justifyContent: 'flex-end',
     backgroundColor: 'rgba(0,0,0,0.4)',
   },
   modalContainer: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    alignItems: 'center',
     position: 'absolute',
     left: 0,
     right: 0,
     bottom: 0,
-    height: '30%',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     overflow: 'hidden',
+    maxHeight: '35%',
   },
   pickerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: '100%',
+    height: 280,
+  },
+  spinnerColumn: {
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
     overflow: 'hidden',
   },
   picker: {
-    width: '30%',
+    flex: 1,
+    width: '100%',
+  },
+  arrowButton: {
+    width: '100%',
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 2,
+  },
+  gradient: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    height: '20%',
+    zIndex: 1,
   },
   item: {
     height: ITEM_HEIGHT,
@@ -278,19 +414,13 @@ const styles = StyleSheet.create({
   },
   itemText: {
     opacity: 0.7,
+    fontFamily: 'Inter',
+    fontSize: 13,
   },
   selectedText: {
     fontFamily: 'Baloo',
     fontSize: 16,
     opacity: 1,
-  },
-  gradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    height: '20%',
-    zIndex: 1,
-    pointerEvents: 'none',
   },
 });
 

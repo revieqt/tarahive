@@ -56,11 +56,11 @@ export default function ItineraryScreen() {
   );
 
   return (
-    <View style={{ flex: 1 }}>
+    <TView style={{ flex: 1 }}>
       <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}> 
 
         <Header title='Itinerary' subtitle='Manage your travel plans' type="major" />
-        
+
         <TView style={styles.container}>
           <View style={styles.tabsContainer}>
             {ItineraryOptions.map((option, index) => (
@@ -104,7 +104,7 @@ export default function ItineraryScreen() {
         onPress={() => router.push('/itinerary/create')}
         style={styles.addButton}
       />
-    </View>
+    </TView>
   );
 }
 

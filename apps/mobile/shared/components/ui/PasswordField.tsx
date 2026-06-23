@@ -1,7 +1,7 @@
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import { TIcon } from '@/shared/components/ui/Themed';
-import React, { useState } from 'react';
-import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { Animated, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 
 interface PasswordFieldProps {
   placeholder: string;
@@ -23,10 +23,24 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
   const backgroundColor = useThemeColor({}, 'primary');
   const textColor = useThemeColor({}, 'text');
   const accentColor = useThemeColor({}, 'accent');
+  const placeholderColor = useThemeColor({ light: '#aaa', dark: '#888' }, 'icon');
+  const floatedLabelColor = useThemeColor({ light: '#888', dark: '#999' }, 'icon');
 
   const [isPasswordVisible, setPasswordVisible] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const focused = isFocusedProp !== undefined ? isFocusedProp : isFocused;
+
+  const isFloated = focused || value.length > 0;
+
+  const floatAnim = useRef(new Animated.Value(isFloated ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.timing(floatAnim, {
+      toValue: isFloated ? 1 : 0,
+      duration: 180,
+      useNativeDriver: false,
+    }).start();
+  }, [isFloated]);
 
   const handleFocus = () => {
     setIsFocused(true);
@@ -38,6 +52,21 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
     onBlur && onBlur();
   };
 
+  const labelTop = floatAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [15, 8],
+  });
+
+  const labelFontSize = floatAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [13, 9],
+  });
+
+  const labelColor = floatAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [placeholderColor as string, floatedLabelColor as string],
+  });
+
   return (
     <View
       style={[
@@ -46,20 +75,41 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
         { borderColor: focused ? '#ccc' : '#ccc4', borderWidth: 1 },
       ]}
     >
+      <Animated.Text
+        style={[
+          styles.floatingLabel,
+          {
+            top: labelTop,
+            fontSize: labelFontSize,
+            color: labelColor,
+          },
+        ]}
+        numberOfLines={1}
+        pointerEvents="none"
+      >
+        {placeholder}
+      </Animated.Text>
+
       <TextInput
         secureTextEntry={!isPasswordVisible}
         style={[
           styles.input,
-          { color: textColor, textAlignVertical: 'center', paddingTop: 0, paddingBottom: 0 },
+          {
+            color: textColor,
+            paddingTop: isFloated ? 12 : 0,
+            paddingBottom: 0,
+            textAlignVertical: 'center',
+          },
         ]}
         value={value}
         onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor={useThemeColor({ light: '#aaa', dark: '#888' }, 'icon')}
+        placeholder=""
+        placeholderTextColor="transparent"
         onFocus={handleFocus}
         onBlur={handleBlur}
         underlineColorAndroid="transparent"
       />
+
       <TouchableOpacity
         style={styles.eyeButton}
         onPress={() => setPasswordVisible(!isPasswordVisible)}
@@ -87,6 +137,12 @@ const styles = StyleSheet.create({
     position: 'relative',
     minHeight: 48,
     height: 48,
+  },
+  floatingLabel: {
+    position: 'absolute',
+    left: 16,
+    right: 16,
+    fontFamily: 'Inter',
   },
   input: {
     flex: 1,

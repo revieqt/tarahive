@@ -18,8 +18,8 @@ const Switch: React.FC<SwitchProps> = ({ label, description, value, onValueChang
   return (
     <View style={styles.container}>
       <View>
+        {description && <TText style={{opacity: 0.5, fontSize: 9, fontWeight: 'normal'}}>{description}</TText>}
         {label && <TText>{label}</TText>}
-        {description && <TText style={{opacity: 0.5, fontSize: 11}}>{description}</TText>}
       </View>
       <RNSwitch
         value={value}

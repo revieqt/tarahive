@@ -4,9 +4,11 @@ import BackButton from '@/shared/components/common/BackButton';
 import { useLocation } from '@/shared/context/LocationContext';
 import { usePlaceWeather } from '@/shared/hooks/useWeather';
 import { useSession } from '@/features/auth/context/SessionContext';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, router } from 'expo-router';
 import React, { useState, useRef, useEffect } from 'react';
 import { Alert, StyleSheet, TouchableOpacity, View, Dimensions, Linking, ScrollView, Platform } from 'react-native';
+import { useQueryClient } from '@tanstack/react-query';
+import { Dialog } from '@/shared/services/dialog.service';
 import { LinearGradient } from 'expo-linear-gradient';
 import { formatDateToString } from '@/shared/utils/formatDateToString';
 import ShareModal from '@/shared/components/modals/ShareModal';
@@ -23,11 +25,10 @@ interface LocationWithDate extends Location {
 
 export default function ItineraryViewScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
-  const router = useRouter();
 
-  // Use React Query hooks
   const { itinerary, isLoading, error } = useGetItinerary(id || null);
   const deleteItineraryMutation = useDeleteItinerary();
+  const queryClient = useQueryClient();
 
   const { latitude: userLat, longitude: userLng } = useLocation();
   const { session, updateSession } = useSession();
@@ -130,8 +131,29 @@ export default function ItineraryViewScreen() {
       const googleSearchUrl = `https://www.google.com/search?q=${searchQuery}`;
       await Linking.openURL(googleSearchUrl);
     } catch (error) {
-      Alert.alert('Error', 'Unable to open search. Please try again.');
+      Dialog.alert('Error', 'Unable to open search. Please try again.');
     }
+  };
+
+  const handleDeleteItinerary = () => {
+    Dialog.confirm(
+      'Delete Itinerary',
+      'Are you sure you want to delete this itinerary?',
+      {
+        onConfirm: () => {
+          if (id) {
+            deleteItineraryMutation.delete(id, {
+              onSuccess: async () => {
+                await queryClient.invalidateQueries({ queryKey: ['user-itineraries'] });
+                router.back();
+              },
+            });
+          }
+        },
+        confirmText: 'Delete',
+        destructive: true,
+      }
+    );
   };
 
   const showFirstOptions =
@@ -195,7 +217,7 @@ export default function ItineraryViewScreen() {
             showFirstOptions ? (
               <OptionsPopup
                 options={[
-                  // OPTIONS IF ACTIVE
+                  { label: 'Delete Itinerary', iconName: 'delete', onPress: handleDeleteItinerary },
                 ]}
                 style={styles.options}
               >
@@ -204,7 +226,7 @@ export default function ItineraryViewScreen() {
             ) : (
               <OptionsPopup
                 options={[
-                  // OPTIONS IF NOT ACTIVE
+                  { label: 'Delete Itinerary', iconName: 'delete', onPress: handleDeleteItinerary },
                 ]}
                 style={styles.options}
               >
@@ -213,7 +235,7 @@ export default function ItineraryViewScreen() {
             ))
           }
 
-          <BackButton type="close-floating" color="#fff" />
+          <BackButton type="close" color="#fff" style={styles.backButton} />
           <View style={styles.headerRow}>
             <TText type='subtitle' style={{ color: '#fff' }}>
               {itinerary?.title}
@@ -222,14 +244,14 @@ export default function ItineraryViewScreen() {
               <TIcon name="lock" size={15} color='white' />
             )}
           </View>
-          <TText style={{ color: '#fff'}}>
+          <TText style={{ color: '#fff' }}>
             {formatDateToString(itinerary?.startDate || "")} - {formatDateToString(itinerary?.endDate || "")}
           </TText>
           <TText style={{ color: '#fff7', fontSize: 11 }}>
             Created by {itinerary?.user?.username}
           </TText>
 
-          
+
 
           <View style={styles.headerRow}>
             <View style={[styles.headerBubble, { backgroundColor: getStatusColor(itinerary?.status || 'active') }]}>
@@ -368,6 +390,20 @@ export default function ItineraryViewScreen() {
           />
         </View>
       )}
+
+      {isLoading || error && (
+        <View style={styles.privateOverlay}>
+          <EmptyMessage
+            iconName="lock"
+            title={error ? "Failed to load itinerary" : "Loading itinerary..."}
+            description={error ? "Please try again later." : "Please wait while we load the itinerary details."}
+            buttonLabel="Go Back"
+            buttonAction={() => router.back()}
+            isWhite
+            loading={isLoading}
+          />
+        </View>
+      )}
     </View>
   );
 }
@@ -395,10 +431,16 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    padding: 16,
+    padding: '3%',
     paddingBottom: 50,
     gap: 6,
     zIndex: 1,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 11,
+    right: '3%',
+    zIndex: 10,
   },
   headerRow: {
     flexDirection: 'row',
@@ -416,7 +458,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    paddingHorizontal: 16,
+    paddingHorizontal: '3%',
     justifyContent: 'flex-end',
   },
   goBack: {
