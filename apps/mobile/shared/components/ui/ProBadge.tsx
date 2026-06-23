@@ -14,7 +14,7 @@ export const ProBadge = ({ isProUser, size = 50 }: ProBadgeProps) => {
   return (
     <View style={[styles.container, { width: size, height: size }]}>
       <Image
-        source={require('@/assets/images/pro-badge.png')}
+        source={require('@/shared/assets/images/pro-badge.png')}
         style={{
           width: size,
           height: size,

@@ -61,8 +61,8 @@ export default function AccountScreen() {
             style={styles.profileButton}
             onPress={() =>
               router.push({
-                pathname: '/account/[id]',
-                params: { id: user?.id },
+                pathname: '/user/[id]',
+                params: { id: user?.username },
               } as any)
             }
           >

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { View,  StyleSheet, Animated, Easing } from "react-native";
-import { ThemedText } from "./ThemedText";
+import { TText } from "../ui/Themed";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 // ----------------------------------------------------
@@ -103,10 +103,10 @@ export const ExpProgress = ({ expPoints }: { expPoints: number }) => {
       </View>
 
       <View style={styles.progressLabels}>
-        <ThemedText style={styles.progressText}>User's Points: {expPoints}</ThemedText>
-        <ThemedText style={styles.progressText}>
+        <TText style={styles.progressText}>User's Points: {expPoints}</TText>
+        <TText style={styles.progressText}>
           {maxExp === Infinity ? "MAX" : maxExp}
-        </ThemedText>
+        </TText>
       </View>
     </View>
   );
@@ -119,9 +119,9 @@ export const ExpLevel = ({ expPoints }: { expPoints: number }) => {
   const levelInfo = getLevelInfo(expPoints);
 
   return (
-    <ThemedText style={styles.levelText} type="subtitle">
+    <TText style={styles.levelText} type="subtitle">
       {levelInfo.title}
-    </ThemedText>
+    </TText>
   );
 };
 

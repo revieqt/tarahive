@@ -11,9 +11,7 @@ import QRCode from "react-native-qrcode-svg";
 import * as Clipboard from "expo-clipboard";
 import { TText, TIcon, TView } from "@/shared/components/ui/Themed";
 import { LinearGradient } from "expo-linear-gradient";
-import { Dialog } from "@/shared/services/dialog.service";
 import { useThemeColor } from "@/shared/hooks/useThemeColor";
-import { showInfo } from "@/shared/services/toast.service";
 
 interface ShareModalProps {
   visible: boolean;
@@ -68,7 +66,7 @@ export default function ShareModal({
 
             {/* Clickable Link */}
             <TouchableOpacity onPress={handleCopy} style={styles.linkButton} activeOpacity={0.7}>
-              <TText style={{ textAlign: "center", fontSize: 13 }}>{link}</TText>
+              <TText style={{ textAlign: "center", fontSize: 13 }}>exp://tarag-v2.exp.app/{link}</TText>
               <TText style={{ opacity: 0.5, fontSize: 11, marginTop: 4 }}>
                 {copied ? "Copied!" : "Tap to copy"}
               </TText>

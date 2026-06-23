@@ -1,9 +1,10 @@
 import { AppDataSource } from "../../../config/postgres";
 import { User } from "./user.entity";
 
+const userRepository = AppDataSource.getRepository(User);
+
 export const getUserById = async (userId: string): Promise<Partial<User>> => {
-  const userRepo = AppDataSource.getRepository(User);
-  const user = await userRepo.findOne({ where: { id: userId } });
+  const user = await userRepository.findOne({ where: { id: userId } });
 
   if (!user) {
     throw new Error("User not found");
@@ -14,13 +15,11 @@ export const getUserById = async (userId: string): Promise<Partial<User>> => {
 };
 
 export const getUserByIdOrUsername = async (idOrUsername: string): Promise<Partial<User>> => {
-  const userRepo = AppDataSource.getRepository(User);
-  const user = await userRepo.findOne({
-    where: [
-      { id: idOrUsername },
-      { username: idOrUsername }
-    ]
-  });
+  const user = await userRepository
+    .createQueryBuilder('user')
+    .where('CAST(user.id AS TEXT) = :idOrUsername', { idOrUsername })
+    .orWhere('user.username = :idOrUsername', { idOrUsername })
+    .getOne();
 
   if (!user) {
     throw new Error("User not found");
