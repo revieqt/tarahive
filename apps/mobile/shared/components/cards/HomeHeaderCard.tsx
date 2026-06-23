@@ -2,11 +2,12 @@ import React from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import { TText, TIcon } from '@/shared/components/ui/Themed';
 import { useLocation } from '@/shared/context/LocationContext';
-import { useCurrentWeather } from '@/shared/hooks/useWeather';
+import { useCurrentWeather, type WeatherData } from '@/shared/hooks/useWeather';
 import Skeleton from '@/shared/components/ui/Skeleton';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import HiveBg from '../common/HiveBg';
+import WeatherDisplay from '../common/WeatherDisplay';
 
 const getWeatherImage = (weatherCode: number): any => {
   if (weatherCode === 0) {
@@ -33,106 +34,60 @@ export default function HomeHeaderCard() {
   const accentColor = useThemeColor({}, 'accent');
 
   const displayCity = locationData.city || locationData.suburb || locationData.region || locationData.state || 'Your Location';
-  const { data: displayWeather, isLoading } = useCurrentWeather(
+  const query = useCurrentWeather(
     locationData.latitude,
     locationData.longitude,
     displayCity
   );
+  const displayWeather = query.data as WeatherData | undefined;
+  const isLoading = query.isLoading;
 
   const showLoading = isLoading || (locationData.loading && !displayWeather);
 
   return (
-    <LinearGradient colors={[accentColor,secondaryColor]} style={styles.locationContent}>
-      <HiveBg flipHorizontal blur={false}/>
-      <HiveBg blur={false}/>
-      {showLoading ? <>
-        <Skeleton style={styles.descLoading}/>
-        <Skeleton style={styles.locationLoading}/>
-        <Skeleton style={styles.weatherTypeLoading}/>
+    <LinearGradient colors={[accentColor, secondaryColor]} style={styles.locationContent}>
+      <HiveBg flipHorizontal blur={false} />
+      <HiveBg blur={false} />
+      <View style={{ gap: 5 }}>
+        {showLoading ? <>
+          <Skeleton style={styles.descLoading} />
+          <Skeleton style={styles.locationLoading} />
+          <Skeleton style={styles.weatherTypeLoading} />
+        </> :
+          <>
+            <TText style={{ opacity: 0.5, fontSize: 12 }}>
+              You're currently at
+            </TText>
+            <TText type='subtitle' style={{ color: '#fff', fontSize: 17 }}>
+              {displayCity}
+            </TText>
 
-        <View style={styles.weatherDetailsContainer}>
-          <View style={styles.weather}>
-            <Skeleton style={styles.weatherIconLoading}/>
-            <Skeleton style={styles.weatherValueLoading}/>
-            <Skeleton style={styles.weatherLabelLoading}/>
-          </View>
-          <View style={styles.weather}>
-            <Skeleton style={styles.weatherIconLoading}/>
-            <Skeleton style={styles.weatherValueLoading}/>
-            <Skeleton style={styles.weatherLabelLoading}/>
-          </View>
-          <View style={styles.weather}>
-            <Skeleton style={styles.weatherIconLoading}/>
-            <Skeleton style={styles.weatherValueLoading}/>
-            <Skeleton style={styles.weatherLabelLoading}/>
-          </View>
-          <View style={styles.weather}>
-            <Skeleton style={styles.weatherIconLoading}/>
-            <Skeleton style={styles.weatherValueLoading}/>
-            <Skeleton style={styles.weatherLabelLoading}/>
-          </View>
-        </View>
-      </> : <>
-        <View style={{ gap: 3}}>
-          <TText style={{ opacity: 0.5, fontSize: 12 }}>
-            You're currently at
-          </TText>
-          <TText type='subtitle' style={{ color: '#fff', fontSize: 17 }}>
-            {displayCity}
-          </TText>
-          
-          <TText style={{ opacity: 0.5, fontSize: 12 }}>
-            {displayWeather?.weatherType || 'No data'}
-          </TText>
+            <TText style={{ opacity: 0.5, fontSize: 12 }}>
+              {displayWeather?.weatherType || 'No data'}
+            </TText>
+          </>
+        }
 
-          {displayWeather && (
-            <Image
-              source={getWeatherImage(displayWeather.weatherCode)}
-              style={styles.weatherImage}
-              resizeMode='cover'
-            />
-          )}
-          
-          <View style={styles.weatherDetailsContainer}>
-            <View style={styles.weather}>
-              <TIcon name='thermometer' size={20} color='#fff' />
-              <TText style={styles.weatherValue}>
-                {displayWeather?.temperature !== null && displayWeather?.temperature !== undefined
-                  ? `${Math.round(displayWeather.temperature)}°C`
-                  : 'N/A'}
-              </TText>
-              <TText style={styles.weatherLabel}>Heat</TText>
-            </View>
-            <View style={styles.weather}>
-              <TIcon name='cloud' size={20} color='#fff' />
-              <TText style={styles.weatherValue}>
-                {displayWeather?.precipitation !== null && displayWeather?.precipitation !== undefined
-                  ? `${displayWeather.precipitation}mm`
-                  : 'N/A'}
-              </TText>
-              <TText style={styles.weatherLabel}>Rain</TText>
-            </View>
-            <View style={styles.weather}>
-              <TIcon name='water' size={20} color='#fff' />
-              <TText style={styles.weatherValue}>
-                {displayWeather?.humidity !== null && displayWeather?.humidity !== undefined
-                  ? `${displayWeather.humidity.toFixed(0)}%`
-                  : 'N/A'}
-              </TText>
-              <TText style={styles.weatherLabel}>Humid</TText>
-            </View>
-            <View style={styles.weather}>
-              <TIcon name='fan' size={20} color='#fff' />
-              <TText style={styles.weatherValue}>
-                {displayWeather?.windSpeed !== null && displayWeather?.windSpeed !== undefined
-                  ? `${Math.round(displayWeather.windSpeed)}km/h`
-                  : 'N/A'}
-              </TText>
-              <TText style={styles.weatherLabel}>Wind</TText>
-            </View>
-          </View>
+
+        {displayWeather && !showLoading && (
+          <Image
+            source={getWeatherImage(displayWeather.weatherCode)}
+            style={styles.weatherImage}
+            resizeMode='cover'
+          />
+        )}
+
+        <View style={{marginTop: 25}}>
+          <WeatherDisplay
+            heatValue={displayWeather?.temperature || 0}
+            rainValue={displayWeather?.precipitation || 0}
+            humidValue={displayWeather?.humidity || 0}
+            windValue={displayWeather?.windSpeed || 0}
+            loading={showLoading}
+          />
         </View>
-      </>}
+
+      </View>
     </LinearGradient>
   );
 }
@@ -147,26 +102,6 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
     height: 300,
   },
-  weatherDetailsContainer: {
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 7,
-    marginTop: 35,
-  },
-  weather: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '23%',
-  },
-  weatherValue: {
-    marginTop: 5,
-  },
-  weatherLabel: {
-    fontSize: 9,
-    opacity: 0.5,
-    marginTop: 5,
-  },
   weatherImage: {
     position: 'absolute',
     top: '-13%',
@@ -175,45 +110,21 @@ const styles = StyleSheet.create({
     height: '75%',
     zIndex: 1000,
   },
-  weatherValueLoading: {
-    width: 50,
-    height: 15,
-    borderRadius: 100,
-    marginVertical: 5,
-    overflow: 'hidden',
-  },
-  weatherLabelLoading: {
-    width: 50,
-    height: 10,
-    borderRadius: 100,
-    marginVertical: 1,
-    overflow: 'hidden',
-  },
-  weatherIconLoading: {
-    width: 30,
-    height: 20,
-    borderRadius: 100,
-    marginVertical: 1,
-    overflow: 'hidden',
-  },
   weatherTypeLoading: {
     width: 70,
     height: 15,
     borderRadius: 100,
-    marginVertical: 5,
     overflow: 'hidden',
   },
   descLoading: {
     width: 70,
     height: 15,
     borderRadius: 100,
-    marginBottom: 5,
     overflow: 'hidden',
   },
   locationLoading: {
     width: 200,
     height: 20,
-    marginVertical:3,
     borderRadius: 100,
     overflow: 'hidden',
   },

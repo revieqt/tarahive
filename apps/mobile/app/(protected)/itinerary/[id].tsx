@@ -18,6 +18,9 @@ import { Location, Address, getStatusColor } from '@/features/itinerary/types/it
 import { useGetItinerary } from '@/features/itinerary/hooks/useGetItinerary';
 import { useDeleteItinerary } from '@/features/itinerary/hooks/useDeleteItinerary';
 import EmptyMessage from '@/shared/components/common/EmptyMessage';
+import WeatherDisplay from '@/shared/components/common/WeatherDisplay';
+import { showError } from '@/shared/services/toast.service';
+import HiveBg from '@/shared/components/common/HiveBg';
 
 interface LocationWithDate extends Location {
   date?: number | Date | string;
@@ -107,15 +110,12 @@ export default function ItineraryViewScreen() {
       let url = '';
 
       if (Platform.OS === 'ios') {
-        // Apple Maps
         url = `maps://maps.apple.com/?q=${encodedLabel}&ll=${latitude},${longitude}`;
         await Linking.openURL(url);
       } else if (Platform.OS === 'web') {
-        // Web: Open Google Maps in new tab
         url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
         window.open(url, '_blank');
       } else {
-        // Android: Google Maps
         url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
         await Linking.openURL(url);
       }
@@ -123,7 +123,6 @@ export default function ItineraryViewScreen() {
       Alert.alert('Error', 'Unable to open maps application.');
     }
   };
-
 
   const handleSearchLocation = async (location: Location) => {
     try {
@@ -156,52 +155,23 @@ export default function ItineraryViewScreen() {
     );
   };
 
-  const showFirstOptions =
-    itinerary && (itinerary.status === 'active');
-
-
-
-  // Component to display weather for selected location
-  const SelectedLocationWeather = ({ selectedLocation, secondaryColor }: any) => {
+  const SelectedLocationWeather = ({ selectedLocation }: any) => {
     const { data: weatherData, isLoading } = usePlaceWeather(
       selectedLocation.latitude,
       selectedLocation.longitude,
       selectedLocation.address?.city
     );
 
-    if (isLoading || !weatherData) return null;
-
     return (
-      <View style={styles.weatherInfoContainer}>
-        <View style={styles.weatherInfo}>
-          <TIcon name="thermometer" size={16} color="#B36B6B" />
-          <TText style={{ color: '#fff', fontSize: 11, marginTop: 4 }}>
-            {weatherData.temperature !== null ? `${Math.round(weatherData.temperature)}°C` : 'N/A'}
-          </TText>
-          <TText style={{ color: '#fff', fontSize: 9 }}>Heat</TText>
-        </View>
-        <View style={styles.weatherInfo}>
-          <TIcon name="cloud" size={16} color="#5A7D9A" />
-          <TText style={{ color: '#fff', fontSize: 11, marginTop: 4 }}>
-            {weatherData.precipitation !== null ? `${weatherData.precipitation}mm` : 'N/A'}
-          </TText>
-          <TText style={{ color: '#fff', fontSize: 9 }}>Rain</TText>
-        </View>
-        <View style={styles.weatherInfo}>
-          <TIcon name="water" size={16} color="#5A7D9A" />
-          <TText style={{ color: '#fff', fontSize: 11, marginTop: 4 }}>
-            {weatherData.humidity !== null ? `${Math.round(weatherData.humidity)}%` : 'N/A'}
-          </TText>
-          <TText style={{ color: '#fff', fontSize: 9 }}>Humid</TText>
-        </View>
-        <View style={styles.weatherInfo}>
-          <TIcon name="fan" size={16} color="#5A7D9A" />
-          <TText style={{ color: '#fff', fontSize: 11, marginTop: 4 }}>
-            {weatherData.windSpeed !== null ? `${Math.round(weatherData.windSpeed)}km/h` : 'N/A'}
-          </TText>
-          <TText style={{ color: '#fff', fontSize: 9 }}>Wind</TText>
-        </View>
-      </View>
+      <WeatherDisplay
+        heatValue={weatherData?.temperature || 0}
+        rainValue={weatherData?.precipitation || 0}
+        humidValue={weatherData?.humidity || 0}
+        windValue={weatherData?.windSpeed || 0}
+        textColor="#fff"
+        backgroundColor="#0004"
+        loading={isLoading}
+      />
     );
   };
 
@@ -214,7 +184,7 @@ export default function ItineraryViewScreen() {
           style={styles.headerGradient}
         >
           {(itinerary?.user && itinerary?.user.id === session?.user?.id) && (
-            showFirstOptions ? (
+            itinerary.status === 'active' ? (
               <OptionsPopup
                 options={[
                   { label: 'Delete Itinerary', iconName: 'delete', onPress: handleDeleteItinerary },
@@ -252,10 +222,8 @@ export default function ItineraryViewScreen() {
             Created by {itinerary?.user?.username}
           </TText>
 
-
-
           <View style={styles.headerRow}>
-            <View style={[styles.headerBubble, { backgroundColor: getStatusColor(itinerary?.status || 'active') }]}>
+            <View style={styles.headerBubble}>
               <TText style={{ color: '#fff', fontSize: 11 }}>
                 {itinerary?.status ? itinerary.status[0].toUpperCase() + itinerary.status.slice(1) : 'N/A'}
               </TText>
@@ -278,18 +246,23 @@ export default function ItineraryViewScreen() {
               style={styles.bottomGradient}
             >
 
-              <TouchableOpacity onPress={() => setSelectedLocation(null)} style={styles.goBack}>
-                <TIcon name="arrow-left" size={20} color="#fff" />
-                <TText style={{ color: '#fff', fontSize: 11 }}>Back</TText>
-              </TouchableOpacity>
-              <TText type="subtitle" style={{ color: '#fff' }}>
-                {selectedLocation.locationName}
-              </TText>
-              {selectedLocation.address && (selectedLocation.address.city || selectedLocation.address.district || selectedLocation.address.region || selectedLocation.address.country) && (
-                <TText style={{ color: '#fff', opacity: 0.7, marginBottom: 8, fontSize: 12 }}>
-                  {[selectedLocation.address.district, selectedLocation.address.city, selectedLocation.address.region, selectedLocation.address.country].filter(Boolean).join(', ')}
-                </TText>
-              )}
+              <View style={styles.headerRow}>
+                <TouchableOpacity onPress={() => setSelectedLocation(null)}>
+                  <TIcon name="chevron-left" size={30} color="#fff" />
+                </TouchableOpacity>
+                <View style={{ flex: 1, marginLeft: 10 }}>
+                  <TText type="subtitle" style={{ color: '#fff' }}>
+                    {selectedLocation.locationName}
+                  </TText>
+                  {selectedLocation.address && (selectedLocation.address.city || selectedLocation.address.district || selectedLocation.address.region || selectedLocation.address.country) && (
+                    <TText style={{ color: '#fff', opacity: 0.7, marginBottom: 8, fontSize: 12 }}>
+                      {[selectedLocation.address.district, selectedLocation.address.city, selectedLocation.address.region, selectedLocation.address.country].filter(Boolean).join(', ')}
+                    </TText>
+                  )}
+                </View>
+              </View>
+
+
 
               <View style={styles.locationButtonsContainer}>
                 <TouchableOpacity
@@ -317,10 +290,14 @@ export default function ItineraryViewScreen() {
               <SelectedLocationWeather selectedLocation={selectedLocation} secondaryColor={secondaryColor} />
 
               {selectedLocation.note && (
-                <TText style={styles.locationNote}>
-                  {selectedLocation.note}
-                </TText>
+                <ScrollView style={styles.locationNote} showsVerticalScrollIndicator={false}>
+                  <TText>
+                    {selectedLocation.note}
+                  </TText>
+                </ScrollView>
+
               )}
+              <HiveBg />
             </LinearGradient>
           ) : (
             itinerary && (
@@ -375,7 +352,7 @@ export default function ItineraryViewScreen() {
       )}
       <ShareModal
         visible={showShare}
-        link={itinerary ? `exp://tarag-v2.exp.app/itineraries/${itinerary.id}` : ''}
+        link={itinerary ? `exp://tarahive.exp.app/itinerary/${itinerary.id}` : ''}
         onClose={() => setShowShare(false)}
       />
 
@@ -460,32 +437,22 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     paddingHorizontal: '3%',
+    paddingTop: 50,
+    paddingBottom: 20,
     justifyContent: 'flex-end',
-  },
-  goBack: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    backgroundColor: '#0008',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
-    marginBottom: 10,
-    opacity: .7
   },
   locationButtonsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 7,
-    marginVertical: 5,
-    paddingBottom: 10,
+    marginTop: 5,
+    marginBottom: 10,
   },
   locationButtons: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    backgroundColor: '#0008',
+    backgroundColor: '#0007',
     paddingHorizontal: 10,
     paddingVertical: 7,
     borderRadius: 20,
@@ -506,28 +473,14 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     marginBottom: 10,
   },
-  weatherInfoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 5,
-  },
-  weatherInfo: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#0005',
-    paddingVertical: 10,
-    paddingHorizontal: 6,
-    borderRadius: 8,
-    gap: 2,
-  },
   locationNote: {
     zIndex: 100,
     color: '#fff',
     backgroundColor: '#0005',
     padding: 10,
     borderRadius: 10,
-    marginVertical: 10,
+    marginTop: 10,
+    maxHeight: 120,
   },
   privateOverlay: {
     position: 'absolute',

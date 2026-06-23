@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
-import { getUserById } from "./user.service";
+import { getUserById, getUserByIdOrUsername } from "./user.service";
 
 interface AuthRequest extends Request {
-  user?: any;
+  user?:{
+    sub: string;
+  };
 }
 
 /**
@@ -11,7 +13,7 @@ interface AuthRequest extends Request {
  */
 export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    if (!req.user || !req.user.id) {
+    if (!req.user || !req.user.sub) {
       res.status(401).json({
         success: false,
         message: "Unauthorized",
@@ -19,7 +21,7 @@ export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
       return;
     }
 
-    const user = await getUserById(req.user.id);
+    const user = await getUserById(req.user.sub);
 
     res.status(200).json({
       success: true,
@@ -29,6 +31,52 @@ export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
     res.status(500).json({
       success: false,
       message: error.message || "Failed to fetch user profile",
+    });
+  }
+};
+
+/**
+ * GET /user/:id
+ * Get a user's profile by id or username
+ */
+export const getUser = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    if (!req.user || !req.user.sub) {
+      res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+      return;
+    }
+
+    const { id } = req.params;
+
+    if (!id) {
+      res.status(400).json({
+        success: false,
+        message: "User id or username is required",
+      });
+      return;
+    }
+
+    const user = await getUserByIdOrUsername(id as string);
+
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (error: any) {
+    if (error.message === "User not found") {
+      res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+      return;
+    }
+
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to fetch user",
     });
   }
 };
