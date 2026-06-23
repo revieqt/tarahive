@@ -218,6 +218,7 @@ export default function ItineraryViewScreen() {
               <OptionsPopup
                 options={[
                   { label: 'Delete Itinerary', iconName: 'delete', onPress: handleDeleteItinerary },
+                  { label: 'Share Itinerary', iconName: 'share-variant', onPress: () => setShowShare(true) },
                 ]}
                 style={styles.options}
               >

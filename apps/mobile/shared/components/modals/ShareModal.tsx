@@ -1,17 +1,19 @@
 import React from "react";
 import {
   View,
-  Text,
   Modal,
   StyleSheet,
   TouchableOpacity,
-  Linking,
-  Alert,
   Share,
+  Pressable,
 } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import * as Clipboard from "expo-clipboard";
 import { TText, TIcon, TView } from "@/shared/components/ui/Themed";
+import { LinearGradient } from "expo-linear-gradient";
+import { Dialog } from "@/shared/services/dialog.service";
+import { useThemeColor } from "@/shared/hooks/useThemeColor";
+import { showInfo } from "@/shared/services/toast.service";
 
 interface ShareModalProps {
   visible: boolean;
@@ -24,19 +26,21 @@ export default function ShareModal({
   link,
   onClose,
 }: ShareModalProps) {
+  const primaryColor = useThemeColor({}, 'primary');
+  const accentColor = useThemeColor({}, 'accent');
   const customMessage = `Hey! Join me using this link:\n${link}`;
+  const [ copied, setCopied ] = React.useState(false);
 
   const handleCopy = async () => {
     await Clipboard.setStringAsync(link);
-    Alert.alert("Copied!", "Link copied to clipboard.");
+    setCopied(true);
   };
 
-  // 🔵 Universal Share (recommended)
   const handleNativeShare = async () => {
     try {
       await Share.share({
         message: customMessage,
-        url: link, // iOS mainly
+        url: link,
       });
     } catch (error) {
       console.log(error);
@@ -45,37 +49,56 @@ export default function ShareModal({
 
   return (
     <Modal visible={visible} transparent animationType="fade">
-      <View style={styles.overlay}>
-        <TView style={styles.container}>
-          {/* QR Code */}
-          <View style={styles.qrContainer}>
-            <QRCode value={link} size={200} />
+      <Pressable style={styles.overlay} onPress={onClose}>
+        <TView style={[styles.container, { backgroundColor: primaryColor }]}>
+          {/* Gradient Accent */}
+          <LinearGradient
+            colors={[accentColor + '50', "transparent"]}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}
+            style={styles.gradient}
+          />
+
+          {/* Content */}
+          <View style={styles.content}>
+            {/* QR Code */}
+            <View style={styles.qrContainer}>
+              <QRCode value={link} size={180} />
+            </View>
+
+            {/* Clickable Link */}
+            <TouchableOpacity onPress={handleCopy} style={styles.linkButton} activeOpacity={0.7}>
+              <TText style={{ textAlign: "center", fontSize: 13 }}>{link}</TText>
+              <TText style={{ opacity: 0.5, fontSize: 11, marginTop: 4 }}>
+                {copied ? "Copied!" : "Tap to copy"}
+              </TText>
+            </TouchableOpacity>
+
+            {/* Share Button */}
+            <TouchableOpacity
+              style={[styles.shareButton, { backgroundColor: accentColor + '30' }]}
+              onPress={handleNativeShare}
+            >
+              <TIcon name="share-variant" size={18} />
+              <TText style={{ fontSize: 13 }}>Share to other platforms</TText>
+            </TouchableOpacity>
           </View>
 
-          {/* Clickable Link */}
-          <TouchableOpacity onPress={handleCopy} style={styles.copyLink} activeOpacity={0.7}>
-            <TText style={{textAlign: "center"}}>{link}</TText>
-            <TText style={{opacity: 0.5, fontSize: 11}}>Tap to copy</TText>
-          </TouchableOpacity>
+          {/* Divider */}
+          <View style={styles.divider} />
 
-          
-
-          <TouchableOpacity
-              style={styles.shareOthers}
-              onPress={handleNativeShare}
+          {/* Cancel Button */}
+          <Pressable
+            style={({ pressed }) => [
+              styles.cancelButton,
+              pressed && styles.buttonPressed,
+            ]}
+            onPress={onClose}
           >
-            <TText>Share to other platforms</TText>
-            <View style={styles.shareOthersIcon}>
-              <TIcon name="dots-horizontal" size={30}/>
-            </View>
-              
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <TIcon name="close" size={30}/>
-          </TouchableOpacity>
+            <TText style={styles.cancelButtonText}>Cancel</TText>
+          </Pressable>
         </TView>
-      </View>
+      </Pressable>
     </Modal>
   );
 }
@@ -83,67 +106,73 @@ export default function ShareModal({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.45)",
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: '3%',
   },
   container: {
-    width: "85%",
-    borderRadius: 16,
-    padding: 20,
-    paddingTop: 40,
-    alignItems: "center",
+    width: "100%",
+    borderRadius: 15,
     overflow: "hidden",
+    position: "relative",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.18,
+    shadowRadius: 32,
+    elevation: 24,
+    zIndex: 1,
+  },
+  gradient: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 100,
+    zIndex: -1,
+  },
+  content: {
+    alignItems: "center",
+    paddingHorizontal: '3%',
+    paddingTop: 24,
+    paddingBottom: 10,
   },
   qrContainer: {
-    marginBottom: 20,
-    padding: 10,
+    marginBottom: 8,
+    padding: 12,
     backgroundColor: "white",
     borderRadius: 12,
   },
-  copyLink: {
+  linkButton: {
     alignItems: "center",
-    marginBottom: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    padding: 10,
-    borderRadius: 8,
+    paddingVertical: 12,
   },
-  iconRow:{
-    flexDirection: "row",
-    gap: 10,
-    marginVertical: 10,
-  },
-  icons:{
-    width: 55,
-    aspectRatio: 1,
-    borderRadius: 100,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  closeButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    padding: 5,
-  },
-  shareOthers: {
-    padding: 10,
-    borderRadius: 100,
-    backgroundColor: "#ccc7",
+  shareButton: {
     flexDirection: "row",
     alignItems: "center",
-    paddingLeft: 20,
-    gap: 20,
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 12,
+    width: "100%",
+    borderRadius: 10,
+    marginTop: 8,
   },
-  shareOthersIcon:{
-    backgroundColor: "#ccc",
-    height: 35,
-    aspectRatio: 1,
-    borderRadius: 100,
+  divider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: "#ccc4",
+  },
+  cancelButton: {
+    height: 50,
     justifyContent: "center",
     alignItems: "center",
-  }
+    width: "100%",
+  },
+  buttonPressed: {
+    backgroundColor: "#ccc4",
+  },
+  cancelButtonText: {
+    fontSize: 15,
+    fontWeight: "500",
+    color: "#8E8E93",
+  },
 });
