@@ -12,6 +12,12 @@ import { formatDateToString } from "@/shared/utils/formatDateToString";
 import EmptyMessage from "@/shared/components/common/EmptyMessage";
 import ItineraryCardSkeleton from "@/shared/components/feedback/ItineraryCardSkeleton";
 
+const ItineraryOptions = [
+  { value: 'active', icon: 'cards-heart', label: 'Active' },
+  { value: 'done', icon: 'check-circle', label: 'Completed' },
+  { value: 'cancelled', icon: 'close-circle', label: 'Cancelled' },
+];
+
 export default function ItineraryScreen() {
   const { t } = useLanguage();
   const primaryColor = useThemeColor({}, 'primary');
@@ -50,63 +56,55 @@ export default function ItineraryScreen() {
   );
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <Header title='Itinerary' subtitle='Manage your travel plans' type="major" />
-      <TView style={styles.container}>
-        <View style={styles.tabsContainer}>
-          <TouchableOpacity
-            style={[styles.tabs, selectedStatus === 'active' && { borderBottomColor: secondaryColor, borderBottomWidth: 2 }]}
-            onPress={() => setSelectedStatus('active')}
-          >
-            <TIcon name="cards-heart" size={15} color={selectedStatus === 'active' ? secondaryColor : 'gray'} />
-            <TText style={{ color: selectedStatus === 'active' ? secondaryColor : 'gray' }}>Active</TText>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tabs, selectedStatus === 'done' && { borderBottomColor: secondaryColor, borderBottomWidth: 2 }]}
-            onPress={() => setSelectedStatus('done')}
-          >
-            <TIcon name="check-circle" size={15} color={selectedStatus === 'done' ? secondaryColor : 'gray'} />
-            <TText style={{ color: selectedStatus === 'done' ? secondaryColor : 'gray' }}>Completed</TText>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tabs, selectedStatus === 'cancelled' && { borderBottomColor: secondaryColor, borderBottomWidth: 2 }]}
-            onPress={() => setSelectedStatus('cancelled')}
-          >
-            <TIcon name="close-circle" size={15} color={selectedStatus === 'cancelled' ? secondaryColor : 'gray'} />
-            <TText style={{ color: selectedStatus === 'cancelled' ? secondaryColor : 'gray' }}>Cancelled</TText>
-          </TouchableOpacity>
-        </View>
+    <View style={{ flex: 1 }}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}> 
 
-        {isLoading ? (
-          <View style={styles.listContent}>
-            <ItineraryCardSkeleton />
-            <ItineraryCardSkeleton />
+        <Header title='Itinerary' subtitle='Manage your travel plans' type="major" />
+        
+        <TView style={styles.container}>
+          <View style={styles.tabsContainer}>
+            {ItineraryOptions.map((option, index) => (
+              <TouchableOpacity
+                style={[styles.tabs, selectedStatus === option.value && { borderBottomColor: secondaryColor, borderBottomWidth: 2 }]}
+                onPress={() => setSelectedStatus(option.value as 'active' | 'done' | 'cancelled')}
+              >
+                <TIcon name={option.icon} size={15} color={selectedStatus === option.value ? secondaryColor : 'gray'} />
+                <TText style={{ color: selectedStatus === option.value ? secondaryColor : 'gray' }}>{option.label}</TText>
+              </TouchableOpacity>
+            ))}
           </View>
-        ) : isError || !itineraries || itineraries.length === 0 ? (
-          <View style={styles.errorContainer}>
-            <EmptyMessage
-              title={isError ? 'Failed to load itineraries' : 'No itineraries yet'}
-              description={isError ? 'Please try again later' : 'Nothing to see here!'}
-              iconName='inbox'
+
+          {isLoading ? (
+            <View style={styles.listContent}>
+              <ItineraryCardSkeleton />
+              <ItineraryCardSkeleton />
+            </View>
+          ) : isError || !itineraries || itineraries.length === 0 ? (
+            <View style={styles.errorContainer}>
+              <EmptyMessage
+                title={isError ? 'Failed to load itineraries' : 'No itineraries yet'}
+                description={isError ? 'Please try again later' : 'Nothing to see here!'}
+                iconName='inbox'
+              />
+            </View>
+          ) : (
+            <FlatList
+              data={itineraries}
+              renderItem={renderItineraryCard}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={styles.listContent}
+              scrollEnabled={false}
             />
-          </View>
-        ) : (
-          <FlatList
-            data={itineraries}
-            renderItem={renderItineraryCard}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.listContent}
-            scrollEnabled={false}
-          />
-        )}
-      </TView>
+          )}
+        </TView>
+      </ScrollView>
+
       <RoundButton
         iconName='plus'
         onPress={() => router.push('/itinerary/create')}
         style={styles.addButton}
       />
-    </ScrollView>
-
+    </View>
   );
 }
 

@@ -12,25 +12,25 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import HiveBg from "@/shared/components/common/HiveBg";
 
 const emergencyTypes = [
-  { id: 'medical', label: 'Medical Emergency', icon: 'medical-bag'},
-  { id: 'criminal', label: 'Criminal Activity', icon: 'shield-alert'},
-  { id: 'fire', label: 'Fire Emergency', icon: 'fire'},
-  { id: 'natural', label: 'Natural Disasters', icon: 'weather-hurricane'},
-  { id: 'utility', label: 'Utility Emergency', icon: 'flash-off'},
-  { id: 'road', label: 'Road Emergency', icon: 'car'},
-  { id: 'domestic', label: 'Domestic and Personal Safety', icon: 'home-alert'},
-  { id: 'animal', label: 'Animal-Related Emergency', icon: 'paw'},
+  { id: 'medical', label: 'Medical Emergency', icon: 'medical-bag' },
+  { id: 'criminal', label: 'Criminal Activity', icon: 'shield-alert' },
+  { id: 'fire', label: 'Fire Emergency', icon: 'fire' },
+  { id: 'natural', label: 'Natural Disasters', icon: 'weather-hurricane' },
+  { id: 'utility', label: 'Utility Emergency', icon: 'flash-off' },
+  { id: 'road', label: 'Road Emergency', icon: 'car' },
+  { id: 'domestic', label: 'Domestic and Personal Safety', icon: 'home-alert' },
+  { id: 'animal', label: 'Animal-Related Emergency', icon: 'paw' },
   { id: 'other', label: 'Other', icon: 'help-circle' },
 ];
 
-export default function SOSSection(){
+export default function SOSSection() {
   const gradientColor = useThemeColor({}, 'primary');
   const secondaryColor = useThemeColor({}, 'secondary');
   const accentColor = useThemeColor({}, 'accent');
   const { session, updateSession } = useSession();
   // const { handleEnableSOS, handleDisableSOS, isLoading } = useSafety();
   // const deviceInfo = useDeviceInfo();
-  
+
   const [isSOSActive, setIsSOSActive] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedEmergencyType, setSelectedEmergencyType] = useState<string>('');
@@ -41,11 +41,11 @@ export default function SOSSection(){
   const [alertTitle, setAlertTitle] = useState('');
   const [showSOSInHome, setShowSOSInHome] = useState(false);
   const [isLoadingContact, setIsLoadingContact] = useState(false);
-  
+
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isLongPressing, setIsLongPressing] = useState(false);
 
-  const gradientColors = isSOSActive 
+  const gradientColors = isSOSActive
     ? (['#D53E0F', secondaryColor] as const)
     : ([accentColor, secondaryColor] as const);
 
@@ -75,53 +75,58 @@ export default function SOSSection(){
 
   return (
     <>
-      <BackButton type='floating' color='#fff'/>
+      <BackButton type='floating' color='#fff' />
       <LinearGradient colors={gradientColors} style={styles.background}>
-        <HiveBg flipHorizontal/>
-        <HiveBg/>
+        <HiveBg flipHorizontal />
+        <HiveBg />
       </LinearGradient>
-        <ScrollView>
-          <View style={styles.headerContainer}>
-            <View style={styles.titleContainer}>
-              {isSOSActive ? (
-                <>
-                  <TText type='title' style={{color: '#fff'}}>SOS in Progress!</TText>
-                  <TText type='subtitle' style={{color: '#fff'}}>SOS: On</TText>
-                </>
-              ) : (
-                <>
-                  <TText type='title' style={{color: '#fff'}}>All Clear!</TText>
-                  <TText type='subtitle' style={{color: '#fff'}}>SOS: Off</TText>
-                </>
-              )}
-            </View>
 
-            <SOSButton 
-              state={isSOSActive ? 'active' : 'notActive'}
-              onPressIn={handleLongPressStart}
-              onPressOut={handleLongPressEnd}
-              disabled={false}
-            />
+      <View style={styles.container}>
+        <View style={styles.titleContainer}>
+          {isSOSActive ? (
+            <>
+              <TText type='title' style={{ color: '#fff' }}>SOS in Progress!</TText>
+              <TText type='subtitle' style={{ color: '#fff' }}>SOS: On</TText>
+            </>
+          ) : (
+            <>
+              <TText type='title' style={{ color: '#fff' }}>All Clear!</TText>
+              <TText type='subtitle' style={{ color: '#fff' }}>SOS: Off</TText>
+            </>
+          )}
+        </View>
 
-            <View style={styles.titleContainer}>
-              <TText type='subtitle'>☝️</TText>
-              {isLongPressing ? (
-                <TText style={{color: '#fff'}}>Hold for {isSOSActive ? 'deactivation' : 'activation'}...</TText>
-              ) : isSOSActive ? (
-                <TText style={{color: '#fff'}}>Long-press to End SOS</TText>
-              ) : (
-                <TText style={{color: '#fff'}}>Long-press to Activate SOS</TText>
-              )}
-            </View>
-          </View>
+        <SOSButton
+          state={isSOSActive ? 'active' : 'notActive'}
+          onPressIn={handleLongPressStart}
+          onPressOut={handleLongPressEnd}
+          disabled={false}
+        />
 
-          <TView style={styles.messageContainer}>
+        <View style={styles.titleContainer}>
+          <TText type='subtitle'>☝️</TText>
+          {isLongPressing ? (
+            <TText style={{ color: '#fff' }}>Hold for {isSOSActive ? 'deactivation' : 'activation'}...</TText>
+          ) : isSOSActive ? (
+            <TText style={{ color: '#fff' }}>Long-press to End SOS</TText>
+          ) : (
+            <TText style={{ color: '#fff' }}>Long-press to Activate SOS</TText>
+          )}
+        </View>
+      </View>
 
-          </TView>
-          
-        </ScrollView>
-        
-      
+      <TView style={styles.messageContainer}>
+        <TIcon name='information' size={20} />
+        <View style={{ gap: 5, flex: 1 }}>
+          <TText type="subtitle">What is SOS?</TText>
+          <TText>
+            SOS Type Here
+          </TText>
+          <TouchableOpacity style={[styles.openSettings,{backgroundColor: accentColor}]}>
+            <TText style={{ color: '#fff' }}>Open Settings</TText>
+          </TouchableOpacity>
+        </View>
+      </TView>
 
       <Modal
         animationType="slide"
@@ -129,84 +134,84 @@ export default function SOSSection(){
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <SafeAreaView style={{flex: 1}}>
-        <TouchableOpacity 
-          style={styles.modalOverlay} 
-          onPress={() => setModalVisible(false)}
-          activeOpacity={1}
-        >
-          <KeyboardAvoidingView 
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.keyboardAvoidingView}
+        <SafeAreaView style={{ flex: 1 }}>
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            onPress={() => setModalVisible(false)}
+            activeOpacity={1}
           >
-            <TouchableOpacity 
-              style={styles.modalContent} 
-              onPress={(e) => e.stopPropagation()}
-              activeOpacity={1}
+            <KeyboardAvoidingView
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+              style={styles.keyboardAvoidingView}
             >
-            <TView color='primary' style={styles.modalContentInner}>
-              <TIcon
-                name='alert-octagon'
-                size={50} 
-                color={accentColor}
-                style={{alignSelf: 'center'}}
-              />
-              <TText type="subtitle" style={{textAlign: 'center', marginVertical: 10}}>Select Emergency Type</TText>
+              <TouchableOpacity
+                style={styles.modalContent}
+                onPress={(e) => e.stopPropagation()}
+                activeOpacity={1}
+              >
+                <TView color='primary' style={styles.modalContentInner}>
+                  <TIcon
+                    name='alert-octagon'
+                    size={50}
+                    color={accentColor}
+                    style={{ alignSelf: 'center' }}
+                  />
+                  <TText type="subtitle" style={{ textAlign: 'center', marginVertical: 10 }}>Select Emergency Type</TText>
 
-              <ScrollView 
-                horizontal 
-                contentContainerStyle={{gap: 7}}
-                style={{maxHeight: 95}}
-                showsHorizontalScrollIndicator={false}>
-                {emergencyTypes.map((type) => (
-                  <TouchableOpacity
-                    key={type.id}
-                    style={[
-                      styles.emergencyTypeButton,
-                      selectedEmergencyType === type.id && { backgroundColor: accentColor+'50' }
-                    ]}
-                    onPress={() => setSelectedEmergencyType(type.id)}
-                  >
-                    <TIcon
-                      name={type.icon} 
-                      size={30} 
-                    />
-                    <TText style={[{ textAlign: 'center', fontSize: 10 }]}>
-                      {type.label}
-                    </TText>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
+                  <ScrollView
+                    horizontal
+                    contentContainerStyle={{ gap: 7 }}
+                    style={{ maxHeight: 95 }}
+                    showsHorizontalScrollIndicator={false}>
+                    {emergencyTypes.map((type) => (
+                      <TouchableOpacity
+                        key={type.id}
+                        style={[
+                          styles.emergencyTypeButton,
+                          selectedEmergencyType === type.id && { backgroundColor: accentColor + '50' }
+                        ]}
+                        onPress={() => setSelectedEmergencyType(type.id)}
+                      >
+                        <TIcon
+                          name={type.icon}
+                          size={30}
+                        />
+                        <TText style={[{ textAlign: 'center', fontSize: 10 }]}>
+                          {type.label}
+                        </TText>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
 
-              <TextField
-              placeholder="Describe your emergency situation... (Optional)"
-              value={message}
-              onChangeText={setMessage}
-              multiline={true}
-              numberOfLines={3}
-              style={styles.messageInput}
-            />
+                  <TextField
+                    placeholder="Describe your emergency situation... (Optional)"
+                    value={message}
+                    onChangeText={setMessage}
+                    multiline={true}
+                    numberOfLines={3}
+                    style={styles.messageInput}
+                  />
 
-              <Button
-                title={'Activate SOS'}
-                onPress={() => {}}
-                disabled={false}
-                type="primary"
-                buttonStyle={{marginTop: 10}}
-              />
-            </TView>
-            </TouchableOpacity>
-          </KeyboardAvoidingView>
-        </TouchableOpacity>
-      </SafeAreaView>
+                  <Button
+                    title={'Activate SOS'}
+                    onPress={() => { }}
+                    disabled={false}
+                    type="primary"
+                    buttonStyle={{ marginTop: 10 }}
+                  />
+                </TView>
+              </TouchableOpacity>
+            </KeyboardAvoidingView>
+          </TouchableOpacity>
+        </SafeAreaView>
       </Modal>
     </>
-    
+
   );
 };
 
 const styles = StyleSheet.create({
-  background:{
+  background: {
     flex: 1,
     position: 'absolute',
     top: 0,
@@ -214,19 +219,29 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
   },
-  headerContainer:{
-    height: Dimensions.get('window').height - 100,
+  container: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     gap: 40,
-    backgroundColor: 'red',
   },
-  messageContainer:{
+  messageContainer: {
     padding: 16,
     marginHorizontal: '3%',
     borderRadius: 12,
+    marginBottom: 20,
+    flexDirection: 'row',
+    gap: 10,
+    alignItems: 'center',
   },
-  titleContainer:{
+  openSettings: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#007AFF20',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  titleContainer: {
     justifyContent: 'center',
     alignItems: 'center',
     gap: 3,
@@ -270,7 +285,7 @@ const styles = StyleSheet.create({
     minHeight: 80,
     marginTop: 7,
   },
-  manual:{
+  manual: {
     position: 'absolute',
     top: 16,
     right: 16,
@@ -278,11 +293,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 8,
   },
-  emergencyContact:{
+  emergencyContact: {
     padding: 10,
     borderRadius: 12,
   },
-  emergencyContactEdit:{
+  emergencyContactEdit: {
     position: 'absolute',
     top: 10,
     right: 15,

@@ -356,7 +356,6 @@ export default function ItineraryViewScreen() {
         onClose={() => setShowShare(false)}
       />
 
-      {/* Show privacy overlay if itinerary is private and user is not the owner */}
       {itinerary && itinerary.isPrivate && itinerary.user?.id !== session?.user?.id && (
         <View style={styles.privateOverlay}>
           <EmptyMessage
