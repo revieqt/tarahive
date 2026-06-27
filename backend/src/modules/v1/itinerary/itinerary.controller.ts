@@ -22,7 +22,7 @@ interface AuthRequest extends Request {
 export const createItinerary = async (req: AuthRequest, res: Response) => {
   try {
     console.log('🟡 createItinerary - req.user:', req.user);
-    const { title, type, description, startDate, endDate, planDaily, locations } = req.body;
+    const { title, type, content, startDate, endDate, isPrivate, publicPermissions } = req.body;
 
     // Get userID from authenticated token 'sub' payload
     const userID = req.user?.sub;
@@ -31,50 +31,21 @@ export const createItinerary = async (req: AuthRequest, res: Response) => {
     }
 
     // Validate required fields
-    if (!title || !type || !startDate || !endDate || planDaily === undefined || !locations) {
+    if (!title || !type || !startDate || !endDate || !content || !isPrivate || !publicPermissions) {
       return res.status(400).json({
         success: false,
-        message: 'Missing required fields: title, type, startDate, endDate, planDaily, locations',
+        message: 'Missing required fields: title, type, startDate, endDate, content, isPrivate, publicPermissions',
       });
-    }
-
-    if (!Array.isArray(locations) || locations.length === 0) {
-      return res.status(400).json({ success: false, message: 'Locations must be a non-empty array' });
-    }
-
-    // Validate locations based on planDaily flag
-    if (planDaily) {
-      // Should be array of DailyItinerary
-      const isValidDailyFormat = (locations as any[]).every(
-        (item) => item.date && Array.isArray(item.locations)
-      );
-      if (!isValidDailyFormat) {
-        return res.status(400).json({
-          success: false,
-          message: 'When planDaily is true, locations must have date and locations array for each entry',
-        });
-      }
-    } else {
-      // Should be array of Location
-      const isValidGeneralFormat = (locations as any[]).every(
-        (item) => item.latitude !== undefined && item.longitude !== undefined && item.locationName
-      );
-      if (!isValidGeneralFormat) {
-        return res.status(400).json({
-          success: false,
-          message: 'When planDaily is false, each location must have latitude, longitude, and locationName',
-        });
-      }
     }
 
     const itineraryData: CreateItineraryRequest = {
       title,
       type,
-      description: description || '',
       startDate: new Date(startDate),
       endDate: new Date(endDate),
-      planDaily,
-      locations,
+      content,
+      isPrivate,
+      publicPermissions,
     };
 
     const newItinerary = await createItineraryService(userID, itineraryData);

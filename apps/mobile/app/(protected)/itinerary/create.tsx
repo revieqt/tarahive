@@ -10,7 +10,7 @@ import { useThemeColor } from "@/shared/hooks/useThemeColor";
 import { formatDateToString } from "@/shared/utils/formatDateToString";
 
 const COLLAPSED_HEIGHT = 90;
-const EXPANDED_HEIGHT = 175;
+const EXPANDED_HEIGHT = 167;
 
 export default function ItinerarySettingsScreen() {
   const { t } = useLanguage();
@@ -22,7 +22,7 @@ export default function ItinerarySettingsScreen() {
   const accentColor = useThemeColor({}, 'accent');
   const textColor = useThemeColor({}, 'text');
   const primaryColor = useThemeColor({}, 'primary');
-
+  const backgroundColor = useThemeColor({}, 'background');
   const animatedHeight = useRef(new Animated.Value(COLLAPSED_HEIGHT)).current;
   const animatedRotation = useRef(new Animated.Value(0)).current;
 
@@ -97,11 +97,11 @@ export default function ItinerarySettingsScreen() {
           </>
         ) : (
           <View style={styles.headerTitleContainer}>
-            <TouchableOpacity style={[styles.headerTab, { backgroundColor: accentColor + '40' }]} onPress={toggleHeader}>
+            <TouchableOpacity style={[styles.headerTab, { backgroundColor }]} onPress={toggleHeader}>
               <TIcon name="pencil" size={15} />
               <TText style={{ fontSize: 12 }}>{type}</TText>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.headerTab, { backgroundColor: accentColor + '40' }]} onPress={toggleHeader}>
+            <TouchableOpacity style={[styles.headerTab, { backgroundColor }]} onPress={toggleHeader}>
               <TIcon name="calendar" size={15} />
               <TText style={{ fontSize: 12 }}>
                 {!startDate || !endDate ? "Set Date" : `${formatDateToString(startDate)} - ${formatDateToString(endDate)}`}
@@ -136,7 +136,7 @@ export default function ItinerarySettingsScreen() {
           </TouchableOpacity>
         </TView>
 
-        <ScrollView contentContainerStyle={{ padding: 10, paddingTop: 70 }}>
+        <ScrollView contentContainerStyle={{ paddingHorizontal: '3%', paddingTop: 70 }}>
           <TText>
             Content goes here...
           </TText>
@@ -186,6 +186,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     gap: 5,
+    borderWidth: 1,
+    borderColor: '#ccc4',
   },
   toolbar: {
     flexDirection: "row",

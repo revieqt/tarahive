@@ -8,35 +8,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { User } from '../user/user.entity';
-
-export enum ItineraryStatus {
-  ACTIVE = 'active',
-  CANCELLED = 'cancelled',
-  DONE = 'done',
-}
-
-export interface Address {
-  country?: string;
-  region?: string;
-  province?: string;
-  city?: string;
-  district?: string;
-  neighborhood?: string;
-  postal_code?: string;
-}
-
-export interface Location {
-  latitude: number;
-  longitude: number;
-  locationName: string;
-  address?: Address;
-  note?: string;
-}
-
-export interface DailyItinerary {
-  date: Date;
-  locations: Location[];
-}
+import { ItineraryStatus, PublicPermissions } from './itinerary.types';
 
 @Entity({ name: 'itineraries' })
 export class Itinerary {
@@ -63,12 +35,6 @@ export class Itinerary {
   type!: string;
 
   @Column({
-    type: 'text',
-    default: '',
-  })
-  description!: string;
-
-  @Column({
     type: 'timestamp',
   })
   startDate!: Date;
@@ -86,42 +52,29 @@ export class Itinerary {
   status!: ItineraryStatus;
 
   @Column({
-    type: 'boolean',
-    default: false,
+    type: 'text',
+    default: '',
   })
-  planDaily!: boolean;
-
-  /**
-   * If planDaily = false:
-   * [
-   *   {
-   *     latitude,
-   *     longitude,
-   *     locationName,
-   *     address,
-   *     note
-   *   }
-   * ]
-   *
-   * If planDaily = true:
-   * [
-   *   {
-   *     date,
-   *     locations: [...]
-   *   }
-   * ]
-   */
-  @Column({
-    type: 'jsonb',
-    default: () => "'[]'",
-  })
-  locations!: Location[] | DailyItinerary[];
+  content!: string;
 
   @Column({
     type: 'boolean',
     default: true,
   })
   isPrivate!: boolean;
+
+  @Column({
+    type: 'enum',
+    enum: PublicPermissions,
+    default: PublicPermissions.VIEW,
+  })
+  publicPermissions!: PublicPermissions;
+
+  @Column({
+    type: 'integer',
+    default: 1,
+  })
+  v!: number;
 
   @CreateDateColumn({
     type: 'timestamp',

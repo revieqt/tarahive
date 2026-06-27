@@ -1,7 +1,9 @@
 import { AppDataSource } from '../../../config/postgres';
-import { Itinerary, ItineraryStatus } from './itinerary.entity';
+import { Itinerary } from './itinerary.entity';
 import {
   CreateItineraryRequest,
+  PublicPermissions,
+  ItineraryStatus,
 } from './itinerary.types';
 
 const itineraryRepository = AppDataSource.getRepository(Itinerary);
@@ -22,13 +24,11 @@ export const createItineraryService = async (
       user: userId as any,
       title: itineraryData.title,
       type: itineraryData.type,
-      description: itineraryData.description,
       startDate: itineraryData.startDate,
       endDate: itineraryData.endDate,
-      planDaily: itineraryData.planDaily,
-      locations: itineraryData.locations,
-      status: ItineraryStatus.ACTIVE,
-      isPrivate: true,
+      content: itineraryData.content,
+      isPrivate: itineraryData.isPrivate,
+      publicPermissions: itineraryData.publicPermissions,
     });
 
     const savedItinerary =
@@ -115,7 +115,7 @@ export const getAllUserItinerariesService = async (
         'itinerary.id',
         'itinerary.title',
         'itinerary.type',
-        'itinerary.description',
+        'itinerary.content',
         'itinerary.startDate',
         'itinerary.endDate',
         'itinerary.status',
