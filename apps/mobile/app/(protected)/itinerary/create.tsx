@@ -18,11 +18,13 @@ export default function ItinerarySettingsScreen() {
   const [type, setType] = useState('Solo');
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
+  const [content, setContent] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
   const accentColor = useThemeColor({}, 'accent');
   const textColor = useThemeColor({}, 'text');
   const primaryColor = useThemeColor({}, 'primary');
   const backgroundColor = useThemeColor({}, 'background');
+  const [contentHeight, setContentHeight] = useState(0);
   const animatedHeight = useRef(new Animated.Value(COLLAPSED_HEIGHT)).current;
   const animatedRotation = useRef(new Animated.Value(0)).current;
 
@@ -59,7 +61,7 @@ export default function ItinerarySettingsScreen() {
             placeholder="Title"
             value={title}
             onChangeText={setTitle}
-            style={[styles.titleInput, { color: textColor }]}
+            style={[styles.titleInput, { color: title ? textColor : '#ccc8' }]}
           />
           <TouchableOpacity onPress={toggleHeader} style={styles.collapseButton} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
             <Animated.View style={{ transform: [{ rotate: rotateInterpolate }] }}>
@@ -111,8 +113,8 @@ export default function ItinerarySettingsScreen() {
         )}
       </Animated.View>
 
-      <View>
-        <TView style={styles.toolbar} color="primary" shadow>
+      <View style={{ flex: 1}}>
+        <TView style={styles.toolbar} color="primary">
           <View style={styles.toolbarButtonsContainer}>
             <TouchableOpacity>
               <TIcon name="format-bold" size={20} />
@@ -136,10 +138,15 @@ export default function ItinerarySettingsScreen() {
           </TouchableOpacity>
         </TView>
 
-        <ScrollView contentContainerStyle={{ paddingHorizontal: '3%', paddingTop: 70 }}>
-          <TText>
-            Content goes here...
-          </TText>
+        <ScrollView 
+          contentContainerStyle={{ paddingHorizontal: '3%', paddingTop: 60, zIndex: 0 , overflow: 'hidden'}}
+          showsVerticalScrollIndicator={false}
+        >
+          <TextInput placeholder="Add Content" value={content} onChangeText={setContent}
+            style={[styles.contentInput, { color: content ? textColor : '#ccc8', height: Math.max(100, contentHeight) }]}
+            multiline
+            onContentSizeChange={e => setContentHeight(e.nativeEvent.contentSize.height)}
+          />
 
         </ScrollView>
       </View>
@@ -150,8 +157,6 @@ export default function ItinerarySettingsScreen() {
 const styles = StyleSheet.create({
   header: {
     width: "100%",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc4",
     paddingHorizontal: '3%',
     paddingTop: 10,
     paddingBottom: 10,
@@ -164,9 +169,10 @@ const styles = StyleSheet.create({
     gap: 7,
   },
   titleInput: {
-    fontFamily: 'Baloo',
-    fontSize: 24,
+    fontFamily: 'Inter',
+    fontSize: 20,
     borderColor: 'transparent',
+    fontWeight: 'bold',
     height: 30,
     flex: 1,
     marginLeft: -10,
@@ -192,12 +198,15 @@ const styles = StyleSheet.create({
   toolbar: {
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 7,
+    paddingVertical: 7,
+    paddingHorizontal: '3%',
     position: "absolute",
-    top: 10,
-    left: '3%',
-    right: '3%',
-    borderRadius: 15,
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1,
+    borderWidth: 1,
+    borderColor: "#ccc4",
   },
   addLocationButton: {
     borderRadius: 10,
@@ -212,5 +221,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
+  },
+  contentInput: {
+    fontFamily: 'Inter',
+    fontSize: 13,
+    textAlignVertical: 'top',
+    marginHorizontal: 5,
+    marginBottom: 16
   },
 });
