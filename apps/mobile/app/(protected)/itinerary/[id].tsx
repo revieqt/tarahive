@@ -178,7 +178,7 @@ export default function ItineraryViewScreen() {
   return (
     <View style={{ flex: 1 }}>
 
-      {(!itinerary?.isPrivate || (itinerary?.user?.id === session?.user?.id)) && (<>
+      {((itinerary?.privacy === 'Only Me') || (itinerary?.user?.id === session?.user?.id)) && (<>
         <LinearGradient
           colors={['#000', 'transparent']}
           style={styles.headerGradient}
@@ -211,7 +211,7 @@ export default function ItineraryViewScreen() {
             <TText type='subtitle' style={{ color: '#fff' }}>
               {itinerary?.title}
             </TText>
-            {itinerary?.isPrivate && (
+            {itinerary?.privacy === 'Only Me' && (
               <TIcon name="lock" size={15} color='white' />
             )}
           </View>
@@ -238,7 +238,7 @@ export default function ItineraryViewScreen() {
       </>)}
 
 
-      {(!itinerary?.isPrivate || (itinerary?.user?.id === session?.user?.id)) && (
+      {((itinerary?.privacy === 'Only Me') || (itinerary?.user?.id === session?.user?.id)) && (
         <>
           {selectedLocation ? (
             <LinearGradient
@@ -289,62 +289,14 @@ export default function ItineraryViewScreen() {
 
               <SelectedLocationWeather selectedLocation={selectedLocation} secondaryColor={secondaryColor} />
 
-              {selectedLocation.note && (
-                <ScrollView style={styles.locationNote} showsVerticalScrollIndicator={false}>
-                  <TText>
-                    {selectedLocation.note}
-                  </TText>
-                </ScrollView>
-
-              )}
               <HiveBg />
             </LinearGradient>
           ) : (
             itinerary && (
               <TView style={styles.bottomSheet} color='primary'>
                 <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: '3%', paddingVertical: 20 }}>
-                  <TText style={styles.description}>{itinerary.description}</TText>
-                  {Array.isArray(itinerary.locations) && itinerary.locations.length > 0 && (
-                    // Check if planDaily (has nested locations) or direct locations
-                    (itinerary.locations[0] as any)?.locations ? (
-                      // planDaily = true: locations have date and nested locations array
-                      itinerary.locations.map((loc: any, idx: number) => (
-                        <View key={idx}>
-                          {loc.date && (
-                            <>
-                              <TText type='subtitle' style={{ fontSize: 15 }}>Day {idx + 1} </TText>
-                              <TText style={{ marginBottom: 12, opacity: .5 }}>({formatMapDate(loc.date)})</TText>
-                            </>
-                          )}
-                          {renderDayLocations(loc)}
-                        </View>
-                      ))
-                    ) : (
-                      // planDaily = false: locations are direct objects
-                      <LocationDisplay
-                        content={itinerary.locations.map((loc: any, i: number) => (
-                          <TouchableOpacity
-                            key={i}
-                            style={{ flexDirection: 'row', alignItems: 'center', gap: 10, justifyContent: 'space-between', marginBottom: 10 }}
-                            onPress={() => handleLocationClick(loc)}
-                            activeOpacity={0.7}
-                          >
-                            <View>
-                              <TText>{loc.locationName} </TText>
-                              {loc.address && (loc.address.city || loc.address.district || loc.address.region) && (
-                                <TText style={{ opacity: .6, fontSize: 12 }}>
-                                  {[loc.address.district, loc.address.city, loc.address.region].filter(Boolean).join(', ')}
-                                </TText>
-                              )}
-                              <TText style={{ opacity: .5 }}>{loc.note ? `${loc.note}` : ''}</TText>
-                            </View>
-                          </TouchableOpacity>
-                        ))}
-                      />
-                    )
-                  )}
+                  <TText style={styles.description}>{itinerary.content}</TText>
                 </ScrollView>
-
               </TView>
             )
           )}
@@ -356,7 +308,7 @@ export default function ItineraryViewScreen() {
         onClose={() => setShowShare(false)}
       />
 
-      {itinerary && itinerary.isPrivate && itinerary.user?.id !== session?.user?.id && (
+      {itinerary && itinerary.privacy === 'Only Me' && itinerary.user?.id !== session?.user?.id && (
         <View style={styles.privateOverlay}>
           <EmptyMessage
             iconName="lock"

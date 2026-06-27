@@ -4,6 +4,7 @@ import {
   CreateItineraryRequest,
   PublicPermissions,
   ItineraryStatus,
+  ItineraryPrivacy,
 } from './itinerary.types';
 
 const itineraryRepository = AppDataSource.getRepository(Itinerary);
@@ -27,8 +28,7 @@ export const createItineraryService = async (
       startDate: itineraryData.startDate,
       endDate: itineraryData.endDate,
       content: itineraryData.content,
-      isPrivate: itineraryData.isPrivate,
-      publicPermissions: itineraryData.publicPermissions,
+      privacy: itineraryData.privacy
     });
 
     const savedItinerary =
@@ -74,7 +74,7 @@ export const getItineraryService = async (
     }
 
     // Check authorization: allow if user is owner or itinerary is public
-    if (itinerary.isPrivate && itinerary.user.id !== userId) {
+    if (itinerary.privacy === ItineraryPrivacy.ONLY_ME && itinerary.user.id !== userId) {
       console.log(
         '🟡 User not authorized to view this private itinerary'
       );

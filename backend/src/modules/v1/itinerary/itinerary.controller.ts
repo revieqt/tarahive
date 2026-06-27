@@ -22,7 +22,7 @@ interface AuthRequest extends Request {
 export const createItinerary = async (req: AuthRequest, res: Response) => {
   try {
     console.log('🟡 createItinerary - req.user:', req.user);
-    const { title, type, content, startDate, endDate, isPrivate, publicPermissions } = req.body;
+    const { title, type, content, startDate, endDate, privacy } = req.body;
 
     // Get userID from authenticated token 'sub' payload
     const userID = req.user?.sub;
@@ -31,10 +31,10 @@ export const createItinerary = async (req: AuthRequest, res: Response) => {
     }
 
     // Validate required fields
-    if (!title || !type || !startDate || !endDate || !content || !isPrivate || !publicPermissions) {
+    if (!title || !type || !startDate || !endDate || !content || !privacy ) {
       return res.status(400).json({
         success: false,
-        message: 'Missing required fields: title, type, startDate, endDate, content, isPrivate, publicPermissions',
+        message: 'Missing required fields: title, type, startDate, endDate, content, privacy',
       });
     }
 
@@ -44,8 +44,7 @@ export const createItinerary = async (req: AuthRequest, res: Response) => {
       startDate: new Date(startDate),
       endDate: new Date(endDate),
       content,
-      isPrivate,
-      publicPermissions,
+      privacy: privacy
     };
 
     const newItinerary = await createItineraryService(userID, itineraryData);

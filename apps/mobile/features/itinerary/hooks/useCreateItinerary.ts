@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createItinerary } from '@/features/itinerary/services/itineraryService';
 import { showError, showSuccess } from '@/shared/services/toast.service';
 import { CreateItineraryRequest, Itinerary } from '../types/itineraryTypes';
+import { router } from 'expo-router';
 
 export const useCreateItinerary = () => {
   const queryClient = useQueryClient();
@@ -29,10 +30,6 @@ export const useCreateItinerary = () => {
         throw new Error('Start date must be before end date');
       }
 
-      if (!data.locations || data.locations.length === 0) {
-        throw new Error('At least one location is required');
-      }
-
       return await createItinerary(data);
     },
 
@@ -40,6 +37,7 @@ export const useCreateItinerary = () => {
       showSuccess('Success', `Itinerary "${data.title}" created successfully`);
       // Invalidate all user itineraries queries (all status filters)
       queryClient.invalidateQueries({ queryKey: ['user-itineraries'] });
+      router.replace(`/itinerary/${data.id}`);
     },
 
     onError: (error: any) => {

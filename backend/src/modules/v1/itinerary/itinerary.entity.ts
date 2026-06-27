@@ -8,7 +8,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { User } from '../user/user.entity';
-import { ItineraryStatus, PublicPermissions } from './itinerary.types';
+import { ItineraryPrivacy, ItineraryStatus, PublicPermissions } from './itinerary.types';
 
 @Entity({ name: 'itineraries' })
 export class Itinerary {
@@ -58,10 +58,11 @@ export class Itinerary {
   content!: string;
 
   @Column({
-    type: 'boolean',
-    default: true,
+    type: 'enum',
+    enum: ItineraryPrivacy,
+    default: ItineraryPrivacy.ONLY_ME,
   })
-  isPrivate!: boolean;
+  privacy!: ItineraryPrivacy;
 
   @Column({
     type: 'enum',

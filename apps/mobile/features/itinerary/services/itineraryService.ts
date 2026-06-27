@@ -43,11 +43,10 @@ export const createItinerary = async (
   const payload = {
     title: data.title,
     type: data.type,
-    description: data.description || '',
     startDate: data.startDate.toISOString(),
     endDate: data.endDate.toISOString(),
-    planDaily: data.planDaily,
-    locations: data.locations,
+    content: data.content,
+    privacy: data.privacy,
   };
 
   const response = await api.post<ItineraryResponse>(`${API_URL}/create`, payload);

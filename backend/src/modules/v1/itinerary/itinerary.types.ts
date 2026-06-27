@@ -4,6 +4,11 @@ export enum ItineraryStatus {
   DONE = 'done',
 }
 
+export enum ItineraryPrivacy {
+  ONLY_ME = 'Only Me',
+  PUBLIC = 'Public',
+}
+
 export enum PublicPermissions {
   EDIT = 'edit',
   VIEW = 'view',
@@ -15,8 +20,7 @@ export interface CreateItineraryRequest {
   startDate: Date;
   endDate: Date;
   content: string;
-  isPrivate: boolean;
-  publicPermissions: PublicPermissions;
+  privacy: ItineraryPrivacy;
 }
 
 // export interface UpdateItineraryRequest {
