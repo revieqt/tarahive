@@ -47,9 +47,9 @@ export default function ItineraryScreen() {
           <TText style={[styles.cardBubbleText, { opacity: 0.7 }]}>{item.type}</TText>
         </TView>
       </View>
-      {item.description && (
+      {item.content && (
         <TText style={styles.cardDescription} numberOfLines={1}>
-          {item.description}
+          {item.content}
         </TText>
       )}
     </TouchableOpacity>
@@ -68,8 +68,8 @@ export default function ItineraryScreen() {
                 style={[styles.tabs, selectedStatus === option.value && { borderBottomColor: secondaryColor, borderBottomWidth: 2 }]}
                 onPress={() => setSelectedStatus(option.value as 'active' | 'done' | 'cancelled')}
               >
-                <TIcon name={option.icon} size={15} color={selectedStatus === option.value ? secondaryColor : 'gray'} />
-                <TText style={{ color: selectedStatus === option.value ? secondaryColor : 'gray' }}>{option.label}</TText>
+                <TIcon name={option.icon} size={13} color={selectedStatus === option.value ? secondaryColor : 'gray'} />
+                <TText style={{ color: selectedStatus === option.value ? secondaryColor : 'gray', fontSize: 12 }}>{option.label}</TText>
               </TouchableOpacity>
             ))}
           </View>
@@ -159,11 +159,12 @@ const styles = StyleSheet.create({
   },
   tabs: {
     justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    height: 50,
+    height: 30,
     paddingBottom: 8,
-    gap: 4,
+    gap: 5,
   },
   addButton: {
     position: 'absolute',

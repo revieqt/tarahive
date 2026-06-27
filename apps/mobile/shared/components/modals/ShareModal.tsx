@@ -5,6 +5,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   Share,
+  StyleProp,
+  ViewStyle,
   Pressable,
 } from "react-native";
 import QRCode from "react-native-qrcode-svg";
@@ -15,19 +17,22 @@ import { useThemeColor } from "@/shared/hooks/useThemeColor";
 
 interface ShareModalProps {
   visible: boolean;
-  link: string;
-  onClose: () => void;
+  path: string;
+  onClose?: () => void;
 }
 
 export default function ShareModal({
   visible,
-  link,
+  path,
   onClose,
 }: ShareModalProps) {
   const primaryColor = useThemeColor({}, 'primary');
   const accentColor = useThemeColor({}, 'accent');
-  const customMessage = `Hey! Join me using this link:\n${link}`;
+  
   const [ copied, setCopied ] = React.useState(false);
+  const link = 'exp://tarag-v2.exp.app/'+ path;
+
+  const customMessage = `Hey! Join me using this link:\n${link}`;
 
   const handleCopy = async () => {
     await Clipboard.setStringAsync(link);
@@ -66,7 +71,7 @@ export default function ShareModal({
 
             {/* Clickable Link */}
             <TouchableOpacity onPress={handleCopy} style={styles.linkButton} activeOpacity={0.7}>
-              <TText style={{ textAlign: "center", fontSize: 13 }}>exp://tarag-v2.exp.app/{link}</TText>
+              <TText style={{ textAlign: "center", fontSize: 13 }}>{link}</TText>
               <TText style={{ opacity: 0.5, fontSize: 11, marginTop: 4 }}>
                 {copied ? "Copied!" : "Tap to copy"}
               </TText>

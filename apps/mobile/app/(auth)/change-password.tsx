@@ -7,22 +7,46 @@ import Header from '@/shared/components/common/Header';
 import HiveBg from '@/shared/components/common/HiveBg';
 import PasswordValidationCard from '@/shared/components/cards/PasswordValidationCard';
 import { useLanguage } from '@/shared/context/LanguageContext';
+import { useChangePassword } from '@/features/auth/hooks/useChangePassword';
+import { useRouter } from 'expo-router';
 
 export default function ChangePasswordScreen() {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const { t } = useLanguage();
+  const router = useRouter();
+  const { changePassword, isPending } = useChangePassword();
+
+  const handleChangePassword = () => {
+    changePassword(
+      { oldPassword, newPassword, confirmPassword },
+      {
+        onSuccess: () => {
+          // Reset form on success
+          setOldPassword('');
+          setNewPassword('');
+          setConfirmPassword('');
+          // Navigate back
+          router.back();
+        },
+      }
+    );
+  };
+
+  const isFormValid =
+    oldPassword && newPassword && confirmPassword && newPassword === confirmPassword;
 
   return (
-    <TView style={{flex: 1}}>
-      <HiveBg />
+    <TView style={{ flex: 1 }}>
       <KeyboardAvoidingView
-        style={{padding: '3%'}}
+        style={{ padding: '3%' }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        
-        <Header title={t('auth.change_password.title')} subtitle={t('auth.change_password.subtitle')} />
+        <Header
+          title={t('auth.change_password.title')}
+          subtitle={t('auth.change_password.subtitle')}
+        />
 
         <PasswordField
           placeholder={t('auth.change_password.current_password')}
@@ -39,15 +63,20 @@ export default function ChangePasswordScreen() {
           value={confirmPassword}
           onChangeText={setConfirmPassword}
         />
-        <PasswordValidationCard password={newPassword} confirmPassword={confirmPassword} withConfirmation/>
+        <PasswordValidationCard
+          password={newPassword}
+          confirmPassword={confirmPassword}
+          withConfirmation
+        />
       </KeyboardAvoidingView>
 
       <Button
         title={t('auth.change_password.change_button')}
-        onPress={() => {}}
+        onPress={handleChangePassword}
         type="primary"
         buttonStyle={styles.updateButton}
-        disabled={!oldPassword || !newPassword || !confirmPassword}
+        disabled={!isFormValid || isPending}
+        loading={isPending}
       />
     </TView>
   );

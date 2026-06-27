@@ -5,8 +5,11 @@ import { useLocation } from '@/shared/context/LocationContext';
 import { usePlaceWeather } from '@/shared/hooks/useWeather';
 import { useSession } from '@/features/auth/context/SessionContext';
 import { useLocalSearchParams, router } from 'expo-router';
-import React, { useState, useRef, useEffect } from 'react';
-import { Alert, StyleSheet, TouchableOpacity, View, Dimensions, Linking, ScrollView, Platform } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import {
+  Alert, StyleSheet, TouchableOpacity, View,
+  Linking, ScrollView, Platform,
+} from 'react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { Dialog } from '@/shared/services/dialog.service';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -14,122 +17,196 @@ import { formatDateToString } from '@/shared/utils/formatDateToString';
 import ShareModal from '@/shared/components/modals/ShareModal';
 import LocationDisplay from '@/shared/components/common/LocationDisplay';
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
-import { Location, Address, getStatusColor } from '@/features/itinerary/types/itineraryTypes';
+import { Address } from '@/features/itinerary/types/itineraryTypes';
 import { useGetItinerary } from '@/features/itinerary/hooks/useGetItinerary';
 import { useDeleteItinerary } from '@/features/itinerary/hooks/useDeleteItinerary';
 import EmptyMessage from '@/shared/components/common/EmptyMessage';
 import WeatherDisplay from '@/shared/components/common/WeatherDisplay';
-import { showError } from '@/shared/services/toast.service';
 import HiveBg from '@/shared/components/common/HiveBg';
 
-interface LocationWithDate extends Location {
-  date?: number | Date | string;
+// ─── Content parser ───────────────────────────────────────────────────────────
+
+type ParsedTextBlock = { id: string; type: 'text'; value: string };
+type ParsedToggleBlock = { id: string; type: 'toggle'; value: string; checked: boolean };
+type ParsedLocationBlock = {
+  id: string; type: 'location';
+  latitude: number; longitude: number;
+  locationName: string; address: Address;
+};
+type ParsedBlock = ParsedTextBlock | ParsedToggleBlock | ParsedLocationBlock;
+
+function parseContent(content: string): ParsedBlock[] {
+  if (!content) return [];
+
+  const blocks: ParsedBlock[] = [];
+  let remaining = content;
+  let idx = 0;
+
+  while (remaining.length > 0) {
+    // Try toggle: $tg[id].[bool]$ {value} /$tg$
+    const tgMatch = remaining.match(/^\$tg\[([^\]]+)\]\.\[(true|false)\]\$\s*\{([\s\S]*?)\}\s*\/\$tg\$/);
+    if (tgMatch) {
+      blocks.push({
+        id: tgMatch[1],
+        type: 'toggle',
+        value: tgMatch[3],
+        checked: tgMatch[2] === 'true',
+      });
+      remaining = remaining.slice(tgMatch[0].length).replace(/^\n/, '');
+      continue;
+    }
+
+    // Try location: $l[id]$ {json} /$l$
+    const lMatch = remaining.match(/^\$l\[([^\]]+)\]\$\s*\{([\s\S]*?)\}\s*\/\$l\$/);
+    if (lMatch) {
+      try {
+        const payload = JSON.parse(lMatch[2]);
+        blocks.push({
+          id: lMatch[1],
+          type: 'location',
+          latitude: payload.latitude,
+          longitude: payload.longitude,
+          locationName: payload.locationName,
+          address: payload.address ?? {},
+        });
+      } catch {}
+      remaining = remaining.slice(lMatch[0].length).replace(/^\n/, '');
+      continue;
+    }
+
+    // Plain text until next block marker or end
+    const nextBlock = remaining.search(/\$tg\[|\$l\[/);
+    const textChunk = nextBlock === -1 ? remaining : remaining.slice(0, nextBlock);
+    if (textChunk.trim()) {
+      blocks.push({ id: `parsed_text_${idx++}`, type: 'text', value: textChunk.trimEnd() });
+    }
+    remaining = nextBlock === -1 ? '' : remaining.slice(nextBlock);
+  }
+
+  return blocks;
 }
+
+// ─── Block renderers ──────────────────────────────────────────────────────────
+
+function TextBlockView({ value }: { value: string }) {
+  return <TText style={styles.textBlock}>{value}</TText>;
+}
+
+function ToggleBlockView({ value, checked }: { value: string; checked: boolean }) {
+  const accentColor = useThemeColor({}, 'accent');
+  const primaryColor = useThemeColor({}, 'primary');
+  const textColor = useThemeColor({}, 'text');
+
+  return (
+    <View style={[styles.toggleBlock, { borderColor: '#ccc4', backgroundColor: primaryColor }]}>
+      <View style={[
+        styles.checkbox,
+        { borderColor: checked ? accentColor : '#ccc6', backgroundColor: checked ? accentColor : 'transparent' },
+      ]}>
+        {checked && <TIcon name="check" size={11} color="white" />}
+      </View>
+      <TText style={[
+        styles.toggleText,
+        { color: textColor, textDecorationLine: checked ? 'line-through' : 'none', opacity: checked ? 0.45 : 1 },
+      ]}>
+        {value}
+      </TText>
+    </View>
+  );
+}
+
+function LocationBlockView({
+  block,
+  onPress,
+}: {
+  block: ParsedLocationBlock;
+  onPress: (loc: ParsedLocationBlock) => void;
+}) {
+  const accentColor = useThemeColor({}, 'accent');
+  const primaryColor = useThemeColor({}, 'primary');
+
+  return (
+    <TouchableOpacity
+      style={[styles.locationBlock, { borderColor: accentColor + '55', backgroundColor: primaryColor }]}
+      onPress={() => onPress(block)}
+      activeOpacity={0.75}
+    >
+      <View style={[styles.locationIconBox, { backgroundColor: accentColor + '22' }]}>
+        <TIcon name="map-marker" size={18} color={accentColor} />
+      </View>
+      <View style={{ flex: 1 }}>
+        <TText style={styles.locationName} numberOfLines={1}>{block.locationName}</TText>
+        {(block.address.city || block.address.region) ? (
+          <TText style={styles.locationSub} numberOfLines={1}>
+            {[block.address.city, block.address.region].filter(Boolean).join(', ')}
+          </TText>
+        ) : null}
+      </View>
+      <TIcon name="chevron-right" size={16} color="#ccc8" />
+    </TouchableOpacity>
+  );
+}
+
+function ContentRenderer({
+  content,
+  onLocationPress,
+}: {
+  content: string;
+  onLocationPress: (loc: ParsedLocationBlock) => void;
+}) {
+  const blocks = useMemo(() => parseContent(content), [content]);
+
+  return (
+    <>
+      {blocks.map((block) => {
+        if (block.type === 'text') return <TextBlockView key={block.id} value={block.value} />;
+        if (block.type === 'toggle') return <ToggleBlockView key={block.id} value={block.value} checked={block.checked} />;
+        return <LocationBlockView key={block.id} block={block as ParsedLocationBlock} onPress={onLocationPress} />;
+      })}
+    </>
+  );
+}
+
+// ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function ItineraryViewScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
-
   const { itinerary, isLoading, error } = useGetItinerary(id || null);
   const deleteItineraryMutation = useDeleteItinerary();
   const queryClient = useQueryClient();
 
   const { latitude: userLat, longitude: userLng } = useLocation();
-  const { session, updateSession } = useSession();
-  const [selectedLocation, setSelectedLocation] = useState<LocationWithDate | null>(null);
+  const { session } = useSession();
   const secondaryColor = useThemeColor({}, 'secondary');
-  const [groupName, setGroupName] = useState('');
-  const [creatingGroup, setCreatingGroup] = useState(false);
+
+  const [selectedLocation, setSelectedLocation] = useState<ParsedLocationBlock | null>(null);
   const [showShare, setShowShare] = useState(false);
   const [is3DMode, setIs3DMode] = useState(true);
-  const [currentHeading, setCurrentHeading] = useState(0);
 
-
-  const handleLocationClick = (location: LocationWithDate) => {
-    setSelectedLocation(location);
-    setCurrentHeading(0);
+  const handleLocationPress = (loc: ParsedLocationBlock) => {
+    setSelectedLocation(loc);
   };
 
-  const formatMapDate = (dateValue: any): string => {
-    if (!dateValue) return 'N/A';
-
-    try {
-      if (typeof dateValue === 'string') {
-        return dateValue.slice(0, 10);
-      }
-      if (dateValue instanceof Date) {
-        return dateValue.toISOString().slice(0, 10);
-      }
-      if (typeof dateValue === 'number') {
-        return new Date(dateValue).toISOString().slice(0, 10);
-      }
-      if (dateValue.toDate && typeof dateValue.toDate === 'function') {
-        return dateValue.toDate().toISOString().slice(0, 10);
-      }
-      return 'Invalid Date';
-    } catch (error) {
-      console.warn('Error formatting date:', dateValue, error);
-      return 'Invalid Date';
-    }
-  };
-
-  const renderDayLocations = (loc: any) => {
-    return (
-      <LocationDisplay
-        content={loc.locations && Array.isArray(loc.locations) ? loc.locations.map((l: any, i: number) => (
-          <TouchableOpacity
-            key={i}
-            style={{ flexDirection: 'row', alignItems: 'center', gap: 10, justifyContent: 'space-between', marginBottom: 10 }}
-            onPress={() => handleLocationClick(l)}
-            activeOpacity={0.7}
-          >
-            <View>
-              <TText>{l.locationName} </TText>
-              {l.address && (l.address.city || l.address.district || l.address.region) && (
-                <TText style={{ opacity: .6, fontSize: 12 }}>
-                  {[l.address.district, l.address.city, l.address.region].filter(Boolean).join(', ')}
-                </TText>
-              )}
-              <TText style={{ opacity: .5 }}>{l.note ? `${l.note}` : ''}</TText>
-            </View>
-          </TouchableOpacity>
-        )) : []}
-      />
-    );
-  };
-
-  const handleGetDirections = async (amenity: any) => {
-    if (!amenity.latitude || !amenity.longitude || !amenity.name) {
+  const handleGetDirections = async (loc: ParsedLocationBlock) => {
+    if (!loc.latitude || !loc.longitude || !loc.locationName) {
       Alert.alert('Error', 'Unable to get directions to this location.');
       return;
     }
-
-    const { latitude, longitude, name } = amenity;
-    const encodedLabel = encodeURIComponent(name);
-
+    const encoded = encodeURIComponent(loc.locationName);
     try {
-      let url = '';
-
-      if (Platform.OS === 'ios') {
-        url = `maps://maps.apple.com/?q=${encodedLabel}&ll=${latitude},${longitude}`;
-        await Linking.openURL(url);
-      } else if (Platform.OS === 'web') {
-        url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
-        window.open(url, '_blank');
-      } else {
-        url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
-        await Linking.openURL(url);
-      }
-    } catch (error) {
+      const url = Platform.OS === 'ios'
+        ? `maps://maps.apple.com/?q=${encoded}&ll=${loc.latitude},${loc.longitude}`
+        : `https://www.google.com/maps/search/?api=1&query=${loc.latitude},${loc.longitude}`;
+      await Linking.openURL(url);
+    } catch {
       Alert.alert('Error', 'Unable to open maps application.');
     }
   };
 
-  const handleSearchLocation = async (location: Location) => {
+  const handleSearchLocation = async (loc: ParsedLocationBlock) => {
     try {
-      const searchQuery = encodeURIComponent(location.locationName);
-      const googleSearchUrl = `https://www.google.com/search?q=${searchQuery}`;
-      await Linking.openURL(googleSearchUrl);
-    } catch (error) {
+      await Linking.openURL(`https://www.google.com/search?q=${encodeURIComponent(loc.locationName)}`);
+    } catch {
       Dialog.alert('Error', 'Unable to open search. Please try again.');
     }
   };
@@ -155,13 +232,10 @@ export default function ItineraryViewScreen() {
     );
   };
 
-  const SelectedLocationWeather = ({ selectedLocation }: any) => {
+  const SelectedLocationWeather = ({ loc }: { loc: ParsedLocationBlock }) => {
     const { data: weatherData, isLoading } = usePlaceWeather(
-      selectedLocation.latitude,
-      selectedLocation.longitude,
-      selectedLocation.address?.city
+      loc.latitude, loc.longitude, loc.address?.city
     );
-
     return (
       <WeatherDisplay
         heatValue={weatherData?.temperature || 0}
@@ -175,53 +249,39 @@ export default function ItineraryViewScreen() {
     );
   };
 
+  const isOwner = itinerary?.user?.id === session?.user?.id;
+  const canView = !itinerary?.isPrivate || isOwner;
+
   return (
     <View style={{ flex: 1 }}>
 
-      {((itinerary?.privacy === 'Only Me') || (itinerary?.user?.id === session?.user?.id)) && (<>
-        <LinearGradient
-          colors={['#000', 'transparent']}
-          style={styles.headerGradient}
-        >
-          {(itinerary?.user && itinerary?.user.id === session?.user?.id) && (
-            itinerary.status === 'active' ? (
-              <OptionsPopup
-                options={[
-                  { label: 'Delete Itinerary', iconName: 'delete', onPress: handleDeleteItinerary },
-                  { label: 'Share Itinerary', iconName: 'share-variant', onPress: () => setShowShare(true) },
-                ]}
-                style={styles.options}
-              >
-                <TIcon name="dots-vertical" size={20} color="#fff" />
-              </OptionsPopup>
-            ) : (
-              <OptionsPopup
-                options={[
-                  { label: 'Delete Itinerary', iconName: 'delete', onPress: handleDeleteItinerary },
-                ]}
-                style={styles.options}
-              >
-                <TIcon name="dots-vertical" size={20} color="#fff" />
-              </OptionsPopup>
-            ))
-          }
+      {canView && (
+        <LinearGradient colors={['#000', 'transparent']} style={styles.headerGradient}>
+          {isOwner && (
+            <OptionsPopup
+              options={[
+                { label: 'Delete Itinerary', iconName: 'delete', onPress: handleDeleteItinerary },
+                ...(itinerary?.status === 'active'
+                  ? [{ label: 'Share Itinerary', iconName: 'share-variant', onPress: () => setShowShare(true) }]
+                  : []),
+              ]}
+              style={styles.options}
+            >
+              <TIcon name="dots-vertical" size={20} color="#fff" />
+            </OptionsPopup>
+          )}
 
           <BackButton type="close" color="#fff" style={styles.backButton} />
           <View style={styles.headerRow}>
-            <TText type='subtitle' style={{ color: '#fff' }}>
-              {itinerary?.title}
-            </TText>
-            {itinerary?.privacy === 'Only Me' && (
-              <TIcon name="lock" size={15} color='white' />
-            )}
+            <TText type="subtitle" style={{ color: '#fff' }}>{itinerary?.title}</TText>
+            {itinerary?.isPrivate && <TIcon name="lock" size={15} color="white" />}
           </View>
           <TText style={{ color: '#fff' }}>
-            {formatDateToString(itinerary?.startDate || "")} - {formatDateToString(itinerary?.endDate || "")}
+            {formatDateToString(itinerary?.startDate || '')} - {formatDateToString(itinerary?.endDate || '')}
           </TText>
           <TText style={{ color: '#fff7', fontSize: 11 }}>
             Created by {itinerary?.user?.username}
           </TText>
-
           <View style={styles.headerRow}>
             <View style={styles.headerBubble}>
               <TText style={{ color: '#fff', fontSize: 11 }}>
@@ -229,86 +289,69 @@ export default function ItineraryViewScreen() {
               </TText>
             </View>
             <View style={styles.headerBubble}>
-              <TText style={{ color: '#fff', fontSize: 11 }}>
-                {itinerary?.type || 'N/A'}
-              </TText>
+              <TText style={{ color: '#fff', fontSize: 11 }}>{itinerary?.type || 'N/A'}</TText>
             </View>
           </View>
         </LinearGradient>
-      </>)}
+      )}
 
-
-      {((itinerary?.privacy === 'Only Me') || (itinerary?.user?.id === session?.user?.id)) && (
+      {canView && (
         <>
           {selectedLocation ? (
-            <LinearGradient
-              colors={['transparent', '#000']}
-              style={styles.bottomGradient}
-            >
-
+            <LinearGradient colors={['transparent', '#000']} style={styles.bottomGradient}>
               <View style={styles.headerRow}>
                 <TouchableOpacity onPress={() => setSelectedLocation(null)}>
                   <TIcon name="chevron-left" size={30} color="#fff" />
                 </TouchableOpacity>
                 <View style={{ flex: 1, marginLeft: 10 }}>
-                  <TText type="subtitle" style={{ color: '#fff' }}>
-                    {selectedLocation.locationName}
-                  </TText>
-                  {selectedLocation.address && (selectedLocation.address.city || selectedLocation.address.district || selectedLocation.address.region || selectedLocation.address.country) && (
+                  <TText type="subtitle" style={{ color: '#fff' }}>{selectedLocation.locationName}</TText>
+                  {(selectedLocation.address.city || selectedLocation.address.district || selectedLocation.address.region) && (
                     <TText style={{ color: '#fff', opacity: 0.7, marginBottom: 8, fontSize: 12 }}>
-                      {[selectedLocation.address.district, selectedLocation.address.city, selectedLocation.address.region, selectedLocation.address.country].filter(Boolean).join(', ')}
+                      {[selectedLocation.address.district, selectedLocation.address.city, selectedLocation.address.region].filter(Boolean).join(', ')}
                     </TText>
                   )}
                 </View>
               </View>
-
-
 
               <View style={styles.locationButtonsContainer}>
                 <TouchableOpacity
                   style={[styles.locationButtons, { backgroundColor: is3DMode ? secondaryColor : '#0008' }]}
                   onPress={() => setIs3DMode(!is3DMode)}
                 >
-                  <TIcon name={is3DMode ? "cube-outline" : "square-outline"} size={20} color="#fff" />
+                  <TIcon name={is3DMode ? 'cube-outline' : 'square-outline'} size={20} color="#fff" />
                   <TText style={{ color: '#fff', fontSize: 11 }}>{is3DMode ? '3D' : '2D'}</TText>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.locationButtons}
-                  onPress={() => handleGetDirections(selectedLocation)
-                  }>
+                <TouchableOpacity style={styles.locationButtons} onPress={() => handleGetDirections(selectedLocation)}>
                   <TIcon name="directions" size={20} color="#fff" />
                   <TText style={{ color: '#fff', fontSize: 11 }}>Get Directions</TText>
                 </TouchableOpacity>
-
-                <TouchableOpacity style={styles.locationButtons}
-                  onPress={() => handleSearchLocation(selectedLocation)}>
+                <TouchableOpacity style={styles.locationButtons} onPress={() => handleSearchLocation(selectedLocation)}>
                   <TIcon name="magnify" size={20} color="#fff" />
                   <TText style={{ color: '#fff', fontSize: 11 }}>Search</TText>
                 </TouchableOpacity>
-
               </View>
 
-              <SelectedLocationWeather selectedLocation={selectedLocation} secondaryColor={secondaryColor} />
-
-              <HiveBg />
+              <SelectedLocationWeather loc={selectedLocation} />
             </LinearGradient>
           ) : (
             itinerary && (
-              <TView style={styles.bottomSheet} color='primary'>
-                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: '3%', paddingVertical: 20 }}>
-                  <TText style={styles.description}>{itinerary.content}</TText>
+              <TView style={styles.bottomSheet} color="primary">
+                <ScrollView
+                  showsVerticalScrollIndicator={false}
+                  contentContainerStyle={{ paddingHorizontal: '3%', paddingVertical: 20, gap: 4 }}
+                >
+                  <ContentRenderer
+                    content={itinerary.content ?? ''}
+                    onLocationPress={handleLocationPress}
+                  />
                 </ScrollView>
               </TView>
             )
           )}
         </>
       )}
-      <ShareModal
-        visible={showShare}
-        link={itinerary ? `exp://tarahive.exp.app/itinerary/${itinerary.id}` : ''}
-        onClose={() => setShowShare(false)}
-      />
 
-      {itinerary && itinerary.privacy === 'Only Me' && itinerary.user?.id !== session?.user?.id && (
+      {itinerary?.isPrivate && !isOwner && (
         <View style={styles.privateOverlay}>
           <EmptyMessage
             iconName="lock"
@@ -321,12 +364,12 @@ export default function ItineraryViewScreen() {
         </View>
       )}
 
-      {isLoading || error && (
+      {(isLoading || error) && (
         <View style={styles.privateOverlay}>
           <EmptyMessage
             iconName="lock"
-            title={error ? "Failed to load itinerary" : "Loading itinerary..."}
-            description={error ? "Please try again later." : "Please wait while we load the itinerary details."}
+            title={error ? 'Failed to load itinerary' : 'Loading itinerary...'}
+            description={error ? 'Please try again later.' : 'Please wait while we load the itinerary details.'}
             buttonLabel="Go Back"
             buttonAction={() => router.back()}
             isWhite
@@ -338,6 +381,8 @@ export default function ItineraryViewScreen() {
   );
 }
 
+// ─── Styles ───────────────────────────────────────────────────────────────────
+
 const styles = StyleSheet.create({
   options: {
     position: 'absolute',
@@ -345,16 +390,6 @@ const styles = StyleSheet.create({
     right: 30,
     zIndex: 10,
     padding: 8,
-  },
-  optionsChild: {
-    flexDirection: 'row',
-    gap: 10,
-    flex: 1,
-  },
-  createGroupTrip: {
-    flexDirection: 'row',
-    height: 20,
-    gap: 10,
   },
   headerGradient: {
     position: 'absolute',
@@ -419,31 +454,70 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
-  description: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc4',
-    paddingBottom: 10,
-    marginBottom: 10,
-  },
-  locationNote: {
-    zIndex: 100,
-    color: '#fff',
-    backgroundColor: '#0005',
-    padding: 10,
-    borderRadius: 10,
-    marginTop: 10,
-    maxHeight: 120,
-  },
   privateOverlay: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.7)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 200,
     gap: 12,
+  },
+  // Content blocks
+  textBlock: {
+    fontSize: 13,
+    lineHeight: 20,
+    marginHorizontal: 5,
+  },
+  toggleBlock: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    borderRadius: 10,
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    gap: 10,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 5,
+    borderWidth: 1.5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 2,
+    flexShrink: 0,
+  },
+  toggleText: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 20,
+  },
+  locationBlock: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 10,
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    gap: 10,
+  },
+  locationIconBox: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexShrink: 0,
+  },
+  locationName: {
+    fontSize: 13,
+    fontWeight: '600',
+    lineHeight: 18,
+  },
+  locationSub: {
+    fontSize: 11,
+    opacity: 0.55,
+    lineHeight: 16,
   },
 });

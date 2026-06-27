@@ -1,7 +1,7 @@
 import { api } from '@/shared/api/client';
 import { formatDeviceInfo } from '@/shared/utils/deviceFormatter';
 import { DeviceInfo } from '@/shared/hooks/useDeviceInfo';
-import { RegisterRequest, RegisterResponse, VerificationResponse, LoginRequest, LoginResponse } from '../types/auth.types';
+import { RegisterRequest, RegisterResponse, VerificationResponse, LoginRequest, LoginResponse, ChangePasswordRequest, ChangePasswordResponse } from '../types/auth.types';
 
 const API_URL = '/v1/auth';
 
@@ -70,4 +70,23 @@ export const loginUser = async (
   };
 
   return await api.post<LoginResponse>(`${API_URL}/login`, payload);
+};
+
+/**
+ * Change user password
+ */
+export const changePassword = async (
+  oldPassword: string,
+  newPassword: string,
+  confirmPassword: string,
+  device?: DeviceInfo
+): Promise<ChangePasswordResponse> => {
+  const payload = {
+    oldPassword,
+    newPassword,
+    confirmPassword,
+    device: device ? formatDeviceInfo(device) : undefined,
+  };
+
+  return await api.post<ChangePasswordResponse>(`${API_URL}/change-password`, payload);
 };

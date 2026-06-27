@@ -12,10 +12,11 @@ import BackButton from '@/shared/components/common/BackButton';
 import ProfileImage from '@/shared/components/ui/ProfileImage';
 import { ExpBadge, ExpLevel, ExpProgress } from '@/shared/components/common/ExpFeature';
 import { useInternetConnection } from '@/shared/utils/checkInternetConnection';
-import ShareModal from '@/shared/components/modals/ShareModal';
 import { ProBadge } from '@/shared/components/ui/ProBadge';
 import HiveBg from '@/shared/components/common/HiveBg';
 import StickyScrollView from '@/shared/components/ui/StickyScrollView';
+import ErrorOverlayModal from '@/shared/components/modals/ErrorOverlayModal';
+import { ShareButton } from '@/shared/components/common/ShareButton';
 
 export default function ProfileScreen() {
   const { id } = useLocalSearchParams();
@@ -37,7 +38,7 @@ export default function ProfileScreen() {
 
   if (!isCurrentUser && isLoading) {
     return (
-      <TView style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <TView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <TText>Loading profile...</TText>
       </TView>
     );
@@ -45,19 +46,19 @@ export default function ProfileScreen() {
 
   if (isProfileLocked) {
     return (
-      <TView style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <TIcon name="alert-circle" size={48}/>
-        <TText type='subtitle' style={{marginTop: 16, textAlign: 'center'}}>
+      <TView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <TIcon name="alert-circle" size={48} />
+        <TText type='subtitle' style={{ marginTop: 16, textAlign: 'center' }}>
           This profile is private
         </TText>
-        <TText style={{marginTop: 8, textAlign: 'center', opacity: 0.7}}>
+        <TText style={{ marginTop: 8, textAlign: 'center', opacity: 0.7 }}>
           This user has made their profile private
         </TText>
-        <TouchableOpacity 
-          style={{marginTop: 20, paddingHorizontal: 16, paddingVertical: 8}}
+        <TouchableOpacity
+          style={{ marginTop: 20, paddingHorizontal: 16, paddingVertical: 8 }}
           onPress={() => router.back()}
         >
-          <TText style={{textDecorationLine: 'underline'}}>Go Back</TText>
+          <TText style={{ textDecorationLine: 'underline' }}>Go Back</TText>
         </TouchableOpacity>
       </TView>
     );
@@ -66,53 +67,86 @@ export default function ProfileScreen() {
   // Show not loaded state if other user data hasn't loaded yet
   if (!isCurrentUser && !displayUser) {
     return (
-      <TView style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <TView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <TText>Unable to load profile</TText>
       </TView>
     );
   }
 
   return (
-    <StickyScrollView 
-      style={{flex: 1}}
-      contentContainerStyle={{height: 2000}}
-      headerAppearOn={200}
-      title={displayUser?.fname ? `${displayUser.fname} ${displayUser.lname}` : 'Profile'}
-      subtitle={displayUser?.username ? `@${displayUser.username}` : 'Profile'}
-    >
-      <TView style={styles.headerBackground} color='secondary'>
-        <BackButton type='floating' color='white'/>
+    <>
 
-        
-        <HiveBg fade={false}/>
-        <HiveBg fade={false} flipHorizontal/>
-        <TView style={styles.headerBottom} color='primary'/>
-      </TView>
+      <StickyScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ height: 2000 }}
+        headerAppearOn={200}
+        title={displayUser?.fname ? `${displayUser.fname} ${displayUser.lname}` : 'Profile'}
+        subtitle={displayUser?.username ? `@${displayUser.username}` : 'Profile'}
+      >
+        <TView style={styles.headerBackground} color='secondary'>
+          <BackButton type='floating' color='white' />
 
-      <TView style={styles.userInfoContainer} color='primary'>
-        <View style={styles.profileImage}>
-          <ProfileImage imagePath={displayUser?.profileImage}/>
-        </View>
-        <TText type='subtitle' style={{marginTop: 8}}>{displayUser?.fname} {displayUser?.lname}</TText>
-        <TText style={{opacity: .5}}>@{displayUser?.username}</TText>
-        <TText style={{opacity: .5}}>
-          {displayUser?.bio? displayUser.bio : isCurrentUser && 'You have not set a bio yet' }
-        </TText>
-      </TView>
-      
-    </StickyScrollView>
+
+          <HiveBg fade={false} />
+          <HiveBg fade={false} flipHorizontal />
+          <TView style={styles.headerBottom} />
+        </TView>
+
+        <TView style={styles.userInfoContainer}>
+          <View style={styles.profileImage}>
+            <ProfileImage imagePath={displayUser?.profileImage} />
+          </View>
+          <View style={[styles.row, { marginVertical: 5 }]}>
+            <TText type='subtitle'>{displayUser?.fname} {displayUser?.lname}</TText>
+            <ProBadge isProUser size={15} />
+          </View>
+
+          <TText style={{ opacity: .5, marginBottom: 10 }}>@{displayUser?.username}</TText>
+          <TText style={{ opacity: .5, marginBottom: 10 }}>
+            {displayUser?.bio ? displayUser.bio : isCurrentUser && 'You have not set a bio yet'}
+          </TText>
+
+          {isCurrentUser &&
+            <View style={styles.row}>
+              <TouchableOpacity
+                onPress={() => router.push('/user/settings/edit-profile')}
+                style={styles.userInfoButton}>
+                <TText>Edit Profile</TText>
+              </TouchableOpacity>
+              <ShareButton path={`user/${displayUser?.username}`} style={styles.userInfoButton}>
+                <TText>Share Profile</TText>
+              </ShareButton>
+            </View>
+          }
+
+          <TView style={styles.badgeContainer} color='primary'>
+            <ExpBadge expPoints={displayUser?.expPoints || 0} />
+            <View style={styles.progressContainer}>
+              <ExpLevel expPoints={displayUser?.expPoints || 0} />
+              <ExpProgress expPoints={displayUser?.expPoints || 0} />
+            </View>
+          </TView>
+        </TView>
+      </StickyScrollView>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  headerBackground:{
+  headerBackground: {
     width: '100%',
     height: 150,
     overflow: 'hidden',
   },
-  userInfoContainer:{
+  row: {
+    flexDirection: 'row',
+    gap: 5,
+    alignItems: 'center',
+  },
+  userInfoContainer: {
     width: '100%',
     alignItems: 'center',
+    paddingHorizontal: '3%'
   },
   profileImage: {
     zIndex: 1,
@@ -121,8 +155,9 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     overflow: 'hidden',
     marginTop: -85,
+    marginBottom: 10
   },
-  headerBottom:{
+  headerBottom: {
     position: 'absolute',
     bottom: -1,
     left: 0,
@@ -132,122 +167,28 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     zIndex: 200,
   },
-  // imageHeaderContainer:{
-  //   height: Dimensions.get('window').height /1.25,
-  // },
-  // profileImage: {
-  //   width: '100%',
-  //   height: Dimensions.get('window').height /1.25,
-  // },
-  // imageHeaderGradient:{
-  //   position: 'absolute',
-  //   bottom: 0,
-  //   left: 0,
-  //   right: 0,
-  //   paddingHorizontal: 16,
-  //   paddingTop: 40,
-  //   paddingBottom: 70,
-  // },
-  // headerBottom:{
-  //   position: 'absolute',
-  //   bottom: -1,
-  //   left: 0,
-  //   right: 0,
-  //   height: 20,
-  //   borderTopLeftRadius: 20,
-  //   borderTopRightRadius: 20,
-  //   zIndex: 200,
-  // },
-  // tabsContainer:{
-  //   flexDirection: 'row',
-  //   maxHeight: 50,
-  //   overflow: 'hidden',
-  //   position: 'absolute',
-  //   bottom: 30,
-  //   zIndex: 300,
-  // },
-  // tabsContentContainer:{
-  //   paddingHorizontal: 10,
-  //   gap: 7,
-  // },
-  // tabs:{
-  //   paddingHorizontal: 12,
-  //   height: 35,
-  //   alignItems: 'center',
-  //   justifyContent: 'center',
-  //   borderRadius: 20,
-  //   backgroundColor: '#ccc3',
-  // },
-  // badgeContainer:{
-  //   width: '100%',
-  //   padding: 10,
-  //   marginBottom: 16,
-  //   overflow: 'hidden',
-  //   borderRadius: 12,
-  //   justifyContent: 'center',
-  // },
-  // progressContainer:{
-  //   position: 'absolute',
-  //   top: 0,
-  //   bottom: 0,
-  //   left: 70,
-  //   right: 0,
-  //   justifyContent: 'center',
-  //   paddingHorizontal: 16,
-  // },
-  // // gridContainer:{
-  // //   flexDirection: 'row',
-  // //   justifyContent: 'space-between',
-  // //   alignItems: 'center',
-  // //   marginBottom: 16,
-  // // },
-  // // gridChildContainer:{
-  // //   width: Dimensions.get('window').width * 0.445,
-  // //   aspectRatio: 1,
-  // //   borderRadius: 12,
-  // // },
-  // // leftGridContainer:{
-  // //   padding: 14,
-  // //   overflow: 'hidden',
-  // //   borderWidth: 1,
-  // //   borderColor: '#ccc3'
-  // // },
-  // // rightGridContainer:{
-  // //   height: '48%',
-  // //   width: '100%',
-  // //   borderRadius: 12,
-  // //   overflow: 'hidden',
-  // //   borderWidth: 1,
-  // //   borderColor: '#ccc3'
-  // // },
-  // rowContainer:{
-  //   padding: 16,
-  //   borderBottomWidth: 1,
-  //   borderColor: '#ccc3',
-  //   justifyContent: 'center',
-  //   opacity: 0.7,
-  // },
-  // lockedProfileContainer:{
-  //   flex: 1,
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  //   pointerEvents: 'box-none',
-  // },
-  // noteContainer:{
-  //   position: 'absolute',
-  //   bottom: 10,
-  //   left: 10,
-  //   right: 10,
-  //   padding:10,
-  //   borderRadius: 8,
-  //   borderWidth: 1,
-  //   borderColor: '#ccc3',
-  //   justifyContent: 'space-between',
-  //   flexDirection: 'row',
-  //   zIndex: 10000,
-  // },
-  // note:{
-  //   fontSize: 12,
-  //   opacity: 0.7,
-  // }
+  userInfoButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ccc3',
+  },
+  badgeContainer: {
+    width: '100%',
+    padding: 5,
+    marginVertical: 16,
+    overflow: 'hidden',
+    borderRadius: 12,
+    justifyContent: 'center',
+  },
+  progressContainer: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 70,
+    right: 0,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+  },
 });

@@ -178,19 +178,40 @@ export const updatePassword = async (
   confirmPassword: string
 ): Promise<{ accessToken: string; refreshToken: string }> => {
   try {
+    // Validate inputs
+    if (!oldPassword || !oldPassword.trim()) throw new Error('Current password is required');
+    if (!newPassword || !newPassword.trim()) throw new Error('New password is required');
+    if (!confirmPassword || !confirmPassword.trim()) throw new Error('Password confirmation is required');
+    
     if (newPassword !== confirmPassword) throw new Error('New passwords do not match');
 
-    const user = await userRepo.findOne({ where: { id: userId }, select: ['password', 'tv'] });
+    // Load full user with password (select: false by default)
+    const user = await userRepo.findOne({ 
+      where: { id: userId },
+      select: ['id', 'fname', 'lname', 'email', 'username', 'password', 'tv']
+    });
     if (!user) throw new Error('User not found');
 
     if (user.tv !== tokenVersion) throw new Error('Invalid token version');
 
-    const isValidPassword = await comparePassword(oldPassword, user.password!);
+    // Ensure user has a stored password
+    if (!user.password) throw new Error('User password not found');
+
+    const isValidPassword = await comparePassword(oldPassword, user.password);
     if (!isValidPassword) throw new Error('Current password is incorrect');
 
-    user.password = await hashPassword(newPassword);
-    user.tv += 1;
-    await userRepo.save(user);
+    const hashedPassword = await hashPassword(newPassword);
+    const newTokenVersion = user.tv + 1;
+
+    // Update only password and tv columns to avoid overwriting other fields
+    await userRepo.update(
+      { id: userId },
+      { password: hashedPassword, tv: newTokenVersion }
+    );
+
+    // Update local user object for token generation
+    user.password = hashedPassword;
+    user.tv = newTokenVersion;
 
     const accessToken = await generateAccessToken(user);
     const refreshToken = await generateRefreshToken(user);

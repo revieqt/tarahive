@@ -51,12 +51,12 @@ export const ExpBadge = ({ expPoints }: { expPoints: number }) => {
 
   return (
     <View style={styles.badgeWrapper}>
-      <MaterialCommunityIcons name="shield" size={60} color={badgeColor} />
+      <MaterialCommunityIcons name="shield" size={50} color={badgeColor} />
 
       <View style={styles.innerIcon}>
         <MaterialCommunityIcons
           name={levelInfo.icon as any}
-          size={28}
+          size={23}
           color="#fff"
         />
       </View>
@@ -119,7 +119,7 @@ export const ExpLevel = ({ expPoints }: { expPoints: number }) => {
   const levelInfo = getLevelInfo(expPoints);
 
   return (
-    <TText style={styles.levelText} type="subtitle">
+    <TText style={styles.levelText}>
       {levelInfo.title}
     </TText>
   );
@@ -159,7 +159,9 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   levelText: {
-    marginTop: 6,
+    fontWeight: '700',
+    fontSize: 14,
+    marginBottom: 10
   },
 });
 

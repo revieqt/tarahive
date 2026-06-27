@@ -79,7 +79,7 @@ export default function StickyScrollView({
             paddingTop: STATUS_BAR_HEIGHT,
             opacity: headerOpacity,
             transform: [{ translateY: headerTranslateY }],
-            backgroundColor: primaryColor + '40',
+            backgroundColor: primaryColor,
           },
         ]}
         pointerEvents="box-none"

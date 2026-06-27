@@ -38,3 +38,17 @@ export interface LoginResponse {
   accessToken: string;
   refreshToken: string;
 }
+
+export interface ChangePasswordRequest {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+  device?: DeviceInfo;
+}
+
+export interface ChangePasswordResponse {
+  success: boolean;
+  message: string;
+  accessToken: string;
+  refreshToken: string;
+}

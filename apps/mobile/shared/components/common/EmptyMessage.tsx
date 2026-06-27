@@ -25,7 +25,6 @@ const EmptyMessage: React.FC<EmptyMessageProps> = ({
   isSolid = false
 }) => {
   const color = isWhite ? '#FFFFFF' : useThemeColor({}, 'text');
-  
 
   return (
     <View style={[styles.container, {opacity: isSolid ? 1 : .5}]}>
