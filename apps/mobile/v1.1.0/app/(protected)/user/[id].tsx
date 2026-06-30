@@ -96,8 +96,8 @@ export default function ProfileScreen() {
         <View style={styles.profileImage}>
           <ProfileImage imagePath={displayUser?.profileImage} />
         </View>
-        <View style={[styles.row, { marginVertical: 5 }]}>
-          <TText type='subtitle'>{displayUser?.fname} {displayUser?.lname}</TText>
+        <View style={styles.row}>
+          <TText type='title' style={{fontSize: 16}}>{displayUser?.fname} {displayUser?.lname}</TText>
           <ProBadge isProUser size={15} />
         </View>
 

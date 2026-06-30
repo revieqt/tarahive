@@ -4,7 +4,6 @@ import { TIcon, TText, TView } from "@/shared/components/ui/Themed";
 import { useLanguage } from "@/shared/context/LanguageContext";
 import { useThemeColor } from "@/shared/hooks/useThemeColor";
 import { showError } from "@/shared/services/toast.service";
-import HiveBg from "@/shared/components/common/HiveBg";
 import Header from "@/shared/components/common/Header";
 
 export default function VisibilitySettingsScreen() {
@@ -12,7 +11,6 @@ export default function VisibilitySettingsScreen() {
 
   return (
     <TView style={styles.container}>
-      <HiveBg />
       <Header title={t("settings.visibility.title")} subtitle={t("settings.visibility.subtitle")} />
 
     </TView>

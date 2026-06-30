@@ -4,7 +4,6 @@ import { StyleSheet, Animated, Modal } from "react-native";
 import { useState } from "react";
 import { useTheme, getThemeInfo } from "@/shared/context/ThemeContext";
 import { useThemeColor } from "@/shared/hooks/useThemeColor";
-import HiveBg from "@/shared/components/common/HiveBg";
 import Header from "@/shared/components/common/Header";
 import { useLanguage } from "@/shared/context/LanguageContext";
 
@@ -135,7 +134,6 @@ export default function LanguageSettingsScreen() {
       </Modal>
 
       <TView style={styles.container}>
-        <HiveBg />
         <Header title={t('settings.theme.title')} subtitle={t('settings.theme.subtitle')} />
         <TouchableOpacity 
             key="device" 

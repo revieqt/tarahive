@@ -99,16 +99,17 @@ const styles = StyleSheet.create({
   },
   outlineText: {
     opacity: 0.7,
-    fontSize: 14,
+    fontSize: 13,
     textAlign: 'center',
-    fontFamily: 'Baloo',
+    fontFamily: 'Inter',
     letterSpacing: 1,
   },
   primaryText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 13,
     textAlign: 'center',
-    fontFamily: 'Baloo',
+    fontWeight: 800,
+    fontFamily: 'Inter',
     letterSpacing: 1,
   },
 });

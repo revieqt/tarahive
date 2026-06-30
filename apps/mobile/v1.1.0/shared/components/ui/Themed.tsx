@@ -98,7 +98,7 @@ export function TText({
       style={[
         { color },
         type === "default" && {fontFamily: "Inter",fontSize: 13,fontWeight: "500",},
-        type === "title" && {fontFamily: "Baloo",fontSize: 22,lineHeight: 34},
+        type === "title" && {fontFamily: "PoppinsBold",fontSize: 20,lineHeight: 34},
         type === "subtitle" && {fontFamily: "Inter",fontSize: 14,fontWeight: "600", letterSpacing: 3, textTransform: "uppercase"},
         style,
       ]}

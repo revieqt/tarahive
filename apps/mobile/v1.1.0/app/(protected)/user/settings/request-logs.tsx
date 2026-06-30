@@ -8,7 +8,6 @@ import DatePickerField from '@/shared/components/ui/DatePickerField';
 // import { useUser } from '@/hooks/useUser';
 import Button from '@/shared/components/ui/Button';
 import { router } from 'expo-router';
-import HiveBg from '@/shared/components/common/HiveBg';
 import Header from '@/shared/components/common/Header';
 import { useLanguage } from '@/shared/context/LanguageContext';
 
@@ -38,8 +37,6 @@ export default function RequestLogsScreen() {
 
   return (
     <TView style={styles.container}>
-      
-        <HiveBg/>
         <Header title={t("settings.logs.title")} subtitle={t("settings.logs.subtitle")} />  
 
         <DatePickerField

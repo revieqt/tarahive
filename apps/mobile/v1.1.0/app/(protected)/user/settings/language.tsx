@@ -5,7 +5,6 @@ import { LANGUAGES } from "@/shared/constants/Languages";
 import { useLanguage } from "@/shared/context/LanguageContext";
 import { useThemeColor } from "@/shared/hooks/useThemeColor";
 import { showError } from "@/shared/services/toast.service";
-import HiveBg from "@/shared/components/common/HiveBg";
 import Header from "@/shared/components/common/Header";
 
 export default function LanguageSettingsScreen() {
@@ -26,7 +25,6 @@ export default function LanguageSettingsScreen() {
 
   return (
     <TView style={styles.container}>
-      <HiveBg />
       <Header title={t("settings.language.title")} subtitle={t("settings.language.subtitle")} />
 
       <ScrollView style={styles.languageList}>

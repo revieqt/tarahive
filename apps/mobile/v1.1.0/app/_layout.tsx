@@ -19,12 +19,11 @@ SplashScreen.preventAutoHideAsync();
 
 export { ErrorBoundary } from 'expo-router';
 
-// Create a client for React Query
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
-      gcTime: 1000 * 60 * 10, // 10 minutes
+      gcTime: 1000 * 60 * 10,
     },
   },
 });
@@ -32,7 +31,7 @@ const queryClient = new QueryClient({
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     Inter: require('../shared/assets/fonts/Inter-VariableFont_opsz,wght.ttf'),
-    Baloo: require('../shared/assets/fonts/Baloo2-ExtraBold.ttf'),
+    PoppinsBold: require('../shared/assets/fonts/Poppins-Bold.ttf'),
   });
 
   useEffect(() => {
@@ -47,11 +46,9 @@ export default function RootLayout() {
 
   const [dialogState, setDialogState] = useState<DialogState>(INITIAL_STATE);
  
-  // Wire the service to this component's state setter once on mount
   useEffect(() => {
     DialogService._subscribe(setDialogState);
     DialogService._setDismissCallback(handleDismiss);
-    // No cleanup needed — the root layout lives for the app's lifetime
   }, []);
  
   const handleDismiss = useCallback(() => {

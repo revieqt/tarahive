@@ -58,7 +58,7 @@ export default function HomeScreen() {
               style={[styles.qrButton, styles.shadow,{backgroundColor: primaryColor}]}
               onPress={() => router.push('/camera')}
             >
-              <TIcon name='qrcode-scan' size={20} color={textColor}/>
+              <TIcon name='qrcode-scan' size={25} color={textColor}/>
             </TouchableOpacity>
           </View>
 
@@ -68,8 +68,8 @@ export default function HomeScreen() {
               style={[styles.gridChildContainer, styles.leftGridContainer, styles.shadow, {backgroundColor: primaryColor}]}
             >
               <View style={{padding: 12}}>
-                <TText style={{opacity: .7, fontSize: 10}}>Plan your Travels</TText>
-                <TText style={{fontSize: 16}}>Itinerary</TText>
+                <TText style={{opacity: .5, fontSize: 10}}>Plan your Travels</TText>
+                <TText style={{opacity: .85, fontSize: 16}}>Itinerary</TText>
               </View>
               
               <LinearGradient
@@ -87,8 +87,8 @@ export default function HomeScreen() {
                 onPress={() => router.push('/sos')}
                 style={[styles.rightGridContainer, styles.shadow, {backgroundColor: primaryColor}]}
               >
-                <TText style={{opacity: .7, fontSize: 10}}>Safety in mind</TText>
-                <TText>SOS</TText>
+                <TText style={{opacity: .5, fontSize: 10}}>Safety in mind</TText>
+                <TText style={{opacity: .85}}>SOS</TText>
                 <LinearGradient
                   colors={[accentColor+'60', 'transparent']}
                   start={{ x: 1, y: 0 }}
@@ -102,8 +102,8 @@ export default function HomeScreen() {
                 onPress={() => router.push('/tara')}
                 style={[styles.rightGridContainer, styles.shadow, {backgroundColor: primaryColor}]}
               >
-                <TText style={{opacity: .7, fontSize: 10}}>Your AI Travel Buddy</TText>
-                <TText>Tara</TText>
+                <TText style={{opacity: .5, fontSize: 10}}>Your AI Travel Buddy</TText>
+                <TText style={{opacity: .85}}>Tara</TText>
                 <LinearGradient
                   colors={[accentColor+'60', 'transparent']}
                   start={{ x: 1, y: 0 }}
