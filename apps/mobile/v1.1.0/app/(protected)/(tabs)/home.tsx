@@ -38,42 +38,42 @@ export default function HomeScreen() {
       <HomeHeaderCard />
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.menuContainer}>
-          <LinearGradient colors={['transparent', backgroundColor, backgroundColor]} style={styles.menuGradient}/>
+          <LinearGradient colors={['transparent', backgroundColor, backgroundColor]} style={styles.menuGradient} />
           <View style={styles.searchContainer}>
-            <View style={[styles.searchFieldContainer, styles.shadow, {backgroundColor: primaryColor}]}>
+            <View style={[styles.searchFieldContainer, styles.shadow, { backgroundColor: primaryColor }]}>
               <TextInput
                 value={searchAi}
                 onChangeText={setSearchAi}
                 autoCapitalize="words"
-                style={[styles.searchField, {color: textColor}]}
+                style={[styles.searchField, { color: textColor }]}
               />
 
               <TouchableOpacity>
-                <TIcon name='send' size={18} color={searchAi ? secondaryColor : '#ccc4'}/>
+                <TIcon name='send' size={18} color={searchAi ? secondaryColor : '#ccc4'} />
               </TouchableOpacity>
             </View>
-            
 
-            <TouchableOpacity 
-              style={[styles.qrButton, styles.shadow,{backgroundColor: primaryColor}]}
+
+            <TouchableOpacity
+              style={[styles.qrButton, styles.shadow, { backgroundColor: primaryColor }]}
               onPress={() => router.push('/camera')}
             >
-              <TIcon name='qrcode-scan' size={25} color={textColor}/>
+              <TIcon name='qrcode-scan' size={25} color={textColor + '90'} />
             </TouchableOpacity>
           </View>
 
           <View style={styles.gridContainer}>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => router.push('/itinerary')}
-              style={[styles.gridChildContainer, styles.leftGridContainer, styles.shadow, {backgroundColor: primaryColor}]}
+              style={[styles.gridChildContainer, styles.leftGridContainer, styles.shadow, { backgroundColor: primaryColor }]}
             >
-              <View style={{padding: 12}}>
-                <TText style={{opacity: .5, fontSize: 10}}>Plan your Travels</TText>
-                <TText style={{opacity: .85, fontSize: 16}}>Itinerary</TText>
+              <View style={{ padding: 12 }}>
+                <TText style={{ opacity: .5, fontSize: 10 }}>Plan your Travels</TText>
+                <TText style={{ opacity: .85, fontSize: 14 }}>Itinerary</TText>
               </View>
-              
+
               <LinearGradient
-                colors={[accentColor+'60', 'transparent']}
+                colors={[accentColor + '60', 'transparent']}
                 start={{ x: 1, y: 0 }}
                 end={{ x: 0, y: 0 }}
                 style={styles.gridCircle}
@@ -83,14 +83,14 @@ export default function HomeScreen() {
             </TouchableOpacity>
             <View
               style={[styles.gridChildContainer, styles.leftGridContainer]}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={() => router.push('/sos')}
-                style={[styles.rightGridContainer, styles.shadow, {backgroundColor: primaryColor}]}
+                style={[styles.rightGridContainer, styles.shadow, { backgroundColor: primaryColor }]}
               >
-                <TText style={{opacity: .5, fontSize: 10}}>Safety in mind</TText>
-                <TText style={{opacity: .85}}>SOS</TText>
+                <TText style={{ opacity: .5, fontSize: 10 }}>Safety in mind</TText>
+                <TText style={{ opacity: .85 }}>SOS</TText>
                 <LinearGradient
-                  colors={[accentColor+'60', 'transparent']}
+                  colors={[accentColor + '60', 'transparent']}
                   start={{ x: 1, y: 0 }}
                   end={{ x: 0, y: 0 }}
                   style={styles.rightGridCircle}
@@ -98,14 +98,14 @@ export default function HomeScreen() {
                 />
                 <Image source={require('@/shared/assets/images/slide4-img.png')} style={styles.rightGridImage} />
               </TouchableOpacity>
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={() => router.push('/tara')}
-                style={[styles.rightGridContainer, styles.shadow, {backgroundColor: primaryColor}]}
+                style={[styles.rightGridContainer, styles.shadow, { backgroundColor: primaryColor }]}
               >
-                <TText style={{opacity: .5, fontSize: 10}}>Your AI Travel Buddy</TText>
-                <TText style={{opacity: .85}}>Tara</TText>
+                <TText style={{ opacity: .5, fontSize: 10 }}>Your AI Travel Buddy</TText>
+                <TText style={{ opacity: .85 }}>Tara</TText>
                 <LinearGradient
-                  colors={[accentColor+'60', 'transparent']}
+                  colors={[accentColor + '60', 'transparent']}
                   start={{ x: 1, y: 0 }}
                   end={{ x: 0, y: 0 }}
                   style={styles.rightGridCircle}
@@ -131,11 +131,11 @@ const styles = StyleSheet.create({
     zIndex: 5,
     paddingTop: 185,
   },
-  menuContainer:{
+  menuContainer: {
     position: 'relative',
     zIndex: 100,
   },
-  searchContainer:{
+  searchContainer: {
     flexDirection: 'row',
     gap: 6,
     paddingHorizontal: '3%',
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     zIndex: 1000,
     opacity: .9,
   },
-  searchFieldContainer:{
+  searchFieldContainer: {
     flex: 1,
     height: 40,
     borderRadius: 10,
@@ -152,13 +152,13 @@ const styles = StyleSheet.create({
     paddingRight: 10,
     overflow: 'hidden'
   },
-  searchField:{
+  searchField: {
     fontFamily: 'Inter',
     fontSize: 11,
     paddingHorizontal: 12,
     flex: 1,
   },
-  qrButton:{
+  qrButton: {
     height: 40,
     aspectRatio: 1,
     borderRadius: 10,
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     zIndex: 100,
     pointerEvents: 'none',
   },
-  shadow:{
+  shadow: {
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2.22,
     elevation: 3,
   },
-  gridContainer:{
+  gridContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -194,18 +194,18 @@ const styles = StyleSheet.create({
     zIndex: 100,
     gap: '2%',
   },
-  gridChildContainer:{
+  gridChildContainer: {
     flex: 1,
     aspectRatio: 1,
     borderRadius: 12,
     gap: '5%',
   },
-  leftGridContainer:{
+  leftGridContainer: {
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#ccc0'
   },
-  rightGridContainer:{
+  rightGridContainer: {
     flex: 1,
     borderRadius: 12,
     overflow: 'hidden',
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc0',
     padding: 12,
   },
-  gridCircle:{
+  gridCircle: {
     height: '150%',
     aspectRatio: 1,
     borderRadius: 1000,
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     bottom: '-75%',
     right: '-50%',
   },
-  rightGridCircle:{
+  rightGridCircle: {
     height: '170%',
     aspectRatio: 1,
     borderRadius: 1000,
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     bottom: '-60%',
     right: '-20%',
   },
-  leftGridImage:{
+  leftGridImage: {
     width: '100%',
     height: '100%',
     position: 'absolute',
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     right: '-30%',
     opacity: .9,
   },
-  rightGridImage:{
+  rightGridImage: {
     width: '55%',
     height: '130%',
     position: 'absolute',

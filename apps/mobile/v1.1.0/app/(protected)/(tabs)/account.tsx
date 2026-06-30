@@ -13,6 +13,7 @@ import { useLanguage } from '@/shared/context/LanguageContext';
 import { useDev } from '@/shared/hooks/useDev';
 import NoInternetCard from '@/shared/components/cards/NoInternetCard';
 import HiveBg from '@/shared/components/common/HiveBg';
+import StickyScrollView from '@/shared/components/ui/StickyScrollView';
 
 const SettingsOption = ({ icon, label, onPress }: { icon: string; label: string; onPress: () => void }) => (
   <TouchableOpacity onPress={onPress} style={styles.optionsChild}>
@@ -20,7 +21,7 @@ const SettingsOption = ({ icon, label, onPress }: { icon: string; label: string;
       <TIcon name={icon} size={15} />
       <TText>{label}</TText>
     </View>
-    <TIcon name='chevron-right' size={15} style={{opacity: 0.8}}/>
+    <TIcon name='chevron-right' size={15} style={{ opacity: 0.8 }} />
   </TouchableOpacity>
 );
 
@@ -54,13 +55,17 @@ export default function AccountScreen() {
   };
 
   return (
-    <TView style={{flex: 1}}>
-      <ScrollView contentContainerStyle={{padding: '3%'}} showsVerticalScrollIndicator={true}>
+    <TView style={{ flex: 1 }}>
+      <StickyScrollView
+        contentContainerStyle={{ padding: '3%' }}
+        title={fullName}
+        subtitle={'@'+user?.username}
+      >
         <TView shadow color='primary' style={styles.header}>
           <View style={styles.headerHive}>
-            <HiveBg fade={false}/>
+            <HiveBg fade={false} />
           </View>
-          
+
           <TouchableOpacity
             style={styles.profileButton}
             onPress={() =>
@@ -71,27 +76,27 @@ export default function AccountScreen() {
             }
           >
             <View style={styles.profileImage}>
-              <ProfileImage imagePath={user?.profileImage}/>
+              <ProfileImage imagePath={user?.profileImage} />
             </View>
             <View style={{ justifyContent: 'center' }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                 <TText type='subtitle'>{fullName}</TText>
                 <ProBadge isProUser={true} />
               </View>
-              <TText style={{opacity: .5}}>@{user?.username}</TText>
+              <TText style={{ opacity: .5 }}>@{user?.username}</TText>
             </View>
             <View style={{ position: 'absolute', right: 0 }}>
               <TIcon name='chevron-right' size={25} />
             </View>
           </TouchableOpacity>
         </TView>
-        
-        { !isConnected && <NoInternetCard/> }
+
+        {!isConnected && <NoInternetCard />}
 
         <View style={styles.options}>
           <TText style={styles.optionsTitle}>{t('tabs.account.personalization_title')}</TText>
-          
-          { isConnected && 
+
+          {isConnected &&
             <SettingsOption icon='pen' label={t('tabs.account.edit_profile_button')}
               onPress={() => router.push('/user/settings/edit-profile')}
             />
@@ -101,11 +106,11 @@ export default function AccountScreen() {
             onPress={() => router.push('/user/settings/theme')}
           />
 
-          { isConnected && <>
+          {isConnected && <>
             <SettingsOption icon='translate' label={t('tabs.account.language_button')}
               onPress={() => router.push('/user/settings/language')}
             />
-          
+
             <TText style={styles.optionsTitle}>{t('tabs.account.privacy_title')}</TText>
 
             <SettingsOption icon='key' label={t('tabs.account.change_password_button')}
@@ -138,31 +143,31 @@ export default function AccountScreen() {
 
           </>}
 
-            <Pressable 
-              onLongPress={() => {
-                const timer = setTimeout(() => setDevMode(!devMode), 3000);
-                return () => clearTimeout(timer);
-              }}
-              style={({ pressed }) => [
-                styles.optionsChild,
-                pressed && { opacity: 0.6 }
-              ]}
-              delayLongPress={100}
-            >
-              <View style={styles.optionsLabel}>
-                <TIcon name='diversify' size={15} />
-                <TText>Tarahive v1.1.0 {devMode ? ' (Dev Mode)' : ''}</TText>
-              </View>
-              <TIcon name='chevron-right' size={15} style={{opacity: 0.8}}/>
-            </Pressable>
+          <Pressable
+            onLongPress={() => {
+              const timer = setTimeout(() => setDevMode(!devMode), 3000);
+              return () => clearTimeout(timer);
+            }}
+            style={({ pressed }) => [
+              styles.optionsChild,
+              pressed && { opacity: 0.6 }
+            ]}
+            delayLongPress={100}
+          >
+            <View style={styles.optionsLabel}>
+              <TIcon name='diversify' size={15} />
+              <TText>Tarahive v1.1.0 {devMode ? ' (Dev Mode)' : ''}</TText>
+            </View>
+            <TIcon name='chevron-right' size={15} style={{ opacity: 0.8 }} />
+          </Pressable>
 
-            {devMode && <>
-              <TText style={styles.optionsTitle}> {t('tabs.account.developer_title')} </TText>
-              <SettingsOption icon='layers-remove' label={t('tabs.account.cache_button')}
-                onPress={clearCache}
-              />
-            </>}
-          
+          {devMode && <>
+            <TText style={styles.optionsTitle}> {t('tabs.account.developer_title')} </TText>
+            <SettingsOption icon='layers-remove' label={t('tabs.account.cache_button')}
+              onPress={clearCache}
+            />
+          </>}
+
         </View>
 
         <Button
@@ -171,7 +176,7 @@ export default function AccountScreen() {
           type='primary'
           buttonStyle={styles.logoutButton}
         />
-      </ScrollView>
+      </StickyScrollView>
     </TView>
   );
 }
@@ -189,12 +194,12 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     overflow: 'hidden'
   },
-  headerHive:{
+  headerHive: {
     position: 'absolute',
     top: -80,
     bottom: 0,
     left: 0,
-    right:-50,
+    right: -50,
   },
   profileButton: {
     flexDirection: 'row',
