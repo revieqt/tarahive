@@ -1,0 +1,36 @@
+{
+  "common": {
+    "welcome": "Welcome to Tarahive",
+    "cancel": "Cancel",
+    "continue": "Continue"
+  },
+  "months": {
+    "january": "January",
+    "february": "February",
+    "march": "March",
+    "april": "April",
+    "may": "May",
+    "june": "June",
+    "july": "July",
+    "august": "August",
+    "september": "September",
+    "october": "October",
+    "november": "November",
+    "december": "December"
+  },
+  "genders": {
+    "male": "Male",
+    "female": "Female",
+    "non_binary": "Non-binary",
+    "prefer_not_to_say": "Prefer not to say",
+    "other": "Other"
+  },
+  "no_internet": {
+    "title": "No Internet Connection",
+    "description": "You are using Tarahive in offline mode. Some features may be limited until you reconnect to the internet."
+  },
+  "dev": {
+    "cache_clear_title": "Clear Cache",
+    "cache_clear_subtitle": "This will clear all cached data and log you out. Continue?"
+  }
+}
