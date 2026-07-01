@@ -1,0 +1,178 @@
+{
+  "id": "navigation",
+  "title": "Navigating the Interface",
+  "subtitle": "Learn about the main areas of the TaraHive interface and how to move around the application.",
+  "blocks": [
+    {
+      "type": "heading",
+      "text": "Application Layout"
+    },
+    {
+      "type": "paragraph",
+      "text": "TaraHive is designed with a clean and intuitive interface to help you quickly access the features you need. The exact layout may vary slightly depending on your device, but the core navigation remains consistent across supported platforms."
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/app-layout.png",
+      "caption": "Overview of the TaraHive interface"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Navigation Menu"
+    },
+    {
+      "type": "paragraph",
+      "text": "The navigation menu provides quick access to the primary sections of the application."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Dashboard – View an overview of your upcoming trips and activities.",
+        "Itineraries – Create, manage, and organize your travel plans.",
+        "Groups – Collaborate with family, friends, or travel companions.",
+        "Weather – View weather forecasts for your destinations.",
+        "AI Assistant – Receive personalized travel suggestions and recommendations.",
+        "Settings – Manage your account, preferences, and application settings."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/navigation-menu.png",
+      "caption": "Main navigation menu"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Dashboard"
+    },
+    {
+      "type": "paragraph",
+      "text": "The Dashboard serves as your home screen. It provides a summary of your travel information and quick access to commonly used features."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Upcoming itineraries.",
+        "Recent activity.",
+        "Weather summary.",
+        "AI travel suggestions.",
+        "Quick action shortcuts."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/dashboard.png",
+      "caption": "Dashboard overview"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Page Navigation"
+    },
+    {
+      "type": "paragraph",
+      "text": "Moving between pages is simple and consistent throughout the application."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Select an item from the navigation menu to open a different section.",
+        "Use the Back button to return to the previous page.",
+        "Tap buttons and cards to open detailed views.",
+        "Use breadcrumb navigation where available to return to higher-level pages."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/page-navigation.png",
+      "caption": "Navigating between pages"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Search and Quick Actions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Many pages include tools that help you find information and perform common tasks more efficiently."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Use the search bar to quickly locate itineraries, destinations, or groups.",
+        "Use filter options to narrow search results.",
+        "Use the Create button to add new itineraries or groups.",
+        "Access contextual actions through menus or action buttons."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/search-and-actions.png",
+      "caption": "Search and quick actions"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Profile and Settings"
+    },
+    {
+      "type": "paragraph",
+      "text": "Your profile menu allows you to manage your personal account and customize the application."
+    },
+    {
+      "type": "list",
+      "items": [
+        "View and edit your profile.",
+        "Manage account security.",
+        "Change appearance and preferences.",
+        "Configure notification settings.",
+        "Sign out of your account."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/profile-menu.png",
+      "caption": "Profile and settings menu"
+    },
+    {
+      "type": "note",
+      "text": "Some menu items may vary depending on your account permissions or the version of TaraHive you are using."
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Tips for Navigation"
+    },
+    {
+      "type": "paragraph",
+      "text": "The following tips can help you navigate the application more efficiently."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Use the Dashboard as your starting point for daily activities.",
+        "Keep your itineraries organized with meaningful names.",
+        "Use the search function when managing many trips.",
+        "Review notifications regularly for reminders and updates.",
+        "Explore each section to become familiar with the available features."
+      ]
+    },
+    {
+      "type": "note",
+      "text": "As TaraHive continues to evolve, the interface may receive updates that improve usability while keeping the overall navigation familiar."
+    }
+  ]
+}

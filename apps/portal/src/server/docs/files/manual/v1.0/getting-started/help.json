@@ -1,0 +1,153 @@
+{
+  "id": "help",
+  "title": "Getting Help",
+  "subtitle": "Learn how to find assistance and support while using TaraHive.",
+  "blocks": [
+    {
+      "type": "heading",
+      "text": "Help and Support"
+    },
+    {
+      "type": "paragraph",
+      "text": "If you need assistance while using TaraHive, several resources are available to help you learn about the application's features, resolve common issues, and contact the support team."
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/help-center.png",
+      "caption": "TaraHive Help Center"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Using This Manual"
+    },
+    {
+      "type": "paragraph",
+      "text": "This user manual provides step-by-step instructions for the application's features. You can browse sections from the table of contents or navigate between topics to learn more about a specific feature."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Browse the manual using the navigation menu.",
+        "Read the Getting Started guide if you are new to TaraHive.",
+        "Refer to feature-specific sections for detailed instructions.",
+        "Check the Troubleshooting section for solutions to common problems."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/user-manual.png",
+      "caption": "Browsing the user manual"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Frequently Asked Questions"
+    },
+    {
+      "type": "paragraph",
+      "text": "Many common questions can be answered by reviewing the Frequently Asked Questions (FAQ) section of the documentation."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Account and sign-in issues.",
+        "Installation and updates.",
+        "Managing itineraries.",
+        "Using AI travel suggestions.",
+        "Troubleshooting common errors."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/faq.png",
+      "caption": "Frequently Asked Questions"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Contact Support"
+    },
+    {
+      "type": "paragraph",
+      "text": "If you are unable to resolve an issue using the available documentation, you can contact the TaraHive support team for further assistance."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Describe the issue you are experiencing.",
+        "Include screenshots if applicable.",
+        "Provide the device and operating system you are using.",
+        "Mention the version of TaraHive installed on your device."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/contact-support.png",
+      "caption": "Contacting TaraHive support"
+    },
+    {
+      "type": "note",
+      "text": "Providing detailed information helps the support team diagnose and resolve your issue more quickly."
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Report a Bug"
+    },
+    {
+      "type": "paragraph",
+      "text": "If you discover unexpected behavior or encounter an application error, please report it so that it can be investigated and resolved in future updates."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Explain what happened.",
+        "Describe the steps to reproduce the issue.",
+        "Include screenshots or screen recordings when possible.",
+        "Specify the device, operating system, and TaraHive version."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/report-bug.png",
+      "caption": "Reporting a bug"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Keep TaraHive Updated"
+    },
+    {
+      "type": "paragraph",
+      "text": "Installing the latest version of TaraHive ensures that you receive new features, performance improvements, security updates, and bug fixes."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Check for application updates regularly.",
+        "Install updates when they become available.",
+        "Restart the application after updating if prompted."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/application-update.png",
+      "caption": "Keeping TaraHive up to date"
+    },
+    {
+      "type": "note",
+      "text": "Using the latest version of TaraHive provides the best experience and ensures compatibility with the newest features."
+    }
+  ]
+}

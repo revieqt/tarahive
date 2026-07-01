@@ -8,6 +8,7 @@ import HomeHeaderCard from '@/shared/components/cards/HomeHeaderCard';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/shared/context/LanguageContext';
 import { TARA_AI_SUGGESTIONS } from '@/shared/constants/Tara';
+import TaraSuggestionCard from '@/shared/components/cards/TaraSuggestionCard';
 
 export default function HomeScreen() {
   const isConnected = useInternetConnection();
@@ -116,6 +117,8 @@ export default function HomeScreen() {
             </View>
           </View>
         </View>
+
+        <TaraSuggestionCard/>
       </ScrollView>
     </TView>
   );

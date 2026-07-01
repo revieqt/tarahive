@@ -1,0 +1,130 @@
+{
+  "id": "first-launch",
+  "title": "First Launch",
+  "subtitle": "Complete the initial setup when opening TaraHive for the first time.",
+  "blocks": [
+    {
+      "type": "heading",
+      "text": "Welcome to TaraHive"
+    },
+    {
+      "type": "paragraph",
+      "text": "After installing TaraHive and signing in, the application will guide you through a short setup process to configure permissions and personalize your experience."
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/welcome-screen.png",
+      "caption": "TaraHive welcome screen"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Grant Required Permissions"
+    },
+    {
+      "type": "paragraph",
+      "text": "TaraHive may request permission to access certain features on your device. These permissions enable the application's core functionality."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Location – Used for maps, navigation, nearby places, and weather updates.",
+        "Notifications – Allows TaraHive to send reminders, itinerary alerts, and important updates.",
+        "Camera – Required when uploading profile pictures or trip photos.",
+        "Storage – Allows importing and exporting itinerary files and saving downloaded content."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/permission-request.png",
+      "caption": "Permission requests during setup"
+    },
+    {
+      "type": "note",
+      "text": "You can change these permissions later from your device's Settings menu."
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Choose Your Preferences"
+    },
+    {
+      "type": "paragraph",
+      "text": "During the initial setup, you may customize several application preferences to personalize your experience."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Select your preferred language.",
+        "Choose between Light Mode and Dark Mode.",
+        "Configure notification preferences.",
+        "Review the Privacy Policy and Terms of Service."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/preferences-setup.png",
+      "caption": "Initial application preferences"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Sync Your Account"
+    },
+    {
+      "type": "paragraph",
+      "text": "Once the setup is complete, TaraHive synchronizes your account information, preferences, and saved itineraries with the cloud so they are available across your devices."
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/account-sync.png",
+      "caption": "Synchronizing your account"
+    },
+    {
+      "type": "note",
+      "text": "The initial synchronization may take a few moments depending on your internet connection."
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Explore the Dashboard"
+    },
+    {
+      "type": "paragraph",
+      "text": "After synchronization is complete, you will be taken to the TaraHive dashboard. This is your starting point for creating itineraries, accessing upcoming trips, viewing AI recommendations, checking the weather, and managing your account."
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/dashboard-overview.png",
+      "caption": "TaraHive dashboard"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "You're Ready to Begin"
+    },
+    {
+      "type": "paragraph",
+      "text": "Your TaraHive setup is now complete. You can begin creating your first itinerary, invite other travelers, and explore the application's travel planning features."
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/get-started.png",
+      "caption": "Ready to start planning"
+    },
+    {
+      "type": "note",
+      "text": "If you skipped any optional setup steps, they can be configured later from the Settings page."
+    }
+  ]
+}
