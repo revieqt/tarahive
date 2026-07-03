@@ -104,3 +104,26 @@ export async function getWeather(
     };
   }
 }
+
+export async function getAIWeather(
+  prompt: string,
+  lang: string = 'en',
+) {
+  try {
+    const today = new Date();
+    return { success: true };
+  } catch (err) {
+    console.error('Weather service error:', err);
+    return {
+      success: false,
+      data: {
+        temperature: null,
+        windSpeed: null,
+        humidity: null,
+        precipitation: null,
+        weatherCode: null,
+        weatherType: null,
+      },
+    };
+  }
+}
