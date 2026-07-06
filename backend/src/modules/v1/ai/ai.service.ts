@@ -12,7 +12,7 @@ export async function getAIResponse({
   lang,
   level,
   systemPrompt = DEFAULT_SYSTEM_PROMPT,
-  temperature = 0.7,
+  temperature = 0.5,
   maxTokens,
 }: GetAIResponseProps): Promise<string> {
   if (!process.env.OPENROUTER_API_KEY) {

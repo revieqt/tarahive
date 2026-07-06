@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { getWeather } from './weather.service';
 
-export async function getWeatherController(req: Request, res: Response) {
+export async function getAIResponseController(req: Request, res: Response) {
   try {
     const { city, latitude, longitude, date } = req.query;
 

@@ -1,7 +1,8 @@
 import fetch from 'node-fetch';
 import { WeatherData, OpenMeteoDailyResponse } from './weather.types';
 import redis from '../../../config/redis';
-import { t } from '../localization/localization.service'; // 1. add import
+import { t } from '../localization/localization.service';
+import { getAIResponse } from '../ai/ai.service';
 
 const weatherCodeKeyMap: Record<number, string> = {  // 2. rename map + swap values to keys
   0:  'weather.conditions.clear_sky',
@@ -58,6 +59,7 @@ export async function getWeather(
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max,weathercode&hourly=relativehumidity_2m&timezone=auto`;
     const res = await fetch(url);
     const data = (await res.json()) as OpenMeteoDailyResponse;
+    
 
     const dayIndex = data.daily.time.findIndex((d) => d === targetDate);
     if (dayIndex === -1) throw new Error('Weather data for the given date not available');
@@ -73,6 +75,21 @@ export async function getWeather(
         ? humidityValues.reduce((a, b) => a + b, 0) / humidityValues.length
         : null;
 
+    // const aiSuggestion = await getAIResponse({
+    //   prompt: `
+    //     This is the weather data for ${city} on ${targetDate}:
+    //     - Temp: ${data.daily.temperature_2m_max[dayIndex]} °C
+    //     - Wind: ${data.daily.windspeed_10m_max[dayIndex]} m/s
+    //     - Rain: ${data.daily.precipitation_sum[dayIndex]} mm
+    //     - Humidity: ${averageHumidity} %.
+
+    //     Create a suggestion on what to do on that city based on this weather. 
+    //     Keep it short, concise, friendly, and relevant to the weather conditions.
+    //   `,
+    //   level: "LOW",
+    //   lang: lang,
+    // });
+
     const weather: WeatherData = {
       temperature: data.daily.temperature_2m_max[dayIndex] ?? null,
       windSpeed: data.daily.windspeed_10m_max[dayIndex] ?? null,
@@ -83,6 +100,8 @@ export async function getWeather(
         data.daily.weathercode[dayIndex] != null
           ? t(weatherCodeKeyMap[data.daily.weathercode[dayIndex]], lang) ?? null
           : null,
+        aiSuggestion: null,  // 4. add AI suggestion to the weather data
+      // aiSuggestion: aiSuggestion || null,  // 4. add AI suggestion to the weather data
     };
 
     await redis.setex(key, 60 * 60 * 6, JSON.stringify(weather));
@@ -100,29 +119,7 @@ export async function getWeather(
         precipitation: null,
         weatherCode: null,
         weatherType: null,
-      },
-    };
-  }
-}
-
-export async function getAIWeather(
-  prompt: string,
-  lang: string = 'en',
-) {
-  try {
-    const today = new Date();
-    return { success: true };
-  } catch (err) {
-    console.error('Weather service error:', err);
-    return {
-      success: false,
-      data: {
-        temperature: null,
-        windSpeed: null,
-        humidity: null,
-        precipitation: null,
-        weatherCode: null,
-        weatherType: null,
+        aiSuggestion: null,
       },
     };
   }

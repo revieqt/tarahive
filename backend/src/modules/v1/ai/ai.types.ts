@@ -13,7 +13,7 @@ export interface GetAIResponseProps {
 
   /**
    * AI creativity.
-   * Default: 0.7
+   * Default: 0.5
    */
   temperature?: number;
 
@@ -25,7 +25,7 @@ export interface GetAIResponseProps {
 }
 
 export const MODEL_MAP: Record<AILevel, string> = {
-  LOW: "google/gemma-3-4b-it:free",
+  LOW: "stepfun/step-3.5-flash:free",
   MEDIUM: "qwen/qwen3-30b-a3b:free",
   HIGH: "deepseek/deepseek-r1-0528:free",
 };
