@@ -97,7 +97,7 @@ export default function ProfileScreen() {
           <ProfileImage imagePath={displayUser?.profileImage} />
         </View>
         <View style={styles.row}>
-          <TText type='title' style={{fontSize: 16}}>{displayUser?.fname} {displayUser?.lname}</TText>
+          <TText type='title' style={{ fontSize: 16 }}>{displayUser?.fname} {displayUser?.lname}</TText>
           <ProBadge isProUser size={15} />
         </View>
 
@@ -113,9 +113,16 @@ export default function ProfileScreen() {
               style={styles.userInfoButton}>
               <TText>Edit Profile</TText>
             </TouchableOpacity>
-            <ShareButton path={`user/${displayUser?.username}`} style={styles.userInfoButton}>
+
+            <TouchableOpacity
+              onPress={() => router.push({
+                pathname: '/share',
+                params: { path: `user/${displayUser?.username}` },
+              } as any)}
+              style={styles.userInfoButton}>
               <TText>Share Profile</TText>
-            </ShareButton>
+            </TouchableOpacity>
+
           </View>
         }
 

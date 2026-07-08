@@ -13,14 +13,12 @@ import { TText } from '@/shared/components/ui/Themed';
 
 const ActiveRouteSidebarButton: React.FC = () => {
     const primaryColor = useThemeColor({}, 'primary');
+    const accentColor = useThemeColor({}, 'accent');
     const floatAnimation = useRef(new Animated.Value(0)).current;
     const fadeAnimation = useRef(new Animated.Value(0)).current;
     const slideAnimation = useRef(new Animated.Value(24)).current;
     const [isVisible, setIsVisible] = useState(true);
-    const [displayedText, setDisplayedText] = useState('');
-    const [isTypingComplete, setIsTypingComplete] = useState(false);
     const { session } = useSession();
-    const fullMessage = `Hello ${session?.user?.fname ?? 'there'}! I've got some suggestions for you. Click me!`;
 
     useEffect(() => {
         const startFloatingAnimation = () => {
@@ -42,17 +40,6 @@ const ActiveRouteSidebarButton: React.FC = () => {
 
         startFloatingAnimation();
 
-        let currentIndex = 0;
-        const typingInterval = setInterval(() => {
-            setDisplayedText(fullMessage.slice(0, currentIndex + 1));
-            currentIndex += 1;
-
-            if (currentIndex >= fullMessage.length) {
-                setIsTypingComplete(true);
-                clearInterval(typingInterval);
-            }
-        }, 45);
-
         Animated.sequence([
             Animated.parallel([
                 Animated.timing(fadeAnimation, {
@@ -66,7 +53,7 @@ const ActiveRouteSidebarButton: React.FC = () => {
                     useNativeDriver: true,
                 }),
             ]),
-            Animated.delay(5000),
+            Animated.delay(7000),
             Animated.parallel([
                 Animated.timing(fadeAnimation, {
                     toValue: 0,
@@ -84,11 +71,7 @@ const ActiveRouteSidebarButton: React.FC = () => {
                 setIsVisible(false);
             }
         });
-
-        return () => {
-            clearInterval(typingInterval);
-        };
-    }, [fadeAnimation, floatAnimation, fullMessage]);
+    }, [fadeAnimation, floatAnimation]);
 
     return (
         <View style={styles.container}>
@@ -118,8 +101,7 @@ const ActiveRouteSidebarButton: React.FC = () => {
                     ]}
                 >
                     <TText style={styles.messageText}>
-                        {displayedText}
-                        {!isTypingComplete ? '|' : ''}
+                        Hello {session?.user?.fname}! I've got some suggestions for you. Click me!
                     </TText>
                 </Animated.View>
             ) : null}
@@ -132,6 +114,7 @@ const ActiveRouteSidebarButton: React.FC = () => {
                     style={[
                         styles.taraImage,
                         {
+                            backgroundColor: accentColor,
                             transform: [
                                 {
                                     translateY: floatAnimation.interpolate({
@@ -166,7 +149,7 @@ const styles = StyleSheet.create({
     messageOverlay: {
         position: 'absolute',
         top: 0,
-        left: Dimensions.get('window').width * -0.8, // 5% from the left
+        left: Dimensions.get('window').width * -0.8,
         right: 10,
         height: 60,
         zIndex: 10,
@@ -196,11 +179,10 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 5,
+        borderWidth: 1,
         marginBottom: 4,
         overflow: 'hidden',
         borderColor: 'white',
-        backgroundColor: 'orange',
         zIndex: 10,
         shadowColor: "rgba(120,120,120,0.6)",
         shadowOffset: { width: 0, height: 0 },

@@ -1,308 +1,328 @@
-import React, { useState, useRef } from "react";
-import { View, StyleSheet, Modal, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Dimensions } from "react-native";
-import TextField from '@/shared/components/ui/TextField';
-import { TText, TIcon, TView } from '@/shared/components/ui/Themed';
-import Button from '@/shared/components/ui/Button';
-import SOSButton from "@/shared/components/common/SOSButton";
-import { LinearGradient } from "expo-linear-gradient";
-import { useThemeColor } from "@/shared/hooks/useThemeColor";
-import { useSession } from "@/features/auth/context/SessionContext";
-import BackButton from "@/shared/components/common/BackButton";
-import { SafeAreaView } from "react-native-safe-area-context";
-import HiveBg from "@/shared/components/common/HiveBg";
+import React, { useState, useRef, useEffect } from 'react';
+import { View, ScrollView, KeyboardAvoidingView, Platform, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
+import * as Speech from 'expo-speech';
+import { ChatArea, ChatHeader, ChatField, ChatBubble } from '@/shared/components/ui/Chat';
+import { useAiChat } from '@/features/tara/hooks/useAiChat';
+import { useSession } from '@/features/auth/context/SessionContext';
+import { TText, TView, TIcon } from '@/shared/components/ui/Themed';
+import { Markdown } from '@/shared/components/ui/Markdown';
+import BackButton from '@/shared/components/common/BackButton';
+import { AutoScrollView } from '@/shared/components/ui/AutoScrollView';
+import { TARA_AI_SUGGESTIONS } from '@/shared/constants/Tara';
+import { formatDateToString } from '@/shared/utils/formatDateToString';
 
-const emergencyTypes = [
-  { id: 'medical', label: 'Medical Emergency', icon: 'medical-bag' },
-  { id: 'criminal', label: 'Criminal Activity', icon: 'shield-alert' },
-  { id: 'fire', label: 'Fire Emergency', icon: 'fire' },
-  { id: 'natural', label: 'Natural Disasters', icon: 'weather-hurricane' },
-  { id: 'utility', label: 'Utility Emergency', icon: 'flash-off' },
-  { id: 'road', label: 'Road Emergency', icon: 'car' },
-  { id: 'domestic', label: 'Domestic and Personal Safety', icon: 'home-alert' },
-  { id: 'animal', label: 'Animal-Related Emergency', icon: 'paw' },
-  { id: 'other', label: 'Other', icon: 'help-circle' },
-];
+export default function AiChatScreen() {
+  const router = useRouter();
+  const [inputText, setInputText] = useState('');
+  const [isTtsEnabled, setIsTtsEnabled] = useState(false);
+  const [dotCount, setDotCount] = useState(1);
+  const [todayMessageCount, setTodayMessageCount] = useState(0);
+  const [rateLimitError, setRateLimitError] = useState<string | null>(null);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const { messages, isSending, handleSendMessage, clearChat } = useAiChat();
+  const { session } = useSession();
+  const maxMessages = parseInt(process.env.EXPO_PUBLIC_MAX_FREE_AI_MESSAGES_PER_DAY || '5', 5);
 
-export default function SOSSection() {
-  const gradientColor = useThemeColor({}, 'primary');
-  const secondaryColor = useThemeColor({}, 'secondary');
-  const accentColor = useThemeColor({}, 'accent');
-  const { session, updateSession } = useSession();
-  // const { handleEnableSOS, handleDisableSOS, isLoading } = useSafety();
-  // const deviceInfo = useDeviceInfo();
+  useEffect(() => {
+    scrollViewRef.current?.scrollToEnd({ animated: true });
+  }, [messages]);
 
-  const [isSOSActive, setIsSOSActive] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedEmergencyType, setSelectedEmergencyType] = useState<string>('');
-  const [message, setMessage] = useState('');
-  const [emergencyContactModalVisible, setEmergencyContactModalVisible] = useState(false);
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertTitle, setAlertTitle] = useState('');
-  const [showSOSInHome, setShowSOSInHome] = useState(false);
-  const [isLoadingContact, setIsLoadingContact] = useState(false);
+  useEffect(() => {
+    const loadMessageCount = async () => {
+      try {
+        const today = new Date().toDateString();
+        const lastDateKey = 'last_message_count_date';
+        const countKey = 'message_count_today';
+        const lastDate = await AsyncStorage.getItem(lastDateKey);
 
-  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [isLongPressing, setIsLongPressing] = useState(false);
+        if (lastDate && lastDate !== today) {
+          await AsyncStorage.removeItem(countKey);
+          await AsyncStorage.setItem(lastDateKey, today);
+          setTodayMessageCount(0);
+          return;
+        }
 
-  const gradientColors = isSOSActive
-    ? (['#D53E0F', secondaryColor] as const)
-    : ([accentColor, secondaryColor] as const);
+        const count = await AsyncStorage.getItem(countKey);
+        setTodayMessageCount(count ? parseInt(count, 10) : 0);
 
-  const handleLongPressStart = () => {
-    setIsLongPressing(true);
-    longPressTimer.current = setTimeout(() => {
-      if (isSOSActive) {
-        // Disable safety mode
-        // handleDisableSafetyMode();
-      } else {
-        // Show modal to enable safety mode
-        setModalVisible(true);
+        if (!lastDate) {
+          await AsyncStorage.setItem(lastDateKey, today);
+        }
+      } catch (error) {
+        console.error('Failed to load message count:', error);
       }
-      setIsLongPressing(false);
-    }, 2000); // 2 seconds
-  };
+    };
+    loadMessageCount();
+  }, []);
 
-  const handleLongPressEnd = () => {
-    setIsLongPressing(false);
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
+  useEffect(() => {
+    if (!isSending) return;
+
+    const interval = setInterval(() => {
+      setDotCount(prev => (prev % 3) + 1);
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, [isSending]);
+
+  useEffect(() => {
+    const lastMessage = messages[messages.length - 1];
+    if (
+      lastMessage &&
+      !lastMessage.isUser &&
+      isTtsEnabled &&
+      !isSending
+    ) {
+      Speech.speak(lastMessage.text, {
+        language: 'en',
+        rate: 1,
+      });
+    }
+  }, [messages, isTtsEnabled, isSending]);
+
+  useEffect(() => {
+    const isProUser = session?.user?.isProUser;
+
+    if (!isProUser && todayMessageCount >= maxMessages) {
+      setRateLimitError(`You've reached your daily limit of ${maxMessages} messages. Upgrade to Pro for unlimited access.`);
+    } else {
+      setRateLimitError(null);
+    }
+  }, [session?.user?.isProUser, todayMessageCount]);
+
+  const handleSend = () => {
+    if (inputText.trim()) {
+      const isProUser = session?.user?.isProUser;
+
+      if (!isProUser && todayMessageCount >= maxMessages) {
+        return;
+      }
+
+      handleSendMessage(inputText);
+      setInputText('');
+
+      if (!isProUser) {
+        const newCount = todayMessageCount + 1;
+        setTodayMessageCount(newCount);
+        AsyncStorage.setItem('message_count_today', newCount.toString()).catch(error => {
+          console.error('Failed to save message count:', error);
+        });
+      }
     }
   };
 
+  const handleSuggestionPress = (suggestion: string) => {
+    setInputText(suggestion);
+  };
 
+  const hasUserMessages = messages.some(msg => msg.isUser);
+
+  const handleClearChat = async () => {
+    Speech.stop();
+    await clearChat();
+  };
+
+  const headerOptions: React.ReactNode[] = [
+    <TouchableOpacity
+      key="clear-chat"
+      style={{ flexDirection: 'row', alignItems: 'center' }}
+      onPress={handleClearChat}
+    >
+      <TIcon name="trash-can" size={18} />
+      <TText style={{ marginLeft: 10 }}>Clear Chat</TText>
+    </TouchableOpacity>,
+    <TouchableOpacity
+      key="toggle-tts"
+      style={{ flexDirection: 'row', alignItems: 'center' }}
+      onPress={() => setIsTtsEnabled(!isTtsEnabled)}
+    >
+      <TIcon
+        name={isTtsEnabled ? 'volume-high' : 'volume-off'}
+        size={18}
+      />
+      <TText style={{ marginLeft: 10 }}>
+        {isTtsEnabled ? 'Disable Speech' : 'Enable Speech'}
+      </TText>
+    </TouchableOpacity>,
+  ];
 
   return (
-    <>
-      <BackButton type='floating' color='#fff' />
-      <LinearGradient colors={gradientColors} style={styles.background}>
-        <HiveBg flipHorizontal />
-        <HiveBg />
-      </LinearGradient>
+    <TView style={{ height: '100%', width: '100%' }}>
 
-      <View style={styles.container}>
-        <View style={styles.titleContainer}>
-          {isSOSActive ? (
-            <>
-              <TText type='title' style={{ color: '#fff' }}>SOS in Progress!</TText>
-              <TText type='subtitle' style={{ color: '#fff' }}>SOS: On</TText>
-            </>
-          ) : (
-            <>
-              <TText type='title' style={{ color: '#fff' }}>All Clear!</TText>
-              <TText type='subtitle' style={{ color: '#fff' }}>SOS: Off</TText>
-            </>
-          )}
-        </View>
+      {!hasUserMessages ? (
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1, justifyContent: 'space-between' }}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+        >
+          <BackButton type='floating' />
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Image
+              source={require('@/shared/assets/images/icon.png')}
+              style={{ width: 60, height: 60, marginBottom: 10 }}
+            />
+            <TText type='title'>
+              Hello, I'm Tara!
+            </TText>
+            <TText style={{ textAlign: 'center', opacity: 0.7, marginTop: 10, paddingHorizontal: 16 }}>
+              Your personal travel assistant! What would you like to explore today?
+            </TText>
 
-        <SOSButton
-          state={isSOSActive ? 'active' : 'notActive'}
-          onPressIn={handleLongPressStart}
-          onPressOut={handleLongPressEnd}
-          disabled={false}
-        />
+            <AutoScrollView horizontal speed={10000} style={styles.suggestionContainer}>
+              {TARA_AI_SUGGESTIONS.map((suggestion, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.suggestionButton}
+                  onPress={() => handleSuggestionPress(suggestion)}
+                >
+                  <TText style={styles.suggestionText}>{suggestion}</TText>
+                </TouchableOpacity>
+              ))}
+            </AutoScrollView>
+          </View>
 
-        <View style={styles.titleContainer}>
-          <TText type='subtitle'>☝️</TText>
-          {isLongPressing ? (
-            <TText style={{ color: '#fff' }}>Hold for {isSOSActive ? 'deactivation' : 'activation'}...</TText>
-          ) : isSOSActive ? (
-            <TText style={{ color: '#fff' }}>Long-press to End SOS</TText>
-          ) : (
-            <TText style={{ color: '#fff' }}>Long-press to Activate SOS</TText>
-          )}
-        </View>
-      </View>
-
-      <TView style={styles.messageContainer}>
-        <TIcon name='information' size={20} />
-        <View style={{ gap: 5, flex: 1 }}>
-          <TText type="subtitle">What is SOS?</TText>
-          <TText>
-            SOS Type Here
-          </TText>
-          <TouchableOpacity style={[styles.openSettings,{backgroundColor: accentColor}]}>
-            <TText style={{ color: '#fff' }}>Open Settings</TText>
-          </TouchableOpacity>
-        </View>
-      </TView>
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <SafeAreaView style={{ flex: 1 }}>
-          <TouchableOpacity
-            style={styles.modalOverlay}
-            onPress={() => setModalVisible(false)}
-            activeOpacity={1}
+          <ChatField
+            value={inputText}
+            onChangeText={setInputText}
+            onSend={handleSend}
+            placeholder="Ask Tara something..."
+            maxHeight={120}
           >
-            <KeyboardAvoidingView
-              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-              style={styles.keyboardAvoidingView}
+            {rateLimitError && (
+              <TText style={{ color: '#ef4444', padding: 8, textAlign: 'center', marginBottom: 8 }}>
+                {rateLimitError}
+              </TText>
+            )}
+          </ChatField>
+        </KeyboardAvoidingView>
+      ) : (
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1 }}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+        >
+          <ChatHeader
+            title="Tara"
+            description="Your travel assistant"
+            hasBackButton
+            onBackPress={() => router.back()}
+            optionsValue={headerOptions}
+          />
+
+          <ChatArea>
+            <ScrollView
+              ref={scrollViewRef}
+              contentContainerStyle={{ paddingVertical: 10, flexGrow: 1, paddingRight: 7, paddingLeft: 16 }}
+              scrollEventThrottle={16}
+              showsVerticalScrollIndicator={false}
             >
-              <TouchableOpacity
-                style={styles.modalContent}
-                onPress={(e) => e.stopPropagation()}
-                activeOpacity={1}
-              >
-                <TView color='primary' style={styles.modalContentInner}>
-                  <TIcon
-                    name='alert-octagon'
-                    size={50}
-                    color={accentColor}
-                    style={{ alignSelf: 'center' }}
-                  />
-                  <TText type="subtitle" style={{ textAlign: 'center', marginVertical: 10 }}>Select Emergency Type</TText>
+              {messages.map((msg, index) => {
+                const dateString = msg.timestamp.toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit'
+                });
+                const isLastMessage = index === messages.length - 1;
 
-                  <ScrollView
-                    horizontal
-                    contentContainerStyle={{ gap: 7 }}
-                    style={{ maxHeight: 95 }}
-                    showsHorizontalScrollIndicator={false}>
-                    {emergencyTypes.map((type) => (
-                      <TouchableOpacity
-                        key={type.id}
-                        style={[
-                          styles.emergencyTypeButton,
-                          selectedEmergencyType === type.id && { backgroundColor: accentColor + '50' }
-                        ]}
-                        onPress={() => setSelectedEmergencyType(type.id)}
-                      >
-                        <TIcon
-                          name={type.icon}
-                          size={30}
-                        />
-                        <TText style={[{ textAlign: 'center', fontSize: 10 }]}>
-                          {type.label}
-                        </TText>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
+                if (!msg.isUser) {
+                  return (
+                    <View key={msg.id} style={{ paddingVertical: 30, alignItems: 'flex-start', maxWidth: '95%', marginBottom: isLastMessage ? 60 : 0, gap: 8 }}>
+                      <View style={{ flex: 1 }}>
+                        <Markdown>
+                          {msg.text}
+                        </Markdown>
+                      </View>
+                      {msg.itineraryData && msg.type === 'itinerary' && (
+                        <TouchableOpacity
+                          style={styles.viewItineraryButton}
+                          onPress={() => {
+                            router.push({
+                              pathname: '/ai/ai-itinerary',
+                              params: { itineraryData: JSON.stringify(msg.itineraryData) }
+                            });
+                          }}
+                        >
+                          <View style={{ flex: 1 }}>
+                            <TText type='subtitle'>{msg.itineraryData?.title || 'View Itinerary'}</TText>
+                            <TText style={{ opacity: 0.5 }}>
+                              {msg.itineraryData?.startDate && msg.itineraryData?.endDate
+                                ? `${formatDateToString(msg.itineraryData.startDate)} - ${formatDateToString(msg.itineraryData.endDate)}`
+                                : ''}
+                            </TText>
+                          </View>
+                          <TIcon name="chevron-right" size={20} color='#ccc7' style={{ marginLeft: 10 }} />
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  );
+                }
 
-                  <TextField
-                    placeholder="Describe your emergency situation... (Optional)"
-                    value={message}
-                    onChangeText={setMessage}
-                    multiline={true}
-                    numberOfLines={3}
-                    style={styles.messageInput}
-                  />
+                return (
+                  <View key={msg.id} style={isLastMessage ? { marginBottom: 100 } : undefined}>
+                    <ChatBubble
+                      message={msg.text}
+                      isCurrentUser={msg.isUser}
+                      name={msg.isUser ? 'You' : 'Tara'}
+                      date={dateString}
+                      profileImage={undefined}
+                    />
+                  </View>
+                );
+              })}
+              {isSending && (
+                <View style={{ paddingVertical: 30, padding: 10, opacity: 0.7 }}>
+                  <TText>Thinking{'.'.repeat(dotCount)}</TText>
+                </View>
+              )}
+            </ScrollView>
+          </ChatArea>
 
-                  <Button
-                    title={'Activate SOS'}
-                    onPress={() => { }}
-                    disabled={false}
-                    type="primary"
-                    buttonStyle={{ marginTop: 10 }}
-                  />
-                </TView>
-              </TouchableOpacity>
-            </KeyboardAvoidingView>
-          </TouchableOpacity>
-        </SafeAreaView>
-      </Modal>
-    </>
-
+          <ChatField
+            value={inputText}
+            onChangeText={setInputText}
+            onSend={handleSend}
+            placeholder="Ask Tara something..."
+            maxHeight={120}
+          >
+            {rateLimitError && (
+              <TText style={{ color: '#ef4444', padding: 8, textAlign: 'center', marginBottom: 8 }}>
+                {rateLimitError}
+              </TText>
+            )}
+          </ChatField>
+        </KeyboardAvoidingView>
+      )}
+    </TView>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+  suggestionContainer: {
+    maxHeight: 100
   },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
+  suggestionButton: {
+    backgroundColor: '#00CAFF',
+    borderRadius: 50,
+    paddingVertical: 7,
+    paddingHorizontal: 14,
+    opacity: 0.8,
+  },
+  suggestionText: {
+    color: '#fff',
+    textAlign: 'center',
+    fontSize: 13,
+  },
+  viewItineraryButton: {
     alignItems: 'center',
-    gap: 40,
-  },
-  messageContainer: {
-    padding: 16,
-    marginHorizontal: '3%',
-    borderRadius: 12,
-    marginBottom: 20,
-    flexDirection: 'row',
-    gap: 10,
-    alignItems: 'center',
-  },
-  openSettings: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#007AFF20',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  titleContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 3,
-  },
-  modalOverlay: {
-    flex: 1,
-  },
-  keyboardAvoidingView: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  modalContentInner: {
-    borderRadius: 15,
-    padding: 16,
-    margin: '3%',
-  },
-  emergencyTypesList: {
-    maxHeight: 300,
-    marginVertical: 20,
-  },
-  emergencyTypeButton: {
-    alignItems: 'center',
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 8,
+    width: '100%',
     borderWidth: 1,
-    borderColor: '#ccc4',
-    gap: 10,
-    width: 100,
-    height: 90,
-  },
-  messageSection: {
-    marginBottom: 20,
-    gap: 10,
-  },
-  messageInput: {
-    minHeight: 80,
-    marginTop: 7,
-  },
-  manual: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 8,
-  },
-  emergencyContact: {
+    borderColor: '#ccc7',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    flexDirection: 'row',
+    borderRadius: 8,
+    marginVertical: 10,
     padding: 10,
-    borderRadius: 12,
-  },
-  emergencyContactEdit: {
-    position: 'absolute',
-    top: 10,
-    right: 15,
-    bottom: 10,
     justifyContent: 'center',
-    alignItems: 'center',
   },
 });

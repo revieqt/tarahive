@@ -14,7 +14,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Dialog } from '@/shared/services/dialog.service';
 import { LinearGradient } from 'expo-linear-gradient';
 import { formatDateToString } from '@/shared/utils/formatDateToString';
-import ShareModal from '@/shared/components/modals/ShareModal';
 import LocationDisplay from '@/shared/components/common/LocationDisplay';
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import { Address } from '@/features/itinerary/types/itineraryTypes';
@@ -69,7 +68,7 @@ function parseContent(content: string): ParsedBlock[] {
           locationName: payload.locationName,
           address: payload.address ?? {},
         });
-      } catch {}
+      } catch { }
       remaining = remaining.slice(lMatch[0].length).replace(/^\n/, '');
       continue;
     }
@@ -262,7 +261,7 @@ export default function ItineraryViewScreen() {
               options={[
                 { label: 'Delete Itinerary', iconName: 'delete', onPress: handleDeleteItinerary },
                 ...(itinerary?.status === 'active'
-                  ? [{ label: 'Share Itinerary', iconName: 'share-variant', onPress: () => setShowShare(true) }]
+                  ? [{ label: 'Share Itinerary', iconName: 'share-variant', onPress: () => router.push({ pathname: '/share', params: { path: `itinerary/${itinerary.id}` } }) }]
                   : []),
               ]}
               style={styles.options}
