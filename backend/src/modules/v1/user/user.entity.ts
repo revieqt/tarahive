@@ -93,6 +93,10 @@ export class User {
     default: {
       isInAnEmergency: false,
       emergencyContact: {},
+      delivery: {
+        isEmailEnabled: false,
+        isSMSEnabled: false,
+      },
     },
   })
   safetyState!: {
@@ -102,6 +106,10 @@ export class User {
     emergencyContact?:{
       email?: string;
       phone?: string;
+    };
+    delivery?: {
+      isEmailEnabled: boolean;
+      isSMSEnabled: boolean;
     };
     lastKnownLocation?: {
       locationName: string;

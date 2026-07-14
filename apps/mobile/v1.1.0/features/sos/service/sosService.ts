@@ -1,6 +1,7 @@
-import { BACKEND_URL } from '@/constants/Config';
-import { DeviceInfo } from '@/hooks/useDeviceInfo';
+import { BACKEND_URL } from '@/Config';
+import { DeviceInfo } from '@/shared/hooks/useDeviceInfo';
 import { api } from '@/shared/api/client';
+import { User } from '@/features/auth/context/SessionContext';
 
 const API_URL = `${BACKEND_URL}/v1/sos`;
 
@@ -15,6 +16,17 @@ export interface EnableSOSRequest {
 export interface SafetyResponse {
   success: boolean;
   message: string;
+}
+
+export interface UpdateSafetySettingsPayload {
+  delivery: {
+    isEmailEnabled: boolean;
+    isSMSEnabled: boolean;
+  };
+  emergencyContact?: {
+    email?: string;
+    phone?: string;
+  };
 }
 
 /**
@@ -61,4 +73,32 @@ export const disableSOS = async (
   };
 
   return await api.post<SafetyResponse>(`${API_URL}/disable-sos`, payload);
+};
+
+
+export const updateUserSafetySettings = async (
+  payload: UpdateSafetySettingsPayload
+): Promise<{ success: boolean; data: User; message: string }> => {
+  try {
+    const response = await api.post<{ success: boolean; data: User; message: string }>(
+      '/v1/user/update-settings',
+      {
+        safetySettings: {
+          delivery: payload.delivery,
+          emergencyContact: payload.emergencyContact,
+        },
+      }
+    );
+
+    if (!response.success || !response.data) {
+      throw new Error(response.message || 'Failed to update safety settings');
+    }
+
+    return response;
+  } catch (error: any) {
+    if (error.status === 401) {
+      throw new Error('Unauthorized');
+    }
+    throw new Error(error.message || 'Failed to update safety settings');
+  }
 };

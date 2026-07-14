@@ -1,11 +1,47 @@
 import { Request, Response } from "express";
-import { getUserById, getUserByIdOrUsername } from "./user.service";
+import { getUserById, getUserByIdOrUsername, updateUserSettings } from "./user.service";
 
 interface AuthRequest extends Request {
   user?:{
     sub: string;
   };
 }
+
+export const updateUserSettingsController = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    if (!req.user || !req.user.sub) {
+      res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+      return;
+    }
+
+    const delivery = req.body?.safetySettings?.delivery ?? req.body?.delivery;
+    const emergencyContact = req.body?.safetySettings?.emergencyContact ?? req.body?.emergencyContact;
+
+    if (!delivery || typeof delivery !== "object") {
+      res.status(400).json({
+        success: false,
+        message: "Delivery settings are required",
+      });
+      return;
+    }
+
+    const user = await updateUserSettings(req.user.sub, delivery, emergencyContact);
+
+    res.status(200).json({
+      success: true,
+      message: "Safety settings updated successfully",
+      data: user,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to update safety settings",
+    });
+  }
+};
 
 /**
  * GET /user/me

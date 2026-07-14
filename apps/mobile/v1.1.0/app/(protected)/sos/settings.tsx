@@ -1,28 +1,41 @@
-import React, { useState } from "react";
-import { StyleSheet, ScrollView, TouchableOpacity, View } from "react-native";
-import { TIcon, TText, TView } from "@/shared/components/ui/Themed";
+import React, { useEffect, useState } from "react";
+import { StyleSheet } from "react-native";
+import { TView } from "@/shared/components/ui/Themed";
 import { useLanguage } from "@/shared/context/LanguageContext";
-import { useThemeColor } from "@/shared/hooks/useThemeColor";
 import Header from "@/shared/components/common/Header";
 import TextField from "@/shared/components/ui/TextField";
 import Button from "@/shared/components/ui/Button";
 import ContactNumberField from "@/shared/components/ui/ContactNumberField";
 import Switch from "@/shared/components/ui/Switch";
-import HiveBg from "@/shared/components/common/HiveBg";
 import { useSession } from "@/features/auth/context/SessionContext";
+import { useUpdateSafetySettings } from "@/features/sos/hooks/useSafetySettings";
 import { router } from "expo-router";
 
 export default function SOSSettingsScreen() {
     const { t } = useLanguage();
-    const primaryColor = useThemeColor({}, "primary");
-    const accentColor = useThemeColor({}, "accent");
-    const [selectedEmergencyType, setSelectedEmergencyType] = useState<string | null>(null);
     const [message, setMessage] = useState<string>('');
     const [areaCode, setAreaCode] = useState('+63');
     const [contactNumber, setContactNumber] = useState('');
     const [isEmailEnabled, setIsEmailEnabled] = useState(false);
     const [isSmsEnabled, setIsSmsEnabled] = useState(false);
-    const { session, updateSession } = useSession();
+    const { session } = useSession();
+    const { updateSafetySettings, isPending } = useUpdateSafetySettings();
+
+    useEffect(() => {
+        const delivery = session?.user?.safetyState?.delivery;
+        if (delivery) {
+            setIsEmailEnabled(Boolean(delivery.isEmailEnabled));
+            setIsSmsEnabled(Boolean(delivery.isSMSEnabled));
+        }
+
+        const emergencyContact = session?.user?.safetyState?.emergencyContact;
+        if (emergencyContact?.email) {
+            setMessage(emergencyContact.email);
+        }
+        if (emergencyContact?.phone) {
+            setContactNumber(emergencyContact.phone);
+        }
+    }, [session?.user?.safetyState?.delivery?.isEmailEnabled, session?.user?.safetyState?.delivery?.isSMSEnabled, session?.user?.safetyState?.emergencyContact?.email, session?.user?.safetyState?.emergencyContact?.phone]);
 
     const handleEnableSMS = () => {
         if (session?.user?.isProUser) {
@@ -32,6 +45,24 @@ export default function SOSSettingsScreen() {
         }
     }
 
+
+    const handleSaveSettings = () => {
+        const nextEmail = message.trim() || session?.user?.safetyState?.emergencyContact?.email;
+        const nextPhone = contactNumber.trim()
+            ? `${areaCode}${contactNumber}`
+            : session?.user?.safetyState?.emergencyContact?.phone;
+
+        updateSafetySettings({
+            delivery: {
+                isEmailEnabled,
+                isSMSEnabled: isSmsEnabled,
+            },
+            emergencyContact: {
+                email: nextEmail,
+                phone: nextPhone,
+            },
+        });
+    };
 
     return (
         <TView style={styles.container}>
@@ -80,9 +111,9 @@ export default function SOSSettingsScreen() {
             </TView>
 
             <Button
-                title={t("sos.settings.save_button")}
-                onPress={() => { }}
-                disabled={false}
+                title={isPending ? "Saving..." : t("sos.settings.save_button")}
+                onPress={handleSaveSettings}
+                disabled={isPending}
                 type="primary"
                 buttonStyle={styles.saveButton}
             />

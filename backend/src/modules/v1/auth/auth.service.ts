@@ -97,6 +97,10 @@ export const verifyUserEmail = async (email: string, code: string): Promise<Part
       safetyState: {
         isInAnEmergency: false,
         emergencyContact: {},
+        delivery: {
+          isEmailEnabled: false,
+          isSMSEnabled: false,
+        },
       },
       settings: {
         visibility: {
