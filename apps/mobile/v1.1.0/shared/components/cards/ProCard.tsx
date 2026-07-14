@@ -5,10 +5,13 @@ import { useThemeColor } from "@/shared/hooks/useThemeColor";
 import { TText, TIcon } from "../ui/Themed";
 import Button from "../ui/Button";
 import { router } from "expo-router";
+import { useLanguage } from "@/shared/context/LanguageContext";
 
 export default function ProCard() {
+  const { t } = useLanguage();
   const secondaryColor = useThemeColor({}, 'secondary');
   const accentColor = useThemeColor({}, 'accent');
+  
   return (
     <LinearGradient
       colors={[secondaryColor + '20', accentColor + '70']}
@@ -29,19 +32,18 @@ export default function ProCard() {
         </View>
 
         <View>
-          <TText type='subtitle' style={{color: secondaryColor, marginLeft:-6}}> Be a Certified Traveller </TText>
+          <TText type='subtitle' style={{color: secondaryColor, marginLeft:-6}}> {t('tabs.account.pro_card_title')} </TText>
           <TText style={{ opacity: 0.7 }}>
-            Upgrade to Pro Now!
+            {t('tabs.account.pro_card_subtitle')}
           </TText>
         </View>
       </View>
 
-      <TText style={{opacity: 0.7}}>
-        Unlock premium travel tools, AI-powered planning, faster
-        syncing, and exclusive perks with Tarahive Pro.
+      <TText style={{opacity: 0.7, fontSize: 11}}>
+        {t('tabs.account.pro_card_description')}
       </TText>
 
-      <Button type="primary" title="Upgrade Now" onPress={() => router.push('/pro')} />
+      <Button type="primary" title={t('tabs.account.upgrade_button')} onPress={() => router.push('/pro')} />
     </LinearGradient>
   );
 }

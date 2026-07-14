@@ -27,7 +27,7 @@
   },
   "no_internet": {
     "title": "No Internet Connection",
-    "description": "You are using Tarahive in offline mode. Some features may be limited until you reconnect to the internet."
+    "subtitle": "You are using Tarahive in offline mode. Some features may be limited until you reconnect to the internet."
   },
   "dev": {
     "cache_clear_title": "Clear Cache",

@@ -1,24 +1,11 @@
 import React, { useState } from "react";
-import { StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { StyleSheet, ScrollView, TouchableOpacity, View } from "react-native";
 import { TIcon, TText, TView } from "@/shared/components/ui/Themed";
 import { useLanguage } from "@/shared/context/LanguageContext";
 import { useThemeColor } from "@/shared/hooks/useThemeColor";
 import Header from "@/shared/components/common/Header";
 import TextField from "@/shared/components/ui/TextField";
 import Button from "@/shared/components/ui/Button";
-import Switch from "@/shared/components/ui/Switch";
-
-const emergencyTypes = [
-    { id: 'medical', label: 'Medical Emergency', icon: 'medical-bag' },
-    { id: 'criminal', label: 'Criminal Activity', icon: 'shield-alert' },
-    { id: 'fire', label: 'Fire Emergency', icon: 'fire' },
-    { id: 'natural', label: 'Natural Disasters', icon: 'weather-hurricane' },
-    { id: 'utility', label: 'Utility Emergency', icon: 'flash-off' },
-    { id: 'road', label: 'Road Emergency', icon: 'car' },
-    { id: 'domestic', label: 'Domestic and Personal Safety', icon: 'home-alert' },
-    { id: 'animal', label: 'Animal-Related Emergency', icon: 'paw' },
-    { id: 'other', label: 'Other', icon: 'help-circle' },
-];
 
 export default function SOSFormScreen() {
     const { t } = useLanguage();
@@ -27,6 +14,17 @@ export default function SOSFormScreen() {
     const [selectedEmergencyType, setSelectedEmergencyType] = useState<string | null>(null);
     const [message, setMessage] = useState<string>('');
 
+    const emergencyTypes = [
+        { id: 'medical', label: t("sos.emergency_types.medical"), icon: 'medical-bag' },
+        { id: 'criminal', label: t("sos.emergency_types.criminal"), icon: 'shield-alert' },
+        { id: 'fire', label: t("sos.emergency_types.fire"), icon: 'fire' },
+        { id: 'natural', label: t("sos.emergency_types.natural"), icon: 'weather-hurricane' },
+        { id: 'utility', label: t("sos.emergency_types.utility"), icon: 'flash-off' },
+        { id: 'road', label: t("sos.emergency_types.road"), icon: 'car' },
+        { id: 'domestic', label: t("sos.emergency_types.domestic"), icon: 'home-alert' },
+        { id: 'animal', label: t("sos.emergency_types.animal"), icon: 'paw' },
+        { id: 'other', label: t("sos.emergency_types.other"), icon: 'help-circle' },
+    ];
 
     return (
         <TView style={styles.container}>
@@ -42,7 +40,7 @@ export default function SOSFormScreen() {
                         key={type.id}
                         style={[
                             styles.emergencyTypeButton,
-                            selectedEmergencyType === type.id ? { backgroundColor: accentColor + '50' } : { backgroundColor: primaryColor  }
+                            selectedEmergencyType === type.id ? { backgroundColor: accentColor + '50' } : { backgroundColor: primaryColor }
                         ]}
                         onPress={() => setSelectedEmergencyType(type.id)}
                     >
@@ -58,7 +56,7 @@ export default function SOSFormScreen() {
             </ScrollView>
 
             <TextField
-                placeholder="Describe your emergency situation... (Optional)"
+                placeholder={t("sos.form.message_placeholder")}
                 value={message}
                 onChangeText={setMessage}
                 multiline={true}
@@ -66,20 +64,22 @@ export default function SOSFormScreen() {
                 style={styles.messageInput}
             />
 
-            <Switch
-                value={true}
-                onValueChange={() => {}}
-                label="Share Location"
-                description="dsads"
-            />
+            <View style={styles.activateButton}>
+                <TouchableOpacity>
+                    <TText style={styles.settingsLink}>
+                        {t("sos.form.settings_link")}
+                    </TText>
+                </TouchableOpacity>
 
-            <Button
-                title={'Activate SOS'}
-                onPress={() => { }}
-                disabled={false}
-                type="primary"
-                buttonStyle={styles.activateButton}
-            />
+                <Button
+                    title={t("sos.form.activate_button")}
+                    onPress={() => { }}
+                    disabled={false}
+                    type="primary"
+                />
+            </View>
+
+
 
         </TView>
     );
@@ -110,5 +110,12 @@ const styles = StyleSheet.create({
         bottom: 20,
         left: '3%',
         right: '3%',
+        gap: 10,
+    },
+    settingsLink: {
+        opacity: 0.5,
+        textDecorationLine: 'underline',
+        marginTop: 10,
+        textAlign: 'center',
     },
 });

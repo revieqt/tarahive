@@ -1,18 +1,17 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
-import { useThemeColor } from "@/shared/hooks/useThemeColor";
-import { TText, TIcon } from "../ui/Themed";
+import { StyleSheet } from "react-native";
+import { TText, TIcon, TView } from "../ui/Themed";
 import { useLanguage } from "@/shared/context/LanguageContext";
 
 export default function NoInternetCard() {
   const { t } = useLanguage();
 
   return (
-    <View style={styles.container}>
+    <TView style={styles.container} color="primary" shadow>
       <TIcon name="wifi-off" size={30}/>
       <TText type='subtitle'>{t('common.no_internet.title')}</TText>
-      <TText>{t('common.no_internet.subtitle')}</TText>
-     </View>
+      <TText style={styles.subtitle}>{t('common.no_internet.subtitle')}</TText>
+     </TView>
   );
 }
 
@@ -22,10 +21,13 @@ const styles = StyleSheet.create({
     padding: 16,
     overflow: "hidden",
     gap: 8,
-    borderWidth: 1,
-    borderColor: '#ccc4',
     justifyContent: "center",
     alignItems: "center",
+    opacity: 0.7,
+  },
+  subtitle: {
+    textAlign: "center",
+    fontSize: 11,
     opacity: 0.7,
   },
 });

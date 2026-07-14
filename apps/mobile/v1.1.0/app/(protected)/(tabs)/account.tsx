@@ -14,6 +14,7 @@ import { useDev } from '@/shared/hooks/useDev';
 import NoInternetCard from '@/shared/components/cards/NoInternetCard';
 import HiveBg from '@/shared/components/common/HiveBg';
 import StickyScrollView from '@/shared/components/ui/StickyScrollView';
+import ProCard from '@/shared/components/cards/ProCard';
 
 const SettingsOption = ({ icon, label, onPress }: { icon: string; label: string; onPress: () => void }) => (
   <TouchableOpacity onPress={onPress} style={styles.optionsChild}>
@@ -91,7 +92,7 @@ export default function AccountScreen() {
           </TouchableOpacity>
         </TView>
 
-        {!isConnected && <NoInternetCard />}
+        {isConnected ? <ProCard /> : <NoInternetCard />}
 
         <View style={styles.options}>
           <TText style={styles.optionsTitle}>{t('tabs.account.personalization_title')}</TText>

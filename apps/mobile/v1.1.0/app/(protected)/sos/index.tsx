@@ -16,7 +16,7 @@ export default function SOSSection() {
   // const { handleEnableSOS, handleDisableSOS, isLoading } = useSafety();
   // const deviceInfo = useDeviceInfo();
 
-  const [isSOSActive, setIsSOSActive] = useState(false);
+  const [isSOSActive, setIsSOSActive] = useState(true);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isLongPressing, setIsLongPressing] = useState(false);
 

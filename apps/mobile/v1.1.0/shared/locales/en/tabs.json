@@ -6,6 +6,10 @@
     "account_button": "Account"
   },
   "account": {
+    "pro_card_title": "Be a Certified Traveller",
+    "pro_card_subtitle": "Upgrade to Pro Now!",
+    "pro_card_description": "Get access to exclusive features and benefits by upgrading to a Pro account.",
+    "upgrade_button": "Upgrade Now!",
     "personalization_title": "Personalization",
     "edit_profile_button": "Edit Profile",
     "theme_button": "App Theme",

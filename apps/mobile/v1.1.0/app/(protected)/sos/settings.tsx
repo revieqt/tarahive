@@ -10,6 +10,7 @@ import ContactNumberField from "@/shared/components/ui/ContactNumberField";
 import Switch from "@/shared/components/ui/Switch";
 import HiveBg from "@/shared/components/common/HiveBg";
 import { useSession } from "@/features/auth/context/SessionContext";
+import { router } from "expo-router";
 
 export default function SOSSettingsScreen() {
     const { t } = useLanguage();
@@ -22,6 +23,14 @@ export default function SOSSettingsScreen() {
     const [isEmailEnabled, setIsEmailEnabled] = useState(false);
     const [isSmsEnabled, setIsSmsEnabled] = useState(false);
     const { session, updateSession } = useSession();
+
+    const handleEnableSMS = () => {
+        if (session?.user?.isProUser) {
+            setIsSmsEnabled(!isSmsEnabled);
+        }else{
+            router.push('/pro');
+        }
+    }
 
 
     return (
@@ -52,7 +61,7 @@ export default function SOSSettingsScreen() {
             <TView style={styles.emergencyAlertContainer} color="primary" shadow>
                 <Switch
                     value={isSmsEnabled}
-                    onValueChange={() => setIsSmsEnabled(!isSmsEnabled)}
+                    onValueChange={handleEnableSMS}
                     label={isSmsEnabled ? t("sos.settings.sms_label_enabled") : t("sos.settings.sms_label_disabled")}
                     description={t("sos.settings.sms_description")}
                 />

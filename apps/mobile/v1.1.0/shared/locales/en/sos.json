@@ -1,4 +1,22 @@
 {
+  "form":{
+    "title": "Enable SOS",
+    "subtitle": "Configure your emergency alert",
+    "message_placeholder": "Describe your emergency situation... (Optional)",
+    "activate_button": "Activate SOS",
+    "settings_link": "Configure where to send your emergency alerts"
+  },
+  "emergency_types":{
+    "medical": "Medical Emergency",
+    "criminal": "Criminal Activity",
+    "fire": "Fire Emergency",
+    "natural": "Natural Disaster",
+    "utility": "Utility Emergency",
+    "road": "Road Emergency",
+    "domestic": "Domestic and Personal Safety",
+    "animal": "Animal-Related Emergency",
+    "other": "Other"
+  },
   "settings": {
     "title": "SOS Settings",
     "subtitle": "Configure your emergency alert preferences",
