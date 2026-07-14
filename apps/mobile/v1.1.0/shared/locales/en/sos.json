@@ -1,0 +1,15 @@
+{
+  "settings": {
+    "title": "SOS Settings",
+    "subtitle": "Configure your emergency alert preferences",
+    "email_label_enabled": "Email Alert Enabled",
+    "email_label_disabled": "Email Alert Disabled",
+    "email_description": "Send Emergency Alert via Email",
+    "email_placeholder": "Emergency Contact Email",
+    "sms_label_enabled": "SMS Alert Enabled",
+    "sms_label_disabled": "SMS Alert Disabled",
+    "sms_description": "Send Emergency Alert via SMS (Pro Users Only)",
+    "sms_placeholder": "Emergency Contact Phone",
+    "save_button": "Save Changes"
+  }
+}

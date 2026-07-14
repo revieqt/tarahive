@@ -1,30 +1,15 @@
 import React, { useState, useRef } from "react";
-import { View, StyleSheet, Modal, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Dimensions } from "react-native";
-import TextField from '@/shared/components/ui/TextField';
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { TText, TIcon, TView } from '@/shared/components/ui/Themed';
-import Button from '@/shared/components/ui/Button';
 import SOSButton from "@/shared/components/common/SOSButton";
 import { LinearGradient } from "expo-linear-gradient";
 import { useThemeColor } from "@/shared/hooks/useThemeColor";
 import { useSession } from "@/features/auth/context/SessionContext";
 import BackButton from "@/shared/components/common/BackButton";
-import { SafeAreaView } from "react-native-safe-area-context";
 import HiveBg from "@/shared/components/common/HiveBg";
-
-const emergencyTypes = [
-  { id: 'medical', label: 'Medical Emergency', icon: 'medical-bag' },
-  { id: 'criminal', label: 'Criminal Activity', icon: 'shield-alert' },
-  { id: 'fire', label: 'Fire Emergency', icon: 'fire' },
-  { id: 'natural', label: 'Natural Disasters', icon: 'weather-hurricane' },
-  { id: 'utility', label: 'Utility Emergency', icon: 'flash-off' },
-  { id: 'road', label: 'Road Emergency', icon: 'car' },
-  { id: 'domestic', label: 'Domestic and Personal Safety', icon: 'home-alert' },
-  { id: 'animal', label: 'Animal-Related Emergency', icon: 'paw' },
-  { id: 'other', label: 'Other', icon: 'help-circle' },
-];
+import { router } from "expo-router";
 
 export default function SOSSection() {
-  const gradientColor = useThemeColor({}, 'primary');
   const secondaryColor = useThemeColor({}, 'secondary');
   const accentColor = useThemeColor({}, 'accent');
   const { session, updateSession } = useSession();
@@ -32,16 +17,6 @@ export default function SOSSection() {
   // const deviceInfo = useDeviceInfo();
 
   const [isSOSActive, setIsSOSActive] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedEmergencyType, setSelectedEmergencyType] = useState<string>('');
-  const [message, setMessage] = useState('');
-  const [emergencyContactModalVisible, setEmergencyContactModalVisible] = useState(false);
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertTitle, setAlertTitle] = useState('');
-  const [showSOSInHome, setShowSOSInHome] = useState(false);
-  const [isLoadingContact, setIsLoadingContact] = useState(false);
-
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isLongPressing, setIsLongPressing] = useState(false);
 
@@ -56,11 +31,11 @@ export default function SOSSection() {
         // Disable safety mode
         // handleDisableSafetyMode();
       } else {
-        // Show modal to enable safety mode
-        setModalVisible(true);
+        // Show form to enable safety mode
+        router.push('/sos/form');
       }
       setIsLongPressing(false);
-    }, 2000); // 2 seconds
+    }, 2000);
   };
 
   const handleLongPressEnd = () => {
@@ -71,14 +46,12 @@ export default function SOSSection() {
     }
   };
 
-
-
   return (
-    <>
+    <TView style={{ flex: 1 }}>
       <BackButton type='floating' color='#fff' />
       <LinearGradient colors={gradientColors} style={styles.background}>
-        <HiveBg flipHorizontal />
-        <HiveBg />
+        <HiveBg flipHorizontal fade={false} />
+        <HiveBg fade={false} />
       </LinearGradient>
 
       <View style={styles.container}>
@@ -116,96 +89,22 @@ export default function SOSSection() {
       </View>
 
       <TView style={styles.messageContainer}>
-        <TIcon name='information' size={20} />
-        <View style={{ gap: 5, flex: 1 }}>
-          <TText type="subtitle">What is SOS?</TText>
-          <TText>
-            SOS Type Here
-          </TText>
-          <TouchableOpacity style={[styles.openSettings,{backgroundColor: accentColor}]}>
-            <TText style={{ color: '#fff' }}>Open Settings</TText>
+        <TText type="subtitle">What is SOS?</TText>
+        <TText>
+          SOS Type Here
+        </TText>
+        <View style={styles.messageButtons}>
+
+          <TouchableOpacity style={[styles.openSettings, { backgroundColor: accentColor }]} onPress={() => router.push('/sos/settings')}>
+            <TText style={{ color: '#fff' }}>Settings</TText>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.openSettings}>
+            <TText style={{ opacity: 0.5 }}>How SOS Works</TText>
           </TouchableOpacity>
         </View>
       </TView>
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <SafeAreaView style={{ flex: 1 }}>
-          <TouchableOpacity
-            style={styles.modalOverlay}
-            onPress={() => setModalVisible(false)}
-            activeOpacity={1}
-          >
-            <KeyboardAvoidingView
-              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-              style={styles.keyboardAvoidingView}
-            >
-              <TouchableOpacity
-                style={styles.modalContent}
-                onPress={(e) => e.stopPropagation()}
-                activeOpacity={1}
-              >
-                <TView color='primary' style={styles.modalContentInner}>
-                  <TIcon
-                    name='alert-octagon'
-                    size={50}
-                    color={accentColor}
-                    style={{ alignSelf: 'center' }}
-                  />
-                  <TText type="subtitle" style={{ textAlign: 'center', marginVertical: 10 }}>Select Emergency Type</TText>
-
-                  <ScrollView
-                    horizontal
-                    contentContainerStyle={{ gap: 7 }}
-                    style={{ maxHeight: 95 }}
-                    showsHorizontalScrollIndicator={false}>
-                    {emergencyTypes.map((type) => (
-                      <TouchableOpacity
-                        key={type.id}
-                        style={[
-                          styles.emergencyTypeButton,
-                          selectedEmergencyType === type.id && { backgroundColor: accentColor + '50' }
-                        ]}
-                        onPress={() => setSelectedEmergencyType(type.id)}
-                      >
-                        <TIcon
-                          name={type.icon}
-                          size={30}
-                        />
-                        <TText style={[{ textAlign: 'center', fontSize: 10 }]}>
-                          {type.label}
-                        </TText>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-
-                  <TextField
-                    placeholder="Describe your emergency situation... (Optional)"
-                    value={message}
-                    onChangeText={setMessage}
-                    multiline={true}
-                    numberOfLines={3}
-                    style={styles.messageInput}
-                  />
-
-                  <Button
-                    title={'Activate SOS'}
-                    onPress={() => { }}
-                    disabled={false}
-                    type="primary"
-                    buttonStyle={{ marginTop: 10 }}
-                  />
-                </TView>
-              </TouchableOpacity>
-            </KeyboardAvoidingView>
-          </TouchableOpacity>
-        </SafeAreaView>
-      </Modal>
-    </>
+    </TView>
 
   );
 };
@@ -226,17 +125,16 @@ const styles = StyleSheet.create({
     gap: 40,
   },
   messageContainer: {
-    padding: 16,
+    padding: 13,
     marginHorizontal: '3%',
     borderRadius: 12,
-    marginBottom: 20,
-    flexDirection: 'row',
-    gap: 10,
-    alignItems: 'center',
+    marginBottom: 16,
+    gap: 5,
   },
   openSettings: {
     alignSelf: 'flex-start',
-    backgroundColor: '#007AFF20',
+    borderWidth: 1,
+    borderColor: '#ccc7',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
@@ -246,63 +144,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 3,
   },
-  modalOverlay: {
-    flex: 1,
-  },
-  keyboardAvoidingView: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  modalContentInner: {
-    borderRadius: 15,
-    padding: 16,
-    margin: '3%',
-  },
-  emergencyTypesList: {
-    maxHeight: 300,
-    marginVertical: 20,
-  },
-  emergencyTypeButton: {
-    alignItems: 'center',
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ccc4',
-    gap: 10,
-    width: 100,
-    height: 90,
-  },
-  messageSection: {
-    marginBottom: 20,
-    gap: 10,
-  },
-  messageInput: {
-    minHeight: 80,
-    marginTop: 7,
-  },
-  manual: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 8,
-  },
-  emergencyContact: {
-    padding: 10,
-    borderRadius: 12,
-  },
-  emergencyContactEdit: {
-    position: 'absolute',
-    top: 10,
-    right: 15,
-    bottom: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
+  messageButtons: {
+    flexDirection: 'row',
+    gap: 5,
+    marginTop: 5,
   },
 });
