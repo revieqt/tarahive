@@ -1,9 +1,8 @@
-import { BACKEND_URL } from '@/Config';
 import { DeviceInfo } from '@/shared/hooks/useDeviceInfo';
 import { api } from '@/shared/api/client';
 import { User } from '@/features/auth/context/SessionContext';
 
-const API_URL = `${BACKEND_URL}/v1/sos`;
+const API_URL = `/v1/sos`;
 
 export interface EnableSOSRequest {
   emergencyType: string;
@@ -79,26 +78,13 @@ export const disableSOS = async (
 export const updateUserSafetySettings = async (
   payload: UpdateSafetySettingsPayload
 ): Promise<{ success: boolean; data: User; message: string }> => {
-  try {
-    const response = await api.post<{ success: boolean; data: User; message: string }>(
-      '/v1/user/update-settings',
-      {
-        safetySettings: {
-          delivery: payload.delivery,
-          emergencyContact: payload.emergencyContact,
-        },
-      }
-    );
-
-    if (!response.success || !response.data) {
-      throw new Error(response.message || 'Failed to update safety settings');
+  return await api.post<{ success: boolean; data: User; message: string }>(
+    `${API_URL}/update-settings`,
+    {
+      safetySettings: {
+        delivery: payload.delivery,
+        emergencyContact: payload.emergencyContact,
+      },
     }
-
-    return response;
-  } catch (error: any) {
-    if (error.status === 401) {
-      throw new Error('Unauthorized');
-    }
-    throw new Error(error.message || 'Failed to update safety settings');
-  }
+  );
 };

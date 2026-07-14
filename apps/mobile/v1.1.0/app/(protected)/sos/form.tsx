@@ -6,6 +6,7 @@ import { useThemeColor } from "@/shared/hooks/useThemeColor";
 import Header from "@/shared/components/common/Header";
 import TextField from "@/shared/components/ui/TextField";
 import Button from "@/shared/components/ui/Button";
+import { router } from 'expo-router';
 
 export default function SOSFormScreen() {
     const { t } = useLanguage();
@@ -65,7 +66,7 @@ export default function SOSFormScreen() {
             />
 
             <View style={styles.activateButton}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => router.push('/sos/settings')}>
                     <TText style={styles.settingsLink}>
                         {t("sos.form.settings_link")}
                     </TText>
@@ -117,5 +118,6 @@ const styles = StyleSheet.create({
         textDecorationLine: 'underline',
         marginTop: 10,
         textAlign: 'center',
+        fontSize: 12
     },
 });

@@ -76,3 +76,49 @@ export const disableSOS = async (req: DisableSOSRequest): Promise<any> => {
     throw error;
   }
 };
+
+export const updateSafetySettings = async (
+  userId: string,
+  delivery?: { isEmailEnabled?: boolean; isSMSEnabled?: boolean },
+  emergencyContact?: { email?: string; phone?: string }
+): Promise<Partial<User>> => {
+  const user = await userRepo.findOne({ where: { id: userId } });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const currentDelivery = user.safetyState?.delivery || {
+    isEmailEnabled: false,
+    isSMSEnabled: false,
+  };
+
+  const nextDelivery = {
+    isEmailEnabled:
+      typeof delivery?.isEmailEnabled === "boolean"
+        ? delivery.isEmailEnabled
+        : currentDelivery.isEmailEnabled,
+    isSMSEnabled:
+      typeof delivery?.isSMSEnabled === "boolean"
+        ? delivery.isSMSEnabled
+        : currentDelivery.isSMSEnabled,
+  };
+
+  const currentEmergencyContact = user.safetyState?.emergencyContact || {};
+  const nextEmergencyContact = {
+    ...currentEmergencyContact,
+    ...(typeof emergencyContact?.email === "string" ? { email: emergencyContact.email } : {}),
+    ...(typeof emergencyContact?.phone === "string" ? { phone: emergencyContact.phone } : {}),
+  };
+
+  user.safetyState = {
+    ...user.safetyState,
+    delivery: nextDelivery,
+    emergencyContact: nextEmergencyContact,
+  };
+
+  await userRepo.save(user);
+
+  const { password: _, ...userWithoutPassword } = user;
+  return userWithoutPassword;
+};

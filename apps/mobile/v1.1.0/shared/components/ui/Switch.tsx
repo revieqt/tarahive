@@ -1,4 +1,3 @@
-// components/Switch.tsx
 import React from "react";
 import { View, Switch as RNSwitch, StyleSheet } from "react-native";
 import { useThemeColor } from "@/shared/hooks/useThemeColor";
@@ -12,7 +11,6 @@ type SwitchProps = {
 };
 
 const Switch: React.FC<SwitchProps> = ({ label, description, value, onValueChange }) => {
-  const primaryColor = useThemeColor({}, 'primary');
   const secondaryColor = useThemeColor({}, 'secondary');
   const accentColor = useThemeColor({}, 'accent');
   return (
@@ -24,8 +22,8 @@ const Switch: React.FC<SwitchProps> = ({ label, description, value, onValueChang
       <RNSwitch
         value={value}
         onValueChange={onValueChange}
-        thumbColor={value ? secondaryColor : secondaryColor}
-        trackColor={{ false: '#ccc', true: accentColor }}
+        thumbColor={value ? accentColor : secondaryColor}
+        trackColor={{ false: '#ccc', true: accentColor + '70' }}
       />
     </View>
   );

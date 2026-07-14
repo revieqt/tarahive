@@ -13,10 +13,8 @@ export default function SOSSection() {
   const secondaryColor = useThemeColor({}, 'secondary');
   const accentColor = useThemeColor({}, 'accent');
   const { session, updateSession } = useSession();
-  // const { handleEnableSOS, handleDisableSOS, isLoading } = useSafety();
-  // const deviceInfo = useDeviceInfo();
 
-  const [isSOSActive, setIsSOSActive] = useState(true);
+  const [isSOSActive, setIsSOSActive] = useState(false);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isLongPressing, setIsLongPressing] = useState(false);
 

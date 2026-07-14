@@ -58,8 +58,6 @@ export const useLogin = () => {
         await updateSession({
           user: userData,
         });
-
-        showInfo('Success', response.message || 'Login successful');
       } catch (err: any) {
         throw new Error('Failed to save session: ' + err.message);
       }

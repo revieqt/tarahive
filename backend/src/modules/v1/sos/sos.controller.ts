@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { disableSOS } from './sos.service';
+import { disableSOS, updateSafetySettings } from './sos.service';
 import { addSOSJob, SOSJobData } from './sos.queue';
 import { LogAction } from '../../v1/audit/audit.service';
 import { AuthRequest } from '../../v1/auth/auth.types';
@@ -134,6 +134,42 @@ export const disableSOSController = async (req: AuthRequest, res: Response) => {
     return res.status(500).json({
       success: false,
       message: errorMessage,
+    });
+  }
+};
+
+export const updateSafetySettingsController = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    if (!req.user || !req.user.sub) {
+      res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+      return;
+    }
+
+    const delivery = req.body?.safetySettings?.delivery ?? req.body?.delivery;
+    const emergencyContact = req.body?.safetySettings?.emergencyContact ?? req.body?.emergencyContact;
+
+    if (!delivery || typeof delivery !== "object") {
+      res.status(400).json({
+        success: false,
+        message: "Delivery settings are required",
+      });
+      return;
+    }
+
+    const user = await updateSafetySettings(req.user.sub, delivery, emergencyContact);
+
+    res.status(200).json({
+      success: true,
+      message: "Safety settings updated successfully",
+      data: user,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to update safety settings",
     });
   }
 };
