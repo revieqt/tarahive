@@ -82,7 +82,7 @@ const ActiveRouteSidebarButton: React.FC = () => {
                         styles.messageOverlay,
                         {
                             opacity: fadeAnimation,
-                            backgroundColor: primaryColor,
+                            backgroundColor: accentColor,
                             transform: [
                                 {
                                     translateY: fadeAnimation.interpolate({
@@ -100,9 +100,12 @@ const ActiveRouteSidebarButton: React.FC = () => {
                         },
                     ]}
                 >
-                    <TText style={styles.messageText}>
-                        Hello {session?.user?.fname}! I've got some suggestions for you. Click me!
-                    </TText>
+                    <TouchableOpacity style={{ flex: 1}} onPress={() => router.push('/suggestion')}>
+                        <TText style={styles.messageText}>
+                            Hello {session?.user?.fname}! I've got some suggestions for you. Click me!
+                        </TText>
+                    </TouchableOpacity>
+                    
                 </Animated.View>
             ) : null}
             <TouchableOpacity
@@ -164,8 +167,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.18,
         shadowRadius: 24,
         elevation: 10,
-        borderColor: 'rgba(255,255,255,0.18)',
-        borderWidth: 1,
         borderRadius: 30,
     },
     messageText: {
@@ -179,10 +180,8 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 1,
         marginBottom: 4,
         overflow: 'hidden',
-        borderColor: 'white',
         zIndex: 10,
         shadowColor: "rgba(120,120,120,0.6)",
         shadowOffset: { width: 0, height: 0 },
