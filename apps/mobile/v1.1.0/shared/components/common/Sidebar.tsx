@@ -7,6 +7,7 @@ import { useSession } from '@/features/auth/context/SessionContext';
 // import SOSSidebarButton from './SOSSidebarButton';
 import { router } from 'expo-router';
 import TaraSuggestionButton from './TaraSuggestionButton';
+import SOSSidebarButton from './SOSSidebarButton';
 
 const SidebarAlerts: React.FC = () => {
     const [hideAlert, setHideAlert] = useState(false);
@@ -180,7 +181,7 @@ const SidebarAlerts: React.FC = () => {
                     transform: [{ translateY: contentSlide }],
                 }}
             >
-
+                { session?.user?.safetyState?.isInAnEmergency && <SOSSidebarButton/> }
                 <TaraSuggestionButton/>
             </Animated.View>
 
