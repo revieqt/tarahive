@@ -7,9 +7,13 @@ import Header from "@/shared/components/common/Header";
 import TextField from "@/shared/components/ui/TextField";
 import Button from "@/shared/components/ui/Button";
 import { router } from 'expo-router';
+import { useSafety } from "@/features/sos/hooks/useSOS";
+import { useLocation } from "@/shared/context/LocationContext";
 
 export default function SOSFormScreen() {
     const { t } = useLanguage();
+    const { latitude, longitude } = useLocation();
+    const { handleEnableSOS } = useSafety();
     const primaryColor = useThemeColor({}, "primary");
     const accentColor = useThemeColor({}, "accent");
     const [selectedEmergencyType, setSelectedEmergencyType] = useState<string | null>(null);
@@ -26,6 +30,22 @@ export default function SOSFormScreen() {
         { id: 'animal', label: t("sos.emergency_types.animal"), icon: 'paw' },
         { id: 'other', label: t("sos.emergency_types.other"), icon: 'help-circle' },
     ];
+
+    const handleEnableSafetyMode = async () => {
+        if (!selectedEmergencyType) {
+            return;
+        }
+
+        await handleEnableSOS({
+            emergencyType: selectedEmergencyType,
+            message: message || undefined,
+            latitude,
+            longitude,
+        });
+
+        setSelectedEmergencyType(null);
+        setMessage('');
+    };
 
     return (
         <TView style={styles.container}>
@@ -74,14 +94,11 @@ export default function SOSFormScreen() {
 
                 <Button
                     title={t("sos.form.activate_button")}
-                    onPress={() => { }}
+                    onPress={handleEnableSafetyMode}
                     disabled={false}
                     type="primary"
                 />
             </View>
-
-
-
         </TView>
     );
 }

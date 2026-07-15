@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { useSession } from '@/features/auth/context/SessionContext';
-import { updateUserSafetySettings, UpdateSafetySettingsPayload } from '../service/sosService';
+import { updateUserSafetySettings, UpdateSafetySettingsPayload } from '../services/sosService';
 import { showError, showInfo } from '@/shared/services/toast.service';
 
 export const useUpdateSafetySettings = () => {

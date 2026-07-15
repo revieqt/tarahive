@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, ScrollView, KeyboardAvoidingView, Platform, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import * as Speech from 'expo-speech';
 import { ChatArea, ChatHeader, ChatField, ChatBubble } from '@/shared/components/ui/Chat';
 import { useAiChat } from '@/features/tara/hooks/useAiChat';
@@ -14,8 +14,8 @@ import { TARA_AI_SUGGESTIONS } from '@/shared/constants/Tara';
 import { formatDateToString } from '@/shared/utils/formatDateToString';
 
 export default function AiChatScreen() {
-  const router = useRouter();
-  const [inputText, setInputText] = useState('');
+  const { prompt } = useLocalSearchParams();
+  const [inputText, setInputText] = useState(prompt as string);
   const [isTtsEnabled, setIsTtsEnabled] = useState(false);
   const [dotCount, setDotCount] = useState(1);
   const [todayMessageCount, setTodayMessageCount] = useState(0);

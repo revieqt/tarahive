@@ -50,7 +50,7 @@ export const enableSOS = async (
     } : undefined,
   };
 
-  return await api.post<SafetyResponse>(`${API_URL}/enable-sos`, payload);
+  return await api.post<SafetyResponse>(`${API_URL}/enable`, payload);
 };
 
 /**
@@ -71,7 +71,7 @@ export const disableSOS = async (
     } : undefined,
   };
 
-  return await api.post<SafetyResponse>(`${API_URL}/disable-sos`, payload);
+  return await api.post<SafetyResponse>(`${API_URL}/disable`, payload);
 };
 
 

@@ -49,7 +49,12 @@ export default function HomeScreen() {
                 style={[styles.searchField, { color: textColor }]}
               />
 
-              <TouchableOpacity>
+              <TouchableOpacity
+               onPress={() => router.push({
+                               pathname: '/tara',
+                               params: { prompt: searchAi },
+                             } as any)}
+              >
                 <TIcon name='send' size={18} color={searchAi ? secondaryColor : '#ccc4'} />
               </TouchableOpacity>
             </View>

@@ -36,7 +36,7 @@ export const sosWorker = new Worker<SOSJobData>(
 
       // 2. Get emergencyContact from user
       console.log('🟡 Step 2: Getting emergency contact...');
-      const emergencyContact = user.safetyState.emergencyContact;
+      const emergencyContact = user.safetyState.emergencyContact?.email;
       if (!emergencyContact) {
         console.warn('⚠️ No emergency contact found for user');
         job.updateProgress(100);

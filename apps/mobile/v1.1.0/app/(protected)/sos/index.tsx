@@ -1,6 +1,6 @@
-import React, { useState, useRef } from "react";
+import React, { useRef, useState } from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
-import { TText, TIcon, TView } from '@/shared/components/ui/Themed';
+import { TText, TView } from '@/shared/components/ui/Themed';
 import SOSButton from "@/shared/components/common/SOSButton";
 import { LinearGradient } from "expo-linear-gradient";
 import { useThemeColor } from "@/shared/hooks/useThemeColor";
@@ -8,13 +8,15 @@ import { useSession } from "@/features/auth/context/SessionContext";
 import BackButton from "@/shared/components/common/BackButton";
 import HiveBg from "@/shared/components/common/HiveBg";
 import { router } from "expo-router";
+import { useSafety } from "@/features/sos/hooks/useSOS"
 
 export default function SOSSection() {
   const secondaryColor = useThemeColor({}, 'secondary');
   const accentColor = useThemeColor({}, 'accent');
-  const { session, updateSession } = useSession();
+  const { session } = useSession();
+  const { handleDisableSOS } = useSafety();
 
-  const [isSOSActive, setIsSOSActive] = useState(false);
+  const isSOSActive = session?.user?.safetyState?.isInAnEmergency ?? false;
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isLongPressing, setIsLongPressing] = useState(false);
 
@@ -26,10 +28,8 @@ export default function SOSSection() {
     setIsLongPressing(true);
     longPressTimer.current = setTimeout(() => {
       if (isSOSActive) {
-        // Disable safety mode
-        // handleDisableSafetyMode();
+        handleDisableSOS();
       } else {
-        // Show form to enable safety mode
         router.push('/sos/form');
       }
       setIsLongPressing(false);

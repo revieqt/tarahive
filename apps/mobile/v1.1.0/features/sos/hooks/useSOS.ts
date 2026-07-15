@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { enableSOS, disableSOS, type EnableSOSRequest } from '@/services/safetyService';
-import { useSession } from '@/context/SessionContext';
-import { DeviceInfo } from '@/hooks/useDeviceInfo';
+import { router } from 'expo-router';
+import { enableSOS, disableSOS, type EnableSOSRequest } from '../services/sosService';
+import { useSession } from '@/features/auth/context/SessionContext';
+import { useDeviceInfo, type DeviceInfo } from '@/shared/hooks/useDeviceInfo';
+import { showError, showSuccess } from '@/shared/services/toast.service';
 
 /**
  * Custom hook for SOS operations
@@ -9,61 +11,54 @@ import { DeviceInfo } from '@/hooks/useDeviceInfo';
  */
 export const useSafety = () => {
   const { session, updateSession } = useSession();
+  const deviceInfo = useDeviceInfo();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleEnableSOS = async (request: EnableSOSRequest) => {
-    if (!session?.accessToken) {
-      const errorMsg = 'Access token not found';
-      setError(errorMsg);
-      throw new Error(errorMsg);
-    }
-
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await enableSOS(request, session.accessToken);
+      const response = await enableSOS({
+        ...request,
+        device: deviceInfo.isLoaded ? deviceInfo : undefined,
+      });
 
-      // Update session with new safety state
-      if (session.user) {
+      if (session?.user) {
         await updateSession({
           user: {
             ...session.user,
             safetyState: {
               isInAnEmergency: true,
               emergencyType: request.emergencyType,
-              emergencyContact: session.user.safetyState?.emergencyContact,
             },
           },
         });
       }
 
+      showSuccess('SOS Activated', response.message || 'Emergency alert has been sent');
+      router.back();
+
       return response;
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Failed to enable SOS';
       setError(errorMsg);
-      throw err;
+      showError('Failed to enable SOS', errorMsg);
+      return null;
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDisableSOS = async (device?: Partial<DeviceInfo>) => {
-    if (!session?.accessToken) {
-      const errorMsg = 'Access token not found';
-      setError(errorMsg);
-      throw new Error(errorMsg);
-    }
-
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await disableSOS(session.accessToken, device);
+      const response = await disableSOS(device ?? (deviceInfo.isLoaded ? deviceInfo : undefined));
 
-      // Update session to disable emergency mode
-      if (session.user) {
+      if (session?.user) {
         await updateSession({
           user: {
             ...session.user,
@@ -80,7 +75,8 @@ export const useSafety = () => {
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Failed to disable SOS';
       setError(errorMsg);
-      throw err;
+      showError('Failed to disable SOS', errorMsg);
+      return null;
     } finally {
       setIsLoading(false);
     }
