@@ -24,70 +24,84 @@ const twilioClient = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKE
 const baseTemplate = (innerContent: string) => `
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet">
   <style>
     body {
-      font-family: 'Poppins', sans-serif;
-      background-color: #f4f4f5;
+      font-family: Arial, Helvetica, sans-serif;
       margin: 0;
       padding: 0;
     }
+
     .container {
       max-width: 600px;
       margin: auto;
-      background: #4f46e5;
-      padding: 24px;
+      padding: 3%;
       border-radius: 8px;
     }
+
     .header {
+      align-items: center;
+      justify-content: center;
       text-align: center;
-      color: #fff;
+      margin-bottom: 20px;
     }
+
     .content {
-      padding: 20px;
+      padding-top: 20px;
+      padding-bottom: 20px;
       color: #111827;
       font-size: 15px;
       line-height: 1.6;
-      background-color: #fff;
       border-radius: 10px;
     }
-    .footer {
-      margin-top: 24px;
-      padding-top: 12px;
-      font-size: 12px;
-      color: #fff;
-      text-align: center;
+
+    .title {
+      height: 20px;
+      margin-top: 0px
     }
-    a.button {
-      display: inline-block;
-      margin-top: 16px;
-      padding: 10px 16px;
-      background: #4f46e5;
-      color: #ffffff;
-      text-decoration: none;
-      border-radius: 6px;
+
+    .underline {
+      width: 100%;
+      height: 1px;
+      background-color: #ccc;
+    }
+
+    .fadeText {
+      font-size: small;
+      opacity: .5;
+      height: 10px;
+      text-align: center;
+      margin-bottom: 20px;
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="header">
-      <h1>TaraG</h1>
+      <img src="https://tarag.vercel.app/icon.png" alt="TaraHive Logo" width="50" height="50"
+        style="display:block; border:0; outline:none; text-decoration:none; margin: 0 auto">
+      <h1 class="title">Tarahive</h1>
       <p>Mobile Travel Companion</p>
+      <p class="fadeText">© ${new Date().getFullYear()}, This is an automated message. Please do not reply.</p>
     </div>
+
+    <div class="underline"></div>
+
     <div class="content">
       ${innerContent}
     </div>
-    <div class="footer">
-      © ${new Date().getFullYear()}
-      <br />This is an automated message. Please do not reply.
-    </div>
   </div>
+
 </body>
+
 </html>
 `;
 

@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import { useLanguage } from '@/shared/context/LanguageContext';
 import { TARA_AI_SUGGESTIONS } from '@/shared/constants/Tara';
 import SidebarAlerts from '@/shared/components/common/Sidebar';
+import MonthlyCalendar from '@/shared/components/common/MonthlyCalendar';
 
 export default function HomeScreen() {
   const isConnected = useInternetConnection();
@@ -51,9 +52,9 @@ export default function HomeScreen() {
 
               <TouchableOpacity
                onPress={() => router.push({
-                               pathname: '/tara',
-                               params: { prompt: searchAi },
-                             } as any)}
+                  pathname: '/tara',
+                  params: { prompt: searchAi },
+                } as any)}
               >
                 <TIcon name='send' size={18} color={searchAi ? secondaryColor : '#ccc4'} />
               </TouchableOpacity>
@@ -122,6 +123,22 @@ export default function HomeScreen() {
             </View>
           </View>
         </View>
+        <TView style={styles.content}>
+          <MonthlyCalendar/>
+
+          <TouchableOpacity style={[styles.rateContainer, {backgroundColor: primaryColor}]}>
+            <TText style={{fontSize: 12}}>Rate Us!</TText>
+            <TText style={{fontSize: 10, opacity: .5}}>dsadsdasd</TText>
+            <View style={{flexDirection: 'row', gap: 3}}>
+              <TIcon name='star' size={13} color={accentColor}/>
+              <TIcon name='star' size={13} color={accentColor}/>
+              <TIcon name='star' size={13} color={accentColor}/>
+              <TIcon name='star' size={13} color={accentColor}/>
+              <TIcon name='star' size={13} color={accentColor}/>
+            </View>
+          </TouchableOpacity>
+        </TView>
+        
       </ScrollView>
 
       <SidebarAlerts />
@@ -142,6 +159,7 @@ const styles = StyleSheet.create({
   menuContainer: {
     position: 'relative',
     zIndex: 100,
+    paddingBottom: '3%'
   },
   searchContainer: {
     flexDirection: 'row',
@@ -197,7 +215,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
     paddingHorizontal: '3%',
     zIndex: 100,
     gap: '2%',
@@ -252,5 +269,19 @@ const styles = StyleSheet.create({
     bottom: '-30%',
     right: '-13%',
     opacity: .8,
+  },
+  content:{
+  },
+  rateContainer:{
+    marginTop: '3%',
+    marginHorizontal: '3%',
+    padding: '3%',
+    height: 60,
+    borderRadius: 15,
+    justifyContent: 'center',
+    marginBottom: 9,
+    paddingRight: 60,
+    overflow: 'hidden',
+    gap: 1
   },
 });

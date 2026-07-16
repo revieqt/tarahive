@@ -52,39 +52,34 @@ export const sosWorker = new Worker<SOSJobData>(
       const mapUrl = `https://maps.google.com/?q=${latitude},${longitude}`;
 
       const emailContent = `
-        <div style="background-color: #fef2f2; border-left: 4px solid #dc2626; padding: 16px; margin-bottom: 16px; border-radius: 4px;">
-          <h2 style="margin-top: 0; color: #dc2626;">🚨 EMERGENCY ALERT</h2>
-          <p style="margin: 0; font-weight: bold; color: #7f1d1d;">Someone you know has activated their emergency alert on TaraG.</p>
-        </div>
-
-        <h3 style="color: #1f2937; margin-bottom: 8px;">📋 User Information</h3>
-        <div style="background-color: #f9fafb; padding: 12px; border-radius: 4px; margin-bottom: 16px;">
-          <p style="margin: 8px 0;"><strong>Name:</strong> ${user.fname} ${user.lname || ''}</p>
-          <p style="margin: 8px 0;"><strong>Username:</strong> @${user.username}</p>
-          <p style="margin: 8px 0;"><strong>Email:</strong> ${user.email}</p>
-          <p style="margin: 8px 0;"><strong>Contact:</strong> ${user.contactNumber || 'Not provided'}</p>
-        </div>
-
-        <h3 style="color: #1f2937; margin-bottom: 8px;">🆘 Emergency Details</h3>
-        <div style="background-color: #f9fafb; padding: 12px; border-radius: 4px; margin-bottom: 16px;">
-          <p style="margin: 8px 0;"><strong>Emergency Type:</strong> ${emergencyType}</p>
-          ${message ? `<p style="margin: 8px 0;"><strong>Message:</strong> ${message}</p>` : ''}
-        </div>
-
-        <h3 style="color: #1f2937; margin-bottom: 8px;">📍 Location</h3>
-        <div style="background-color: #f9fafb; padding: 12px; border-radius: 4px; margin-bottom: 16px;">
-          <p style="margin: 8px 0;"><strong>Coordinates:</strong> ${latitude.toFixed(6)}, ${longitude.toFixed(6)}</p>
-        </div>
-
-        <div style="text-align: center; margin: 24px 0;">
-          <a href="${mapUrl}" class="button" style="display: inline-block; background-color: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">
-            📍 View Location on Google Maps
-          </a>
-        </div>
-
-        <p style="background-color: #fef2f2; padding: 12px; border-radius: 4px; color: #7f1d1d; font-weight: bold; margin: 16px 0;">
-          ⚠️ This is an automated emergency alert. Please respond immediately if you can help.
+        <div
+        style="background-color: #dc2626; padding: 16px; margin-bottom: 16px; border-radius: 15px; text-align: center; color: #fff">
+        <h1>🚨</h2>
+        <h2>SOS ALERT</h2>
+        <p style="margin: 0; font-weight: bold;">
+          ${user.fname} ${user.lname || ''} (@${user.username}) is in an ${emergencyType} Emergency. 
+          Please respond immediately if you can help! ⚠️
         </p>
+      </div>
+
+      <div style="background-color: #f9fafb; padding: 12px; border-radius: 4px; margin-bottom: 16px;">
+        <h3 style="color: #1f2937; margin-bottom: 8px;">Emergency Details</h3>
+        <div class="underline"></div>
+        <p style="margin: 8px 0;"><strong>Emergency Type:</strong> ${emergencyType}</p>
+        ${message ? `<p style="margin: 8px 0;"><strong>Message:</strong> ${message}</p>` : ''}
+        <p style="margin: 8px 0;"><strong>Last known location:</strong> ${latitude.toFixed(6)}, ${longitude.toFixed(6)}</p>
+        <a href="${mapUrl}" class="button"
+          style="display: inline-block; background-color: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; width: 88%;">
+          📍 View Location on Google Maps
+        </a>
+      </div>
+
+      <div style="background-color: #f9fafb; padding: 12px; border-radius: 4px; margin-bottom: 16px;">
+        <h3 style="color: #1f2937; margin-bottom: 8px;">User Contacts</h3>
+        <div class="underline"></div>
+        <p style="margin: 8px 0;"><strong>Email:</strong> ${user.email}</p>
+        <p style="margin: 8px 0;"><strong>Contact:</strong> ${user.contactNumber || 'Not provided'}</p>
+      </div>
       `;
 
       try {
