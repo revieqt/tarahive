@@ -3,8 +3,10 @@ import { View, StyleSheet, FlatList, Dimensions, TouchableOpacity } from 'react-
 import { TIcon, TText, TView } from '../ui/Themed';
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import { router } from 'expo-router';
+import { useLanguage } from '@/shared/context/LanguageContext';
 
-const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+
 
 type DayCell = {
   key: string;
@@ -18,13 +20,23 @@ type DayCell = {
  */
 const MonthlyCalendar: React.FC = () => {
   const today = useMemo(() => new Date(), []);
+  const { t, currentLanguage } = useLanguage();
   const backgroundColor = useThemeColor({}, 'background');
   const secondaryColor = useThemeColor({}, 'accent');
+  const WEEKDAY_LABELS = [
+    t('common.days_short.sun'),
+    t('common.days_short.mon'),
+    t('common.days_short.tue'),
+    t('common.days_short.wed'),
+    t('common.days_short.thu'),
+    t('common.days_short.fri'),
+    t('common.days_short.sat')
+  ];
+
   const { monthLabel, todayLabel, days } = useMemo(() => {
     const year = today.getFullYear();
     const month = today.getMonth(); // 0-indexed
     const todayDate = today.getDate();
-
     const firstDayOfMonth = new Date(year, month, 1);
     const startWeekday = firstDayOfMonth.getDay(); // 0 (Sun) - 6 (Sat)
     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -50,19 +62,19 @@ const MonthlyCalendar: React.FC = () => {
       cells.push({ key: `blank-end-${cells.length}`, date: null, isToday: false });
     }
 
-    const monthLabel = firstDayOfMonth.toLocaleDateString(undefined, {
+    const monthLabel = new Intl.DateTimeFormat(currentLanguage.code, {
       month: 'long',
       year: 'numeric',
-    });
+    }).format(firstDayOfMonth);
 
-    const todayLabel = today.toLocaleDateString(undefined, {
+    const todayLabel = new Intl.DateTimeFormat(currentLanguage.code, {
       weekday: 'long',
       month: 'long',
       day: 'numeric',
-    });
+    }).format(today);
 
     return { monthLabel, todayLabel, days: cells };
-  }, [today]);
+  }, [currentLanguage.code, today]);
 
   const renderCell = ({ item }: { item: DayCell }) => {
     if (item.date === null) {
@@ -81,13 +93,13 @@ const MonthlyCalendar: React.FC = () => {
     <TView style={styles.container} color='primary' shadow>
       <View style={[styles.header, {backgroundColor: secondaryColor + '20'}]}>
         <View style={{marginLeft: 3, marginVertical: 3}}>
-          <TText style={{fontSize: 12}}>{monthLabel}</TText>
+          <TText>{monthLabel}</TText>
           <TText style={{fontSize: 10, opacity: .5}}>{todayLabel}</TText>
         </View>
         
         <TouchableOpacity onPress={() => router.push('/itinerary/create')} style={[styles.newItineraryButton, {backgroundColor}]}>
           <TIcon name='plus' size={12}/>
-          <TText style={{fontSize: 10}}>New Itinerary</TText>
+          <TText style={{fontSize: 10}}>{t('tabs.home.calendar_new_itinerary')}</TText>
         </TouchableOpacity>
       </View>
 
@@ -105,8 +117,26 @@ const MonthlyCalendar: React.FC = () => {
         keyExtractor={(item) => item.key}
         numColumns={7}
         scrollEnabled={false}
-        contentContainerStyle={{marginHorizontal: '2%'}}
+        contentContainerStyle={styles.cellsContainer}
       />
+
+      <View style={styles.header}>
+        <View style={{marginLeft: 3, marginVertical: 3}}>
+          <TText>{todayLabel}</TText>
+          <TText style={{fontSize: 10, opacity: .5}}>{t('tabs.home.menu_itinerary')}</TText>
+        </View>
+
+        <TouchableOpacity onPress={() => router.push('/itinerary')} style={styles.viewAllButton}>
+          <TText style={{fontSize: 11}}>{t('tabs.home.calendar_view_all')}</TText>
+          <TIcon name='arrow-right' size={15}/>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.dailyItineraryContainer}>
+        <TouchableOpacity style={styles.dailyItineraryItem}>
+
+        </TouchableOpacity>
+      </View>
       
     </TView>
   );
@@ -127,7 +157,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 5,
     borderRadius: 10,
-    alignItems: 'center'
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc5'
   },
   weekdayRow: {
     flexDirection: 'row',
@@ -166,6 +198,27 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     opacity: 1
   },
+  cellsContainer: {
+    marginHorizontal: '3%',
+    paddingBottom: 5
+  },
+  dailyItineraryContainer:{
+    marginHorizontal: '2%',
+    paddingBottom: 10
+  },
+  dailyItineraryItem:{
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ccc4',
+    height: 60,
+    overflow: 'hidden',
+  },
+  viewAllButton:{
+    flexDirection: 'row',
+    alignItems: 'center',
+    opacity: .7,
+    gap: 5
+  }
 });
 
 export default MonthlyCalendar;

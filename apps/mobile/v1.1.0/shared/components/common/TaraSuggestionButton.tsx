@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useSession } from '@/features/auth/context/SessionContext';
 import { TText } from '@/shared/components/ui/Themed';
+import { useLanguage } from '@/shared/context/LanguageContext';
 
 const ActiveRouteSidebarButton: React.FC = () => {
     const primaryColor = useThemeColor({}, 'primary');
@@ -19,6 +20,7 @@ const ActiveRouteSidebarButton: React.FC = () => {
     const slideAnimation = useRef(new Animated.Value(24)).current;
     const [isVisible, setIsVisible] = useState(true);
     const { session } = useSession();
+    const { t } = useLanguage();
 
     useEffect(() => {
         const startFloatingAnimation = () => {
@@ -102,7 +104,7 @@ const ActiveRouteSidebarButton: React.FC = () => {
                 >
                     <TouchableOpacity style={{ flex: 1}} onPress={() => router.push('/suggestion')}>
                         <TText style={styles.messageText}>
-                            Hello {session?.user?.fname}! I've got some suggestions for you. Click me!
+                            {t('common.common.hello')} {session?.user?.fname}! {t('tabs.home.suggestions')}
                         </TText>
                     </TouchableOpacity>
                     

@@ -1,7 +1,9 @@
 {
   "common": {
     "welcome": "Tarahive에 오신 것을 환영합니다",
-    "continue": "계속"
+    "cancel": "취소",
+    "continue": "계속",
+    "hello": "안녕하세요"
   },
   "months": {
     "january": "1월",
@@ -17,15 +19,67 @@
     "november": "11월",
     "december": "12월"
   },
+  "days": {
+    "sunday": "일요일",
+    "monday": "월요일",
+    "tuesday": "화요일",
+    "wednesday": "수요일",
+    "thursday": "목요일",
+    "friday": "금요일",
+    "saturday": "토요일"
+  },
+  "days_short": {
+    "sun": "일",
+    "mon": "월",
+    "tue": "화",
+    "wed": "수",
+    "thu": "목",
+    "fri": "금",
+    "sat": "토"
+  },
   "genders": {
     "male": "남성",
     "female": "여성",
     "non_binary": "논바이너리",
-    "prefer_not_to_say": "밝히고 싶지 않음",
+    "prefer_not_to_say": "응답하지 않음",
     "other": "기타"
   },
   "no_internet": {
     "title": "인터넷 연결 없음",
-    "description": "현재 Tarahive를 오프라인 모드로 사용 중입니다. 인터넷에 다시 연결될 때까지 일부 기능이 제한될 수 있습니다."
+    "subtitle": "현재 Tarahive를 오프라인 모드로 사용 중입니다. 인터넷에 다시 연결될 때까지 일부 기능이 제한될 수 있습니다."
+  },
+  "dev": {
+    "cache_clear_title": "캐시 삭제",
+    "cache_clear_subtitle": "모든 캐시된 데이터가 삭제되고 로그아웃됩니다. 계속하시겠습니까?"
+  },
+  "conditions": {
+    "clear_sky": "맑음",
+    "mainly_clear": "대체로 맑음",
+    "partly_cloudy": "구름 조금",
+    "cloudy": "흐림",
+    "fog": "안개",
+    "depositing_rime_fog": "안개 서리",
+    "light_drizzle": "가벼운 이슬비",
+    "moderate_drizzle": "보통 이슬비",
+    "heavy_drizzle": "강한 이슬비",
+    "light_freezing_drizzle": "가벼운 어는 이슬비",
+    "heavy_freezing_drizzle": "강한 어는 이슬비",
+    "slight_rain": "약한 비",
+    "moderate_rain": "보통 비",
+    "heavy_rain": "강한 비",
+    "light_freezing_rain": "가벼운 어는 비",
+    "heavy_freezing_rain": "강한 어는 비",
+    "slight_snow_fall": "약한 눈",
+    "moderate_snow_fall": "보통 눈",
+    "heavy_snow_fall": "강한 눈",
+    "snow_grains": "싸락눈",
+    "slight_rain_showers": "약한 소나기",
+    "moderate_rain_showers": "보통 소나기",
+    "violent_rain_showers": "강한 소나기",
+    "slight_snow_showers": "약한 눈 소나기",
+    "heavy_snow_showers": "강한 눈 소나기",
+    "thunderstorm": "뇌우",
+    "thunderstorm_slight_hail": "약한 우박을 동반한 뇌우",
+    "thunderstorm_heavy_hail": "강한 우박을 동반한 뇌우"
   }
 }

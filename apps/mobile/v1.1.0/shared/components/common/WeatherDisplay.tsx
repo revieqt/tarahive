@@ -3,6 +3,7 @@ import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-nat
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import { TIcon, TText } from '../ui/Themed';
 import Skeleton from '../ui/Skeleton';
+import { useLanguage } from '@/shared/context/LanguageContext';
 
 interface WeatherDisplayProps {
   heatValue?: number;
@@ -24,6 +25,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({
   backgroundColor
 }) => {
   const color = textColor || useThemeColor({}, 'text');
+  const { t } = useLanguage();
 
   if (loading) {
     return (
@@ -67,7 +69,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({
               ? `${Math.round(heatValue)}°C`
               : 'N/A'}
           </TText>
-          <TText style={[styles.weatherLabel, { color }]}>Heat</TText>
+          <TText style={[styles.weatherLabel, { color }]}>{ t('tabs.home.header_heat') }</TText>
         </View>
         <View style={[styles.weather, { backgroundColor: backgroundColor }]}>
           <TIcon name='cloud' size={20} color="#5A7D9A" />
@@ -76,7 +78,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({
               ? `${rainValue}mm`
               : 'N/A'}
           </TText>
-          <TText style={[styles.weatherLabel, { color }]}>Rain</TText>
+          <TText style={[styles.weatherLabel, { color }]}>{ t('tabs.home.header_rain') }</TText>
         </View>
         <View style={[styles.weather, { backgroundColor: backgroundColor }]}>
           <TIcon name='water' size={20} color="#5A7D9A" />
@@ -85,7 +87,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({
               ? `${humidValue.toFixed(0)}%`
               : 'N/A'}
           </TText>
-          <TText style={[styles.weatherLabel, { color }]}>Humid</TText>
+          <TText style={[styles.weatherLabel, { color }]}>{ t('tabs.home.header_humid') }</TText>
         </View>
         <View style={[styles.weather, { backgroundColor: backgroundColor }]}>
           <TIcon name='fan' size={20} color="#5A7D9A" />
@@ -94,7 +96,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({
               ? `${Math.round(windValue)}km/h`
               : 'N/A'}
           </TText>
-          <TText style={[styles.weatherLabel, { color }]}>Wind</TText>
+          <TText style={[styles.weatherLabel, { color }]}>{ t('tabs.home.header_wind') }</TText>
         </View>
       </View>
     </View>

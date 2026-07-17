@@ -4,8 +4,6 @@ export interface WeatherData {
   humidity: number | null;
   precipitation: number | null;
   weatherCode: number | null;
-  weatherType: string | null;
-  aiSuggestion: string | null;  // 1. add AI suggestion field
 }
 
 export interface WeatherResponse {

@@ -75,8 +75,8 @@ export default function HomeScreen() {
               style={[styles.gridChildContainer, styles.leftGridContainer, styles.shadow, { backgroundColor: primaryColor }]}
             >
               <View style={{ padding: 12 }}>
-                <TText style={{ opacity: .5, fontSize: 10 }}>Plan your Travels</TText>
-                <TText style={{ opacity: .85, fontSize: 14 }}>Itinerary</TText>
+                <TText style={{ opacity: .5, fontSize: 10 }}>{t('tabs.home.menu_itinerary_desc')}</TText>
+                <TText style={{ opacity: .85, fontSize: 14 }}>{t('tabs.home.menu_itinerary')}</TText>
               </View>
 
               <LinearGradient
@@ -94,8 +94,8 @@ export default function HomeScreen() {
                 onPress={() => router.push('/sos')}
                 style={[styles.rightGridContainer, styles.shadow, { backgroundColor: primaryColor }]}
               >
-                <TText style={{ opacity: .5, fontSize: 10 }}>Safety in mind</TText>
-                <TText style={{ opacity: .85 }}>SOS</TText>
+                <TText style={{ opacity: .5, fontSize: 10 }}>{t('tabs.home.menu_sos_desc')}</TText>
+                <TText style={{ opacity: .85 }}>{t('tabs.home.menu_sos')}</TText>
                 <LinearGradient
                   colors={[accentColor + '60', 'transparent']}
                   start={{ x: 1, y: 0 }}
@@ -109,8 +109,8 @@ export default function HomeScreen() {
                 onPress={() => router.push('/tara')}
                 style={[styles.rightGridContainer, styles.shadow, { backgroundColor: primaryColor }]}
               >
-                <TText style={{ opacity: .5, fontSize: 10 }}>Your AI Travel Buddy</TText>
-                <TText style={{ opacity: .85 }}>Tara</TText>
+                <TText style={{ opacity: .5, fontSize: 10 }}>{t('tabs.home.menu_tara_desc')}</TText>
+                <TText style={{ opacity: .85 }}>{t('tabs.home.menu_tara')}</TText>
                 <LinearGradient
                   colors={[accentColor + '60', 'transparent']}
                   start={{ x: 1, y: 0 }}
@@ -127,8 +127,8 @@ export default function HomeScreen() {
           <MonthlyCalendar/>
 
           <TouchableOpacity style={[styles.rateContainer, {backgroundColor: primaryColor}]}>
-            <TText style={{fontSize: 12}}>Rate Us!</TText>
-            <TText style={{fontSize: 10, opacity: .5}}>dsadsdasd</TText>
+            <TText>{t('tabs.home.rate_title')}</TText>
+            <TText style={{fontSize: 10, opacity: .5}}>{t('tabs.home.rate_subtitle')}</TText>
             <View style={{flexDirection: 'row', gap: 3}}>
               <TIcon name='star' size={13} color={accentColor}/>
               <TIcon name='star' size={13} color={accentColor}/>
@@ -167,7 +167,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: '3%',
     marginBottom: '2%',
     zIndex: 1000,
-    opacity: .9,
   },
   searchFieldContainer: {
     flex: 1,
@@ -193,7 +192,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   menuGradient: {
-    height: '90%',
+    height: '93%',
     position: 'absolute',
     bottom: 0,
     left: 0,

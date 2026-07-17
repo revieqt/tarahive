@@ -21,7 +21,6 @@ export async function getWeatherController(req: Request, res: Response) {
       parseFloat(latStr),
       parseFloat(lonStr),
       dateStr,
-      res.locals.lang,
     );
 
     return res.json(weather);
@@ -35,8 +34,6 @@ export async function getWeatherController(req: Request, res: Response) {
         humidity: null,
         precipitation: null,
         weatherCode: null,
-        weatherType: null,
-        aiSuggestion: null,
       },
     });
   }

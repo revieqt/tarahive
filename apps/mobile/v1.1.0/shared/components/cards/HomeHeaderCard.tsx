@@ -8,6 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import HiveBg from '../common/HiveBg';
 import WeatherDisplay from '../common/WeatherDisplay';
+import { useLanguage } from '@/shared/context/LanguageContext';
 
 const getWeatherImage = (weatherCode: number): any => {
   if (weatherCode === 0) {
@@ -29,6 +30,7 @@ const getWeatherImage = (weatherCode: number): any => {
 };
 
 export default function HomeHeaderCard() {
+  const { t } = useLanguage();
   const locationData = useLocation();
   const secondaryColor = useThemeColor({}, 'secondary');
   const accentColor = useThemeColor({}, 'accent');
@@ -56,7 +58,7 @@ export default function HomeHeaderCard() {
         </> :
           <>
             <TText style={{ opacity: 0.5, fontSize: 12 }}>
-              You're currently at
+              { t('tabs.home.header_title') }
             </TText>
             <TText type='subtitle' style={{ color: '#fff', fontSize: 17 }}>
               {displayCity}
@@ -100,7 +102,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderWidth: 1,
     borderColor: 'transparent',
-    height: 300,
+    height: 310,
   },
   weatherImage: {
     position: 'absolute',
