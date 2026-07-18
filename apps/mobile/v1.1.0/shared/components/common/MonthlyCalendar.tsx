@@ -17,8 +17,21 @@ type DayCell = {
   hasItinerary: boolean;
 };
 
+const toLocalDateKey = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
+
+const parseLocalDateKey = (dateString: string) => {
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
+
 const itineraryOverlapsDay = (itinerary: Itinerary, dateString: string) => {
-  const targetDate = new Date(dateString);
+  const targetDate = parseLocalDateKey(dateString);
   const dayStart = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 0, 0, 0, 0);
   const dayEnd = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 23, 59, 59, 999);
   const startDate = new Date(itinerary.startDate);
@@ -33,20 +46,16 @@ const itineraryOverlapsDay = (itinerary: Itinerary, dateString: string) => {
  */
 const MonthlyCalendar: React.FC = () => {
   const today = useMemo(() => new Date(), []);
-  const [selectedDate, setSelectedDate] = useState(() => {
-    const normalized = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    return normalized.toISOString().slice(0, 10);
-  });
+  const [selectedDate, setSelectedDate] = useState(() => toLocalDateKey(today));
 
   const { t, currentLanguage } = useLanguage();
   const backgroundColor = useThemeColor({}, 'background');
   const secondaryColor = useThemeColor({}, 'accent');
 
   const monthQuery = useGetUserItineraries('active', { currentMonth: true });
-  const dayQuery = useGetUserItineraries('active', { date: selectedDate });
 
   const monthItineraries = monthQuery.itineraries ?? [];
-  const activeDayItineraries = dayQuery.itineraries ?? [];
+  const activeDayItineraries = monthItineraries.filter((itinerary) => itineraryOverlapsDay(itinerary, selectedDate));
 
   const WEEKDAY_LABELS = [
     t('common.days_short.sun'),
@@ -74,7 +83,7 @@ const MonthlyCalendar: React.FC = () => {
 
     for (let d = 1; d <= daysInMonth; d++) {
       const date = new Date(year, month, d);
-      const dateString = date.toISOString().slice(0, 10);
+      const dateString = toLocalDateKey(date);
 
       cells.push({
         key: `day-${d}`,
@@ -104,7 +113,7 @@ const MonthlyCalendar: React.FC = () => {
       weekday: 'long',
       month: 'long',
       day: 'numeric',
-    }).format(new Date(selectedDate));
+    }).format(parseLocalDateKey(selectedDate));
 
     return { monthLabel, todayLabel, selectedDateLabel, days: cells };
   }, [currentLanguage.code, monthItineraries, selectedDate, today]);
@@ -124,7 +133,7 @@ const MonthlyCalendar: React.FC = () => {
         <TText style={[styles.day, item.isToday && styles.todayText, isSelected && styles.selectedText, (isSelected && item.isToday) && styles.todayText]}>
           {item.date}
         </TText>
-        {item.hasItinerary && <View style={styles.dot} />}
+        {item.hasItinerary && <View style={[styles.dot, item.isToday && {backgroundColor: '#fff'}]} />}
       </TouchableOpacity>
     );
   };
@@ -187,7 +196,7 @@ const MonthlyCalendar: React.FC = () => {
       </View>
 
       <View style={styles.dailyItineraryContainer}>
-        {dayQuery.isLoading ? (
+        {monthQuery.isLoading ? (
           <CalendarCardSkeleton/>
         ) : activeDayItineraries.length > 0 ? (
           <FlatList

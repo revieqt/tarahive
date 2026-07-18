@@ -53,23 +53,25 @@ export const useGetUserItineraries = (
   options?: GetUserItinerariesOptions
 ) => {
   const queryClient = useQueryClient();
+  const cacheKey = ['user-itineraries', status] as const;
+
   const query = useQuery({
-    queryKey: [
-      'user-itineraries',
-      status,
-      options?.currentMonth ? 'currentMonth' : 'all',
-      options?.date ?? 'all',
-    ],
+    queryKey: cacheKey,
     queryFn: async () => {
       try {
-        const activeCache = queryClient.getQueryData<Itinerary[]>(['user-itineraries', 'active']);
-        const cached = filterCachedActiveItineraries(activeCache, options);
+        const cachedStatusData = queryClient.getQueryData<Itinerary[]>(cacheKey);
 
-        if (cached && cached.length > 0) {
-          return cached;
+        if (cachedStatusData !== undefined) {
+          return cachedStatusData;
         }
 
-        return await getAllUserItineraries(status, options);
+        const fetchOptions = status === 'active' && options?.date
+          ? { currentMonth: true }
+          : options;
+
+        const fetchedData = await getAllUserItineraries(status, fetchOptions);
+        queryClient.setQueryData(cacheKey, fetchedData);
+        return fetchedData;
       } catch (error: any) {
         const errorMsg = error?.message || 'Failed to fetch itineraries';
         showError('Fetch Error', errorMsg);
@@ -79,8 +81,12 @@ export const useGetUserItineraries = (
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
+  const itineraries = status === 'active'
+    ? filterCachedActiveItineraries(query.data, options) ?? []
+    : query.data ?? [];
+
   return {
-    itineraries: query.data as Itinerary[] | undefined,
+    itineraries: itineraries as Itinerary[] | undefined,
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,
