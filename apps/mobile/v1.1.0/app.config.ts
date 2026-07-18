@@ -5,12 +5,12 @@ const config: ExpoConfig = {
   name: 'Tarahive',
   slug: 'tarahive-mobile',
   scheme: 'tarahiveapp',
-  version: '1.0.0',
+  version: '1.1.0',
   orientation: 'portrait',
-  icon: './assets/images/icon.png',
+  icon: './shared/assets/images/icon.png',
 
   splash: {
-    image: './assets/images/icon.png',
+    image: './shared/assets/images/icon.png',
     resizeMode: 'contain',
     backgroundColor: '#FFD65A',
   },

@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   selectedText: {
-    fontFamily: 'Baloo',
+    fontWeight: 900,
     fontSize: 16,
     opacity: 1,
   },
