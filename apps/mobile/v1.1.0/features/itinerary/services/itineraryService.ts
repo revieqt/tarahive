@@ -8,14 +8,28 @@ import {
 
 const API_URL = '/v1/itinerary';
 
+export interface GetAllUserItinerariesOptions {
+  currentMonth?: boolean;
+  date?: string;
+}
+
 /**
  * Get all user itineraries
  * @param status - Filter by status: 'active' (default), 'done', or 'cancelled'
+ * @param options - Optional backend filters for the MonthlyCalendar flow
  */
-export const getAllUserItineraries = async (status: string = 'active'): Promise<Itinerary[]> => {
+export const getAllUserItineraries = async (
+  status: string = 'active',
+  options?: GetAllUserItinerariesOptions
+): Promise<Itinerary[]> => {
   const response = await api.get<AllItinerariesResponse>(`${API_URL}/`, {
-    params: { status },
+    params: {
+      status,
+      currentMonth: options?.currentMonth ? true : undefined,
+      day: options?.date,
+    },
   });
+
   return response.data || [];
 };
 

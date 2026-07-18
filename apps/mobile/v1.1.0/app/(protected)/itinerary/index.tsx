@@ -10,7 +10,7 @@ import { useGetUserItineraries } from "@/features/itinerary/hooks/useGetUserItin
 import { Itinerary, getStatusColor } from "@/features/itinerary/types/itineraryTypes";
 import { formatDateToString } from "@/shared/utils/formatDateToString";
 import EmptyMessage from "@/shared/components/common/EmptyMessage";
-import ItineraryCardSkeleton from "@/shared/components/feedback/ItineraryCardSkeleton";
+import ItineraryCardSkeleton from "@/shared/components/feedback/CalendarCardSkeleton";
 
 const ItineraryOptions = [
   { value: 'active', icon: 'cards-heart', label: 'Active' },

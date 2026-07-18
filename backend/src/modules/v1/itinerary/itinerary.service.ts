@@ -98,18 +98,26 @@ export const getItineraryService = async (
 
 export const getAllUserItinerariesService = async (
   userId: string,
-  status?: string
+  status?: string,
+  filters?: {
+    currentMonth?: boolean;
+    day?: string;
+  }
 ): Promise<Itinerary[]> => {
   try {
-    const statusFilter = status || ItineraryStatus.ACTIVE;
+    const hasDateFilter = Boolean(filters?.currentMonth || filters?.day);
+    const defaultStatus = status || ItineraryStatus.ACTIVE;
+
     console.log(
       '🟡 getAllUserItinerariesService - Fetching itineraries for user:',
       userId,
       'with status:',
-      statusFilter
+      hasDateFilter ? ItineraryStatus.ACTIVE : defaultStatus,
+      'filters:',
+      filters
     );
 
-    const itineraries = await itineraryRepository
+    const query = itineraryRepository
       .createQueryBuilder('itinerary')
       .select([
         'itinerary.id',
@@ -121,7 +129,31 @@ export const getAllUserItinerariesService = async (
         'itinerary.status',
       ])
       .where('itinerary.user.id = :userId', { userId })
-      .andWhere('itinerary.status = :status', { status: statusFilter })
+      .andWhere('itinerary.status = :status', {
+        status: hasDateFilter ? ItineraryStatus.ACTIVE : defaultStatus,
+      });
+
+    if (filters?.currentMonth && !filters?.day) {
+      const now = new Date();
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+      query
+        .andWhere('itinerary.startDate <= :monthEnd', { monthEnd })
+        .andWhere('itinerary.endDate >= :monthStart', { monthStart });
+    }
+
+    if (filters?.day) {
+      const parsedDay = new Date(filters.day);
+      const dayStart = new Date(parsedDay.getFullYear(), parsedDay.getMonth(), parsedDay.getDate(), 0, 0, 0, 0);
+      const dayEnd = new Date(parsedDay.getFullYear(), parsedDay.getMonth(), parsedDay.getDate(), 23, 59, 59, 999);
+
+      query
+        .andWhere('itinerary.startDate <= :dayEnd', { dayEnd })
+        .andWhere('itinerary.endDate >= :dayStart', { dayStart });
+    }
+
+    const itineraries = await query
       .orderBy('itinerary.createdOn', 'DESC')
       .getMany();
 

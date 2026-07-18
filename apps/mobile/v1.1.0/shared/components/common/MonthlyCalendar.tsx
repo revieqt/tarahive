@@ -1,17 +1,30 @@
-import React, { useMemo } from 'react';
-import { View, StyleSheet, FlatList, Dimensions, TouchableOpacity } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { TIcon, TText, TView } from '../ui/Themed';
 import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import { router } from 'expo-router';
 import { useLanguage } from '@/shared/context/LanguageContext';
-
-
-
+import { useGetUserItineraries } from '@/features/itinerary/hooks/useGetUserItineraries';
+import { Itinerary } from '@/features/itinerary/types/itineraryTypes';
+import { formatDateToString } from '@/shared/utils/formatDateToString';
+import CalendarCardSkeleton from '../feedback/CalendarCardSkeleton';
 
 type DayCell = {
   key: string;
-  date: number | null; // null represents a blank leading/trailing cell
+  date: number | null;
   isToday: boolean;
+  dateString: string;
+  hasItinerary: boolean;
+};
+
+const itineraryOverlapsDay = (itinerary: Itinerary, dateString: string) => {
+  const targetDate = new Date(dateString);
+  const dayStart = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 0, 0, 0, 0);
+  const dayEnd = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 23, 59, 59, 999);
+  const startDate = new Date(itinerary.startDate);
+  const endDate = new Date(itinerary.endDate);
+
+  return startDate <= dayEnd && endDate >= dayStart;
 };
 
 /**
@@ -20,9 +33,21 @@ type DayCell = {
  */
 const MonthlyCalendar: React.FC = () => {
   const today = useMemo(() => new Date(), []);
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const normalized = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    return normalized.toISOString().slice(0, 10);
+  });
+
   const { t, currentLanguage } = useLanguage();
   const backgroundColor = useThemeColor({}, 'background');
   const secondaryColor = useThemeColor({}, 'accent');
+
+  const monthQuery = useGetUserItineraries('active', { currentMonth: true });
+  const dayQuery = useGetUserItineraries('active', { date: selectedDate });
+
+  const monthItineraries = monthQuery.itineraries ?? [];
+  const activeDayItineraries = dayQuery.itineraries ?? [];
+
   const WEEKDAY_LABELS = [
     t('common.days_short.sun'),
     t('common.days_short.mon'),
@@ -33,33 +58,35 @@ const MonthlyCalendar: React.FC = () => {
     t('common.days_short.sat')
   ];
 
-  const { monthLabel, todayLabel, days } = useMemo(() => {
+  const { monthLabel, todayLabel, selectedDateLabel, days } = useMemo(() => {
     const year = today.getFullYear();
-    const month = today.getMonth(); // 0-indexed
+    const month = today.getMonth();
     const todayDate = today.getDate();
     const firstDayOfMonth = new Date(year, month, 1);
-    const startWeekday = firstDayOfMonth.getDay(); // 0 (Sun) - 6 (Sat)
+    const startWeekday = firstDayOfMonth.getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
     const cells: DayCell[] = [];
 
-    // Leading blank cells so the 1st lands on the correct weekday column
     for (let i = 0; i < startWeekday; i++) {
-      cells.push({ key: `blank-start-${i}`, date: null, isToday: false });
+      cells.push({ key: `blank-start-${i}`, date: null, isToday: false, dateString: '', hasItinerary: false });
     }
 
-    // Actual day cells
     for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(year, month, d);
+      const dateString = date.toISOString().slice(0, 10);
+
       cells.push({
         key: `day-${d}`,
         date: d,
         isToday: d === todayDate,
+        dateString,
+        hasItinerary: monthItineraries.some((itinerary) => itineraryOverlapsDay(itinerary, dateString)),
       });
     }
 
-    // Trailing blank cells to complete the last week row
     while (cells.length % 7 !== 0) {
-      cells.push({ key: `blank-end-${cells.length}`, date: null, isToday: false });
+      cells.push({ key: `blank-end-${cells.length}`, date: null, isToday: false, dateString: '', hasItinerary: false });
     }
 
     const monthLabel = new Intl.DateTimeFormat(currentLanguage.code, {
@@ -73,40 +100,67 @@ const MonthlyCalendar: React.FC = () => {
       day: 'numeric',
     }).format(today);
 
-    return { monthLabel, todayLabel, days: cells };
-  }, [currentLanguage.code, today]);
+    const selectedDateLabel = new Intl.DateTimeFormat(currentLanguage.code, {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+    }).format(new Date(selectedDate));
+
+    return { monthLabel, todayLabel, selectedDateLabel, days: cells };
+  }, [currentLanguage.code, monthItineraries, selectedDate, today]);
 
   const renderCell = ({ item }: { item: DayCell }) => {
     if (item.date === null) {
       return <View style={[styles.cell, styles.emptyCell]} />;
     }
+
+    const isSelected = selectedDate === item.dateString;
+
     return (
-      <View style={[styles.cell, item.isToday && styles.todayCell]}>
-        <TText style={[styles.day, item.isToday && styles.todayText]}>
+      <TouchableOpacity
+        onPress={() => setSelectedDate(item.dateString)}
+        style={[styles.cell, isSelected && styles.selectedCell, item.isToday && styles.todayCell]}
+      >
+        <TText style={[styles.day, item.isToday && styles.todayText, isSelected && styles.selectedText, (isSelected && item.isToday) && styles.todayText]}>
           {item.date}
         </TText>
-      </View>
+        {item.hasItinerary && <View style={styles.dot} />}
+      </TouchableOpacity>
     );
   };
 
+  const renderDailyItinerary = ({ item }: { item: Itinerary }) => (
+    <TouchableOpacity
+      key={item.id}
+      style={styles.dailyItineraryItem}
+      onPress={() => router.push(`/itinerary/${item.id}`)}
+    >
+      <TText>{item.title}</TText>
+      <TText style={styles.dailyItineraryDetails}>
+        {formatDateToString(new Date(item.startDate), currentLanguage.code)} - {formatDateToString(new Date(item.endDate), currentLanguage.code)}
+      </TText>
+      <TText style={styles.dailyItineraryDetails}>{item.type}</TText>
+    </TouchableOpacity>
+  );
+
   return (
     <TView style={styles.container} color='primary' shadow>
-      <View style={[styles.header, {backgroundColor: secondaryColor + '20'}]}>
-        <View style={{marginLeft: 3, marginVertical: 3}}>
+      <View style={[styles.header, { backgroundColor: `${secondaryColor}20` }]}>
+        <View style={{ marginLeft: 3, marginVertical: 3 }}>
           <TText>{monthLabel}</TText>
-          <TText style={{fontSize: 10, opacity: .5}}>{todayLabel}</TText>
+          <TText style={{ fontSize: 10, opacity: 0.5 }}>{todayLabel}</TText>
         </View>
-        
-        <TouchableOpacity onPress={() => router.push('/itinerary/create')} style={[styles.newItineraryButton, {backgroundColor}]}>
-          <TIcon name='plus' size={12}/>
-          <TText style={{fontSize: 10}}>{t('tabs.home.calendar_new_itinerary')}</TText>
+
+        <TouchableOpacity onPress={() => router.push('/itinerary/create')} style={[styles.newItineraryButton, { backgroundColor }]}>
+          <TIcon name='plus' size={12} />
+          <TText style={{ fontSize: 10 }}>{t('tabs.home.calendar_new_itinerary')}</TText>
         </TouchableOpacity>
       </View>
 
       <View style={styles.weekdayRow}>
         {WEEKDAY_LABELS.map((label) => (
-          <View key={label} style={[styles.weekdayCell, {backgroundColor: backgroundColor}]}>
-            <TText style={{fontSize: 10}}>{label}</TText>
+          <View key={label} style={[styles.weekdayCell, { backgroundColor }]}>
+            <TText style={{ fontSize: 10 }}>{label}</TText>
           </View>
         ))}
       </View>
@@ -121,23 +175,31 @@ const MonthlyCalendar: React.FC = () => {
       />
 
       <View style={styles.header}>
-        <View style={{marginLeft: 3, marginVertical: 3}}>
-          <TText>{todayLabel}</TText>
-          <TText style={{fontSize: 10, opacity: .5}}>{t('tabs.home.menu_itinerary')}</TText>
+        <View style={{ marginLeft: 3, marginVertical: 3 }}>
+          <TText>{selectedDateLabel}</TText>
+          <TText style={{ fontSize: 10, opacity: 0.5 }}>{t('tabs.home.menu_itinerary')}</TText>
         </View>
 
         <TouchableOpacity onPress={() => router.push('/itinerary')} style={styles.viewAllButton}>
-          <TText style={{fontSize: 11}}>{t('tabs.home.calendar_view_all')}</TText>
-          <TIcon name='arrow-right' size={15}/>
+          <TText style={{ fontSize: 11 }}>{t('tabs.home.calendar_view_all')}</TText>
+          <TIcon name='arrow-right' size={15} />
         </TouchableOpacity>
       </View>
 
       <View style={styles.dailyItineraryContainer}>
-        <TouchableOpacity style={styles.dailyItineraryItem}>
-
-        </TouchableOpacity>
+        {dayQuery.isLoading ? (
+          <CalendarCardSkeleton/>
+        ) : activeDayItineraries.length > 0 ? (
+          <FlatList
+            data={activeDayItineraries}
+            renderItem={renderDailyItinerary}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+          />
+        ) : (
+          <TText style={styles.emptyStateText}>{t('tabs.home.calendar_no_itineraries')}</TText>
+        )}
       </View>
-      
     </TView>
   );
 };
@@ -148,12 +210,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden'
   },
-  header:{
+  header: {
     padding: '2%',
     flexDirection: 'row',
     justifyContent: 'space-between'
   },
-  newItineraryButton:{
+  newItineraryButton: {
     flexDirection: 'row',
     padding: 5,
     borderRadius: 10,
@@ -184,9 +246,9 @@ const styles = StyleSheet.create({
   emptyCell: {
     // Blank filler cell, no visible content
   },
-  day:{
+  day: {
     fontWeight: 400,
-    opacity: .7,
+    opacity: 0.7,
     fontSize: 12
   },
   todayCell: {
@@ -198,25 +260,58 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     opacity: 1
   },
+  selectedCell: {
+    borderRadius: 100,
+    borderWidth: 1,
+    borderColor: '#F59E0B',
+  },
+  selectedText: {
+    color: '#F59E0B',
+    fontWeight: '700',
+  },
+  dot: {
+    width: 5,
+    height: 5,
+    borderRadius: 999,
+    backgroundColor: '#F59E0B',
+    position: 'absolute',
+    bottom: 4,
+  },
   cellsContainer: {
     marginHorizontal: '3%',
     paddingBottom: 5
   },
-  dailyItineraryContainer:{
+  dailyItineraryContainer: {
     marginHorizontal: '2%',
-    paddingBottom: 10
+    paddingBottom: 2,
+    gap: 8,
   },
-  dailyItineraryItem:{
+  dailyItineraryItem: {
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#ccc4',
-    height: 60,
+    borderLeftWidth: 3,
+    borderLeftColor: '#F59E0B',
+    padding: 10,
+    gap: 2,
+    marginBottom: 8,
     overflow: 'hidden',
   },
-  viewAllButton:{
+  dailyItineraryDetails: {
+    fontSize: 11,
+    opacity: 0.5,
+  },
+  emptyStateText: {
+    fontSize: 12,
+    opacity: 0.5,
+    paddingBottom: 8,
+    textAlign: 'center',
+    textDecorationLine: 'underline',
+  },
+  viewAllButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    opacity: .7,
+    opacity: 0.7,
     gap: 5
   }
 });

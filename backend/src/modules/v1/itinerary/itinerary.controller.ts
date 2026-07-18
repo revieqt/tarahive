@@ -120,8 +120,23 @@ export const getAllUserItineraries = async (req: AuthRequest, res: Response) => 
 
     // Get status from query parameter (defaults to 'active' if not provided)
     const status = req.query.status as string | undefined;
+    const currentMonth = req.query.currentMonth === 'true' || req.query.currentMonth === '1';
+    const day = req.query.day as string | undefined;
 
-    const itineraries = await getAllUserItinerariesService(userID, status);
+    if (day) {
+      const parsedDay = new Date(day);
+      if (Number.isNaN(parsedDay.getTime())) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid day format. Please use YYYY-MM-DD',
+        });
+      }
+    }
+
+    const itineraries = await getAllUserItinerariesService(userID, status, {
+      currentMonth,
+      day,
+    });
 
     res.status(200).json({
       success: true,

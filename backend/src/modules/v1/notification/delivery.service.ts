@@ -86,7 +86,7 @@ const baseTemplate = (innerContent: string) => `
 <body>
   <div class="container">
     <div class="header">
-      <img src="https://tarag.vercel.app/icon.png" alt="TaraHive Logo" width="50" height="50"
+      <img src="https://tarahive.vercel.app/icon.png" alt="TaraHive Logo" width="50" height="50"
         style="display:block; border:0; outline:none; text-decoration:none; margin: 0 auto">
       <h1 class="title">Tarahive</h1>
       <p>Mobile Travel Companion</p>
