@@ -65,7 +65,7 @@ export default function HomeHeaderCard() {
             </TText>
 
             <TText style={{ opacity: 0.5, fontSize: 12 }}>
-              {displayWeather?.weatherType || 'No data'}
+              {t(displayWeather?.weatherType || 'No data')}
             </TText>
           </>
         }

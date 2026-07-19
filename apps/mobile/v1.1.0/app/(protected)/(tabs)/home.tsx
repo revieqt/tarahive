@@ -74,7 +74,7 @@ export default function HomeScreen() {
               onPress={() => router.push('/itinerary')}
               style={[styles.gridChildContainer, styles.leftGridContainer, styles.shadow, { backgroundColor: primaryColor }]}
             >
-              <View style={{ padding: 12 }}>
+              <View style={{ padding: 10 }}>
                 <TText style={{ opacity: .5, fontSize: 10 }}>{t('tabs.home.menu_itinerary_desc')}</TText>
                 <TText style={{ opacity: .85, fontSize: 14 }}>{t('tabs.home.menu_itinerary')}</TText>
               </View>
@@ -190,6 +190,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ccc7',
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
   },
   menuGradient: {
     height: '93%',
@@ -235,7 +236,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#ccc0',
-    padding: 12,
+    padding: 10,
   },
   gridCircle: {
     height: '150%',
