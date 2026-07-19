@@ -101,7 +101,7 @@ export default function ItineraryScreen() {
 
       <RoundButton
         iconName='plus'
-        onPress={() => router.push('/itinerary/create')}
+        onPress={() => router.push('/itinerary/new')}
         style={styles.addButton}
       />
     </TView>
