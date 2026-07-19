@@ -31,10 +31,10 @@ export const createItinerary = async (req: AuthRequest, res: Response) => {
     }
 
     // Validate required fields
-    if (!title || !type || !startDate || !endDate || !content || !privacy ) {
+    if (!title || !type || !startDate || !endDate || !privacy ) {
       return res.status(400).json({
         success: false,
-        message: 'Missing required fields: title, type, startDate, endDate, content, privacy',
+        message: 'Missing required fields: title, type, startDate, endDate, privacy',
       });
     }
 

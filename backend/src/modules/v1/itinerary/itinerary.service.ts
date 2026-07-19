@@ -2,7 +2,6 @@ import { AppDataSource } from '../../../config/postgres';
 import { Itinerary } from './itinerary.entity';
 import {
   CreateItineraryRequest,
-  PublicPermissions,
   ItineraryStatus,
   ItineraryPrivacy,
 } from './itinerary.types';
@@ -74,7 +73,7 @@ export const getItineraryService = async (
     }
 
     // Check authorization: allow if user is owner or itinerary is public
-    if (itinerary.privacy === ItineraryPrivacy.ONLY_ME && itinerary.user.id !== userId) {
+    if (itinerary.privacy === ItineraryPrivacy.PRIVATE && itinerary.user.id !== userId) {
       console.log(
         '🟡 User not authorized to view this private itinerary'
       );

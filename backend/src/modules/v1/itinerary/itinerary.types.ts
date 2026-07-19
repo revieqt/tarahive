@@ -20,14 +20,14 @@ export enum CollaboratorStatus {
   ACCEPTED = 'accepted'
 }
 
-// export interface CreateItineraryRequest {
-//   title: string;
-//   type: string;
-//   startDate: Date;
-//   endDate: Date;
-//   content: string;
-//   privacy: ItineraryPrivacy;
-// }
+export interface CreateItineraryRequest {
+  title: string;
+  type: string;
+  startDate: Date;
+  endDate: Date;
+  content: unknown;
+  privacy: ItineraryPrivacy;
+}
 
 // export interface UpdateItineraryRequest {
 //   title?: string;

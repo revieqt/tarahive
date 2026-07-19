@@ -55,7 +55,7 @@ export class Itinerary {
     type: "jsonb",
     nullable: true,
   })
-  content?: Record<string, any>;
+  content?: unknown;
 
   @Column({
     type: 'enum',

@@ -16,11 +16,11 @@ export interface Itinerary {
   type: string;
   startDate: string;
   endDate: string;
-  content: string;
+  content?: unknown;
   status: 'active' | 'cancelled' | 'done';
   createdOn: string;
   updatedOn: string;
-  privacy: 'Only Me' | 'Public';
+  privacy: 'private' | 'collaborators' | 'public';
   user?: UserItinerary;
 }
 
@@ -29,8 +29,8 @@ export interface CreateItineraryRequest {
   type: string;
   startDate: Date;
   endDate: Date;
-  content: string;
-  privacy: 'Only Me' | 'Public';
+  content?: unknown;
+  privacy: 'private' | 'collaborators' | 'public';
 }
 
 export interface ItineraryResponse {

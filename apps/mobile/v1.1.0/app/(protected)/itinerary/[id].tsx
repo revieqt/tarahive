@@ -60,7 +60,7 @@ export default function ItineraryCreateScreen() {
   const [type, setType] = useState('Solo');
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
-  const [privacy, setPrivacy] = useState<'Only Me' | 'Public'>('Only Me');
+  const [privacy, setPrivacy] = useState<'private' | 'collaborators' | 'public'>('private');
   const [isToolbarOpen, setIsToolbarOpen] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(true);
 
@@ -85,6 +85,16 @@ export default function ItineraryCreateScreen() {
     ]).start();
     setIsHeaderExpanded(next);
   };
+
+  const handleCreate = useCallback(() => {
+    create({
+      title,
+      type,
+      startDate: startDate!,
+      endDate: endDate!,
+      privacy
+    });
+  }, [create, title, type, startDate, endDate, privacy]);
 
   const isOwner = true;
   const isViewer = true;
@@ -268,14 +278,14 @@ export default function ItineraryCreateScreen() {
                 style={[styles.tool, { backgroundColor }]}
                 onPress={() => setIsToolbarOpen(!isToolbarOpen)}
               >
-                { isToolbarOpen ? <TIcon name="chevron-down" size={15}/> : <TIcon name="chevron-up" size={15}/> }
+                { isToolbarOpen ? <TIcon name="chevron-down" size={15}/> : <TIcon name="chevron-down" size={15}/> }
                 <TText>{isToolbarOpen ? 'Close Toolbar' : 'Open Toolbar'}</TText>
               </TouchableOpacity>
             }
 
             <TouchableOpacity
               style={[styles.tool, { backgroundColor: accentColor }]}
-              onPress={() => setIsToolbarOpen(!isToolbarOpen)}
+              onPress={() => isCreateMode && handleCreate()}
             >
               <TIcon name="check" size={15} color="#fff"/>
               <View>
