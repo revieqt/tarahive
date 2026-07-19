@@ -53,7 +53,7 @@ export default function HomeScreen() {
               <TouchableOpacity
                onPress={() => router.push({
                   pathname: '/tara',
-                  params: { prompt: searchAi },
+                  params: { prompt: searchAi, triggerSearch: true },
                 } as any)}
               >
                 <TIcon name='send' size={18} color={searchAi ? secondaryColor : '#ccc4'} />

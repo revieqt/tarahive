@@ -223,7 +223,10 @@ export default function ItineraryCreateScreen() {
           style={styles.toolbar}
         >
           { isToolbarOpen &&
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: '3%', gap: 8 }}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} 
+              contentContainerStyle={{ paddingHorizontal: '3%', gap: 8 }}
+              style={{ borderBottomWidth: 1, borderBottomColor: '#ccc2' }}
+            >
               <TouchableOpacity
                 style={[styles.tool, { backgroundColor }]}
               >
@@ -265,7 +268,7 @@ export default function ItineraryCreateScreen() {
                 style={[styles.tool, { backgroundColor }]}
                 onPress={() => setIsToolbarOpen(!isToolbarOpen)}
               >
-                { isToolbarOpen ? <TIcon name="chevron-up" size={15}/> : <TIcon name="chevron-down" size={15}/> }
+                { isToolbarOpen ? <TIcon name="chevron-down" size={15}/> : <TIcon name="chevron-up" size={15}/> }
                 <TText>{isToolbarOpen ? 'Close Toolbar' : 'Open Toolbar'}</TText>
               </TouchableOpacity>
             }

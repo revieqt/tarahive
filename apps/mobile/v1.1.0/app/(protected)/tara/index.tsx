@@ -14,12 +14,15 @@ import { TARA_AI_SUGGESTIONS } from '@/shared/constants/Tara';
 import { formatDateToString } from '@/shared/utils/formatDateToString';
 
 export default function AiChatScreen() {
-  const { prompt } = useLocalSearchParams();
+  const { prompt, triggerSearch } = useLocalSearchParams();
+  const triggerSearchValue = Array.isArray(triggerSearch) ? triggerSearch[0] : triggerSearch;
+  const shouldTriggerSearch = triggerSearchValue === 'true';
   const [inputText, setInputText] = useState(prompt as string);
   const [isTtsEnabled, setIsTtsEnabled] = useState(false);
   const [dotCount, setDotCount] = useState(1);
   const [todayMessageCount, setTodayMessageCount] = useState(0);
   const [rateLimitError, setRateLimitError] = useState<string | null>(null);
+  const autoTriggerRef = useRef(false);
   const scrollViewRef = useRef<ScrollView>(null);
   const { messages, isSending, handleSendMessage, clearChat } = useAiChat();
   const { session } = useSession();
@@ -28,6 +31,13 @@ export default function AiChatScreen() {
   useEffect(() => {
     scrollViewRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
+
+  useEffect(() => {
+    if (!shouldTriggerSearch || autoTriggerRef.current || !inputText?.trim()) return;
+
+    autoTriggerRef.current = true;
+    handleSend();
+  }, [shouldTriggerSearch, inputText]);
 
   useEffect(() => {
     const loadMessageCount = async () => {
@@ -149,8 +159,7 @@ export default function AiChatScreen() {
   ];
 
   return (
-    <TView style={{ height: '100%', width: '100%' }}>
-
+    <TView style={{ height: '100%', width: '100%' }}> 
       {!hasUserMessages ? (
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

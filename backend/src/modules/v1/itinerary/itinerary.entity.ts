@@ -8,7 +8,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { User } from '../user/user.entity';
-import { ItineraryPrivacy, ItineraryStatus, PublicPermissions } from './itinerary.types';
+import { ItineraryPrivacy, ItineraryStatus, CollaboratorPermissions } from './itinerary.types';
 
 @Entity({ name: 'itineraries' })
 export class Itinerary {
@@ -52,24 +52,24 @@ export class Itinerary {
   status!: ItineraryStatus;
 
   @Column({
-    type: 'text',
-    default: '',
+    type: "jsonb",
+    nullable: true,
   })
-  content!: string;
+  content?: Record<string, any>;
 
   @Column({
     type: 'enum',
     enum: ItineraryPrivacy,
-    default: ItineraryPrivacy.ONLY_ME,
+    default: ItineraryPrivacy.PRIVATE,
   })
   privacy!: ItineraryPrivacy;
 
   @Column({
     type: 'enum',
-    enum: PublicPermissions,
-    default: PublicPermissions.VIEW,
+    enum: CollaboratorPermissions,
+    default: CollaboratorPermissions.VIEW,
   })
-  publicPermissions!: PublicPermissions;
+  collaboratorPermissions!: CollaboratorPermissions;
 
   @Column({
     type: 'integer',

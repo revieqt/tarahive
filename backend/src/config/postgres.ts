@@ -3,6 +3,7 @@ import { DataSource } from "typeorm";
 import { Log } from "../modules/v1/audit/audit.entity";
 import { User } from "../modules/v1/user/user.entity";
 import { Itinerary } from "../modules/v1/itinerary/itinerary.entity";
+import { ItineraryCollaborator } from "../modules/v1/itinerary/itinerary-collaborator.entity";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -17,7 +18,7 @@ export const AppDataSource = new DataSource({
 
   logging: false,
 
-  entities: [User, Log, Itinerary],
+  entities: [User, Log, Itinerary, ItineraryCollaborator],
 
   // ✅ Enable connection pooling properly
   extra: {

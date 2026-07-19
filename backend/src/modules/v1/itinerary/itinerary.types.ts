@@ -5,23 +5,29 @@ export enum ItineraryStatus {
 }
 
 export enum ItineraryPrivacy {
-  ONLY_ME = 'Only Me',
-  PUBLIC = 'Public',
+  PRIVATE = 'private',
+  COLLABORATORS = 'collaborators',
+  PUBLIC = 'public',
 }
 
-export enum PublicPermissions {
+export enum CollaboratorPermissions {
   EDIT = 'edit',
   VIEW = 'view',
 }
 
-export interface CreateItineraryRequest {
-  title: string;
-  type: string;
-  startDate: Date;
-  endDate: Date;
-  content: string;
-  privacy: ItineraryPrivacy;
+export enum CollaboratorStatus {
+  PENDING = 'pending',
+  ACCEPTED = 'accepted'
 }
+
+// export interface CreateItineraryRequest {
+//   title: string;
+//   type: string;
+//   startDate: Date;
+//   endDate: Date;
+//   content: string;
+//   privacy: ItineraryPrivacy;
+// }
 
 // export interface UpdateItineraryRequest {
 //   title?: string;
