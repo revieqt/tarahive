@@ -30,5 +30,16 @@
     "sms_placeholder": "Emergency Contact Phone",
     "language": "Preferred Alert Language",
     "save_button": "Save Changes"
+  },
+  "alert": {
+    "email_header_subtitle": "Mobile Travel Companion",
+    "email_header_notice": "This is an automated message. Please do not reply.",
+    "email_sos_alert": "SOS Alert",
+    "email_sos_note": "is in an emergency. Please respond immediately if you can help!",
+    "email_details_title": "Emergency Details",
+    "email_details_type": "Emergency Type",
+    "email_details_loc": "Last known location",
+    "email_details_maps": "View Location on Google Maps",
+    "email_sos_note": "is in an emergency. Please respond immediately if you can help!"
   }
 }

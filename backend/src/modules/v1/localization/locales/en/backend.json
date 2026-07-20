@@ -1,0 +1,18 @@
+{
+  "notifications":{
+    "email_header_subtitle": "Mobile Travel Companion",
+    "no_reply_notice": "This is an automated message from Tarahive. Please do not reply."
+  },
+  "emergency_alert": {
+    "sos_alert": "SOS Alert",
+    "sos_note": "is in an emergency. Please respond immediately if you can help!",
+    "details_title": "Emergency Details",
+    "details_type": "Emergency Type",
+    "details_loc": "Last known location",
+    "details_maps": "View Location on Google Maps",
+    "contact_title": "User Contacts",
+    "contact_email": "Email",
+    "contact_num": "Contact",
+    "contact_no_num": "Not Provided"
+  }
+}

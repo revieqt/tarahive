@@ -1,0 +1,18 @@
+{
+  "notifications": {
+    "email_header_subtitle": "모바일 여행 동반자",
+    "no_reply_notice": "이 메시지는 Tarahive에서 자동으로 발송되었습니다. 회신하지 마십시오."
+  },
+  "emergency_alert": {
+    "sos_alert": "SOS 경보",
+    "sos_note": "님이 긴급 상황에 처해 있습니다. 도움을 줄 수 있다면 즉시 대응해 주세요!",
+    "details_title": "긴급 상황 정보",
+    "details_type": "긴급 상황 유형",
+    "details_loc": "마지막으로 확인된 위치",
+    "details_maps": "Google 지도에서 위치 보기",
+    "contact_title": "사용자 연락처",
+    "contact_email": "이메일",
+    "contact_num": "연락처",
+    "contact_no_num": "제공되지 않음"
+  }
+}
