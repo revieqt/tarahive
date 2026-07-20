@@ -96,6 +96,7 @@ export class User {
       delivery: {
         isEmailEnabled: false,
         isSMSEnabled: false,
+        alertLang: "en"
       },
     },
   })
@@ -110,6 +111,7 @@ export class User {
     delivery?: {
       isEmailEnabled: boolean;
       isSMSEnabled: boolean;
+      alertLang: string;
     };
     lastKnownLocation?: {
       locationName: string;

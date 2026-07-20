@@ -14,6 +14,7 @@ export const useUpdateSafetySettings = () => {
       const hasChanges =
         currentDelivery?.isEmailEnabled !== payload.delivery.isEmailEnabled ||
         currentDelivery?.isSMSEnabled !== payload.delivery.isSMSEnabled ||
+        currentDelivery?.alertLang !== payload.delivery.alertLang ||
         currentEmergencyContact?.email !== payload.emergencyContact?.email ||
         currentEmergencyContact?.phone !== payload.emergencyContact?.phone;
 
@@ -46,7 +47,10 @@ export const useUpdateSafetySettings = () => {
                 phone: payload.emergencyContact?.phone,
               },
               lastKnownLocation: session?.user?.safetyState?.lastKnownLocation,
-              delivery: payload.delivery,
+              delivery: {
+                ...session?.user?.safetyState?.delivery,
+                ...payload.delivery,
+              },
             },
           } as any,
         });

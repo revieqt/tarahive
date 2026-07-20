@@ -50,7 +50,7 @@ const MonthlyCalendar: React.FC = () => {
 
   const { t, currentLanguage } = useLanguage();
   const backgroundColor = useThemeColor({}, 'background');
-  const secondaryColor = useThemeColor({}, 'accent');
+  const secondaryColor = useThemeColor({}, 'secondary');
 
   const monthQuery = useGetUserItineraries('active', { currentMonth: true });
 

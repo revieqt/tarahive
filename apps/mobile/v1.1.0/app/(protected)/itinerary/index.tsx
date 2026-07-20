@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, StyleSheet, ScrollView, TouchableOpacity, FlatList } from "react-native";
+import { View, StyleSheet, TouchableOpacity, FlatList, Image} from "react-native";
 import { TIcon, TText, TView } from "@/shared/components/ui/Themed";
 import { useLanguage } from "@/shared/context/LanguageContext";
 import { useThemeColor } from "@/shared/hooks/useThemeColor";
@@ -11,6 +11,8 @@ import { Itinerary, getStatusColor } from "@/features/itinerary/types/itineraryT
 import { formatDateToString } from "@/shared/utils/formatDateToString";
 import EmptyMessage from "@/shared/components/common/EmptyMessage";
 import ItineraryCardSkeleton from "@/shared/components/feedback/CalendarCardSkeleton";
+import StickyScrollView from "@/shared/components/ui/StickyScrollView";
+import { LinearGradient } from "expo-linear-gradient";
 
 const ItineraryOptions = [
   { value: 'active', icon: 'cards-heart', label: 'Active' },
@@ -22,6 +24,7 @@ export default function ItineraryScreen() {
   const { t } = useLanguage();
   const primaryColor = useThemeColor({}, 'primary');
   const secondaryColor = useThemeColor({}, 'secondary');
+  const accentColor = useThemeColor({}, 'secondary');
   const [selectedStatus, setSelectedStatus] = useState<'active' | 'done' | 'cancelled'>('active');
   const { itineraries, isLoading, isError } = useGetUserItineraries(selectedStatus);
 
@@ -47,57 +50,61 @@ export default function ItineraryScreen() {
           <TText style={[styles.cardBubbleText, { opacity: 0.7 }]}>{item.type}</TText>
         </TView>
       </View>
-      {item.content && (
-        <TText style={styles.cardDescription} numberOfLines={1}>
-          {item.content}
-        </TText>
-      )}
     </TouchableOpacity>
   );
 
   return (
     <TView style={{ flex: 1 }}>
-      <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}> 
+      <StickyScrollView 
+        style={{flex: 1}}
+        contentContainerStyle={{padding: '3%', flex: 1}}
+        title="Itinerary"
+        subtitle="Manage your travel plans"
+      > 
+        <LinearGradient
+          colors={[accentColor + '60', 'transparent']}
+          start={{ x: 1, y: 0 }}
+          end={{ x: 0, y: 0 }}
+          style={styles.gridCircle}
+          pointerEvents="none"
+        />
+        <Image source={require('@/shared/assets/images/slide2-img.png')} style={styles.image} />
+        <Header title='Itinerary' subtitle='Manage your travel plans'/>
+        <View style={styles.tabsContainer}>
+          {ItineraryOptions.map((option, index) => (
+            <TouchableOpacity
+              style={[styles.tabs, selectedStatus === option.value && { borderBottomColor: secondaryColor, borderBottomWidth: 2 }]}
+              onPress={() => setSelectedStatus(option.value as 'active' | 'done' | 'cancelled')}
+            >
+              <TIcon name={option.icon} size={13} color={selectedStatus === option.value ? secondaryColor : 'gray'} />
+              <TText style={{ color: selectedStatus === option.value ? secondaryColor : 'gray', fontSize: 12 }}>{option.label}</TText>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-        <Header title='Itinerary' subtitle='Manage your travel plans' type="major" />
-
-        <TView style={styles.container}>
-          <View style={styles.tabsContainer}>
-            {ItineraryOptions.map((option, index) => (
-              <TouchableOpacity
-                style={[styles.tabs, selectedStatus === option.value && { borderBottomColor: secondaryColor, borderBottomWidth: 2 }]}
-                onPress={() => setSelectedStatus(option.value as 'active' | 'done' | 'cancelled')}
-              >
-                <TIcon name={option.icon} size={13} color={selectedStatus === option.value ? secondaryColor : 'gray'} />
-                <TText style={{ color: selectedStatus === option.value ? secondaryColor : 'gray', fontSize: 12 }}>{option.label}</TText>
-              </TouchableOpacity>
-            ))}
+        {isLoading ? (
+          <View style={styles.listContent}>
+            <ItineraryCardSkeleton />
+            <ItineraryCardSkeleton />
           </View>
-
-          {isLoading ? (
-            <View style={styles.listContent}>
-              <ItineraryCardSkeleton />
-              <ItineraryCardSkeleton />
-            </View>
-          ) : isError || !itineraries || itineraries.length === 0 ? (
-            <View style={styles.errorContainer}>
-              <EmptyMessage
-                title={isError ? 'Failed to load itineraries' : 'No itineraries yet'}
-                description={isError ? 'Please try again later' : 'Nothing to see here!'}
-                iconName='inbox'
-              />
-            </View>
-          ) : (
-            <FlatList
-              data={itineraries}
-              renderItem={renderItineraryCard}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={styles.listContent}
-              scrollEnabled={false}
+        ) : isError || !itineraries || itineraries.length === 0 ? (
+          <View style={styles.errorContainer}>
+            <EmptyMessage
+              title={isError ? 'Failed to load itineraries' : 'No itineraries yet'}
+              description={isError ? 'Please try again later' : 'Nothing to see here!'}
+              iconName='inbox'
             />
-          )}
-        </TView>
-      </ScrollView>
+          </View>
+        ) : (
+          <FlatList
+            data={itineraries}
+            renderItem={renderItineraryCard}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.listContent}
+            scrollEnabled={false}
+          />
+        )}
+      </StickyScrollView>
 
       <RoundButton
         iconName='plus'
@@ -109,9 +116,21 @@ export default function ItineraryScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: '3%',
+  image:{
+    position: 'absolute',
+    width: '60%',
+    height: '20%',
+    top: '-3%',
+    right: '-20%',
+    objectFit: 'contain'
+  },
+  gridCircle: {
+    height: '50%',
+    aspectRatio: 1,
+    borderRadius: 1000,
+    position: 'absolute',
+    top: '-5%',
+    right: '-50%',
   },
   errorContainer: {
     marginTop: 50,

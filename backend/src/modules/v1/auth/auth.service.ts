@@ -100,6 +100,7 @@ export const verifyUserEmail = async (email: string, code: string): Promise<Part
         delivery: {
           isEmailEnabled: false,
           isSMSEnabled: false,
+          alertLang: "en"
         },
       },
       settings: {

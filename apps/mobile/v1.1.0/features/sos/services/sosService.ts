@@ -21,6 +21,7 @@ export interface UpdateSafetySettingsPayload {
   delivery: {
     isEmailEnabled: boolean;
     isSMSEnabled: boolean;
+    alertLang: string;
   };
   emergencyContact?: {
     email?: string;

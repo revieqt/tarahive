@@ -79,7 +79,7 @@ export const disableSOS = async (req: DisableSOSRequest): Promise<any> => {
 
 export const updateSafetySettings = async (
   userId: string,
-  delivery?: { isEmailEnabled?: boolean; isSMSEnabled?: boolean },
+  delivery?: { isEmailEnabled?: boolean; isSMSEnabled?: boolean; alertLang?: string },
   emergencyContact?: { email?: string; phone?: string }
 ): Promise<Partial<User>> => {
   const user = await userRepo.findOne({ where: { id: userId } });
@@ -91,6 +91,7 @@ export const updateSafetySettings = async (
   const currentDelivery = user.safetyState?.delivery || {
     isEmailEnabled: false,
     isSMSEnabled: false,
+    alertLang: "en",
   };
 
   const nextDelivery = {
@@ -102,6 +103,10 @@ export const updateSafetySettings = async (
       typeof delivery?.isSMSEnabled === "boolean"
         ? delivery.isSMSEnabled
         : currentDelivery.isSMSEnabled,
+    alertLang:
+      typeof delivery?.alertLang === "string" && delivery.alertLang.trim()
+        ? delivery.alertLang
+        : currentDelivery.alertLang || "en",
   };
 
   const currentEmergencyContact = user.safetyState?.emergencyContact || {};

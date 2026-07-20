@@ -28,6 +28,7 @@
     "sms_label_disabled": "SMS Alert Disabled",
     "sms_description": "Send Emergency Alert via SMS (Pro Users Only)",
     "sms_placeholder": "Emergency Contact Phone",
+    "language": "Preferred Alert Language",
     "save_button": "Save Changes"
   }
 }

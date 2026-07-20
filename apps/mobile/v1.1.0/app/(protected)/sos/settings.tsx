@@ -10,6 +10,8 @@ import Switch from "@/shared/components/ui/Switch";
 import { useSession } from "@/features/auth/context/SessionContext";
 import { useUpdateSafetySettings } from "@/features/sos/hooks/useSafetySettings";
 import { router } from "expo-router";
+import DropDownField from "@/shared/components/ui/DropDownField";
+import { LANGUAGES } from "@/shared/constants/Languages";
 
 export default function SOSSettingsScreen() {
     const { t } = useLanguage();
@@ -18,14 +20,23 @@ export default function SOSSettingsScreen() {
     const [contactNumber, setContactNumber] = useState('');
     const [isEmailEnabled, setIsEmailEnabled] = useState(false);
     const [isSmsEnabled, setIsSmsEnabled] = useState(false);
+    const [preferredLanguage, setPreferredLanguage] = useState<string>('en');
     const { session } = useSession();
     const { updateSafetySettings, isPending } = useUpdateSafetySettings();
+
+    const languageOptions = LANGUAGES.map((lang) => ({
+        label: lang.name + " (" + lang.nativeName + ")",
+        value: lang.code,
+    }));
 
     useEffect(() => {
         const delivery = session?.user?.safetyState?.delivery;
         if (delivery) {
             setIsEmailEnabled(Boolean(delivery.isEmailEnabled));
             setIsSmsEnabled(Boolean(delivery.isSMSEnabled));
+            if (delivery.alertLang) {
+                setPreferredLanguage(delivery.alertLang);
+            }
         }
 
         const emergencyContact = session?.user?.safetyState?.emergencyContact;
@@ -35,7 +46,7 @@ export default function SOSSettingsScreen() {
         if (emergencyContact?.phone) {
             setContactNumber(emergencyContact.phone);
         }
-    }, [session?.user?.safetyState?.delivery?.isEmailEnabled, session?.user?.safetyState?.delivery?.isSMSEnabled, session?.user?.safetyState?.emergencyContact?.email, session?.user?.safetyState?.emergencyContact?.phone]);
+    }, [session?.user?.safetyState?.delivery?.isEmailEnabled, session?.user?.safetyState?.delivery?.isSMSEnabled, session?.user?.safetyState?.delivery?.alertLang, session?.user?.safetyState?.emergencyContact?.email, session?.user?.safetyState?.emergencyContact?.phone]);
 
     const handleEnableSMS = () => {
         if (session?.user?.isProUser) {
@@ -51,11 +62,13 @@ export default function SOSSettingsScreen() {
         const nextPhone = contactNumber.trim()
             ? `${areaCode}${contactNumber}`
             : session?.user?.safetyState?.emergencyContact?.phone;
+        const nextAlertLang = preferredLanguage || session?.user?.safetyState?.delivery?.alertLang || 'en';
 
         updateSafetySettings({
             delivery: {
                 isEmailEnabled,
                 isSMSEnabled: isSmsEnabled,
+                alertLang: nextAlertLang,
             },
             emergencyContact: {
                 email: nextEmail,
@@ -107,8 +120,14 @@ export default function SOSSettingsScreen() {
                         style={{ marginBottom: 0 }}
                     />
                 )}
-
             </TView>
+
+            <DropDownField
+                placeholder={t("sos.settings.language")}
+                value={preferredLanguage} // should hold the code, e.g. "en"
+                onValueChange={setPreferredLanguage}
+                values={languageOptions}
+            />
 
             <Button
                 title={isPending ? "Saving..." : t("sos.settings.save_button")}
@@ -134,8 +153,9 @@ const styles = StyleSheet.create({
     },
     emergencyAlertContainer: {
         marginBottom: 8,
-        padding: 15,
+        padding: 10,
         borderRadius: 12,
+        paddingHorizontal: 15,
         gap: 10,
     },
 });

@@ -34,6 +34,7 @@ export type User = {
     delivery?: {
       isEmailEnabled: boolean;
       isSMSEnabled: boolean;
+      alertLang: string;
     };
     lastKnownLocation?: {
       locationName: string;
