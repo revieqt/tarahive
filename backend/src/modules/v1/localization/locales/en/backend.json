@@ -1,7 +1,7 @@
 {
   "notifications":{
     "email_header_subtitle": "Mobile Travel Companion",
-    "no_reply_notice": "This is an automated message from Tarahive. Please do not reply."
+    "no_reply_notice": "Automated message from Tarahive. Please do not reply."
   },
   "emergency_alert": {
     "sos_alert": "SOS Alert",
