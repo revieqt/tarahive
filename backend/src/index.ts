@@ -1,5 +1,5 @@
-import express from 'express';
 import dotenv from 'dotenv';
+import express from 'express';
 import cors from 'cors';
 import path from "path";
 import { createServer } from 'http';
@@ -9,7 +9,7 @@ import { connectMongoDB } from './config/mongodb';
 import { serverAdapter } from "./config/bullBoard";
 import { initializeFirebase } from './config/firebase';
 import v1Router from './modules/v1/v1.routes';
-import { initializeV1Workers } from './modules/v1/v1.workers';
+import { initializeEmailDeliveryWorker } from './workers/delivery/email.worker';
 dotenv.config();
 
 const app = express();
@@ -46,7 +46,7 @@ app.get('/health', (_req, res) => {
 });
 
 (async () => {
-  await initializeV1Workers();
+  await initializeEmailDeliveryWorker();
   server.listen(PORT, () => {
     console.log(`🚀 Server running at http://localhost:${PORT}`);
     console.log(`🔌 Socket.IO listening on port ${PORT}`);

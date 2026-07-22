@@ -1,6 +1,7 @@
 import { User } from '../user/user.entity';
 import { DisableSOSRequest } from './sos.types';
 import { AppDataSource } from "../../../config/postgres";
+import { queueEmail } from '../../../workers/delivery/email.queue';
 
 const userRepo = AppDataSource.getRepository(User);
 
@@ -10,24 +11,56 @@ const userRepo = AppDataSource.getRepository(User);
  */
 export const enableSOS = async (req: any): Promise<any> => {
   try {
-    const { userID, emergencyType } = req;
+    const { userID, emergencyType, message, latitude, longitude } = req;
 
     console.log(`🚨 enableSOS - userId: ${userID}, emergencyType: ${emergencyType}`);
 
-    // Validate required fields
     if (!userID || !emergencyType) {
       throw new Error('User ID and Emergency Type are required');
     }
 
-    // Find user to validate they exist
     const user = await userRepo.findOne({ where: { id: userID } });
     if (!user) {
       throw new Error('User not found');
     }
 
+    const emergencyContactEmail = user.safetyState?.emergencyContact?.email;
+    if (!emergencyContactEmail) {
+      console.warn('⚠️ No emergency contact email configured for user');
+      return {
+        success: true,
+        message: 'SOS processed, but no emergency contact email was configured.',
+      };
+    }
+
+    const mapUrl = `https://maps.google.com/?q=${latitude},${longitude}`;
+    const emailContent = `
+      <div style="background-color: #dc2626; padding: 16px; margin-bottom: 16px; border-radius: 15px; text-align: center; color: #fff">
+        <h1>🚨 SOS ALERT</h1>
+        <p style="margin: 0; font-weight: bold;">${user.fname} ${user.lname || ''} is in an emergency.</p>
+      </div>
+      <div style="background-color: #f9fafb; padding: 12px; border-radius: 4px; margin-bottom: 16px;">
+        <p><strong>Emergency Type:</strong> ${emergencyType}</p>
+        ${message ? `<p><strong>Message:</strong> ${message}</p>` : ''}
+        <p><strong>Location:</strong> ${latitude.toFixed(6)}, ${longitude.toFixed(6)}</p>
+        <p><a href="${mapUrl}">View location on Google Maps</a></p>
+      </div>
+    `;
+
+    await queueEmail({
+      to: emergencyContactEmail,
+      subject: `🚨 Emergency Alert: ${emergencyType}`,
+      content: emailContent,
+    });
+
+    user.safetyState.isInAnEmergency = true;
+    user.safetyState.emergencyType = emergencyType;
+    
+    await userRepo.save(user);
+
     return {
       success: true,
-      message: 'SOS queued for processing. Emergency contacts will be notified shortly.'
+      message: 'SOS notification queued for emergency contact.',
     };
   } catch (error) {
     console.error(`❌ Error enabling SOS:`, error);

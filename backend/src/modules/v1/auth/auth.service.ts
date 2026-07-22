@@ -3,7 +3,7 @@ import { User } from "../user/user.entity";
 import { Provider, UserStatus, UserType } from "../user/user.types";
 import { validatePassword, validateAge, hashPassword, generateVerificationCode, comparePassword, generateUsername } from "./auth.utils";
 import { RegisterDto, LoginDto } from "./auth.types";
-import { addSendVerificationEmailJob, addSendPasswordResetEmailJob } from './auth.queue';
+import { queueEmail } from '../../../workers/delivery/email.queue';
 import { generateAccessToken, generateRefreshToken } from "./token.service";
 import {
   storeVerificationCode,
@@ -53,13 +53,39 @@ export const registerUser = async (data: RegisterDto): Promise<{ success: boolea
   };
 };
 
+const generateVerificationEmailContent = (code: string): string => {
+  return `
+    <div style="text-align: center;">
+      <h2 style="color: #333; margin-bottom: 20px;">Verify Your Email Address</h2>
+      <p style="color: #666; font-size: 16px; margin-bottom: 20px;">
+        Please use the following code to verify your email address:
+      </p>
+      <div style="background-color: #f5f5f5; border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+        <h1 style="font-size: 48px; letter-spacing: 10px; margin: 0; color: #4f46e5; font-weight: bold;">
+          ${code}
+        </h1>
+      </div>
+      <p style="color: #999; font-size: 14px;">
+        This code will expire in 30 minutes.
+      </p>
+      <p style="color: #999; font-size: 14px;">
+        If you didn't request this verification, please ignore this email.
+      </p>
+    </div>
+  `;
+};
+
 export const sendVerificationCode = async (email: string): Promise<string> => {
   try {
     const code = generateVerificationCode();
 
     await storeVerificationCode(email, code);
 
-    await addSendVerificationEmailJob({email, code});
+    await queueEmail({
+      to: email,
+      subject: 'Tarahive Email Verification',
+      content: generateVerificationEmailContent(code),
+    });
 
     return code;
   } catch (error) {

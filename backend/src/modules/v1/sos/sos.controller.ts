@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
-import { disableSOS, updateSafetySettings } from './sos.service';
-import { addSOSJob, SOSJobData } from './sos.queue';
+import { disableSOS, enableSOS, updateSafetySettings } from './sos.service';
 import { LogAction } from '../../v1/audit/audit.service';
 import { AuthRequest } from '../../v1/auth/auth.types';
 
@@ -33,21 +32,17 @@ export const enableSOSController = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    console.log(`🟡 Enqueueing SOS job for user ${userID}`);
+    console.log(`🟡 Enabling SOS for user ${userID}`);
 
-    // Prepare job data
-    const sosJobData: SOSJobData = {
+    const result = await enableSOS({
       userID,
       emergencyType,
-      message: message || undefined,
+      message,
       latitude,
       longitude,
-    };
+    });
 
-    // Enqueue the SOS job for background processing
-    const job = await addSOSJob(sosJobData);
-
-    console.log(`✅ SOS job ${job.id} enqueued for user ${userID}`);
+    console.log(`✅ SOS processing result for user ${userID}:`, result);
 
     // Log the SOS activation request
     await LogAction.info({
