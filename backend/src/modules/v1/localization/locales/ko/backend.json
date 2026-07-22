@@ -1,18 +1,24 @@
 {
   "delivery": {
     "email_header_subtitle": "모바일 여행 동반자",
-    "no_reply_notice": "이 메시지는 Tarahive에서 자동으로 발송되었습니다. 회신하지 마십시오."
+    "no_reply_notice": "Tarahive에서 자동으로 발송된 메시지입니다. 회신하지 마세요."
   },
   "emergency_alert": {
-    "sos_alert": "SOS 경보",
+    "sos_alert": "SOS 알림",
     "sos_note": "님이 긴급 상황에 처해 있습니다. 도움을 줄 수 있다면 즉시 대응해 주세요!",
     "details_title": "긴급 상황 정보",
     "details_type": "긴급 상황 유형",
-    "details_loc": "마지막으로 확인된 위치",
+    "details_loc": "마지막 확인된 위치",
     "details_maps": "Google 지도에서 위치 보기",
     "contact_title": "사용자 연락처",
     "contact_email": "이메일",
     "contact_num": "연락처",
-    "contact_no_num": "제공되지 않음"
+    "contact_no_num": "제공되지 않음",
+    "activated_success": "SOS가 활성화되었습니다. 연락처에 알림을 보내는 중입니다.",
+    "activated_failed": "SOS를 활성화하지 못했습니다.",
+    "deactivated_success": "SOS가 성공적으로 비활성화되었습니다.",
+    "deactivated_failed": "SOS를 비활성화하지 못했습니다.",
+    "update_success": "설정이 성공적으로 업데이트되었습니다.",
+    "update_failed": "설정을 업데이트하지 못했습니다."
   }
 }

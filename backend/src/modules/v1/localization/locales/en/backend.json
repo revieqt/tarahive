@@ -13,6 +13,12 @@
     "contact_title": "User Contacts",
     "contact_email": "Email",
     "contact_num": "Contact",
-    "contact_no_num": "Not Provided"
+    "contact_no_num": "Not Provided",
+    "activated_success": "SOS activated. Contacts are being notified",
+    "activated_failed": "Failed to activate SOS",
+    "deactivated_success": "SOS deactivated successfully",
+    "deactivated_failed": "Failed to deactivate SOS",
+    "update_success": "Settings updated successfully",
+    "update_failed": "Failed to update settings"
   }
 }

@@ -2,39 +2,21 @@ import { Request, Response } from 'express';
 import { disableSOS, enableSOS, updateSafetySettings } from './sos.service';
 import { LogAction } from '../../v1/audit/audit.service';
 import { AuthRequest } from '../../v1/auth/auth.types';
+import { t, detectLanguage } from '../localization/localization.service';
 
 export const enableSOSController = async (req: AuthRequest, res: Response) => {
+  const lang = detectLanguage(req.headers['accept-language']);
   try {
-    console.log('🚨 enableSOSController - Received SOS activation request');
-
-    // Extract userID from authenticated request (via authMiddleware)
     const userID = req.user?.sub;
-    if (!userID) {
-      console.warn('⚠️ No authenticated user found');
-      return res.status(401).json({ success: false, message: 'Authentication required' });
-    }
-
-    // Extract emergency details from request body
     const { emergencyType, message, latitude, longitude, device } = req.body;
 
-    // Validate required fields
-    if (!emergencyType || typeof emergencyType !== 'string') {
-      return res.status(400).json({
-        success: false,
-        message: 'Emergency type must be a valid string',
-      });
-    }
+    if (!userID) return res.status(401).json({ success: false, message: 'Authentication required' });
 
-    if (typeof latitude !== 'number' || typeof longitude !== 'number') {
-      return res.status(400).json({
-        success: false,
-        message: 'Valid latitude and longitude are required',
-      });
-    }
+    if (!emergencyType || typeof emergencyType !== 'string') return res.status(400).json({ success: false, message: 'Emergency type must be a valid string'});
 
-    console.log(`🟡 Enabling SOS for user ${userID}`);
-
-    const result = await enableSOS({
+    if (typeof latitude !== 'number' || typeof longitude !== 'number') return res.status(400).json({ success: false, message: 'Valid latitude and longitude are required'});
+    
+    await enableSOS({
       userID,
       emergencyType,
       message,
@@ -42,9 +24,6 @@ export const enableSOSController = async (req: AuthRequest, res: Response) => {
       longitude,
     });
 
-    console.log(`✅ SOS processing result for user ${userID}:`, result);
-
-    // Log the SOS activation request
     await LogAction.info({
       action: "SOS_ACTIVATED",
       module: "auth",
@@ -64,14 +43,14 @@ export const enableSOSController = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    // Return immediate response to frontend (job is processing in background)
     return res.status(200).json({
       success: true,
-      message: 'Emergency alert activated. Emergency contacts are being notified.',
+      message: t('backend.emergency_alert.activated_success', lang),
     });
+
   } catch (error) {
     console.error('❌ Error in enableSOSController:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Failed to activate SOS';
+    const errorMessage = error instanceof Error ? error.message : t('backend.emergency_alert.activated_failed', lang);
     return res.status(500).json({
       success: false,
       message: errorMessage,
@@ -80,26 +59,16 @@ export const enableSOSController = async (req: AuthRequest, res: Response) => {
 };
 
 export const disableSOSController = async (req: AuthRequest, res: Response) => {
+  const lang = detectLanguage(req.headers['accept-language']);
   try {
-    console.log('✅ disableSOSController - Received SOS deactivation request');
-
-    // Extract userID from authenticated request (via authMiddleware)
     const userID = req.user?.sub;
-    if (!userID) {
-      console.warn('⚠️ No authenticated user found');
-      return res.status(401).json({ success: false, message: 'Authentication required' });
-    }
+    if (!userID) return res.status(401).json({ success: false, message: 'Authentication required' });
 
-    // Extract device info from request body
-    const { device } = req.body;
-
-    // Call service function
-    const result = await disableSOS({
+    await disableSOS({
       accessToken: req.headers.authorization || '',
       userID,
     });
 
-    // Log the SOS deactivation request
     await LogAction.info({
       action: "SOS_DEACTIVATED",
       module: "sos",
@@ -121,11 +90,11 @@ export const disableSOSController = async (req: AuthRequest, res: Response) => {
 
     return res.status(200).json({
       success: true,
-      message: 'SOS deactivated successfully',
+      message: t('backend.emergency_alert.deactivated_success', lang),
     });
   } catch (error) {
     console.error('❌ Error in disableSOSController:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Failed to deactivate SOS';
+    const errorMessage = error instanceof Error ? error.message : t('backend.emergency_alert.deactivated_failed', lang);
     return res.status(500).json({
       success: false,
       message: errorMessage,
@@ -134,6 +103,7 @@ export const disableSOSController = async (req: AuthRequest, res: Response) => {
 };
 
 export const updateSafetySettingsController = async (req: AuthRequest, res: Response): Promise<void> => {
+  const lang = detectLanguage(req.headers['accept-language']);
   try {
     if (!req.user || !req.user.sub) {
       res.status(401).json({
@@ -158,13 +128,13 @@ export const updateSafetySettingsController = async (req: AuthRequest, res: Resp
 
     res.status(200).json({
       success: true,
-      message: "Safety settings updated successfully",
+      message: t('backend.emergency_alert.update_success', lang),
       data: user,
     });
   } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: error.message || "Failed to update safety settings",
+      message: error.message || t('backend.emergency_alert.update_failed', lang),
     });
   }
 };

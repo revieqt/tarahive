@@ -6,31 +6,19 @@ import { t } from '../localization/localization.service';
 
 const userRepo = AppDataSource.getRepository(User);
 
-/**
- * Enable SOS/Emergency mode for user
- * Queues a SOS job for background processing
- */
 export const enableSOS = async (req: any): Promise<any> => {
   try {
     const { userID, emergencyType, message, latitude, longitude } = req;
 
-    console.log(`🚨 enableSOS - userId: ${userID}, emergencyType: ${emergencyType}`);
-
-    if (!userID || !emergencyType) {
-      throw new Error('User ID and Emergency Type are required');
-    }
+    if (!userID || !emergencyType) throw new Error('User ID and Emergency Type are required');
 
     const user = await userRepo.findOne({ where: { id: userID } });
-    if (!user) {
-      throw new Error('User not found');
-    }
+    if (!user) throw new Error('User not found');
 
     const emergencyContactEmail = user.safetyState?.emergencyContact?.email;
-
     const delivery = user.safetyState?.delivery || { isEmailEnabled: false, isSMSEnabled: false, alertLang: 'en' };
     const lang = delivery.alertLang || 'en';
 
-    // If neither channel is enabled, just update DB flags and return
     if (!delivery.isEmailEnabled && !delivery.isSMSEnabled) {
       user.safetyState.isInAnEmergency = true;
       user.safetyState.emergencyType = emergencyType;
@@ -43,7 +31,6 @@ export const enableSOS = async (req: any): Promise<any> => {
 
     const mapUrl = `https://maps.google.com/?q=${latitude},${longitude}`;
 
-    // Build localized email content using backend locale namespace
     const header = t('backend.emergency_alert.sos_alert', lang);
     const note = t('backend.emergency_alert.sos_note', lang);
     const detailsTitle = t('backend.emergency_alert.details_title', lang);
@@ -79,7 +66,6 @@ export const enableSOS = async (req: any): Promise<any> => {
       </div>
     `;
 
-    // If email delivery is enabled and we have an emergency contact email, queue it
     if (delivery.isEmailEnabled) {
       if (!emergencyContactEmail) {
         console.warn('⚠️ No emergency contact email configured for user; skipping email delivery');
@@ -93,63 +79,36 @@ export const enableSOS = async (req: any): Promise<any> => {
       }
     }
 
-    // If SMS is enabled, log the SMS message (SMS sending not implemented yet)
     if (delivery.isSMSEnabled) {
       const smsText = `${header}: ${user.fname} ${user.lname || ''} ${note} - ${emergencyTypeLabel} - ${latitude.toFixed(6)},${longitude.toFixed(6)}`;
       console.log('📱 SMS send (simulated):', smsText);
     }
 
-    // Update user's safetyState and persist
     user.safetyState.isInAnEmergency = true;
     user.safetyState.emergencyType = emergencyType;
     await userRepo.save(user);
 
-    return {
-      success: true,
-      message: 'SOS processed; notifications queued/logged according to user settings.',
-    };
+    return;
   } catch (error) {
     console.error(`❌ Error enabling SOS:`, error);
     throw error;
   }
 };
 
-/**
- * Disable SOS/Emergency mode for user
- * Updates user's safetyState to disable emergency mode
- */
 export const disableSOS = async (req: DisableSOSRequest): Promise<any> => {
   try {
     const { userID } = req;
+    if (!userID) throw new Error('User ID is required');
 
-    console.log(`✅ disableSOS - userId: ${userID}`);
-
-    // Validate required fields
-    if (!userID) {
-      throw new Error('User ID is required');
-    }
-
-    // Find user
     const user = await userRepo.findOne({ where: { id: userID } });
-    if (!user) {
-      throw new Error('User not found');
-    }
+    if (!user) throw new Error('User not found');
 
-    // Update user's safetyState
     user.safetyState.isInAnEmergency = false;
     user.safetyState.emergencyType = '';
-    // NOTE: Do NOT update emergencyContact
     
     await userRepo.save(user);
-    console.log(`✅ User safetyState updated - isInAnEmergency: false`);
 
-    // Return updated user safetyState
-    return {
-      isInAnEmergency: user.safetyState.isInAnEmergency,
-      emergencyType: user.safetyState.emergencyType,
-      emergencyContact: user.safetyState.emergencyContact,
-      message: 'SOS deactivated successfully'
-    };
+    return;
   } catch (error) {
     console.error(`❌ Error disabling SOS:`, error);
     throw error;
@@ -163,9 +122,7 @@ export const updateSafetySettings = async (
 ): Promise<Partial<User>> => {
   const user = await userRepo.findOne({ where: { id: userId } });
 
-  if (!user) {
-    throw new Error("User not found");
-  }
+  if (!user) throw new Error("User not found");
 
   const currentDelivery = user.safetyState?.delivery || {
     isEmailEnabled: false,
