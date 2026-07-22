@@ -1,0 +1,34 @@
+{
+  "form":{
+    "title": "Enable SOS",
+    "subtitle": "Configure your emergency alert",
+    "message_placeholder": "Describe your emergency situation... (Optional)",
+    "activate_button": "Activate SOS",
+    "settings_link": "Configure where to send your emergency alerts"
+  },
+  "emergency_types":{
+    "medical": "Medical Emergency",
+    "criminal": "Criminal Activity",
+    "fire": "Fire Emergency",
+    "natural": "Natural Disaster",
+    "utility": "Utility Emergency",
+    "road": "Road Emergency",
+    "domestic": "Domestic and Personal Safety",
+    "animal": "Animal-Related Emergency",
+    "other": "Other"
+  },
+  "settings": {
+    "title": "SOS Settings",
+    "subtitle": "Configure your emergency alert preferences",
+    "email_label_enabled": "Email Alert Enabled",
+    "email_label_disabled": "Email Alert Disabled",
+    "email_description": "Send Emergency Alert via Email",
+    "email_placeholder": "Emergency Contact Email",
+    "sms_label_enabled": "SMS Alert Enabled",
+    "sms_label_disabled": "SMS Alert Disabled",
+    "sms_description": "Send Emergency Alert via SMS (Pro Users Only)",
+    "sms_placeholder": "Emergency Contact Phone",
+    "language": "Preferred Alert Language",
+    "save_button": "Save Changes"
+  }
+}

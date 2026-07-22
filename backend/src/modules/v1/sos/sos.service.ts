@@ -2,6 +2,7 @@ import { User } from '../user/user.entity';
 import { DisableSOSRequest } from './sos.types';
 import { AppDataSource } from "../../../config/postgres";
 import { queueEmail } from '../../../workers/delivery/email.queue';
+import { t } from '../localization/localization.service';
 
 const userRepo = AppDataSource.getRepository(User);
 
@@ -25,42 +26,87 @@ export const enableSOS = async (req: any): Promise<any> => {
     }
 
     const emergencyContactEmail = user.safetyState?.emergencyContact?.email;
-    if (!emergencyContactEmail) {
-      console.warn('⚠️ No emergency contact email configured for user');
+
+    const delivery = user.safetyState?.delivery || { isEmailEnabled: false, isSMSEnabled: false, alertLang: 'en' };
+    const lang = delivery.alertLang || 'en';
+
+    // If neither channel is enabled, just update DB flags and return
+    if (!delivery.isEmailEnabled && !delivery.isSMSEnabled) {
+      user.safetyState.isInAnEmergency = true;
+      user.safetyState.emergencyType = emergencyType;
+      await userRepo.save(user);
       return {
         success: true,
-        message: 'SOS processed, but no emergency contact email was configured.',
+        message: 'SOS activated; no delivery channels enabled — database updated.',
       };
     }
 
     const mapUrl = `https://maps.google.com/?q=${latitude},${longitude}`;
+
+    // Build localized email content using backend locale namespace
+    const header = t('backend.emergency_alert.sos_alert', lang);
+    const note = t('backend.emergency_alert.sos_note', lang);
+    const detailsTitle = t('backend.emergency_alert.details_title', lang);
+    const detailsType = t('backend.emergency_alert.details_type', lang);
+    const detailsLoc = t('backend.emergency_alert.details_loc', lang);
+    const detailsMaps = t('backend.emergency_alert.details_maps', lang);
+    const contactTitle = t('backend.emergency_alert.contact_title', lang);
+    const contactEmailLabel = t('backend.emergency_alert.contact_email', lang);
+    const contactNumLabel = t('backend.emergency_alert.contact_num', lang);
+    const contactNoNum = t('backend.emergency_alert.contact_no_num', lang);
+    const emergencyTypeLabel = t(`sos.emergency_types.${emergencyType}`, lang);
+
     const emailContent = `
       <div style="background-color: #dc2626; padding: 16px; margin-bottom: 16px; border-radius: 15px; text-align: center; color: #fff">
-        <h1>🚨 SOS ALERT</h1>
-        <p style="margin: 0; font-weight: bold;">${user.fname} ${user.lname || ''} is in an emergency.</p>
+        <h1>🚨 ${header}</h1>
+        <p style="margin: 0; font-weight: bold;">${user.fname} ${user.lname || ''} ${note}</p>
       </div>
+
       <div style="background-color: #f9fafb; padding: 12px; border-radius: 4px; margin-bottom: 16px;">
-        <p><strong>Emergency Type:</strong> ${emergencyType}</p>
-        ${message ? `<p><strong>Message:</strong> ${message}</p>` : ''}
-        <p><strong>Location:</strong> ${latitude.toFixed(6)}, ${longitude.toFixed(6)}</p>
-        <p><a href="${mapUrl}">View location on Google Maps</a></p>
+        <h3 style="color: #1f2937; margin-bottom: 8px;">${detailsTitle}</h3>
+        <div class="underline"></div>
+        <p style="margin: 8px 0;"><strong>${detailsType}:</strong> ${emergencyTypeLabel}</p>
+        ${message ? `<p style="margin: 8px 0;"><strong>Message:</strong> ${message}</p>` : ''}
+        <p style="margin: 8px 0;"><strong>${detailsLoc}:</strong> ${latitude.toFixed(6)}, ${longitude.toFixed(6)}</p>
+        <a href="${mapUrl}" class="button" style="display: inline-block; background-color: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; width: 88%;">${detailsMaps}</a>
+      </div>
+
+      <div style="background-color: #f9fafb; padding: 12px; border-radius: 4px; margin-bottom: 16px;">
+        <h3 style="color: #1f2937; margin-bottom: 8px;">${contactTitle}</h3>
+        <div class="underline"></div>
+        <p style="margin: 8px 0;"><strong>${contactEmailLabel}:</strong> ${user.email}</p>
+        <p style="margin: 8px 0;"><strong>${contactNumLabel}:</strong> ${user.contactNumber || contactNoNum}</p>
       </div>
     `;
 
-    await queueEmail({
-      to: emergencyContactEmail,
-      subject: `🚨 Emergency Alert: ${emergencyType}`,
-      content: emailContent,
-    });
+    // If email delivery is enabled and we have an emergency contact email, queue it
+    if (delivery.isEmailEnabled) {
+      if (!emergencyContactEmail) {
+        console.warn('⚠️ No emergency contact email configured for user; skipping email delivery');
+      } else {
+        await queueEmail({
+          to: emergencyContactEmail,
+          subject: `🚨 ${header}: ${emergencyTypeLabel}`,
+          content: emailContent,
+          lang,
+        });
+      }
+    }
 
+    // If SMS is enabled, log the SMS message (SMS sending not implemented yet)
+    if (delivery.isSMSEnabled) {
+      const smsText = `${header}: ${user.fname} ${user.lname || ''} ${note} - ${emergencyTypeLabel} - ${latitude.toFixed(6)},${longitude.toFixed(6)}`;
+      console.log('📱 SMS send (simulated):', smsText);
+    }
+
+    // Update user's safetyState and persist
     user.safetyState.isInAnEmergency = true;
     user.safetyState.emergencyType = emergencyType;
-    
     await userRepo.save(user);
 
     return {
       success: true,
-      message: 'SOS notification queued for emergency contact.',
+      message: 'SOS processed; notifications queued/logged according to user settings.',
     };
   } catch (error) {
     console.error(`❌ Error enabling SOS:`, error);

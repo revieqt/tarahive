@@ -2,6 +2,7 @@ import * as nodemailer from 'nodemailer';
 import { Queue, QueueEvents, JobsOptions } from 'bullmq';
 import redis from '../../config/redis';
 import { EmailPayload } from './delivery.types';
+import { t } from '../../modules/v1/localization/localization.service';
 
 export const createDeliveryQueue = <T>(
   queueName: string,
@@ -60,7 +61,7 @@ const createTransporter = () => {
 
 // const twilioClient = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
 
-const baseTemplate = (innerContent: string) => `
+const baseTemplate = (innerContent: string, lang: string = 'en') => `
 <!DOCTYPE html>
 <html>
 
@@ -124,12 +125,12 @@ const baseTemplate = (innerContent: string) => `
 
 <body>
   <div class="container">
-    <div class="header">
+      <div class="header">
       <img src="https://tarahive.vercel.app/icon.png" alt="TaraHive Logo" width="50" height="50"
         style="display:block; border:0; outline:none; text-decoration:none; margin: 0 auto">
       <h1 class="title">Tarahive</h1>
-      <p>Mobile Travel Companion</p>
-      <p class="fadeText">© ${new Date().getFullYear()}, This is an automated message. Please do not reply.</p>
+      <p>${t('backend.delivery.email_header_subtitle', lang)}</p>
+      <p class="fadeText">© ${new Date().getFullYear()}, ${t('backend.delivery.no_reply_notice', lang)}</p>
     </div>
 
     <div class="underline"></div>
@@ -161,7 +162,7 @@ export const sendEmail = async (payload: EmailPayload) => {
     };
   }
 
-  const html = rawHtml || baseTemplate(content!);
+  const html = rawHtml || baseTemplate(content!, payload.lang || 'en');
 
   const mailOptions = {
     from: process.env.EMAIL_USER,

@@ -1,0 +1,34 @@
+{
+  "form": {
+    "title": "SOS 활성화",
+    "subtitle": "긴급 알림을 설정하세요",
+    "message_placeholder": "긴급 상황을 설명해 주세요... (선택 사항)",
+    "activate_button": "SOS 활성화",
+    "settings_link": "긴급 알림 전송 대상을 설정하세요"
+  },
+  "emergency_types": {
+    "medical": "의료 응급 상황",
+    "criminal": "범죄 상황",
+    "fire": "화재",
+    "natural": "자연재해",
+    "utility": "공공시설 사고",
+    "road": "도로 사고",
+    "domestic": "가정 및 개인 안전",
+    "animal": "동물 관련 긴급 상황",
+    "other": "기타"
+  },
+  "settings": {
+    "title": "SOS 설정",
+    "subtitle": "긴급 알림 환경을 설정하세요",
+    "email_label_enabled": "이메일 알림 활성화",
+    "email_label_disabled": "이메일 알림 비활성화",
+    "email_description": "이메일로 긴급 알림 보내기",
+    "email_placeholder": "긴급 연락처 이메일",
+    "sms_label_enabled": "SMS 알림 활성화",
+    "sms_label_disabled": "SMS 알림 비활성화",
+    "sms_description": "SMS로 긴급 알림 보내기 (Pro 사용자 전용)",
+    "sms_placeholder": "긴급 연락처 전화번호",
+    "language": "선호하는 알림 언어",
+    "save_button": "변경 사항 저장"
+  }
+}

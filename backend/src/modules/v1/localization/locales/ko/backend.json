@@ -1,5 +1,5 @@
 {
-  "notifications": {
+  "delivery": {
     "email_header_subtitle": "모바일 여행 동반자",
     "no_reply_notice": "이 메시지는 Tarahive에서 자동으로 발송되었습니다. 회신하지 마십시오."
   },

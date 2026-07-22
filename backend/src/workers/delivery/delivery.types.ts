@@ -16,6 +16,7 @@ export type EmailPayload = {
     filename: string;
     path: string;
   }[];
+  lang?: string;
 };
 
 export type NotificationProvider = "push" | "sms" | "email";

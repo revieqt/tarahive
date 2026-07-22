@@ -1,5 +1,5 @@
 {
-  "notifications":{
+  "delivery":{
     "email_header_subtitle": "Mobile Travel Companion",
     "no_reply_notice": "Automated message from Tarahive. Please do not reply."
   },
