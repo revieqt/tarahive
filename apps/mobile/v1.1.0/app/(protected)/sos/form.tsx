@@ -8,6 +8,7 @@ import TextField from "@/shared/components/ui/TextField";
 import Button from "@/shared/components/ui/Button";
 import { router } from 'expo-router';
 import { useSafety } from "@/features/sos/hooks/useSOS";
+import { EMERGENCY_TYPES } from '@/features/sos/types/emergencyTypes';
 import { useLocation } from "@/shared/context/LocationContext";
 
 export default function SOSFormScreen() {
@@ -19,17 +20,8 @@ export default function SOSFormScreen() {
     const [selectedEmergencyType, setSelectedEmergencyType] = useState<string | null>(null);
     const [message, setMessage] = useState<string>('');
 
-    const emergencyTypes = [
-        { id: 'medical', label: t("sos.emergency_types.medical"), icon: 'medical-bag' },
-        { id: 'criminal', label: t("sos.emergency_types.criminal"), icon: 'shield-alert' },
-        { id: 'fire', label: t("sos.emergency_types.fire"), icon: 'fire' },
-        { id: 'natural', label: t("sos.emergency_types.natural"), icon: 'weather-hurricane' },
-        { id: 'utility', label: t("sos.emergency_types.utility"), icon: 'flash-off' },
-        { id: 'road', label: t("sos.emergency_types.road"), icon: 'car' },
-        { id: 'domestic', label: t("sos.emergency_types.domestic"), icon: 'home-alert' },
-        { id: 'animal', label: t("sos.emergency_types.animal"), icon: 'paw' },
-        { id: 'other', label: t("sos.emergency_types.other"), icon: 'help-circle' },
-    ];
+    // Use shared EMERGENCY_TYPES and translate labels at render time
+    const emergencyTypes = EMERGENCY_TYPES;
 
     const handleEnableSafetyMode = async () => {
         if (!selectedEmergencyType) {
@@ -69,8 +61,8 @@ export default function SOSFormScreen() {
                             name={type.icon}
                             size={30}
                         />
-                        <TText style={[{ textAlign: 'center', fontSize: 10 }]}>
-                            {type.label}
+                        <TText style={[{ textAlign: 'center', fontSize: 10 }]}> 
+                            {t(type.labelKey)}
                         </TText>
                     </TouchableOpacity>
                 ))}

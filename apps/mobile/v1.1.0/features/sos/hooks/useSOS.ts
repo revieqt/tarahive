@@ -32,6 +32,11 @@ export const useSafety = () => {
             safetyState: {
               isInAnEmergency: true,
               emergencyType: request.emergencyType,
+              lastKnownLocation: {
+                locationName: '',
+                latitude: request.latitude,
+                longitude: request.longitude,
+              },
             },
           },
         });
@@ -66,6 +71,7 @@ export const useSafety = () => {
               isInAnEmergency: false,
               emergencyType: '',
               emergencyContact: session.user.safetyState?.emergencyContact,
+              lastKnownLocation: undefined,
             },
           },
         });

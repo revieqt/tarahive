@@ -9,6 +9,7 @@ import BackButton from "@/shared/components/common/BackButton";
 import HiveBg from "@/shared/components/common/HiveBg";
 import { router } from "expo-router";
 import { useSafety } from "@/features/sos/hooks/useSOS"
+import SOSInfoCard from "@/shared/components/cards/SOSInfoCard";
 
 export default function SOSSection() {
   const secondaryColor = useThemeColor({}, 'secondary');
@@ -87,20 +88,25 @@ export default function SOSSection() {
       </View>
 
       <TView style={styles.messageContainer}>
-        <TText type="subtitle">What is SOS?</TText>
-        <TText>
-          SOS Type Here
-        </TText>
-        <View style={styles.messageButtons}>
+        { isSOSActive ? 
+            <SOSInfoCard userData={session?.user}/>
+          : <>
+            <TText type="subtitle">What is SOS?</TText>
+            <TText>
+              SOS Type Here
+            </TText>
+            <View style={styles.messageButtons}>
 
-          <TouchableOpacity style={[styles.openSettings, { backgroundColor: accentColor }]} onPress={() => router.push('/sos/settings')}>
-            <TText style={{ color: '#fff' }}>Settings</TText>
-          </TouchableOpacity>
+              <TouchableOpacity style={[styles.openSettings, { backgroundColor: accentColor }]} onPress={() => router.push('/sos/settings')}>
+                <TText style={{ color: '#fff' }}>Settings</TText>
+              </TouchableOpacity>
 
-          <TouchableOpacity style={styles.openSettings}>
-            <TText style={{ opacity: 0.5 }}>How SOS Works</TText>
-          </TouchableOpacity>
-        </View>
+              <TouchableOpacity style={styles.openSettings}>
+                <TText style={{ opacity: 0.5 }}>How SOS Works</TText>
+              </TouchableOpacity>
+            </View>
+          </>
+        }
       </TView>
     </TView>
 
@@ -123,7 +129,6 @@ const styles = StyleSheet.create({
     gap: 40,
   },
   messageContainer: {
-    padding: 13,
     marginHorizontal: '3%',
     borderRadius: 12,
     marginBottom: 16,

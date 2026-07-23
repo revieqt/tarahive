@@ -1,4 +1,18 @@
 {
+  "main":{
+    "off_title": "All Clear!",
+    "off_subtitle": "SOS: OFF",
+    "off_note": "Long-press to Activate SOS",
+    "off_hold": "Hold for Activation",
+    "on_title": "SOS in Progress",
+    "on_subtitle": "SOS: ON",
+    "on_note": "Long-press to End SOS",
+    "on_hold": "Hold for Deactivation",
+    "info": "is in a",
+    "email": "Emergency Email",
+    "number": "Emergency Contact",
+    "lang": "Alert Language"
+  },
   "form":{
     "title": "Enable SOS",
     "subtitle": "Configure your emergency alert",
@@ -30,16 +44,5 @@
     "sms_placeholder": "Emergency Contact Phone",
     "language": "Preferred Alert Language",
     "save_button": "Save Changes"
-  },
-  "alert": {
-    "email_header_subtitle": "Mobile Travel Companion",
-    "email_header_notice": "This is an automated message. Please do not reply.",
-    "email_sos_alert": "SOS Alert",
-    "email_sos_note": "is in an emergency. Please respond immediately if you can help!",
-    "email_details_title": "Emergency Details",
-    "email_details_type": "Emergency Type",
-    "email_details_loc": "Last known location",
-    "email_details_maps": "View Location on Google Maps",
-    "email_sos_note": "is in an emergency. Please respond immediately if you can help!"
   }
 }

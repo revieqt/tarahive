@@ -14,6 +14,11 @@ import { Dialog, type DialogState, INITIAL_STATE } from "@/shared/components/ui/
 import { Dialog as DialogService } from "@/shared/services/dialog.service";
 import { LanguageProvider } from '@/shared/context/LanguageContext';
 import { TView } from '@/shared/components/ui/Themed';
+import { Platform } from 'react-native';
+
+if (Platform.OS === 'web') {
+  require('leaflet/dist/leaflet.css');
+}
 
 SplashScreen.preventAutoHideAsync();
 

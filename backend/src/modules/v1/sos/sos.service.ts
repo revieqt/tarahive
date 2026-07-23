@@ -86,6 +86,13 @@ export const enableSOS = async (req: any): Promise<any> => {
 
     user.safetyState.isInAnEmergency = true;
     user.safetyState.emergencyType = emergencyType;
+    const locationName = user.safetyState.lastKnownLocation?.locationName ?? '';
+    user.safetyState.lastKnownLocation = {
+      locationName,
+      latitude: Number(latitude),
+      longitude: Number(longitude),
+    };
+
     await userRepo.save(user);
 
     return;
@@ -105,6 +112,7 @@ export const disableSOS = async (req: DisableSOSRequest): Promise<any> => {
 
     user.safetyState.isInAnEmergency = false;
     user.safetyState.emergencyType = '';
+    user.safetyState.lastKnownLocation = undefined;
     
     await userRepo.save(user);
 
@@ -155,7 +163,7 @@ export const updateSafetySettings = async (
   user.safetyState = {
     ...user.safetyState,
     delivery: nextDelivery,
-    emergencyContact: nextEmergencyContact,
+    emergencyContact: nextEmergencyContact
   };
 
   await userRepo.save(user);

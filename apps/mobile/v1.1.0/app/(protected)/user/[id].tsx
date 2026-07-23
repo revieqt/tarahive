@@ -17,6 +17,7 @@ import HiveBg from '@/shared/components/common/HiveBg';
 import StickyScrollView from '@/shared/components/ui/StickyScrollView';
 import ErrorOverlayModal from '@/shared/components/modals/ErrorOverlayModal';
 import { ShareButton } from '@/shared/components/common/ShareButton';
+import SOSInfoCard from '@/shared/components/cards/SOSInfoCard';
 
 export default function ProfileScreen() {
   const { id } = useLocalSearchParams();
@@ -125,6 +126,8 @@ export default function ProfileScreen() {
 
           </View>
         }
+
+        <SOSInfoCard userData={displayUser ? displayUser : undefined}/>
 
         <TView style={styles.badgeContainer} color='primary'>
           <ExpBadge expPoints={displayUser?.expPoints || 0} />
