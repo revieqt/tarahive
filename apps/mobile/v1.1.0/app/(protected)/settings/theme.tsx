@@ -127,21 +127,21 @@ export default function LanguageSettingsScreen() {
             >
               <TIcon name={themeInfo.icon} size={80} />
             </Animated.View>
-            <TText style={{ marginTop: 20 }}> {t('settings.theme.switch_prompt')} </TText>
+            <TText style={{ marginTop: 20 }}> {t('users.theme.switch_prompt')} </TText>
             <TText type="title"> {themeInfo.name} </TText>
           </Animated.View>
         </Animated.View>
       </Modal>
 
       <TView style={styles.container}>
-        <Header title={t('settings.theme.title')} subtitle={t('settings.theme.subtitle')} />
+        <Header title={t('users.theme.title')} subtitle={t('users.theme.subtitle')} />
         <TouchableOpacity 
             key="device" 
             style={[styles.themeOption, { backgroundColor: primaryColor }]}
             onPress={() => handleThemeSelect(THEME_TYPES.DEVICE)}
           >
             <TIcon  name='cellphone' size={20} />
-            <TText style={styles.themeOptionText}> {t('settings.theme.device')} </TText>
+            <TText style={styles.themeOptionText}> {t('users.theme.device')} </TText>
             {selectedTheme === THEME_TYPES.DEVICE && (
               <TIcon name='check' size={20} color={accentColor} />
             )}
@@ -152,7 +152,7 @@ export default function LanguageSettingsScreen() {
             onPress={() => handleThemeSelect(THEME_TYPES.LIGHT)}
           >
             <TIcon name='white-balance-sunny' size={20} />
-            <TText style={styles.themeOptionText}> {t('settings.theme.light')} </TText>
+            <TText style={styles.themeOptionText}> {t('users.theme.light')} </TText>
             {selectedTheme === THEME_TYPES.LIGHT && (
               <TIcon name='check' size={20} color={accentColor} />
             )}
@@ -163,7 +163,7 @@ export default function LanguageSettingsScreen() {
             onPress={() => handleThemeSelect(THEME_TYPES.DARK)}
           >
             <TIcon name='moon-waning-crescent' size={20} />
-            <TText style={styles.themeOptionText}> {t('settings.theme.dark')} </TText>
+            <TText style={styles.themeOptionText}> {t('users.theme.dark')} </TText>
             {selectedTheme === THEME_TYPES.DARK && (
               <TIcon name='check' size={20} color={accentColor} />
             )}

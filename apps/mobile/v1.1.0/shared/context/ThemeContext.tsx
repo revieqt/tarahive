@@ -27,11 +27,11 @@ export const getThemeInfo = (themeType: string) => {
   const { t } = useLanguage();
   switch (themeType) {
     case THEME_TYPES.DEVICE:
-      return { icon: 'cellphone', name: t('settings.theme.device') };
+      return { icon: 'cellphone', name: t('users.theme.device') };
     case THEME_TYPES.LIGHT:
-      return { icon: 'white-balance-sunny', name: t('settings.theme.light') };
+      return { icon: 'white-balance-sunny', name: t('users.theme.light') };
     case THEME_TYPES.DARK:
-      return { icon: 'moon-waning-crescent', name: t('settings.theme.dark') };
+      return { icon: 'moon-waning-crescent', name: t('users.theme.dark') };
     default:
       return { icon: 'palette', name: 'Theme' };
   }

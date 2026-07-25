@@ -9,12 +9,8 @@ import itineraryRoutes from './itinerary/itinerary.routes';
 
 const v1Router = Router();
 
-// Registered first — i18nMiddleware never touches these
 v1Router.use('/localization', localizationRoutes);
-
-// Middleware applies to everything registered after this line
 v1Router.use(i18nMiddleware);
-
 v1Router.use('/auth', authRoutes);
 v1Router.use('/user', userRoutes);
 v1Router.use('/weather', weatherRoutes);

@@ -3,7 +3,9 @@
     "welcome": "Welcome to Tarahive",
     "cancel": "Cancel",
     "continue": "Continue",
-    "hello": "Hello"
+    "hello": "Hello",
+    "save": "Save Changes",
+    "na": "N/A"
   },
   "months": {
     "january": "January",

@@ -1,4 +1,12 @@
 {
+  "fields":{
+    "username": "Username",
+    "fname": "First Name",
+    "lname": "Last Name",
+    "bio": "Bio",
+    "contact": "Contact Number",
+    "interests": "Interests"
+  },
   "theme": {
     "title": "App Theme",
     "subtitle": "Use the theme you prefer. You can always change it later.",
@@ -13,7 +21,13 @@
   },
   "visibility": {
     "title": "Profile Visibility",
-    "subtitle": "Control who can see your profile and activity."
+    "subtitle": "Control who can see your profile and activity.",
+    "public": "Profile Visibility",
+    "on": "Public",
+    "off": "Private",
+    "personal": "Personal Info Visibility",
+    "travel": "Travel Info Visibility"
+  
   },
   "logs": {
     "title": "Request Security Logs",

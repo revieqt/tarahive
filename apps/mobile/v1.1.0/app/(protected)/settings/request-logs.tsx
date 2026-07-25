@@ -37,15 +37,15 @@ export default function RequestLogsScreen() {
 
   return (
     <TView style={styles.container}>
-        <Header title={t("settings.logs.title")} subtitle={t("settings.logs.subtitle")} />  
+        <Header title={t("users.logs.title")} subtitle={t("users.logs.subtitle")} />  
 
         <DatePickerField
-            placeholder={t("settings.logs.start_date")}
+            placeholder={t("users.logs.start_date")}
             value={startDate}
             onChange={setStartDate}
           />
         <DatePickerField
-            placeholder={t("settings.logs.end_date")}
+            placeholder={t("users.logs.end_date")}
             value={endDate}
             onChange={setEndDate}
           />

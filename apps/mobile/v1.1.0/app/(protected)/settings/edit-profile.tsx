@@ -19,6 +19,7 @@ import Header from '@/shared/components/common/Header';
 import HiveBg from '@/shared/components/common/HiveBg';
 import StickyScrollView from '@/shared/components/ui/StickyScrollView';
 import BackButton from '@/shared/components/common/BackButton';
+import { useLanguage } from '@/shared/context/LanguageContext';
 
 
 
@@ -26,6 +27,7 @@ import BackButton from '@/shared/components/common/BackButton';
 
 export default function EditProfileSettingsScreen() {
   const { session, updateSession } = useSession();
+  const { t } = useLanguage();
   const user = session?.user;
   const primaryColor = useThemeColor({}, 'primary');
   const secondaryColor = useThemeColor({}, 'secondary');
@@ -38,12 +40,12 @@ export default function EditProfileSettingsScreen() {
   const [likesModalVisible, setLikesModalVisible] = useState(false);
 
   const Fields = [
-    { label: 'Username', value: user?.username, onPress: () => [] },
-    { label: 'First Name', value: user?.fname, onPress: () => [] },
-    { label: 'Last Name', value: user?.lname, onPress: () => [] },
-    { label: 'Bio', value: user?.bio, onPress: () => [] },
-    { label: 'Contact Number', value: user?.contactNumber, onPress: () => [] },
-    { label: 'Interests', value: 'interests', onPress: () => [] },
+    { label: t("users.fields.username"), value: user?.username, onPress: () => [] },
+    { label: t("users.fields.fname"), value: user?.fname, onPress: () => [] },
+    { label: t("users.fields.lname"), value: user?.lname, onPress: () => [] },
+    { label: t("users.fields.bio"), value: user?.bio, onPress: () => [] },
+    { label: t("users.fields.contact"), value: user?.contactNumber, onPress: () => [] },
+    { label: t("users.fields.interests"), value: 'interests', onPress: () => [] },
   ];
   //   const [selectedLikes, setSelectedLikes] = useState<string[]>(user?.likes || []);
 
@@ -197,51 +199,59 @@ export default function EditProfileSettingsScreen() {
   //   };
 
   return (
-    <StickyScrollView
-      style={{ flex: 1 }}
-      contentContainerStyle={{ height: 2000 }}
-      headerAppearOn={200}
-      title='Edit Profile'
-      subtitle={'@' + user?.username}
-    >
-      <LinearGradient style={styles.headerBackground} colors={[accentColor, secondaryColor]}>
-        <BackButton type='floating' color='white' />
+    <>
+      <StickyScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ height: 2000 }}
+        headerAppearOn={200}
+        title='Edit Profile'
+        subtitle={'@' + user?.username}
+      >
+        <LinearGradient style={styles.headerBackground} colors={[accentColor, secondaryColor]}>
+          <BackButton type='floating' color='white' />
 
 
-        <HiveBg fade={false} />
-        <HiveBg fade={false} flipHorizontal />
-        <TView style={styles.headerBottom} />
-      </LinearGradient>
+          <HiveBg fade={false} />
+          <HiveBg fade={false} flipHorizontal />
+          <TView style={styles.headerBottom} />
+        </LinearGradient>
 
-      <TView>
-        <TouchableOpacity style={styles.profileImageContainer} onPress={() => []} disabled={loading}>
-          <ProfileImage imagePath={user?.profileImage} />
-          <LinearGradient
-            colors={['transparent', '#000']}
-            style={styles.profileImageGradient}
-          >
-            {loading ? (
-              <ActivityIndicator size="small" color="white" />
-            ) : (
-              <TIcon name='pencil' size={20} color='white' />
-            )}
-          </LinearGradient>
-        </TouchableOpacity>
+        <TView>
+          <TouchableOpacity style={styles.profileImageContainer} onPress={() => []} disabled={loading}>
+            <ProfileImage imagePath={user?.profileImage} />
+            <LinearGradient
+              colors={['transparent', '#000']}
+              style={styles.profileImageGradient}
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <TIcon name='pencil' size={20} color='white' />
+              )}
+            </LinearGradient>
+          </TouchableOpacity>
 
-        {Fields.map(field => (
-          <TView key={field.value} style={styles.sectionContainer} color='primary'>
-            <View>
-              <TText style={styles.sectionChildDescription}>{field.label}</TText>
-              <TText>{field.value ? field.value : 'N/A'}</TText>
-            </View>
-            <TouchableOpacity onPress={field.onPress} disabled={loading}>
-              <TIcon name='pencil' size={20} />
-            </TouchableOpacity>
-          </TView>
-        ))}
-      </TView>
+          {Fields.map(field => (
+            <TView key={field.value} style={styles.sectionContainer} color='primary'>
+              <View>
+                <TText style={styles.sectionChildDescription}>{field.label}</TText>
+                <TText>{field.value ? field.value : t("common.common.na")}</TText>
+              </View>
+              <TouchableOpacity onPress={field.onPress} disabled={loading}>
+                <TIcon name='pencil' size={20} />
+              </TouchableOpacity>
+            </TView>
+          ))}
+        </TView>
+      </StickyScrollView>
 
-    </StickyScrollView>
+      <Button
+        title={t("common.common.save")}
+        type='primary'
+        onPress={() => []}
+        buttonStyle={styles.button}
+      />
+    </>
   )
 }
 
@@ -292,4 +302,10 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     zIndex: 200,
   },
+  button:{
+    position:'absolute',
+    bottom: 16,
+    left: '3%',
+    right: '3%',
+  }
 });

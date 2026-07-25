@@ -46,6 +46,16 @@ export default function AccountScreen() {
     } as any);
   };
 
+  const handleDocs = (id: string, name: string) => () => {
+    router.push({
+      pathname: "/docs/[id]" as any,
+      params: {
+        id: id,
+        name: name,
+      },
+    } as any);
+  };
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -99,17 +109,17 @@ export default function AccountScreen() {
 
           {isConnected &&
             <SettingsOption icon='pen' label={t('tabs.account.edit_profile_button')}
-              onPress={() => router.push('/user/settings/edit-profile')}
+              onPress={() => router.push('/settings/edit-profile')}
             />
           }
 
           <SettingsOption icon='palette' label={t('tabs.account.theme_button')}
-            onPress={() => router.push('/user/settings/theme')}
+            onPress={() => router.push('/settings/theme')}
           />
 
           {isConnected && <>
             <SettingsOption icon='translate' label={t('tabs.account.language_button')}
-              onPress={() => router.push('/user/settings/language')}
+              onPress={() => router.push('/settings/language')}
             />
 
             <TText style={styles.optionsTitle}>{t('tabs.account.privacy_title')}</TText>
@@ -118,10 +128,10 @@ export default function AccountScreen() {
               onPress={() => router.push('/change-password')}
             />
             <SettingsOption icon='eye' label={t('tabs.account.visibility_button')}
-              onPress={() => router.push('/user/settings/visibility')}
+              onPress={() => router.push('/settings/visibility')}
             />
             <SettingsOption icon='key' label={t('tabs.account.logs_button')}
-              onPress={() => router.push('/user/settings/request-logs')}
+              onPress={() => router.push('/settings/request-logs')}
             />
             <SettingsOption icon='file-eye' label={t('tabs.account.privacy_button')}
               onPress={handleWebView(SUPPORT_FORM_URL, t('tabs.account.privacy_button'))}
@@ -133,7 +143,7 @@ export default function AccountScreen() {
             <TText style={styles.optionsTitle}>{t('tabs.account.help_title')}</TText>
 
             <SettingsOption icon='pen' label={t('tabs.account.manual_button')}
-              onPress={handleWebView(SUPPORT_FORM_URL, t('tabs.account.manual_button'))}
+              onPress={handleDocs('manual', t('tabs.account.support_button'))}
             />
             <SettingsOption icon='headset' label={t('tabs.account.support_button')}
               onPress={handleWebView(SUPPORT_FORM_URL, t('tabs.account.support_button'))}
