@@ -1,4 +1,18 @@
 {
+  "main":{
+    "off_title": "All Clear!",
+    "off_subtitle": "SOS: OFF",
+    "off_note": "Long-press to Activate SOS",
+    "off_hold": "Hold for Activation",
+    "on_title": "SOS in Progress",
+    "on_subtitle": "SOS: ON",
+    "on_note": "Long-press to End SOS",
+    "on_hold": "Hold for Deactivation",
+    "info": "is in a",
+    "email": "Emergency Email",
+    "number": "Emergency Contact",
+    "lang": "Alert Language"
+  },
   "form":{
     "title": "Enable SOS",
     "subtitle": "Configure your emergency alert",

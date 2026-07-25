@@ -10,14 +10,16 @@ import HiveBg from "@/shared/components/common/HiveBg";
 import { router } from "expo-router";
 import { useSafety } from "@/features/sos/hooks/useSOS"
 import SOSInfoCard from "@/shared/components/cards/SOSInfoCard";
+import { useLanguage } from "@/shared/context/LanguageContext";
 
 export default function SOSSection() {
   const secondaryColor = useThemeColor({}, 'secondary');
   const accentColor = useThemeColor({}, 'accent');
   const { session } = useSession();
+  const user = session?.user;
   const { handleDisableSOS } = useSafety();
-
-  const isSOSActive = session?.user?.safetyState?.isInAnEmergency ?? false;
+  const { t } = useLanguage();
+  const isSOSActive = user?.safetyState?.isInAnEmergency ?? false;
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isLongPressing, setIsLongPressing] = useState(false);
 
@@ -57,13 +59,13 @@ export default function SOSSection() {
         <View style={styles.titleContainer}>
           {isSOSActive ? (
             <>
-              <TText type='title' style={{ color: '#fff' }}>SOS in Progress!</TText>
-              <TText type='subtitle' style={{ color: '#fff' }}>SOS: On</TText>
+              <TText type='title' style={{ color: '#fff' }}>{t('sos.main.on_title')}</TText>
+              <TText type='subtitle' style={{ color: '#fff' }}>{t('sos.main.on_subtitle')}</TText>
             </>
           ) : (
             <>
-              <TText type='title' style={{ color: '#fff' }}>All Clear!</TText>
-              <TText type='subtitle' style={{ color: '#fff' }}>SOS: Off</TText>
+              <TText type='title' style={{ color: '#fff' }}>{t('sos.main.off_title')}</TText>
+              <TText type='subtitle' style={{ color: '#fff' }}>{t('sos.main.off_subtitle')}</TText>
             </>
           )}
         </View>
@@ -78,11 +80,11 @@ export default function SOSSection() {
         <View style={styles.titleContainer}>
           <TText type='subtitle'>☝️</TText>
           {isLongPressing ? (
-            <TText style={{ color: '#fff' }}>Hold for {isSOSActive ? 'deactivation' : 'activation'}...</TText>
+            <TText style={{ color: '#fff' }}>{isSOSActive ? t('sos.main.on_hold') : t('sos.main.off_hold')}</TText>
           ) : isSOSActive ? (
-            <TText style={{ color: '#fff' }}>Long-press to End SOS</TText>
+            <TText style={{ color: '#fff' }}>{t('sos.main.on_note')}</TText>
           ) : (
-            <TText style={{ color: '#fff' }}>Long-press to Activate SOS</TText>
+            <TText style={{ color: '#fff' }}>{t('sos.main.off_note')}</TText>
           )}
         </View>
       </View>
@@ -90,13 +92,12 @@ export default function SOSSection() {
       <TView style={styles.messageContainer}>
         { isSOSActive ? 
             <SOSInfoCard userData={session?.user}/>
-          : <>
-            <TText type="subtitle">What is SOS?</TText>
-            <TText>
-              SOS Type Here
-            </TText>
-            <View style={styles.messageButtons}>
+          : 
+          <View style={styles.offNote}>
+            <TText>{t('sos.main.email')}: {user?.safetyState.emergencyContact?.email}</TText>
+            <TText>{t('sos.main.number')}: {user?.safetyState.emergencyContact?.phone || "N/A"}</TText>
 
+            <View style={styles.messageButtons}>
               <TouchableOpacity style={[styles.openSettings, { backgroundColor: accentColor }]} onPress={() => router.push('/sos/settings')}>
                 <TText style={{ color: '#fff' }}>Settings</TText>
               </TouchableOpacity>
@@ -105,7 +106,7 @@ export default function SOSSection() {
                 <TText style={{ opacity: 0.5 }}>How SOS Works</TText>
               </TouchableOpacity>
             </View>
-          </>
+          </View>
         }
       </TView>
     </TView>
@@ -152,4 +153,8 @@ const styles = StyleSheet.create({
     gap: 5,
     marginTop: 5,
   },
+  offNote:{
+    padding: 10,
+    gap: 5
+  }
 });

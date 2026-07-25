@@ -1,33 +1,47 @@
 {
+  "main": {
+    "off_title": "안전 확인",
+    "off_subtitle": "SOS: 꺼짐",
+    "off_note": "SOS를 활성화하려면 길게 누르세요",
+    "off_hold": "활성화하려면 길게 누르기",
+    "on_title": "SOS 진행 중",
+    "on_subtitle": "SOS: 켜짐",
+    "on_note": "SOS를 종료하려면 길게 누르세요",
+    "on_hold": "비활성화하려면 길게 누르기",
+    "info": "다음과 같은 상황입니다:",
+    "email": "비상 이메일",
+    "number": "비상 연락처",
+    "lang": "알림 언어"
+  },
   "form": {
     "title": "SOS 활성화",
-    "subtitle": "긴급 알림을 설정하세요",
+    "subtitle": "비상 알림을 설정하세요",
     "message_placeholder": "긴급 상황을 설명해 주세요... (선택 사항)",
     "activate_button": "SOS 활성화",
-    "settings_link": "긴급 알림 전송 대상을 설정하세요"
+    "settings_link": "비상 알림을 보낼 대상을 설정하세요"
   },
   "emergency_types": {
     "medical": "의료 응급 상황",
     "criminal": "범죄 상황",
     "fire": "화재",
     "natural": "자연재해",
-    "utility": "공공시설 사고",
-    "road": "도로 사고",
+    "utility": "공공시설 긴급 상황",
+    "road": "도로 긴급 상황",
     "domestic": "가정 및 개인 안전",
     "animal": "동물 관련 긴급 상황",
     "other": "기타"
   },
   "settings": {
     "title": "SOS 설정",
-    "subtitle": "긴급 알림 환경을 설정하세요",
-    "email_label_enabled": "이메일 알림 활성화",
-    "email_label_disabled": "이메일 알림 비활성화",
-    "email_description": "이메일로 긴급 알림 보내기",
-    "email_placeholder": "긴급 연락처 이메일",
-    "sms_label_enabled": "SMS 알림 활성화",
-    "sms_label_disabled": "SMS 알림 비활성화",
-    "sms_description": "SMS로 긴급 알림 보내기 (Pro 사용자 전용)",
-    "sms_placeholder": "긴급 연락처 전화번호",
+    "subtitle": "비상 알림 환경설정을 구성하세요",
+    "email_label_enabled": "이메일 알림 사용",
+    "email_label_disabled": "이메일 알림 사용 안 함",
+    "email_description": "이메일로 비상 알림 보내기",
+    "email_placeholder": "비상 연락처 이메일",
+    "sms_label_enabled": "SMS 알림 사용",
+    "sms_label_disabled": "SMS 알림 사용 안 함",
+    "sms_description": "SMS로 비상 알림 보내기 (Pro 사용자 전용)",
+    "sms_placeholder": "비상 연락처 전화번호",
     "language": "선호하는 알림 언어",
     "save_button": "변경 사항 저장"
   }
