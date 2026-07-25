@@ -1,0 +1,49 @@
+{
+  "id": "overview",
+  "title": "Overview",
+  "subtitle": "Learn about TaraHive's policies, your privacy, and the terms that govern the use of our services.",
+  "blocks": [
+    {
+      "type": "heading",
+      "text": "Policies & Terms"
+    },
+    {
+      "type": "paragraph",
+      "text": "Welcome to TaraHive's Policies & Terms. These documents explain how we collect, use, and protect your information, as well as the rules and responsibilities that apply when using TaraHive."
+    },
+    {
+      "type": "image",
+      "src": "/docs/policies/v1.1/images/policies-overview.png",
+      "caption": "Policies & Terms"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "What's Included?"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Privacy Policy – Explains what personal information we collect, how we use it, and how we protect it.",
+        "Terms & Conditions – Describes the rules, responsibilities, and conditions for using TaraHive."
+      ]
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Why These Documents Matter"
+    },
+    {
+      "type": "paragraph",
+      "text": "We encourage you to read these documents carefully before using TaraHive. They help you understand your rights, your responsibilities, and our commitment to protecting your privacy while providing our services."
+    },
+    {
+      "type": "note",
+      "text": "These policies may be updated from time to time. The latest versions will always be available within TaraHive."
+    }
+  ]
+}

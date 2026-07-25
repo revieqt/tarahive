@@ -1,0 +1,35 @@
+{
+  "id": "version-support",
+  "title": "Version & Support",
+  "subtitle": "Application version information and where to get help.",
+  "blocks": [
+    {
+      "type": "heading",
+      "text": "Version Information"
+    },
+    {
+      "type": "paragraph",
+      "text": "This documentation corresponds to TaraHive version 1.1.0. New releases may introduce additional features, improvements, or interface changes."
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Need Assistance?"
+    },
+    {
+      "type": "paragraph",
+      "text": "If you encounter issues or have questions, visit the Help section within the application or contact the TaraHive support team through the official support channels."
+    },
+    {
+      "type": "image",
+      "src": "/docs/about/v1.1/images/support.png",
+      "caption": "Support Resources"
+    },
+    {
+      "type": "note",
+      "text": "Keeping TaraHive updated ensures you receive the latest features, performance improvements, and security updates."
+    }
+  ]
+}

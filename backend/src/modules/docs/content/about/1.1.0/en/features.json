@@ -1,0 +1,39 @@
+{
+  "id": "features",
+  "title": "Core Features",
+  "subtitle": "Discover the major capabilities available in TaraHive.",
+  "blocks": [
+    {
+      "type": "heading",
+      "text": "Core Features"
+    },
+    {
+      "type": "paragraph",
+      "text": "TaraHive provides a comprehensive collection of travel planning tools designed for both solo travelers and groups."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Create detailed travel itineraries.",
+        "Collaborate with friends and family in shared trips.",
+        "Receive AI-powered travel recommendations.",
+        "Check weather forecasts before and during your trip.",
+        "Manage group expenses and budgets.",
+        "Use SOS and emergency features for added safety.",
+        "Access your trips across supported devices."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/about/v1.1/images/features.png",
+      "caption": "TaraHive Features"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "note",
+      "text": "Some features may require an internet connection or location permission."
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "id": "terms-and-conditions",
+  "title": "Terms & Conditions",
+  "subtitle": "The rules and conditions that govern your use of TaraHive.",
+  "blocks": [
+    {
+      "type": "heading",
+      "text": "Acceptance of Terms"
+    },
+    {
+      "type": "paragraph",
+      "text": "By creating an account or using TaraHive, you agree to these Terms & Conditions. If you do not agree, you should discontinue using the application."
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Your Account"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Maintain accurate account information.",
+        "Protect your login credentials.",
+        "You are responsible for activities performed using your account."
+      ]
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Acceptable Use"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Use TaraHive only for lawful purposes.",
+        "Do not attempt unauthorized access.",
+        "Do not upload malicious software.",
+        "Do not interfere with the operation or security of TaraHive.",
+        "Do not use TaraHive to violate the rights of others."
+      ]
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "User Content"
+    },
+    {
+      "type": "paragraph",
+      "text": "You retain ownership of the itineraries, notes, budgets, and other content you create. By using TaraHive, you grant us permission to store, process, and synchronize your content solely for providing the Service."
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Service Features"
+    },
+    {
+      "type": "list",
+      "items": [
+        "AI-generated recommendations are provided for informational purposes only.",
+        "Weather information is obtained from third-party providers and may not always be accurate.",
+        "SOS features depend on internet connectivity, device capabilities, and third-party communication services.",
+        "TaraHive is not a substitute for emergency response services."
+      ]
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Third-Party Services"
+    },
+    {
+      "type": "paragraph",
+      "text": "Some TaraHive features rely on third-party providers such as mapping, weather, AI, email, SMS, and calendar services. These services operate under their own terms and privacy policies."
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Disclaimer"
+    },
+    {
+      "type": "paragraph",
+      "text": "TaraHive is provided on an \"as is\" and \"as available\" basis. We do not guarantee uninterrupted service or that the application will always be error-free."
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Limitation of Liability"
+    },
+    {
+      "type": "paragraph",
+      "text": "To the fullest extent permitted by applicable law, TaraHive shall not be liable for indirect or consequential damages arising from the use or inability to use the Service, including travel disruptions, data loss, delayed notifications, AI inaccuracies, or failures of third-party services."
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Changes to the Service"
+    },
+    {
+      "type": "paragraph",
+      "text": "We may update, improve, suspend, or discontinue features of TaraHive at any time. Continued use of the Service after updates constitutes acceptance of the revised Terms."
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Termination"
+    },
+    {
+      "type": "paragraph",
+      "text": "We reserve the right to suspend or terminate accounts that violate these Terms or compromise the security or integrity of the Service."
+    },
+    {
+      "type": "note",
+      "text": "If you have questions regarding these Terms or the Privacy Policy, please contact TaraHive through the official support channels available within the application."
+    }
+  ]
+}

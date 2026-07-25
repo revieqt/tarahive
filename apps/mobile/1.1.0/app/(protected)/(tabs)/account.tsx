@@ -46,12 +46,12 @@ export default function AccountScreen() {
     } as any);
   };
 
-  const handleDocs = (id: string, name: string) => () => {
+  const handleDocs = (id: string, section?: string) => () => {
     router.push({
       pathname: "/docs/[id]" as any,
       params: {
         id: id,
-        name: name,
+        section: section,
       },
     } as any);
   };
@@ -134,22 +134,22 @@ export default function AccountScreen() {
               onPress={() => router.push('/settings/request-logs')}
             />
             <SettingsOption icon='file-eye' label={t('tabs.account.privacy_button')}
-              onPress={handleWebView(SUPPORT_FORM_URL, t('tabs.account.privacy_button'))}
+              onPress={handleDocs('policies-terms', 'privacy-policy')}
             />
             <SettingsOption icon='file-alert' label={t('tabs.account.terms_button')}
-              onPress={handleWebView(SUPPORT_FORM_URL, t('tabs.account.terms_button'))}
+              onPress={handleDocs('policies-terms', 'terms-and-conditions')}
             />
 
             <TText style={styles.optionsTitle}>{t('tabs.account.help_title')}</TText>
 
             <SettingsOption icon='pen' label={t('tabs.account.manual_button')}
-              onPress={handleDocs('manual', t('tabs.account.support_button'))}
+              onPress={handleDocs('manual')}
             />
             <SettingsOption icon='headset' label={t('tabs.account.support_button')}
               onPress={handleWebView(SUPPORT_FORM_URL, t('tabs.account.support_button'))}
             />
             <SettingsOption icon='file-find' label={t('tabs.account.about_button')}
-              onPress={handleWebView(SUPPORT_FORM_URL, t('tabs.account.about_button'))}
+              onPress={handleDocs('about')}
             />
 
           </>}

@@ -1,0 +1,35 @@
+{
+  "id": "overview",
+  "title": "Overview",
+  "subtitle": "Learn what TaraHive is and the purpose behind the application.",
+  "blocks": [
+    {
+      "type": "heading",
+      "text": "About TaraHive"
+    },
+    {
+      "type": "paragraph",
+      "text": "TaraHive is an all-in-one travel planning platform designed to simplify the way individuals and groups organize trips. It combines itinerary planning, collaboration, weather information, AI-powered assistance, budgeting, and safety tools into a single application."
+    },
+    {
+      "type": "image",
+      "src": "/docs/about/v1.1/images/overview.png",
+      "caption": "TaraHive Overview"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Our Mission"
+    },
+    {
+      "type": "paragraph",
+      "text": "Our mission is to make travel planning more organized, collaborative, and accessible. TaraHive helps travelers spend less time managing details and more time enjoying their journeys."
+    },
+    {
+      "type": "note",
+      "text": "TaraHive continuously evolves through updates and user feedback to improve the travel planning experience."
+    }
+  ]
+}

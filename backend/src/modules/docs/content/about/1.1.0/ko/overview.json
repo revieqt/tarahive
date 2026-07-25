@@ -1,0 +1,35 @@
+{
+  "id": "overview",
+  "title": "개요",
+  "subtitle": "TaraHive와 애플리케이션의 목적을 알아보세요.",
+  "blocks": [
+    {
+      "type": "heading",
+      "text": "TaraHive 소개"
+    },
+    {
+      "type": "paragraph",
+      "text": "TaraHive는 개인과 그룹이 여행을 더욱 쉽고 효율적으로 계획할 수 있도록 설계된 올인원 여행 계획 플랫폼입니다. 일정 관리, 협업, 날씨 정보, AI 기반 추천, 예산 관리 및 안전 기능을 하나의 애플리케이션에서 제공합니다."
+    },
+    {
+      "type": "image",
+      "src": "/docs/about/v1.1/images/overview.png",
+      "caption": "TaraHive 개요"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "우리의 목표"
+    },
+    {
+      "type": "paragraph",
+      "text": "TaraHive의 목표는 여행 계획을 더욱 체계적이고 협력적이며 누구나 쉽게 이용할 수 있도록 만드는 것입니다. 사용자가 계획에 드는 시간을 줄이고 여행 자체를 더욱 즐길 수 있도록 돕습니다."
+    },
+    {
+      "type": "note",
+      "text": "TaraHive는 사용자 피드백과 지속적인 업데이트를 통해 더욱 나은 여행 계획 경험을 제공합니다."
+    }
+  ]
+}

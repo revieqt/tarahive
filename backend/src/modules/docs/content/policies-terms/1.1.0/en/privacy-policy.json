@@ -1,0 +1,102 @@
+{
+  "id": "privacy-policy",
+  "title": "Privacy Policy",
+  "subtitle": "Learn how TaraHive collects, uses, stores, and protects your personal information.",
+  "blocks": [
+    {
+      "type": "heading",
+      "text": "Introduction"
+    },
+    {
+      "type": "paragraph",
+      "text": "At TaraHive, we value your privacy. This Privacy Policy explains what information we collect, how we use it, and the measures we take to protect your personal data when you use our services."
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Information We Collect"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Account information such as your name, email address, and profile details.",
+        "Travel-related information including itineraries, destinations, budgets, and notes.",
+        "Location information when you grant permission for maps, weather, or SOS features.",
+        "Device and usage information to improve performance and troubleshoot issues."
+      ]
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "How We Use Your Information"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Provide and maintain TaraHive services.",
+        "Synchronize your itineraries across devices.",
+        "Enable collaboration with users you invite.",
+        "Provide AI-powered travel recommendations.",
+        "Deliver weather updates and emergency-related features.",
+        "Improve the reliability, security, and performance of the application."
+      ]
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Information Sharing"
+    },
+    {
+      "type": "paragraph",
+      "text": "We do not sell your personal information. Information is shared only with your authorized collaborators, trusted service providers required to operate TaraHive, or when required by applicable law."
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Data Security"
+    },
+    {
+      "type": "paragraph",
+      "text": "We implement reasonable administrative, technical, and organizational measures to protect your information from unauthorized access, alteration, disclosure, or destruction."
+    },
+    {
+      "type": "note",
+      "text": "Although we strive to protect your information, no method of electronic storage or internet transmission can be guaranteed to be completely secure."
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Your Rights"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Access your personal information.",
+        "Update or correct your account information.",
+        "Delete your account, subject to applicable legal obligations.",
+        "Withdraw permissions such as location access through your device settings."
+      ]
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Policy Updates"
+    },
+    {
+      "type": "paragraph",
+      "text": "This Privacy Policy may be updated from time to time. Any changes will become effective once the updated version is published within TaraHive."
+    }
+  ]
+}
