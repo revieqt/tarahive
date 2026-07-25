@@ -1,0 +1,173 @@
+{
+  "id": "installation",
+  "title": "Installation",
+  "subtitle": "Download and install TaraHive on your device.",
+  "blocks": [
+    {
+      "type": "heading",
+      "text": "Download TaraHive"
+    },
+    {
+      "type": "paragraph",
+      "text": "Before installing TaraHive, download the latest version of the application from the official TaraHive website. Always download the installer from an official source to ensure you receive the latest features and security updates."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Open your preferred web browser.",
+        "Visit the official TaraHive website.",
+        "Navigate to the Download page.",
+        "Select the installer that matches your operating system.",
+        "Wait for the download to complete."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/download-page.png",
+      "caption": "TaraHive download page"
+    },
+    {
+      "type": "note",
+      "text": "A stable internet connection is recommended while downloading the installer."
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Install on Windows"
+    },
+    {
+      "type": "paragraph",
+      "text": "Follow these steps to install TaraHive on a Windows computer."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Locate the downloaded installer in your Downloads folder.",
+        "Double-click the installer to begin the installation.",
+        "If prompted by Windows, select 'Yes' to allow the installer to make changes.",
+        "Read and accept the license agreement.",
+        "Choose an installation folder or use the default location.",
+        "Click 'Install' and wait for the installation to finish.",
+        "Click 'Finish' to launch TaraHive."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/windows-installation.png",
+      "caption": "Installing TaraHive on Windows"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Install on macOS"
+    },
+    {
+      "type": "paragraph",
+      "text": "Install TaraHive on macOS using the downloaded application package."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Open the downloaded .dmg file.",
+        "Drag the TaraHive application into the Applications folder.",
+        "Open the Applications folder.",
+        "Launch TaraHive.",
+        "If macOS displays a security warning, allow the application from System Settings if necessary."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/macos-installation.png",
+      "caption": "Installing TaraHive on macOS"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Install on Linux"
+    },
+    {
+      "type": "paragraph",
+      "text": "Linux users can install TaraHive using the package provided for their distribution."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Download the Linux package from the TaraHive website.",
+        "Open your Downloads folder.",
+        "Run the installer or install the package using your distribution's package manager.",
+        "Wait for the installation to complete.",
+        "Launch TaraHive from your applications menu."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/linux-installation.png",
+      "caption": "Installing TaraHive on Linux"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Install on Android"
+    },
+    {
+      "type": "paragraph",
+      "text": "Install TaraHive on your Android device using the official APK or through the supported app store when available."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Download the latest Android installation package.",
+        "If installing an APK, allow installation from trusted sources when prompted.",
+        "Open the downloaded file.",
+        "Tap 'Install'.",
+        "Wait until the installation finishes.",
+        "Tap 'Open' to launch TaraHive."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/android-installation.png",
+      "caption": "Installing TaraHive on Android"
+    },
+    {
+      "type": "note",
+      "text": "Only install TaraHive from official sources to protect your device and personal information."
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Verify the Installation"
+    },
+    {
+      "type": "paragraph",
+      "text": "After installation, launch TaraHive to verify that it was installed successfully."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Open TaraHive from your desktop, applications folder, or app drawer.",
+        "Wait for the welcome screen to appear.",
+        "Sign in or create a new account to begin using the application."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/welcome-screen.png",
+      "caption": "TaraHive welcome screen"
+    },
+    {
+      "type": "note",
+      "text": "If the application does not launch successfully, refer to the Troubleshooting section of this manual."
+    }
+  ]
+}

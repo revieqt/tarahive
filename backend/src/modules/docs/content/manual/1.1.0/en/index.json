@@ -1,0 +1,21 @@
+{
+  "id": "manual",
+  "name": "App Manual",
+  "version": "1.0",
+  "created_on": "2026-07-01",
+  "groups": [
+    {
+        "id": "getting-started",
+        "name": "Getting Started",
+        "sections":[
+            { "id": "introduction", "title": "Introduction" },
+            { "id": "system-requirements", "title": "System Requirements" },
+            { "id": "installation", "title": "Installation" },
+            { "id": "account-creation", "title": "Account Creation" },
+            { "id": "first-launch", "title": "First Launch" },
+            { "id": "navigation", "title": "Navigating the Interface" },
+            { "id": "help", "title": "Getting Help" }
+        ]
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "id": "introduction",
+  "title": "Introduction",
+  "subtitle": "Welcome to TaraHive and discover how it simplifies travel planning and collaboration.",
+  "blocks": [
+    {
+      "type": "heading",
+      "text": "Welcome to TaraHive"
+    },
+    {
+      "type": "paragraph",
+      "text": "TaraHive is an all-in-one travel planning platform designed to help individuals, families, and groups organize memorable trips with ease. Whether you are planning a weekend getaway or a multi-day vacation, TaraHive provides the tools you need to keep every part of your journey organized."
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/welcome.png",
+      "caption": "Welcome to TaraHive"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "What Can You Do with TaraHive?"
+    },
+    {
+      "type": "paragraph",
+      "text": "TaraHive combines trip planning, collaboration, and safety features into a single, easy-to-use application."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Create and organize travel itineraries.",
+        "Collaborate with friends, family, or travel groups in real time.",
+        "Receive AI-powered travel suggestions based on your destination and weather.",
+        "View weather forecasts to better prepare for your trip.",
+        "Manage travel expenses and split costs with your group.",
+        "Access emergency assistance features, including SOS and nearby emergency services."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/features-overview.png",
+      "caption": "Overview of TaraHive features"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Why Choose TaraHive?"
+    },
+    {
+      "type": "paragraph",
+      "text": "Instead of using multiple applications for planning, navigation, communication, and budgeting, TaraHive brings everything together in one convenient platform. This helps reduce planning time and allows you to focus on enjoying your journey."
+    },
+    {
+      "type": "note",
+      "text": "Some features require an internet connection and location permission to provide the best experience."
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Getting Started"
+    },
+    {
+      "type": "paragraph",
+      "text": "The following sections of this manual will guide you through installing TaraHive, creating an account, navigating the interface, planning itineraries, collaborating with groups, and making the most of the application's features."
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/getting-started.png",
+      "caption": "Begin your TaraHive journey"
+    }
+  ]
+}

@@ -1,0 +1,154 @@
+{
+  "id": "account-creation",
+  "title": "Account Creation",
+  "subtitle": "Create your TaraHive account to start planning and managing your trips.",
+  "blocks": [
+    {
+      "type": "heading",
+      "text": "Why Create an Account?"
+    },
+    {
+      "type": "paragraph",
+      "text": "A TaraHive account allows you to securely store your itineraries, synchronize your data across devices, collaborate with other travelers, and access personalized features such as AI recommendations and weather updates."
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/account-benefits.png",
+      "caption": "Benefits of creating a TaraHive account"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Create an Account with Email"
+    },
+    {
+      "type": "paragraph",
+      "text": "Follow these steps to register using your email address."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Open the TaraHive application.",
+        "On the Welcome screen, select \"Create Account\".",
+        "Enter your full name.",
+        "Provide a valid email address.",
+        "Create a strong password.",
+        "Confirm your password.",
+        "Read and accept the Terms of Service and Privacy Policy.",
+        "Select \"Create Account\" to continue."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/email-registration.png",
+      "caption": "Email account registration"
+    },
+    {
+      "type": "note",
+      "text": "Use an email address that you can access, as it may be required for account verification and password recovery."
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Sign Up with Google"
+    },
+    {
+      "type": "paragraph",
+      "text": "You can also create an account quickly using your Google account."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Select \"Continue with Google\" on the Welcome screen.",
+        "Choose your Google account.",
+        "Review the requested permissions.",
+        "Grant access to continue.",
+        "Complete any remaining profile information if prompted."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/google-signup.png",
+      "caption": "Google account registration"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Verify Your Email"
+    },
+    {
+      "type": "paragraph",
+      "text": "Depending on your account settings, TaraHive may send a verification email to confirm your email address before you can access all features."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Open your email inbox.",
+        "Locate the verification email from TaraHive.",
+        "Open the email and select the verification link.",
+        "Return to the TaraHive application.",
+        "Sign in using your newly created account."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/email-verification.png",
+      "caption": "Email verification"
+    },
+    {
+      "type": "note",
+      "text": "If you do not receive the verification email within a few minutes, check your Spam or Junk folder."
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Complete Your Profile"
+    },
+    {
+      "type": "paragraph",
+      "text": "After creating your account, you can personalize your profile to improve your experience within TaraHive."
+    },
+    {
+      "type": "list",
+      "items": [
+        "Upload a profile picture (optional).",
+        "Choose your preferred display name.",
+        "Set your preferred language and region.",
+        "Review your notification preferences."
+      ]
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/profile-setup.png",
+      "caption": "Complete your profile"
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "heading",
+      "text": "Account Created Successfully"
+    },
+    {
+      "type": "paragraph",
+      "text": "Congratulations! Your TaraHive account has been created successfully. You can now begin creating itineraries, collaborating with other users, and exploring the application's features."
+    },
+    {
+      "type": "image",
+      "src": "/docs/manual/v1.0/images/account-created.png",
+      "caption": "Account successfully created"
+    },
+    {
+      "type": "note",
+      "text": "Keep your login credentials secure and never share your password with others."
+    }
+  ]
+}
