@@ -9,6 +9,7 @@ import { connectPostgres } from './config/postgres';
 import { serverAdapter } from "./config/bullBoard";
 import { initializeFirebase } from './config/firebase';
 import v1Router from './modules/v1/v1.routes';
+import docsRouter from './modules/docs/docs.routes';
 import { initializeEmailDeliveryWorker } from './workers/delivery/email.worker';
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use('/public', express.static(path.join(__dirname, "../public")));
 app.use('/uploads', express.static(path.join(__dirname, "../uploads")));
 app.use("/queues", serverAdapter.getRouter());
 app.use('/v1', v1Router);
+app.use('/docs', docsRouter);
 app.set("trust proxy", 1);
 
 async function bootstrap() {
