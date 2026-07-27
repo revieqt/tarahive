@@ -8,6 +8,7 @@ import Header from "@/shared/components/common/Header";
 import Switch from "@/shared/components/ui/Switch";
 import { useSession } from "@/features/auth/context/SessionContext";
 import Button from "@/shared/components/ui/Button";
+import { useUpdateVisibilitySettings } from "@/features/user/hooks/useVisibilitySettings";
 
 
 export default function VisibilitySettingsScreen() {
@@ -16,6 +17,7 @@ export default function VisibilitySettingsScreen() {
   const [isPublic, setIsPublic] = useState(false);
   const [isPersonalInfoPublic, setIsPersonalInfoPublic] = useState(false);
   const [isTravelInfoPublic, setIsTravelInfoPublic] = useState(false);
+  const { updateVisibilitySettings, isPending } = useUpdateVisibilitySettings();
 
   useEffect(() => {
     const visibility = session?.user?.settings.visibility;
@@ -25,6 +27,16 @@ export default function VisibilitySettingsScreen() {
       setIsTravelInfoPublic(Boolean(visibility.isTravelInfoPublic));
     }
   }, [session?.user?.settings?.visibility?.isProfilePublic, session?.user?.settings?.visibility?.isPersonalInfoPublic, session?.user?.settings?.visibility?.isTravelInfoPublic]);
+
+  const handleSaveSettings = () => {
+    updateVisibilitySettings({
+        visibility: {
+            isProfilePublic: isPublic,
+            isPersonalInfoPublic: isPersonalInfoPublic,
+            isTravelInfoPublic: isTravelInfoPublic,
+        },
+    });
+  };
 
   return (
     <TView style={styles.container}>
@@ -60,7 +72,7 @@ export default function VisibilitySettingsScreen() {
       <Button
         title={t("common.common.save")}
         type='primary'
-        onPress={() => []}
+        onPress={handleSaveSettings}
         buttonStyle={styles.button}
       />
     </TView>

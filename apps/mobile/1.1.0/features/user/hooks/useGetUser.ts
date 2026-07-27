@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchUserByIdOrUsername } from '../service/userService';
+import { fetchUserByIdOrUsername } from '../services/userService';
 import { showError } from '@/shared/services/toast.service';
 import { useEffect } from 'react';
 import { User } from '@/features/auth/context/SessionContext';

@@ -37,3 +37,5 @@ export const connectPostgres = async () => {
     process.exit(1);
   }
 };
+
+export const userRepo = AppDataSource.getRepository(User);

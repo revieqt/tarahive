@@ -1,10 +1,8 @@
-import { AppDataSource } from "../../../config/postgres";
+import { AppDataSource, userRepo } from "../../../config/postgres";
 import { User } from "./user.entity";
 
-const userRepository = AppDataSource.getRepository(User);
-
 export const getUserById = async (userId: string): Promise<Partial<User>> => {
-  const user = await userRepository.findOne({ where: { id: userId } });
+  const user = await userRepo.findOne({ where: { id: userId } });
 
   if (!user) {
     throw new Error("User not found");
@@ -15,7 +13,7 @@ export const getUserById = async (userId: string): Promise<Partial<User>> => {
 };
 
 export const getUserByIdOrUsername = async (idOrUsername: string): Promise<Partial<User>> => {
-  const user = await userRepository
+  const user = await userRepo
     .createQueryBuilder('user')
     .where('CAST(user.id AS TEXT) = :idOrUsername', { idOrUsername })
     .orWhere('user.username = :idOrUsername', { idOrUsername })
@@ -27,4 +25,43 @@ export const getUserByIdOrUsername = async (idOrUsername: string): Promise<Parti
 
   const { password: _, ...userWithoutPassword } = user;
   return userWithoutPassword;
+};
+
+export const updateVisibilitySettings = async (
+  userId: string,
+  visibility?: { isProfilePublic?: boolean; isPersonalInfoPublic?: boolean; isTravelInfoPublic?: boolean }
+): Promise<void> => {
+  const user = await userRepo.findOne({ where: { id: userId } });
+
+  if (!user) throw new Error("User not found");
+
+  const currentVisibility = user.settings.visibility || {
+    isProfilePublic: true,
+    isPersonalInfoPublic: true,
+    isTravelInfoPublic: true,
+  };
+
+  const nextVisibility = {
+    isProfilePublic:
+      typeof visibility?.isProfilePublic === "boolean"
+        ? visibility.isProfilePublic
+        : currentVisibility.isProfilePublic,
+    isPersonalInfoPublic:
+      typeof visibility?.isPersonalInfoPublic === "boolean"
+        ? visibility.isPersonalInfoPublic
+        : currentVisibility.isPersonalInfoPublic,
+    isTravelInfoPublic:
+      typeof visibility?.isTravelInfoPublic === "boolean"
+        ? visibility.isTravelInfoPublic
+        : currentVisibility.isTravelInfoPublic,
+  };
+
+  user.settings.visibility = {
+    ...user.settings.visibility,
+    ...nextVisibility
+  };
+
+  await userRepo.save(user);
+
+  return;
 };

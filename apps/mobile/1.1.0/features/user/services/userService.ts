@@ -1,5 +1,8 @@
 import { api } from '@/shared/api/client';
 import { User } from '@/features/auth/context/SessionContext';
+import { UpdateVisibilitySettingsPayload } from '../types/userTypes';
+
+const API_URL = `/v1/user`;
 
 /**
  * Fetch user data by ID or username
@@ -11,7 +14,7 @@ export const fetchUserByIdOrUsername = async (idOrUsername: string): Promise<Use
 
   try {
     const response = await api.get<{ success: boolean; data: User }>(
-      `/v1/user/${idOrUsername}`
+      `${API_URL}/${idOrUsername}`
     );
 
     if (!response.success || !response.data) {
@@ -28,4 +31,19 @@ export const fetchUserByIdOrUsername = async (idOrUsername: string): Promise<Use
     }
     throw new Error(error.message || 'Failed to fetch user');
   }
+};
+
+export const updateVisibilitySettings = async (
+  payload: UpdateVisibilitySettingsPayload
+): Promise<{ success: boolean; data: User; message: string }> => {
+  return await api.patch<{ success: boolean; data: User; message: string }>(
+    `${API_URL}/update-visibility`,
+    {
+      visibility: {
+        isProfilePublic: payload.visibility.isProfilePublic,
+        isPersonalInfoPublic: payload.visibility.isPersonalInfoPublic,
+        isTravelInfoPublic: payload.visibility.isTravelInfoPublic,
+      },
+    }
+  );
 };

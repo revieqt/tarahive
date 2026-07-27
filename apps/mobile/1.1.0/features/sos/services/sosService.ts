@@ -79,7 +79,7 @@ export const disableSOS = async (
 export const updateUserSafetySettings = async (
   payload: UpdateSafetySettingsPayload
 ): Promise<{ success: boolean; data: User; message: string }> => {
-  return await api.post<{ success: boolean; data: User; message: string }>(
+  return await api.patch<{ success: boolean; data: User; message: string }>(
     `${API_URL}/update-settings`,
     {
       safetySettings: {
