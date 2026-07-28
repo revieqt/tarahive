@@ -1,5 +1,6 @@
-import { AppDataSource, userRepo } from "../../../config/postgres";
+import { userRepo } from "../../../config/postgres";
 import { User } from "./user.entity";
+import { ProfileUpdatePayload } from "./user.types";
 
 export const getUserById = async (userId: string): Promise<Partial<User>> => {
   const user = await userRepo.findOne({ where: { id: userId } });
@@ -63,5 +64,23 @@ export const updateVisibilitySettings = async (
 
   await userRepo.save(user);
 
+  return;
+};
+
+export const updateProfile = async (
+  userId: string,
+  updates: ProfileUpdatePayload
+): Promise<void> => {
+  const user = await userRepo.findOne({ where: { id: userId } });
+
+  if (!user) throw new Error("User not found");
+  if (typeof updates.username !== "undefined") user.username = updates.username;
+  if (typeof updates.fname !== "undefined") user.fname = updates.fname;
+  if (typeof updates.lname !== "undefined") user.lname = updates.lname;
+  if (typeof updates.bio !== "undefined") user.bio = updates.bio;
+  if (typeof updates.contactNumber !== "undefined") user.contactNumber = updates.contactNumber;
+  if (typeof updates.interests !== "undefined") user.interests = updates.interests;
+
+  await userRepo.save(user);
   return;
 };

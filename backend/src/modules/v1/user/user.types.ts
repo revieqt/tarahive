@@ -16,3 +16,12 @@ export enum UserType {
   ADMIN = "admin",
   SUPER_ADMIN = "super_admin",
 }
+
+export interface ProfileUpdatePayload {
+  username?: string;
+  fname?: string;
+  lname?: string;
+  bio?: string;
+  contactNumber?: string;
+  interests?: string[];
+}

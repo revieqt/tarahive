@@ -1,258 +1,222 @@
 import { TText, TView, TIcon } from '@/shared/components/ui/Themed';
-import React, { useState } from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet, TouchableOpacity, View, ScrollView, ActivityIndicator, Modal } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useSession } from '@/features/auth/context/SessionContext';
-import Switch from '@/shared/components/ui/Switch';
-import { router } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import Button from '@/shared/components/ui/Button';
-import ProfileImage from '@/shared/components/ui/ProfileImage';
-// import InputModal from '@/components/modals/InputModal';
-// import { updateStringUserData, updateBooleanUserData, uploadProfileImage, updateUserLikes } from '@/services/userService';
-// import { CustomAlert } from '@/components/Alert';
-import * as ImagePicker from 'expo-image-picker';
-// import ToggleButton from '@/components/ToggleButton';
-// import { LIKES } from '@/shared/constants/Config';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useThemeColor } from '@/shared/hooks/useThemeColor';
 import Header from '@/shared/components/common/Header';
-import HiveBg from '@/shared/components/common/HiveBg';
 import StickyScrollView from '@/shared/components/ui/StickyScrollView';
-import BackButton from '@/shared/components/common/BackButton';
 import { useLanguage } from '@/shared/context/LanguageContext';
-
-
-
-
+import InputModal from '@/shared/components/modals/InputModal';
+import { useUpdateProfile } from '@/features/user/hooks/useUpdateProfile';
 
 export default function EditProfileSettingsScreen() {
-  const { session, updateSession } = useSession();
+  const { session } = useSession();
   const { t } = useLanguage();
+  const { updateProfile, isPending } = useUpdateProfile();
   const user = session?.user;
-  const primaryColor = useThemeColor({}, 'primary');
-  const secondaryColor = useThemeColor({}, 'secondary');
-  const accentColor = useThemeColor({}, 'accent');
+
   const [modalVisible, setModalVisible] = useState(false);
-  const [currentField, setCurrentField] = useState<'fname' | 'lname' | 'bio' | 'contactNumber' | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alertConfig, setAlertConfig] = useState<{ title: string; message: string; icon: string }>({ title: '', message: '', icon: 'information-circle-outline' });
-  const [likesModalVisible, setLikesModalVisible] = useState(false);
+  const [editingField, setEditingField] = useState<null | { key: string; label: string; type: 'text' | 'contactNumber'; initialValue?: string; placeholder?: string }>(null);
+  const [draftValues, setDraftValues] = useState<Record<string, string | string[] | undefined>>({});
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
 
-  const Fields = [
-    { label: t("users.fields.username"), value: user?.username, onPress: () => [] },
-    { label: t("users.fields.fname"), value: user?.fname, onPress: () => [] },
-    { label: t("users.fields.lname"), value: user?.lname, onPress: () => [] },
-    { label: t("users.fields.bio"), value: user?.bio, onPress: () => [] },
-    { label: t("users.fields.contact"), value: user?.contactNumber, onPress: () => [] },
-    { label: t("users.fields.interests"), value: 'interests', onPress: () => [] },
-  ];
-  //   const [selectedLikes, setSelectedLikes] = useState<string[]>(user?.likes || []);
+  const interestOptions = useMemo(() => [
+    { id: 'travel', label: 'Travel' },
+    { id: 'food', label: 'Food' },
+    { id: 'music', label: 'Music' },
+    { id: 'nature', label: 'Nature' },
+    { id: 'photography', label: 'Photography' },
+    { id: 'fitness', label: 'Fitness' },
+    { id: 'reading', label: 'Reading' },
+    { id: 'gaming', label: 'Gaming' },
+    { id: 'art', label: 'Art' },
+    { id: 'technology', label: 'Technology' },
+    { id: 'fashion', label: 'Fashion' },
+    { id: 'movies', label: 'Movies' },
+  ], []);
 
-  //   const handleOpenModal = (field: 'fname' | 'lname' | 'bio' | 'contactNumber') => {
-  //     setCurrentField(field);
-  //     setModalVisible(true);
-  //   };
+  const fields = useMemo(() => [
+    { key: 'username', label: t('users.fields.username'), value: user?.username, type: 'text' as const, placeholder: t('users.fields.username') },
+    { key: 'fname', label: t('users.fields.fname'), value: user?.fname, type: 'text' as const, placeholder: t('users.fields.fname') },
+    { key: 'lname', label: t('users.fields.lname'), value: user?.lname, type: 'text' as const, placeholder: t('users.fields.lname') },
+    { key: 'bio', label: t('users.fields.bio'), value: user?.bio, type: 'text' as const, placeholder: t('users.fields.bio') },
+    { key: 'contactNumber', label: t('users.fields.contact'), value: user?.contactNumber, type: 'contactNumber' as const, placeholder: t('users.fields.contact') },
+    { key: 'interests', label: t('users.fields.interests'), value: Array.isArray(user?.interests) ? user.interests : [], type: 'text' as const, placeholder: t('users.fields.interests') },
+  ], [user?.username, user?.fname, user?.lname, user?.bio, user?.contactNumber, user?.interests, t]);
 
-  //   const handleStringUpdate = async (value: string | { areaCode: string; number: string }) => {
-  //     if (!currentField || !session?.accessToken || !user?.id) return;
+  const openEditor = (field: typeof fields[number]) => {
+    if (field.key === 'interests') {
+      const currentInterests = Array.isArray(draftValues.interests)
+        ? draftValues.interests
+        : Array.isArray(user?.interests)
+          ? user.interests
+          : [];
+      setSelectedInterests(currentInterests);
+      setEditingField({
+        key: field.key,
+        label: field.label,
+        type: 'text',
+        initialValue: '',
+        placeholder: field.placeholder,
+      });
+      setModalVisible(true);
+      return;
+    }
 
-  //     try {
-  //       setLoading(true);
-  //       let fieldName = currentField;
-  //       let finalValue = value as string;
+    const initialValue = Array.isArray(field.value) ? field.value.join(', ') : field.value || '';
 
-  //       // Handle contact number format
-  //       if (currentField === 'contactNumber' && typeof value === 'object') {
-  //         finalValue = `${value.areaCode}${value.number}`;
-  //       }
+    setEditingField({
+      key: field.key,
+      label: field.label,
+      type: field.type,
+      initialValue,
+      placeholder: field.placeholder,
+    });
+    setModalVisible(true);
+  };
 
-  //       // Capitalize first letter for fname and lname
-  //       if ((currentField === 'fname' || currentField === 'lname') && typeof finalValue === 'string') {
-  //         finalValue = finalValue.charAt(0).toUpperCase() + finalValue.slice(1);
-  //       }
+  const handleModalSubmit = (value: string | { areaCode: string; number: string }) => {
+    if (!editingField) return;
 
-  //       const response = await updateStringUserData(user.id, fieldName, finalValue, session.accessToken, updateSession);
+    if (editingField.key === 'interests') {
+      setDraftValues(prev => ({ ...prev, interests: selectedInterests }));
+      setModalVisible(false);
+      setEditingField(null);
+      return;
+    } else if (typeof value === 'string') {
+      setDraftValues(prev => ({ ...prev, [editingField.key]: value }));
+    } else {
+      setDraftValues(prev => ({ ...prev, [editingField.key]: `${value.areaCode}${value.number}` }));
+    }
 
-  //       if (response.data) {
-  //         setAlertConfig({
-  //           title: 'Success',
-  //           message: `${currentField} updated successfully`,
-  //           icon: 'checkmark-circle-outline'
-  //         });
-  //         setAlertVisible(true);
-  //       }
-  //     } catch (error) {
-  //       setAlertConfig({
-  //         title: 'Error',
-  //         message: error instanceof Error ? error.message : 'Failed to update field',
-  //         icon: 'close-circle-outline'
-  //       });
-  //       setAlertVisible(true);
-  //     } finally {
-  //       setLoading(false);
-  //       setModalVisible(false);
-  //       setCurrentField(null);
-  //     }
-  //   };
+    setModalVisible(false);
+    setEditingField(null);
+  };
 
-  //   const handleBooleanUpdate = async (fieldName: string, value: boolean) => {
-  //     if (!session?.accessToken || !user?.id) return;
+  const handleSave = () => {
+    const payload = Object.entries(draftValues).reduce((acc, [key, value]) => {
+      if (key === 'interests') {
+        if (Array.isArray(value) && value.length > 0) {
+          acc[key as keyof typeof acc] = value;
+        }
+        return acc;
+      }
 
-  //     try {
-  //       const response = await updateBooleanUserData(user.id, fieldName, value, session.accessToken, updateSession);
+      if (typeof value === 'string' && value.trim() !== '') {
+        acc[key as keyof typeof acc] = value;
+      }
+      return acc;
+    }, {} as Record<string, string | string[]>);
 
-  //       if (response.data) {
-  //         setAlertConfig({
-  //           title: 'Success',
-  //           message: 'Setting updated successfully',
-  //           icon: 'checkmark-circle-outline'
-  //         });
-  //         setAlertVisible(true);
-  //       }
-  //     } catch (error) {
-  //       setAlertConfig({
-  //         title: 'Error',
-  //         message: error instanceof Error ? error.message : 'Failed to update setting',
-  //         icon: 'close-circle-outline'
-  //       });
-  //       setAlertVisible(true);
-  //     }
-  //   };
+    if (Object.keys(payload).length === 0) {
+      return;
+    }
 
-  //   const handleLikeToggle = (value: string, isSelected: boolean) => {
-  //     if (isSelected) {
-  //       setSelectedLikes(prev => [...prev, value]);
-  //     } else {
-  //       setSelectedLikes(prev => prev.filter(like => like !== value));
-  //     }
-  //   };
-
-  //   const handleSaveLikes = async () => {
-  //     if (!session?.accessToken) {
-  //       console.error('Missing access token');
-  //       return;
-  //     }
-
-  //     try {
-  //       setLoading(true);
-
-  //       // Update user likes without isFirstLoginValue
-  //       await updateUserLikes(
-  //         selectedLikes,
-  //         session.accessToken,
-  //         updateSession
-  //       );
-
-  //       setAlertConfig({
-  //         title: 'Success',
-  //         message: 'Likes updated successfully',
-  //         icon: 'checkmark-circle-outline'
-  //       });
-  //       setAlertVisible(true);
-  //       setLikesModalVisible(false);
-  //     } catch (error) {
-  //       setAlertConfig({
-  //         title: 'Error',
-  //         message: error instanceof Error ? error.message : 'Failed to update likes',
-  //         icon: 'close-circle-outline'
-  //       });
-  //       setAlertVisible(true);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   const handleProfileImagePick = async () => {
-  //     try {
-  //       const result = await ImagePicker.launchImageLibraryAsync({
-  //         mediaTypes: ['images'],
-  //         allowsEditing: true,
-  //         aspect: [3, 4],
-  //         quality: 0.7,
-  //       });
-
-  //       if (!result.canceled && result.assets[0] && session?.accessToken && user?.id) {
-  //         setLoading(true);
-  //         const imageUri = result.assets[0].uri;
-  //         const response = await uploadProfileImage(user.id, imageUri, session.accessToken, updateSession);
-
-  //         if (response.data) {
-  //           setAlertConfig({
-  //             title: 'Success',
-  //             message: 'Profile image updated successfully',
-  //             icon: 'checkmark-circle-outline'
-  //           });
-  //           setAlertVisible(true);
-  //         }
-  //       }
-  //     } catch (error) {
-  //       setAlertConfig({
-  //         title: 'Error',
-  //         message: error instanceof Error ? error.message : 'Failed to upload profile image',
-  //         icon: 'close-circle-outline'
-  //       });
-  //       setAlertVisible(true);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
+    updateProfile(payload);
+  };
 
   return (
     <>
       <StickyScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{ height: 2000 }}
-        headerAppearOn={200}
-        title='Edit Profile'
-        subtitle={'@' + user?.username}
+        style={{ flex: 1, padding: '3%' }}
+        contentContainerStyle={{ paddingBottom: 100 }}
+        title={t('users.fields.edit_title')}
+        subtitle={t('users.fields.edit_subtitle')}
       >
-        <LinearGradient style={styles.headerBackground} colors={[accentColor, secondaryColor]}>
-          <BackButton type='floating' color='white' />
+        <Header title={t('users.fields.edit_title')} subtitle={t('users.fields.edit_subtitle')} />
 
+        {fields.map(field => {
+          const displayValue = draftValues[field.key] ?? field.value ?? '';
+          const displayText = Array.isArray(displayValue)
+            ? displayValue.map((item) => interestOptions.find((interest) => interest.id === item)?.label || item).join(', ')
+            : displayValue;
 
-          <HiveBg fade={false} />
-          <HiveBg fade={false} flipHorizontal />
-          <TView style={styles.headerBottom} />
-        </LinearGradient>
-
-        <TView>
-          <TouchableOpacity style={styles.profileImageContainer} onPress={() => []} disabled={loading}>
-            <ProfileImage imagePath={user?.profileImage} />
-            <LinearGradient
-              colors={['transparent', '#000']}
-              style={styles.profileImageGradient}
-            >
-              {loading ? (
-                <ActivityIndicator size="small" color="white" />
-              ) : (
-                <TIcon name='pencil' size={20} color='white' />
-              )}
-            </LinearGradient>
-          </TouchableOpacity>
-
-          {Fields.map(field => (
-            <TView key={field.value} style={styles.sectionContainer} color='primary'>
-              <View>
+          return (
+            <TView key={field.key} style={styles.sectionContainer} color='primary'>
+              <View style={styles.fieldContent}>
                 <TText style={styles.sectionChildDescription}>{field.label}</TText>
-                <TText>{field.value ? field.value : t("common.common.na")}</TText>
+                <TText>{displayText ? displayText : t('common.common.na')}</TText>
               </View>
-              <TouchableOpacity onPress={field.onPress} disabled={loading}>
+              <TouchableOpacity onPress={() => openEditor(field)}>
                 <TIcon name='pencil' size={20} />
               </TouchableOpacity>
             </TView>
-          ))}
-        </TView>
+          );
+        })}
       </StickyScrollView>
 
       <Button
-        title={t("common.common.save")}
+        title={t('common.common.save')}
         type='primary'
-        onPress={() => []}
+        onPress={handleSave}
         buttonStyle={styles.button}
+        disabled={isPending}
       />
+
+      {editingField?.key === 'interests' ? (
+        <Modal
+          visible={modalVisible}
+          transparent
+          animationType="slide"
+          onRequestClose={() => {
+            setModalVisible(false);
+            setEditingField(null);
+          }}
+        >
+          <TView style={styles.modalContent}>
+            <TouchableOpacity onPress={() => {
+              setModalVisible(false);
+              setEditingField(null);
+            }}>
+              <TIcon name="chevron-left" size={24} />
+            </TouchableOpacity>
+            <TText type='title'>{editingField.label}</TText>
+
+            <View style={styles.interestList}>
+              {interestOptions.map((interest) => {
+                const isSelected = selectedInterests.includes(interest.id);
+                return (
+                  <TouchableOpacity
+                    key={interest.id}
+                    style={[styles.interestChip, isSelected && styles.interestChipSelected]}
+                    onPress={() => {
+                      setSelectedInterests((prev) =>
+                        prev.includes(interest.id)
+                          ? prev.filter((item) => item !== interest.id)
+                          : [...prev, interest.id]
+                      );
+                    }}
+                  >
+                    <TText style={isSelected && styles.interestChipTextSelected}>{interest.label}</TText>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            <Button
+              title={t('common.common.save')}
+              type='primary'
+              buttonStyle={styles.button}
+              onPress={() => handleModalSubmit('')}
+            />
+          </TView>
+        </Modal>
+      ) : (
+        <InputModal
+          visible={modalVisible}
+          onClose={() => {
+            setModalVisible(false);
+            setEditingField(null);
+          }}
+          onSubmit={handleModalSubmit}
+          label={editingField?.label || ''}
+          type={editingField?.type || 'text'}
+          initialValue={editingField?.initialValue || ''}
+          placeholder={editingField?.placeholder || ''}
+        />
+      )}
     </>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -263,7 +227,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: '3%'
   },
   profileImageContainer: {
     width: 120,
@@ -274,38 +237,41 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginTop: -85,
   },
-  profileImageGradient: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '30%',
-  },
   sectionChildDescription: {
     fontSize: 10,
     opacity: 0.7,
   },
-  headerBackground: {
-    width: '100%',
-    height: 150,
-    overflow: 'hidden',
-  },
-  headerBottom: {
-    position: 'absolute',
-    bottom: -1,
-    left: 0,
-    right: 0,
-    height: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    zIndex: 200,
+  fieldContent: {
+    flex: 1,
+    marginRight: 12,
   },
   button:{
     position:'absolute',
     bottom: 16,
     left: '3%',
     right: '3%',
+  },
+  modalContent: {
+    flex: 1,
+    padding: '3%',
+  },
+  interestList: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  interestChip: {
+    borderRadius: 999,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#8e8e93',
+  },
+  interestChipSelected: {
+    backgroundColor: '#4f46e5',
+    borderColor: '#4f46e5',
+  },
+  interestChipTextSelected: {
+    color: '#fff',
   }
 });

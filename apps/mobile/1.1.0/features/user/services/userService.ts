@@ -1,6 +1,6 @@
 import { api } from '@/shared/api/client';
 import { User } from '@/features/auth/context/SessionContext';
-import { UpdateVisibilitySettingsPayload } from '../types/userTypes';
+import { UpdateProfilePayload, UpdateVisibilitySettingsPayload } from '../types/userTypes';
 
 const API_URL = `/v1/user`;
 
@@ -45,5 +45,14 @@ export const updateVisibilitySettings = async (
         isTravelInfoPublic: payload.visibility.isTravelInfoPublic,
       },
     }
+  );
+};
+
+export const updateProfile = async (
+  payload: UpdateProfilePayload
+): Promise<{ success: boolean; data: User; message: string }> => {
+  return await api.patch<{ success: boolean; data: User; message: string }>(
+    `${API_URL}/update-profile`,
+    payload
   );
 };

@@ -1,5 +1,7 @@
 {
   "fields":{
+    "edit_title": "Edit Profile",
+    "edit_subtitle": "Update your profile information below. You can always change it later.",
     "username": "Username",
     "fname": "First Name",
     "lname": "Last Name",
@@ -27,7 +29,6 @@
     "off": "Private",
     "personal": "Personal Info Visibility",
     "travel": "Travel Info Visibility"
-  
   },
   "logs": {
     "title": "Request Security Logs",

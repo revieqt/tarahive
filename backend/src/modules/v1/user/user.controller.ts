@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getUserById, getUserByIdOrUsername, updateVisibilitySettings } from "./user.service";
+import { getUserById, getUserByIdOrUsername, updateProfile, updateVisibilitySettings } from "./user.service";
 import { detectLanguage } from "../localization/localization.service";
 import { AuthRequest } from "../auth/auth.types";
 
@@ -9,15 +9,7 @@ import { AuthRequest } from "../auth/auth.types";
  */
 export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    if (!req.user || !req.user.sub) {
-      res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
-      return;
-    }
-
-    const user = await getUserById(req.user.sub);
+    const user = await getUserById(req.user?.sub as string);
 
     res.status(200).json({
       success: true,
@@ -37,23 +29,7 @@ export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
  */
 export const getUser = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    if (!req.user || !req.user.sub) {
-      res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
-      return;
-    }
-
     const { id } = req.params;
-
-    if (!id) {
-      res.status(400).json({
-        success: false,
-        message: "User id or username is required",
-      });
-      return;
-    }
 
     const user = await getUserByIdOrUsername(id as string);
 
@@ -80,14 +56,6 @@ export const getUser = async (req: AuthRequest, res: Response): Promise<void> =>
 export const updateVisibilityController = async (req: AuthRequest, res: Response): Promise<void> => {
   const lang = detectLanguage(req.headers['accept-language']);
   try {
-    if (!req.user || !req.user.sub) {
-      res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
-      return;
-    }
-
     const visibility = req.body?.visibility;
 
     if (!visibility || typeof visibility !== "object") {
@@ -98,11 +66,55 @@ export const updateVisibilityController = async (req: AuthRequest, res: Response
       return;
     }
 
-    await updateVisibilitySettings(req.user.sub, visibility);
+    await updateVisibilitySettings(req.user?.sub as string, visibility);
 
     res.status(200).json({
       success: true,
       message: "Visibility settings updated successfully",
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const updateProfileController = async (req: AuthRequest, res: Response): Promise<void> => {
+  const lang = detectLanguage(req.headers['accept-language']);
+  try {
+    const userId = req.user?.sub;
+
+    if (!userId) {
+      res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+      return;
+    }
+
+    const updates = req.body ?? {};
+    const allowedFields = ["username", "fname", "lname", "bio", "contactNumber", "interests"];
+    const profileUpdates = allowedFields.reduce((acc, field) => {
+      if (Object.prototype.hasOwnProperty.call(updates, field)) {
+        acc[field as keyof typeof acc] = updates[field];
+      }
+      return acc;
+    }, {} as Record<string, unknown>);
+
+    if (Object.keys(profileUpdates).length === 0) {
+      res.status(400).json({
+        success: false,
+        message: "No profile fields provided",
+      });
+      return;
+    }
+
+    await updateProfile(userId, profileUpdates as any);
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
     });
   } catch (error: any) {
     res.status(500).json({
