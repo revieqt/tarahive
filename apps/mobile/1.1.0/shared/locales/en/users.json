@@ -31,9 +31,10 @@
     "travel": "Travel Info Visibility"
   },
   "logs": {
-    "title": "Request Security Logs",
-    "subtitle": "Select a date range to request your security logs.",
+    "title": "Request Activity Logs",
+    "subtitle": "Select a date range to request your activity logs.",
     "start_date": "Start Date",
-    "end_date": "End Date"
+    "end_date": "End Date",
+    "type_placeholder": "Log Type (Optional)"
   }
 }
