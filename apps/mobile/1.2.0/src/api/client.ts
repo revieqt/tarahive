@@ -3,7 +3,7 @@
 import { ApiError, NetworkError, TimeoutError } from "./errors";
 import { ApiRequestOptions } from "./types";
 import { buildQueryString, shouldRetry, sleep } from "./utils";
-import { BACKEND_URL } from "@/Config";
+import { BACKEND_URL } from "@/config";
 import { getAccessToken } from "@/services/token.service";
 
 const DEFAULT_TIMEOUT = 15000;

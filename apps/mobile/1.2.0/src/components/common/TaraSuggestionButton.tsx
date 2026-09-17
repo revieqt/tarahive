@@ -115,7 +115,7 @@ const ActiveRouteSidebarButton: React.FC = () => {
                 onPress={() => router.push('/suggestion')}
             >
                 <Animated.Image
-                    source={require('@/assets/images/mascot-side.png')}
+                    source={require('../../../assets/images/mascot-side.png')}
                     style={[
                         styles.taraImage,
                         {

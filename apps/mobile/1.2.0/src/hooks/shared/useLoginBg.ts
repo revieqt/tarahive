@@ -3,7 +3,7 @@ import { Image as RNImage } from 'react-native';
 
 import { BACKGROUND_IMAGES } from '@/constants/BackgroundImages';
 
-const FALLBACK_IMAGE = require('../assets/images/defaultBg.jpg');
+const FALLBACK_IMAGE = require('../../../assets/images/defaultBg.jpg');
 
 const IMAGE_TIMEOUT = 3000;
 

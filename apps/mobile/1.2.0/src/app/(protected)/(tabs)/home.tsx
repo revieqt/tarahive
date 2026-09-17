@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { TARA_AI_SUGGESTIONS } from '@/constants/Tara';
 import SidebarAlerts from '@/components/common/Sidebar';
-import MonthlyCalendar from '@/components/common/MonthlyCalendar';
+// import MonthlyCalendar from '@/components/common/MonthlyCalendar';
 
 export default function HomeScreen() {
   const isConnected = useInternetConnection();
@@ -86,7 +86,7 @@ export default function HomeScreen() {
                 style={styles.gridCircle}
                 pointerEvents="none"
               />
-              <Image source={require('@/assets/images/slide2-img.png')} style={styles.leftGridImage} />
+              <Image source={require('../../../../assets/images/slide2-img.png')} style={styles.leftGridImage} />
             </TouchableOpacity>
             <View
               style={[styles.gridChildContainer, styles.leftGridContainer]}>
@@ -103,7 +103,7 @@ export default function HomeScreen() {
                   style={styles.rightGridCircle}
                   pointerEvents="none"
                 />
-                <Image source={require('@/assets/images/slide4-img.png')} style={styles.rightGridImage} />
+                <Image source={require('../../../../assets/images/slide4-img.png')} style={styles.rightGridImage} />
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => router.push('/tara')}
@@ -118,13 +118,13 @@ export default function HomeScreen() {
                   style={styles.rightGridCircle}
                   pointerEvents="none"
                 />
-                <Image source={require('@/assets/images/icon.png')} style={styles.rightGridImage} />
+                <Image source={require('../../../../assets/images/icon.png')} style={styles.rightGridImage} />
               </TouchableOpacity>
             </View>
           </View>
         </View>
         <TView style={styles.content}>
-          <MonthlyCalendar/>
+          {/* <MonthlyCalendar/> */}
 
           <TouchableOpacity style={[styles.rateContainer, {backgroundColor: primaryColor}]}>
             <TText>{t('tabs.home.rate_title')}</TText>

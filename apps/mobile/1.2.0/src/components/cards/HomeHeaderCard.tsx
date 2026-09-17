@@ -12,21 +12,21 @@ import { useLanguage } from '@/context/LanguageContext';
 
 const getWeatherImage = (weatherCode: number): any => {
   if (weatherCode === 0) {
-    return require('@/assets/images/weather-sunny-min.png');
+    return require('../../../assets/images/weather-sunny-min.png');
   } else if (weatherCode === 1 || weatherCode === 2) {
-    return require('@/assets/images/weather-cloudy-min.png');
+    return require('../../../assets/images/weather-cloudy-min.png');
   } else if (weatherCode === 3 || weatherCode === 45 || weatherCode === 48) {
-    return require('@/assets/images/weather-cloudy-min.png');
+    return require('../../../assets/images/weather-cloudy-min.png');
   } else if ((weatherCode >= 51 && weatherCode <= 67) || (weatherCode >= 80 && weatherCode <= 82)) {
-    return require('@/assets/images/weather-rainy-min.png');
+    return require('../../../assets/images/weather-rainy-min.png');
   } else if (weatherCode >= 71 && weatherCode <= 77) {
-    return require('@/assets/images/weather-rainy-min.png');
+    return require('../../../assets/images/weather-rainy-min.png');
   } else if (weatherCode >= 85 && weatherCode <= 86) {
-    return require('@/assets/images/weather-rainy-min.png');
+    return require('../../../assets/images/weather-rainy-min.png');
   } else if (weatherCode >= 95 && weatherCode <= 99) {
-    return require('@/assets/images/weather-rainy-min.png');
+    return require('../../../assets/images/weather-rainy-min.png');
   }
-  return require('@/assets/images/weather-sunny-min.png');
+  return require('../../../assets/images/weather-sunny-min.png');
 };
 
 export default function HomeHeaderCard() {

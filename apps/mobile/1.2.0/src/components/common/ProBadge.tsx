@@ -14,7 +14,7 @@ export default function ProBadge({ isProUser, size = 20 }: ProBadgeProps) {
   return (
     <View style={[styles.container, { width: size, height: size }]}>
       <Image
-        source={require('@/shared/assets/images/pro-badge.png')}
+        source={require('../../../assets/images/pro-badge.png')}
         style={{
           width: size,
           height: size,
