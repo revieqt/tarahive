@@ -8,16 +8,16 @@ import LangButton from '@/shared/components/common/LanguageButton';
 import { useLanguage } from '@/shared/context/LanguageContext';
 import CodeInputField from '@/shared/components/ui/CodeInputField';
 import Header from '@/shared/components/common/Header';
+import { useLocalSearchParams } from 'expo-router';
 import { router } from 'expo-router';
-import TextField from '@/shared/components/ui/TextField';
 
 const RESEND_COOLDOWN_MS = 3 * 60 * 1000;
 
-export default function ForgotPasswordScreen() {
+export default function PhoneAuthScreen() {
   const [verificationCode, setVerificationCode] = useState('');
   const [cooldownTime, setCooldownTime] = useState(0);
-  const [ email, setEmail] = useState('');
   const { t } = useLanguage();
+  const { email } = useLocalSearchParams<{ email: string }>();
   
   const {
     sendCode,
@@ -80,67 +80,40 @@ export default function ForgotPasswordScreen() {
         style={{ flex: 1, width: '100%' }}
       >
         <HiveBg/>
+        <LangButton/>
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{padding: 16}}>
-          <Header 
-            title={email ? t("auth.verify_email.title") : "Forgot Password"} 
-            subtitle={email ? t("auth.verify_email.subtitle") + email : "Use your email to receive a verification code."}
-          />
-
-          { email ? (
-            <CodeInputField
-              value={verificationCode}
-              onChangeText={setVerificationCode}
-              characters={6}
-              type="numeric"
-            />
-          ):(
-            <TextField
-              placeholder="Enter your email"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          )}
+          <Header title={t("auth.verify_email.title")} subtitle={t("auth.verify_email.subtitle") + email}/>
         
-          
+          <CodeInputField
+            value={verificationCode}
+            onChangeText={setVerificationCode}
+            characters={6}
+            type="numeric"
+          />
         </ScrollView>
 
         <View style={styles.buttonsContainer}>
-          {email ? <>
-            <TouchableOpacity
-              onPress={handleResend}
-              disabled={isResendDisabled || isSendingCode}
-            >
-              <TText style={{ opacity: isResendDisabled ? 0.5 : 1, textAlign: 'center' }}>
-                {
-                  isResendDisabled && cooldownTime > 0
-                    ? `Email resent. You can request another one in ${formatCooldownTime(cooldownTime)}`
-                    : t("auth.verify_email.resend_prompt")
-                }
-              </TText>
-            </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleResend}
+            disabled={isResendDisabled || isSendingCode}
+          >
+            <TText style={{ opacity: isResendDisabled ? 0.5 : 1, textAlign: 'center' }}>
+              {
+                isResendDisabled && cooldownTime > 0
+                  ? `Email resent. You can request another one in ${formatCooldownTime(cooldownTime)}`
+                  : t("auth.verify_email.resend_prompt")
+              }
+            </TText>
+          </TouchableOpacity>
 
-            <Button
-              title={t("auth.verify_email.verify_button") || t("auth.register.register_button")}
-              onPress={handleVerify}
-              type="primary"
-              disabled={isVerifyDisabled}
-              loading={isVerifying}
-              buttonStyle={{ width: '100%' }}
-            />
-          </>
-          :(
-            <Button
-              title={t("auth.verify_email.verify_button") || t("auth.register.register_button")}
-              onPress={handleVerify}
-              type="primary"
-              disabled={isVerifyDisabled}
-              loading={isVerifying}
-              buttonStyle={{ width: '100%' }}
-            />
-          )}
-          
+          <Button
+            title={t("auth.verify_email.verify_button") || t("auth.register.register_button")}
+            onPress={handleVerify}
+            type="primary"
+            disabled={isVerifyDisabled}
+            loading={isVerifying}
+            buttonStyle={{ width: '100%' }}
+          />
         </View>
       </KeyboardAvoidingView>
     </TView>

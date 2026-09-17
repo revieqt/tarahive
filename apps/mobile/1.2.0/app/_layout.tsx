@@ -1,25 +1,39 @@
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useThemeColor } from '@/shared/hooks/useThemeColor';
-import { ThemeProvider } from '@/shared/context/ThemeContext';
+
 import * as SplashScreen from 'expo-splash-screen';
+
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
 import { SessionProvider } from '@/features/auth/context/SessionContext';
 import { LocationProvider } from '@/shared/context/LocationContext';
-import { toastConfig } from "@/shared/components/ui/Toast";
-import Toast from "react-native-toast-message";
-import { Dialog, type DialogState, INITIAL_STATE } from "@/shared/components/ui/Dialog";
-import { Dialog as DialogService } from "@/shared/services/dialog.service";
 import { LanguageProvider } from '@/shared/context/LanguageContext';
-import { TView } from '@/shared/components/ui/Themed';
-import { Platform } from 'react-native';
+import { ThemeProvider } from '@/shared/context/ThemeContext';
 
+import { useThemeColor } from '@/shared/hooks/useThemeColor';
+
+import { TView } from '@/shared/components/ui/Themed';
+import { toastConfig } from '@/shared/components/ui/Toast';
+import Toast from 'react-native-toast-message';
+
+import {
+  Dialog,
+  type DialogState,
+  INITIAL_STATE,
+} from '@/shared/components/ui/Dialog';
+import { Dialog as DialogService } from '@/shared/services/dialog.service';
+
+import { useLoginBg } from '@/shared/hooks/useLoginBg';
+
+// Leaflet only on web
 if (Platform.OS === 'web') {
   require('leaflet/dist/leaflet.css');
 }
 
+// Keep the native splash screen visible until initialization is complete.
 SplashScreen.preventAutoHideAsync();
 
 export { ErrorBoundary } from 'expo-router';
@@ -39,26 +53,49 @@ export default function RootLayout() {
     PoppinsBold: require('../shared/assets/fonts/Poppins-Bold.ttf'),
   });
 
+  const [dialogState, setDialogState] =
+    useState<DialogState>(INITIAL_STATE);
+
+  // Initialize login background image.
+  const loginBackground = useLoginBg();
+
+  const appReady =
+    loaded &&
+    !loginBackground.loading;
+
   useEffect(() => {
-    if (error) throw error;
+    if (error) {
+      throw error;
+    }
   }, [error]);
 
   useEffect(() => {
-    if (loaded) {
+    if (appReady) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [appReady]);
 
-  const [dialogState, setDialogState] = useState<DialogState>(INITIAL_STATE);
- 
   useEffect(() => {
     DialogService._subscribe(setDialogState);
     DialogService._setDismissCallback(handleDismiss);
+
+    return () => {
+      DialogService._subscribe(() => {});
+    };
   }, []);
- 
+
   const handleDismiss = useCallback(() => {
-    setDialogState((prev) => ({ ...prev, visible: false }));
+    setDialogState((prev) => ({
+      ...prev,
+      visible: false,
+    }));
   }, []);
+
+  // Keep rendering nothing while the native splash screen
+  // is still visible.
+  if (!appReady) {
+    return null;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -67,8 +104,13 @@ export default function RootLayout() {
           <LanguageProvider>
             <SessionProvider>
               <AppContent />
+
               <Toast config={toastConfig} />
-              <Dialog state={dialogState} onDismiss={handleDismiss} />
+
+              <Dialog
+                state={dialogState}
+                onDismiss={handleDismiss}
+              />
             </SessionProvider>
           </LanguageProvider>
         </ThemeProvider>
@@ -81,11 +123,19 @@ function AppContent() {
   const backgroundColor = useThemeColor({}, 'primary');
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor }} edges={['top', 'bottom']}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor,
+      }}
+      edges={['top', 'bottom']}
+    >
       <TView style={{ flex: 1 }}>
-        <Stack 
-          screenOptions={{ headerShown: false }}
-          initialRouteName={"index"}
+        <Stack
+          screenOptions={{
+            headerShown: false,
+          }}
+          initialRouteName="index"
         />
       </TView>
     </SafeAreaView>

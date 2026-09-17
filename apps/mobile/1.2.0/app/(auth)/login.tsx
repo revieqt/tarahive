@@ -1,5 +1,5 @@
 import { StyleSheet, View, Platform, KeyboardAvoidingView, ScrollView, TouchableOpacity } from 'react-native';
-import { TText, TView } from '@/shared/components/ui/Themed';
+import { TIcon, TText, TView } from '@/shared/components/ui/Themed';
 import Button from '@/shared/components/ui/Button';
 import TextField from '@/shared/components/ui/TextField';
 import PasswordField from '@/shared/components/ui/PasswordField';
@@ -11,6 +11,7 @@ import LangButton from '@/shared/components/common/LanguageButton';
 import { useLanguage } from '@/shared/context/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import HiveBg from '@/shared/components/common/HiveBg';
+import { Image } from 'expo-image';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -38,188 +39,129 @@ export default function LoginScreen() {
 
   return (
     <TView style={{ flex: 1 }}>
-      <LinearGradient
-        colors={[secondaryColor, accentColor]}
-        style={StyleSheet.absoluteFill}
+
+      <Image
+        source={{ uri: 'https://laurenslighthouse.com/wp-content/uploads/2024/06/Moalboal01.jpg' }}
+        style={{ flex: 1, width: '100%', height: '100%' }}
+        contentFit="cover"
       />
 
-      {/* Header stays fixed — outside the KeyboardAvoidingView */}
-      <View style={styles.headerContainer}>
-        <TText type="title" style={styles.headerTitle}>
-          {t("auth.login.title")}
-        </TText>
-        <TText type="subtitle" style={styles.headerSubtitle}>
-          {t("auth.login.subtitle")}
-        </TText>
-        <HiveBg/>
-      </View>
-
-      {/* Only the card area moves with the keyboard */}
-      <KeyboardAvoidingView
-        style={styles.keyboardAvoider}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+      <LinearGradient
+        colors={['transparent', '#000', '#000']}
+        style={styles.bottomContainer}
       >
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          bounces={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          <TView style={styles.card} color="primary">
-            <TextField
-              placeholder={t("auth.login.email")}
-              value={email}
-              onChangeText={setEmail}
-              onFocus={() => setFocusedInput('email')}
-              onBlur={() => setFocusedInput(null)}
-              isFocused={focusedInput === 'email'}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
+        <View style={styles.titleContainer}>
+          <View style={styles.titleRow}>
+            <TText style={styles.title}>Your Travels,</TText>
+            <TText style={styles.titleAccent}>Made Easier</TText>
+          </View>
+          <TText style={styles.subtitle}>Welcome to Tarahive</TText>
+        </View>
+        
+        <TouchableOpacity style={styles.button} onPress={() => router.push('/home')}>
+          <TIcon name="google" size={20} style={{color: accentColor}} />
+          <TText style={{color: '#fff'}}>Continue with Google</TText>
+        </TouchableOpacity>
 
-            <PasswordField
-              placeholder={t("auth.login.password")}
-              value={password}
-              onChangeText={setPassword}
-              onFocus={() => setFocusedInput('password')}
-              onBlur={() => setFocusedInput(null)}
-              isFocused={focusedInput === 'password'}
-            />
+        <TouchableOpacity style={styles.button}>
+          <TIcon name="apple" size={20} style={{color: '#fff'}} />
+          <TText style={{color: '#fff'}}>Continue with Apple</TText>
+        </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() => router.push('/(auth)/forgot-password')}
-              style={styles.forgotPasswordButton}
-            >
-              <TText style={{opacity: 0.6}}>
-                {t("auth.login.forgot_password_prompt")}
-              </TText>
-            </TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push('/phone')}>
+          <TText style={styles.phoneOption}>Continue with Phone Number</TText>
+        </TouchableOpacity>
 
-            <Button
-              title={t("auth.login.login_button")}
-              onPress={handleLogin}
-              type="primary"
-              loading={isPending}
-              disabled={!isFormValid || isPending}
-              buttonStyle={{marginVertical: 8}}
-            />
+        <TouchableOpacity>
+          <TText style={styles.termsText}>
+            By continuing, you agree to our Terms & Conditions and Privacy Policy.
+          </TText>
+        </TouchableOpacity>
 
-            <Button
-              title={t("auth.login.login_button")}
-              onPress={() => []}
-              loading={isPending}
-            />
+        <View style={styles.hiveBgContainer}>
+          <HiveBg fade={false}/>
+        </View>
 
-            <TouchableOpacity
-              onPress={() => router.push('/(auth)/register')}
-              style={styles.registerButton}
-            >
-              <TText style={styles.registerText}>
-                {t("auth.login.register_prompt")}
-              </TText>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => router.push('/(auth)/forgot-password')}
-              style={styles.forgotPasswordButton}
-            >
-              <TText style={{opacity: 0.6}}>
-                {t("auth.login.forgot_password_prompt")}
-              </TText>
-            </TouchableOpacity>
-          </TView>
-        </ScrollView>
-      </KeyboardAvoidingView>
+      </LinearGradient>
     </TView>
+    
   );
 }
 
 const styles = StyleSheet.create({
-  langButtonWrapper: {
-    position: 'absolute',
-    top: 50,
-    right: 16,
-    zIndex: 200,
-  },
-  headerContainer: {
-    height: '42%',
+  titleContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingBottom: 24,
+    marginBottom: 24,
   },
-  logoDot: {
-    width: 56,
-    height: 56,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    marginBottom: 20,
+  titleRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'baseline',
+    justifyContent: 'center',
+    columnGap: 7,
+    rowGap: 2,
   },
-  headerTitle: {
+  title: {
     color: '#fff',
-    textAlign: 'center',
+    fontSize: 25,
+    fontWeight: '600',
+    letterSpacing: -0.8,
   },
-  headerSubtitle: {
-    color: 'rgba(255,255,255,0.85)',
-    textAlign: 'center',
-    marginTop: 6,
+  titleAccent: {
+    color: '#FFD166',
+    fontSize: 25,
+    fontWeight: '800',
+    letterSpacing: -0.8,
   },
-  keyboardAvoider: {
-    flex: 1,
-    marginTop: '-6%',
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  card: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    flex: 1,
-    padding: '3%',
-    paddingTop: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  forgotPasswordButton: {
-    alignSelf: 'flex-end',
-    marginTop: 12,
-    marginBottom: 8,
-  },
-  forgotPasswordText: {
-    opacity: 0.6,
-    fontSize: 13,
-  },
-  loginButton: {
-    width: '100%',
+  subtitle: {
+    color: '#FFFC',
+    fontSize: 15,
+    fontWeight: '500',
+    letterSpacing: 0.3,
     marginTop: 8,
-    borderRadius: 16,
-    height: 52,
   },
-  dividerRow: {
+  bottomContainer: {
+    padding: '3%',
+    paddingTop: 200,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  button:{
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 28,
-    marginBottom: 20,
-    gap: 12,
+    justifyContent: 'center',
+    backgroundColor: '#ccc2',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 15,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#fff2',
+    gap: 8,
   },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: 'rgba(150,150,150,0.25)',
-  },
-  dividerText: {
-    opacity: 0.5,
-    fontSize: 12,
-  },
-  registerButton: {
-    alignSelf: 'center',
-  },
-  registerText: {
+  phoneOption: {
     textAlign: 'center',
+    paddingVertical: 10,
+    color: '#fff',
     opacity: 0.7,
+  },
+  termsText: {
+    textAlign: 'center',
+    marginTop: 10,
+    fontSize: 11,
+    color: '#fff7',
+    textDecorationLine: 'underline',
+  },
+  hiveBgContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    top: 0,
+    opacity: 0.2,
+    overflow: 'hidden',
   },
 });
