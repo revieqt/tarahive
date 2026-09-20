@@ -1,8 +1,5 @@
-import { StyleSheet, View, Platform, KeyboardAvoidingView, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { TIcon, TText, TView } from '@/components/ui/Themed';
-import Button from '@/components/ui/Button';
-import TextField from '@/components/ui/TextField';
-import PasswordField from '@/components/ui/PasswordField';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
@@ -13,17 +10,17 @@ import HiveBg from '@/components/common/HiveBg';
 import { Image } from 'expo-image';
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [focusedInput, setFocusedInput] = useState<string | null>(null);
   const router = useRouter();
-  const primaryColor = useThemeColor({}, 'primary');
-  const secondaryColor = useThemeColor({}, 'secondary');
   const accentColor = useThemeColor({}, 'accent');
-  const { t } = useLanguage();
+  const { currentLanguage } = useLanguage();
 
   return (
     <TView style={{ flex: 1 }}>
+      <TouchableOpacity style={styles.languageButton}>
+        <TText style={{color: '#fff'}}>{currentLanguage.code[0].toUpperCase() + currentLanguage.code.slice(1)}</TText>
+        <TIcon name="earth" size={15} style={{color: '#fff'}} />
+        
+      </TouchableOpacity>
 
       <Image
         source={{ uri: 'https://laurenslighthouse.com/wp-content/uploads/2024/06/Moalboal01.jpg' }}
@@ -49,12 +46,12 @@ export default function LoginScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.button}>
-          <TIcon name="apple" size={20} style={{color: '#fff'}} />
+          <TIcon name="apple" size={20} style={{color: accentColor}} />
           <TText style={{color: '#fff'}}>Continue with Apple</TText>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push('/phone')}>
-          <TText style={styles.phoneOption}>Continue with Phone Number</TText>
+        <TouchableOpacity onPress={() => router.push('/email')}>
+          <TText style={styles.emailOption}>Continue with Email</TText>
         </TouchableOpacity>
 
         <TouchableOpacity>
@@ -90,21 +87,20 @@ const styles = StyleSheet.create({
   title: {
     color: '#fff',
     fontSize: 25,
-    fontWeight: '600',
+    fontWeight: '300',
     letterSpacing: -0.8,
   },
   titleAccent: {
     color: '#FFD166',
     fontSize: 25,
-    fontWeight: '800',
+    fontWeight: '900',
     letterSpacing: -0.8,
   },
   subtitle: {
     color: '#FFFC',
-    fontSize: 15,
     fontWeight: '500',
     letterSpacing: 0.3,
-    marginTop: 8,
+    marginTop: 5,
   },
   bottomContainer: {
     padding: '3%',
@@ -127,7 +123,7 @@ const styles = StyleSheet.create({
     borderColor: '#fff2',
     gap: 8,
   },
-  phoneOption: {
+  emailOption: {
     textAlign: 'center',
     paddingVertical: 10,
     color: '#fff',
@@ -148,5 +144,22 @@ const styles = StyleSheet.create({
     top: 0,
     opacity: 0.2,
     overflow: 'hidden',
+    zIndex: -1,
+  },
+  languageButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#ccc2',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: '#fff5',
+    gap: 5,
+    position: 'absolute',
+    top: 20,
+    right: '3%',
+    zIndex: 10,
   },
 });

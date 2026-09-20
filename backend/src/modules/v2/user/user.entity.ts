@@ -5,14 +5,14 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Index,
+  OneToMany,
 } from "typeorm";
-import { Provider, UserStatus, UserType } from "./user.types";
+
+import { Auth } from "../auth/auth.entity";
+import { UserStatus, UserType } from "./user.types";
 
 @Entity("users")
-@Index(["email"], { unique: true })
 @Index(["username"], { unique: true })
-@Index(["googleId"])
-
 export class User {
   // ======================
   // CORE IDENTITY
@@ -27,23 +27,20 @@ export class User {
   @Column({ type: "varchar", length: 100, nullable: true })
   lname?: string;
 
-  @Column({ type: "varchar", length: 100, nullable: true, unique: true })
+  @Column({
+    type: "varchar",
+    length: 100,
+    nullable: true,
+    unique: true,
+  })
   username?: string;
 
-  @Column({ type: "varchar", unique: true })
-  email!: string;
-
-  @Column({ type: "varchar", nullable: true, select: false })
-  password?: string;
-
-  @Column({ type: "enum", enum: Provider, default: Provider.EMAIL })
-  provider!: Provider;
-
-  @Column({ type: "varchar", nullable: true, unique: true })
-  googleId?: string;
-
   @Column({ type: "varchar", nullable: true })
-  contactNumber?: string;
+  profileImage?: string;
+
+  // ======================
+  // PROFILE DATA
+  // ======================
 
   @Column({ type: "date", nullable: true })
   bdate?: Date;
@@ -51,41 +48,52 @@ export class User {
   @Column({ type: "varchar", default: "" })
   gender!: string;
 
-  @Column({ type: "varchar", nullable: true })
-  profileImage?: string;
-
-  // ======================
-  // USER PROFILE DATA
-  // ======================
-
   @Column({ type: "text", default: "" })
   bio!: string;
 
   @Column({ type: "varchar" })
   type!: UserType;
 
-  @Column({ type: "enum", enum: UserStatus, default: UserStatus.ACTIVE})
+  @Column({
+    type: "enum",
+    enum: UserStatus,
+    default: UserStatus.ACTIVE,
+  })
   status!: UserStatus;
 
-  @Column({ type: "boolean", default: false })
-  isProUser!: boolean;
-
   // ======================
-  // GAMIFICATION (TARA G EXP SYSTEM)
+  // TRAVEL / PERSONALIZATION
   // ======================
 
-  @Column({ type: "int", default: 0 })
-  expPoints!: number;
-
-  // ======================
-  // RELATION DATA (Mongo arrays → Postgres array/jsonb)
-  // ======================
-
-  @Column({ type: "text", array: true, default: [] })
+  @Column({
+    type: "text",
+    array: true,
+    default: [],
+  })
   interests!: string[];
 
   // ======================
-  // SAFETY SYSTEM (TaraG core feature)
+  // ACCOUNT
+  // ======================
+
+  @Column({
+    type: "boolean",
+    default: false,
+  })
+  isProUser!: boolean;
+
+  // ======================
+  // GAMIFICATION
+  // ======================
+
+  @Column({
+    type: "int",
+    default: 0,
+  })
+  expPoints!: number;
+
+  // ======================
+  // SAFETY SYSTEM
   // ======================
 
   @Column({
@@ -96,23 +104,28 @@ export class User {
       delivery: {
         isEmailEnabled: false,
         isSMSEnabled: false,
-        alertLang: "en"
+        alertLang: "en",
       },
     },
   })
   safetyState!: {
     isInAnEmergency: boolean;
+
     emergencyType?: string;
+
     emergencyNote?: string;
-    emergencyContact?:{
+
+    emergencyContact?: {
       email?: string;
       phone?: string;
     };
+
     delivery?: {
       isEmailEnabled: boolean;
       isSMSEnabled: boolean;
       alertLang: string;
     };
+
     lastKnownLocation?: {
       locationName: string;
       latitude: number;
@@ -121,14 +134,14 @@ export class User {
   };
 
   // ======================
-  // DEVICE INFO (JSONB array)
+  // DEVICE INFO
   // ======================
 
   @Column({
     type: "jsonb",
     default: [],
   })
-  device!: Array<{
+  devices!: Array<{
     deviceId: string;
     brand: string;
     model: string;
@@ -149,13 +162,16 @@ export class User {
         isPersonalInfoPublic: true,
         isTravelInfoPublic: true,
       },
+
       personalization: {
         pushNotifications: true,
         locationSharing: false,
       },
+
       security: {
         is2FAEnabled: false,
       },
+
       taraBuddy: {
         isTaraBuddyEnabled: false,
       },
@@ -167,13 +183,16 @@ export class User {
       isPersonalInfoPublic: boolean;
       isTravelInfoPublic: boolean;
     };
+
     personalization: {
       pushNotifications: boolean;
       locationSharing: boolean;
     };
+
     security: {
       is2FAEnabled: boolean;
     };
+
     taraBuddy: {
       isTaraBuddyEnabled: boolean;
       preferredGender?: string;
@@ -184,19 +203,33 @@ export class User {
   };
 
   // ======================
-  // AUDIT FIELDS
+  // AUTHENTICATION
   // ======================
 
-  @CreateDateColumn({ name: "created_on" })
+  @OneToMany(() => Auth, (auth) => auth.user)
+  authMethods!: Auth[];
+
+  // ======================
+  // AUDIT
+  // ======================
+
+  @CreateDateColumn({
+    name: "created_on",
+  })
   createdOn!: Date;
 
-  @UpdateDateColumn({ name: "updated_on" })
+  @UpdateDateColumn({
+    name: "updated_on",
+  })
   updatedOn!: Date;
 
   // ======================
-  // SECURITY / SESSION CONTROL
+  // SESSION CONTROL
   // ======================
 
-  @Column({ type: "int", default: 1 })
+  @Column({
+    type: "int",
+    default: 1,
+  })
   tv!: number;
 }

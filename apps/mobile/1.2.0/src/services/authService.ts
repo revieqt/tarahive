@@ -3,7 +3,7 @@ import { formatDeviceInfo } from '@/utils/deviceFormatter';
 import { DeviceInfo } from '@/hooks/shared/useDeviceInfo';
 import { RegisterRequest, RegisterResponse, VerificationResponse, LoginRequest, LoginResponse, ChangePasswordRequest, ChangePasswordResponse } from '@/types/auth.types';
 
-const API_URL = '/v1/auth';
+const API_URL = '/v2/auth';
 
 /**
  * Register a new user

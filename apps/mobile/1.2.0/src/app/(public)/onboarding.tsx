@@ -19,6 +19,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import HiveBg from "@/components/common/HiveBg";
 import { useThemeColor } from "@/hooks/shared/useThemeColor";
 import { ONBOARDING_KEY, slideTemplates, SlideItemProps } from "@/constants/Onboarding";
+import { LinearGradient } from "expo-linear-gradient";
 
 const { width, height } = Dimensions.get("window");
 

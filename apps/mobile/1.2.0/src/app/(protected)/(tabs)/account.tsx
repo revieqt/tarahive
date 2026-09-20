@@ -14,7 +14,6 @@ import { useDev } from '@/hooks/shared/useDev';
 import NoInternetCard from '@/components/cards/NoInternetCard';
 import HiveBg from '@/components/common/HiveBg';
 import StickyScrollView from '@/components/ui/StickyScrollView';
-import ProCard from '@/components/cards/ProCard';
 
 const SettingsOption = ({ icon, label, onPress }: { icon: string; label: string; onPress: () => void }) => (
   <TouchableOpacity onPress={onPress} style={styles.optionsChild}>
@@ -102,7 +101,7 @@ export default function AccountScreen() {
           </TouchableOpacity>
         </TView>
 
-        {isConnected ? <ProCard /> : <NoInternetCard />}
+        {!isConnected && <NoInternetCard />}
 
         <View style={styles.options}>
           <TText style={styles.optionsTitle}>{t('tabs.account.personalization_title')}</TText>
@@ -124,9 +123,6 @@ export default function AccountScreen() {
 
             <TText style={styles.optionsTitle}>{t('tabs.account.privacy_title')}</TText>
 
-            <SettingsOption icon='key' label={t('tabs.account.change_password_button')}
-              onPress={() => router.push('/change-password')}
-            />
             <SettingsOption icon='eye' label={t('tabs.account.visibility_button')}
               onPress={() => router.push('/settings/visibility')}
             />
@@ -167,7 +163,7 @@ export default function AccountScreen() {
           >
             <View style={styles.optionsLabel}>
               <TIcon name='diversify' size={15} />
-              <TText>Tarahive v1.1.0 {devMode ? ' (Dev Mode)' : ''}</TText>
+              <TText>Tarahive v1.2.0 {devMode ? ' (Dev Mode)' : ''}</TText>
             </View>
             <TIcon name='chevron-right' size={15} style={{ opacity: 0.8 }} />
           </Pressable>
