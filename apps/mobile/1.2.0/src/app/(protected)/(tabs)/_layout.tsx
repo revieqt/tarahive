@@ -63,24 +63,17 @@ export default function TabLayout() {
           ),
         }}
       />
-      {/* <Tabs.Screen
-        name="maps"
+
+      <Tabs.Screen
+        name="scan"
         options={{
-          title: t('tabs.tabs.maps_button'),
+          title: 'Scan',
           tabBarIcon: ({ color, focused }) => (
-            <TIcon name={focused ? 'map' : 'map-outline'} size={20} color={color}/>
+            <TIcon name='line-scan' size={20} color={color}/>
           ),
         }}
       />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: t('tabs.tabs.explore_button'),
-          tabBarIcon: ({ color, focused }) => (
-            <TIcon name={focused ? 'compass' : 'compass-outline'} size={20} color={color}/>
-          ),
-        }}
-      /> */}
+
       <Tabs.Screen
         name="account"
         options={{

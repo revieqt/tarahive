@@ -63,7 +63,7 @@ export default function HomeScreen() {
 
             <TouchableOpacity
               style={[styles.qrButton, styles.shadow, { backgroundColor: primaryColor }]}
-              onPress={() => router.push('/camera')}
+              onPress={() => router.push('/scan')}
             >
               <TIcon name='qrcode-scan' size={25} color={textColor + '90'} />
             </TouchableOpacity>

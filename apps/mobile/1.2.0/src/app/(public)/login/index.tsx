@@ -16,7 +16,7 @@ export default function LoginScreen() {
 
   return (
     <TView style={{ flex: 1 }}>
-      <TouchableOpacity style={styles.languageButton}>
+      <TouchableOpacity style={styles.languageButton} onPress={() => router.push('/settings/language')}>
         <TText style={{color: '#fff'}}>{currentLanguage.code[0].toUpperCase() + currentLanguage.code.slice(1)}</TText>
         <TIcon name="earth" size={15} style={{color: '#fff'}} />
         
@@ -29,7 +29,7 @@ export default function LoginScreen() {
       />
 
       <LinearGradient
-        colors={['transparent', '#000', '#000']}
+        colors={['transparent', '#1E201E', '#000']}
         style={styles.bottomContainer}
       >
         <View style={styles.titleContainer}>
@@ -50,7 +50,7 @@ export default function LoginScreen() {
           <TText style={{color: '#fff'}}>Continue with Apple</TText>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push('/email')}>
+        <TouchableOpacity onPress={() => router.push('/login/email')}>
           <TText style={styles.emailOption}>Continue with Email</TText>
         </TouchableOpacity>
 

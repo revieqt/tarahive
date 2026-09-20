@@ -106,11 +106,11 @@ export default function AccountScreen() {
         <View style={styles.options}>
           <TText style={styles.optionsTitle}>{t('tabs.account.personalization_title')}</TText>
 
-          {isConnected &&
+          {/* {isConnected &&
             <SettingsOption icon='pen' label={t('tabs.account.edit_profile_button')}
               onPress={() => router.push('/settings/edit-profile')}
             />
-          }
+          } */}
 
           <SettingsOption icon='palette' label={t('tabs.account.theme_button')}
             onPress={() => router.push('/settings/theme')}
@@ -123,12 +123,12 @@ export default function AccountScreen() {
 
             <TText style={styles.optionsTitle}>{t('tabs.account.privacy_title')}</TText>
 
-            <SettingsOption icon='eye' label={t('tabs.account.visibility_button')}
+            {/* <SettingsOption icon='eye' label={t('tabs.account.visibility_button')}
               onPress={() => router.push('/settings/visibility')}
             />
             <SettingsOption icon='key' label={t('tabs.account.logs_button')}
               onPress={() => router.push('/settings/request-logs')}
-            />
+            /> */}
             <SettingsOption icon='file-eye' label={t('tabs.account.privacy_button')}
               onPress={handleDocs('policies-terms', 'privacy-policy')}
             />
