@@ -4,7 +4,7 @@ import { CopilotProvider } from 'react-native-copilot';
 export default function ProtectedLayout() {
   return (
     <CopilotProvider>
-        <Stack screenOptions={{ headerShown: false }}/>
+        <Stack screenOptions={{ headerShown: false }} initialRouteName="index" />
     </CopilotProvider>
   );
 }

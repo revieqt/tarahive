@@ -1,29 +1,8 @@
 import crypto , { randomUUID } from "crypto";
-import { usernameAdjectives } from "./auth.types";
 
 const OTP_SECRET = process.env.OTP_SECRET;
 
 if (!OTP_SECRET) throw new Error("OTP_SECRET environment variable is required.");
-
-
-/**
- * Username Generator
- */
-export function generateUsername(
-  firstName: string,
-): string {
-  if (!firstName) throw new Error("firstName is required");
-  if (!usernameAdjectives?.length) throw new Error("adjectives array cannot be empty");
-
-  const randomAdjective =
-    usernameAdjectives[Math.floor(Math.random() * usernameAdjectives.length)];
-
-  const cleanFirstName = firstName.trim().toLowerCase();
-
-  const uuidSuffix = randomUUID().split("-")[0];
-
-  return `${randomAdjective}_${cleanFirstName}_${uuidSuffix}`;
-}
 
 
 /**

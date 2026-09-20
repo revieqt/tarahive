@@ -13,6 +13,7 @@ import { UserStatus, UserType } from "./user.types";
 
 @Entity("users")
 @Index(["username"], { unique: true })
+@Index(["email"], { unique: true })
 export class User {
   // ======================
   // CORE IDENTITY
@@ -21,8 +22,11 @@ export class User {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @Column({ type: "varchar", length: 100 })
-  fname!: string;
+  @Column({ type: "varchar", length: 254 })
+  email!: string;
+
+  @Column({ type: "varchar", length: 100, nullable: true })
+  fname?: string;
 
   @Column({ type: "varchar", length: 100, nullable: true })
   lname?: string;
@@ -45,8 +49,8 @@ export class User {
   @Column({ type: "date", nullable: true })
   bdate?: Date;
 
-  @Column({ type: "varchar", default: "" })
-  gender!: string;
+  @Column({ type: "varchar", nullable: true })
+  gender?: string;
 
   @Column({ type: "text", default: "" })
   bio!: string;

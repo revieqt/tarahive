@@ -25,3 +25,12 @@ export interface ProfileUpdatePayload {
   contactNumber?: string;
   interests?: string[];
 }
+
+export interface SetupUserPayload {
+  fname?: string;
+  lname?: string;
+  bdate?: Date;
+  gender?: string;
+  username?: string;
+  interests?: string[];
+}

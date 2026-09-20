@@ -1,8 +1,22 @@
 import { api } from '@/api/client';
 import { User } from '@/context/SessionContext';
-import { UpdateProfilePayload, UpdateVisibilitySettingsPayload } from '@/types/userTypes';
+import {
+  SetupAccountPayload,
+  UpdateProfilePayload,
+  UpdateVisibilitySettingsPayload,
+} from '@/types/userTypes';
 
 const API_URL = `/v1/user`;
+const SETUP_API_URL = `/v2/user`;
+
+export const setupUserAccount = async (
+  payload: SetupAccountPayload & { username: string },
+): Promise<{ success: boolean; message: string; data: User }> => {
+  return await api.patch<{ success: boolean; message: string; data: User }>(
+    `${SETUP_API_URL}/setup`,
+    payload,
+  );
+};
 
 /**
  * Fetch user data by ID or username

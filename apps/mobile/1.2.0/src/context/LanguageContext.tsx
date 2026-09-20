@@ -32,7 +32,7 @@ const queryKeys = {
 };
 
 async function fetchPreload(code: string): Promise<NamespaceBundle> {
-  const response = await api.get<PreloadResponse>(`/v1/localization/${code}/preload`);
+  const response = await api.get<PreloadResponse>(`/v2/localization/${code}/preload`);
   return response.data;
 }
 
@@ -41,7 +41,7 @@ async function fetchNamespace(
   namespace: string
 ): Promise<TranslationMap> {
   const response = await api.get<{ version: number; data: TranslationMap }>(
-    `/v1/localization/${code}/${namespace}`
+    `/v2/localization/${code}/${namespace}`
   );
   return response.data;
 }

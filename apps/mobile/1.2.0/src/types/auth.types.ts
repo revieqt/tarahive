@@ -21,7 +21,11 @@ export interface RegisterResponse {
 export interface VerificationResponse {
   success: boolean;
   message: string;
+  provider?: 'email';
+  newAccount?: boolean;
   email?: string;
+  accessToken?: string;
+  refreshToken?: string;
   user?: any;
 }
 

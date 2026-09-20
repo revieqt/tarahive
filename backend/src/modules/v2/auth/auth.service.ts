@@ -1,15 +1,31 @@
 import { AppDataSource } from "../../../config/postgres";
+import { Auth } from "./auth.entity";
 import { User } from "../user/user.entity";
-import { Provider, UserStatus, UserType } from "../user/user.types";
-import { generateVerificationCode, generateUsername } from "./auth.utils";
+import { UserStatus, UserType } from "../user/user.types";
+import { AuthProvider } from "./auth.types";
+import { generateVerificationCode } from "./auth.utils";
 import { queueEmail } from '../../../workers/delivery/email.queue';
-import { generateAccessToken, generateRefreshToken } from "./token.service";
 import {
   storeVerificationCode,
   verifyVerificationCode,
 } from './auth.redis';
 
-const userRepo = AppDataSource.getRepository(User);
+const authRepo = AppDataSource.getRepository(Auth);
+
+export interface VerifyUserEmailResult {
+  user: User;
+  newAccount: boolean;
+}
+
+export const findAccountByProvider = async (
+  provider: AuthProvider,
+  providerId: string,
+): Promise<Auth | null> => {
+  return authRepo.findOne({
+    where: { provider, providerId },
+    relations: { user: true },
+  });
+};
 
 const generateVerificationEmailContent = (code: string): string => {
   return `
@@ -35,12 +51,13 @@ const generateVerificationEmailContent = (code: string): string => {
 
 export const sendVerificationCode = async (email: string): Promise<void> => {
   try {
+    const normalizedEmail = email.trim().toLowerCase();
     const code = generateVerificationCode();
 
-    await storeVerificationCode(email, code);
+    await storeVerificationCode(normalizedEmail, code);
 
     await queueEmail({
-      to: email,
+      to: normalizedEmail,
       subject: 'Tarahive Email Verification',
       content: generateVerificationEmailContent(code),
     });
@@ -52,68 +69,85 @@ export const sendVerificationCode = async (email: string): Promise<void> => {
   }
 };
 
-export const verifyUserEmail = async (email: string, code: string): Promise<Partial<User>> => {
+export const verifyUserEmail = async (
+  email: string,
+  code: string,
+  device?: Partial<User["devices"][number]>,
+): Promise<VerifyUserEmailResult> => {
   try {
-    const isValid = await verifyVerificationCode(email, code);
+    const normalizedEmail = email.trim().toLowerCase();
+    const isValid = await verifyVerificationCode(normalizedEmail, code);
 
     if (!isValid) throw new Error('Invalid or expired verification code');
 
-    const pendingUserData = await getPendingRegistration(email);
+    const existingAuth = await findAccountByProvider(
+      AuthProvider.EMAIL,
+      normalizedEmail,
+    );
 
-    if (!pendingUserData) throw new Error('No pending registration found. Please register again.');
-    
-    if (!pendingUserData.fname || !pendingUserData.fname.trim()) throw new Error('First name is required to complete registration');
+    if (existingAuth?.user) {
+      return { user: existingAuth.user, newAccount: false };
+    }
 
-    const user = userRepo.create({
-      fname: pendingUserData.fname.trim(),
-      lname: pendingUserData.lname?.trim() || null,
-      email: pendingUserData.email,
-      username: generateUsername(pendingUserData.fname),
-      password: pendingUserData.password,
-      bdate: pendingUserData.bdate,
-      gender: pendingUserData.gender,
-      provider: Provider.EMAIL,
-      type: UserType.TRAVELER,
-      status: UserStatus.ACTIVE,
-      isProUser: false,
-      expPoints: 0,
-      interests: [],
-      safetyState: {
-        isInAnEmergency: false,
-        emergencyContact: {},
-        delivery: {
-          isEmailEnabled: false,
-          isSMSEnabled: false,
-          alertLang: "en"
+    return AppDataSource.transaction(async (manager) => {
+      const existingAuth = await manager.findOne(Auth, {
+        where: {
+          provider: AuthProvider.EMAIL,
+          providerId: normalizedEmail,
         },
-      },
-      settings: {
-        visibility: {
-          isProfilePublic: true,
-          isPersonalInfoPublic: true,
-          isTravelInfoPublic: true,
-        },
-        personalization: {
-          pushNotifications: true,
-          locationSharing: false,
-        },
-        security: {
-          is2FAEnabled: false,
-        },
-        taraBuddy: {
-          isTaraBuddyEnabled: false,
-        },
-      },
-      device: [pendingUserData.device],
+        relations: { user: true },
+      });
+
+      if (existingAuth?.user) {
+        return { user: existingAuth.user, newAccount: false };
+      }
+
+      const existingUser = await manager.findOne(User, {
+        where: { email: normalizedEmail },
+      });
+
+      if (existingUser) {
+        const auth = manager.create(Auth, {
+          userId: existingUser.id,
+          user: existingUser,
+          provider: AuthProvider.EMAIL,
+          providerId: normalizedEmail,
+          email: normalizedEmail,
+          isVerified: true,
+        });
+        await manager.save(Auth, auth);
+
+        return { user: existingUser, newAccount: false };
+      }
+
+      const user = manager.create(User, {
+        email: normalizedEmail,
+        type: UserType.TRAVELER,
+        status: UserStatus.ACTIVE,
+        devices: device ? [{
+          deviceId: device.deviceId || "",
+          brand: device.brand || "",
+          model: device.model || "",
+          os: device.os || "",
+          type: device.type || "",
+          appVersion: device.appVersion,
+        }] : [],
+      });
+      const savedUser = await manager.save(User, user);
+      const newAccount = true;
+
+      const auth = manager.create(Auth, {
+        userId: savedUser.id,
+        user: savedUser,
+        provider: AuthProvider.EMAIL,
+        providerId: normalizedEmail,
+        email: normalizedEmail,
+        isVerified: true,
+      });
+      await manager.save(Auth, auth);
+
+      return { user: savedUser, newAccount };
     });
-    const savedUser = await userRepo.save(user);
-
-    await deletePendingRegistration(email);
-
-    const { password: _, ...userWithoutPassword } = savedUser;
-
-    console.log(`✅ Email verified and user created for ${email}`);
-    return userWithoutPassword;
   } catch (error) {
     console.error('Error verifying email:', error);
     throw error;

@@ -14,3 +14,11 @@ export interface UpdateProfilePayload {
   contactNumber?: string;
   interests?: string[];
 }
+
+export interface SetupAccountPayload {
+  fname: string;
+  lname: string;
+  bdate: string;
+  gender: string;
+  interests: string[];
+}

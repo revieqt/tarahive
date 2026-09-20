@@ -6,7 +6,6 @@ import { useEmailVerification } from '@/hooks/auth/useEmailVerification';
 import { useLanguage } from '@/context/LanguageContext';
 import CodeInputField from '@/components/ui/CodeInputField';
 import Header from '@/components/common/Header';
-import { router } from 'expo-router';
 import TextField from '@/components/ui/TextField';
 import { showError } from '@/services/toast.service';
 
@@ -35,7 +34,7 @@ export default function EmailAuthScreen() {
   }, [cooldownTime]);
 
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     const trimmedEmail = email.trim();
 
     if (!trimmedEmail) {
@@ -47,20 +46,27 @@ export default function EmailAuthScreen() {
       showError('Invalid email', 'Please enter a valid email address');
       return;
     }
-
-    setSteps('code');
+    
+    try {
+      await sendCode(trimmedEmail);
+      setSteps('code');
+      setCooldownTime(RESEND_COOLDOWN_MS);
+    } catch {
+      // The hook displays the request error.
+    }
   };
 
 
-  const handleResend = () => {
+  const handleResend = async () => {
     const trimmedEmail = email.trim();
     if (!trimmedEmail || !isValidEmail(trimmedEmail)) return;
 
-    sendCode(trimmedEmail, {
-      onSuccess: () => {
-        setCooldownTime(RESEND_COOLDOWN_MS);
-      },
-    });
+    try {
+      await sendCode(trimmedEmail);
+      setCooldownTime(RESEND_COOLDOWN_MS);
+    } catch {
+      // The hook displays the request error.
+    }
   };
 
 
@@ -68,15 +74,7 @@ export default function EmailAuthScreen() {
     const trimmedEmail = email.trim();
     if (!trimmedEmail || !isValidEmail(trimmedEmail) || !verificationCode) return;
 
-    verifyCode(
-      { email: trimmedEmail, code: verificationCode },
-      {
-        onSuccess: () => {
-          setVerificationCode('');
-          router.replace('/(auth)/login');
-        },
-      }
-    );
+    verifyCode({ email: trimmedEmail, code: verificationCode });
   };
 
 

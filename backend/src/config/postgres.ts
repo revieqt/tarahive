@@ -28,14 +28,26 @@ export const AppDataSource = new DataSource({
 });
 
 export const connectPostgres = async () => {
-  try {
-    if (!AppDataSource.isInitialized) {
-      await AppDataSource.initialize();
-      console.log("✅ Connected to PostgreSQL");
+  const maxAttempts = 20;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      if (!AppDataSource.isInitialized) {
+        await AppDataSource.initialize();
+        console.log("✅ Connected to PostgreSQL");
+        return;
+      }
+
+      return;
+    } catch (err) {
+      if (attempt === maxAttempts) {
+        console.error("❌ PostgreSQL connection error:", err);
+        throw err;
+      }
+
+      console.warn(`PostgreSQL not ready yet (attempt ${attempt}/${maxAttempts}). Retrying in 2s...`);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
     }
-  } catch (err) {
-    console.error("❌ PostgreSQL connection error:", err);
-    process.exit(1);
   }
 };
 

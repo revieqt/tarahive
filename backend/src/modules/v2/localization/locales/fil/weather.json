@@ -1,0 +1,32 @@
+{
+  "conditions": {
+    "clear_sky": "Maaliwalas na kalangitan",
+    "mainly_clear": "Kadalasang maaliwalas",
+    "partly_cloudy": "Bahagyang maulap",
+    "cloudy": "Maulap",
+    "fog": "Hamog",
+    "depositing_rime_fog": "Hamog na may nagyeyelong yelo",
+    "light_drizzle": "Mahinang ambon",
+    "moderate_drizzle": "Katamtamang ambon",
+    "heavy_drizzle": "Malakas na ambon",
+    "light_freezing_drizzle": "Mahinang nagyeyelong ambon",
+    "heavy_freezing_drizzle": "Malakas na nagyeyelong ambon",
+    "slight_rain": "Mahinang ulan",
+    "moderate_rain": "Katamtamang ulan",
+    "heavy_rain": "Malakas na ulan",
+    "light_freezing_rain": "Mahinang nagyeyelong ulan",
+    "heavy_freezing_rain": "Malakas na nagyeyelong ulan",
+    "slight_snow_fall": "Mahinang pag-ulan ng niyebe",
+    "moderate_snow_fall": "Katamtamang pag-ulan ng niyebe",
+    "heavy_snow_fall": "Malakas na pag-ulan ng niyebe",
+    "snow_grains": "Pinong butil ng niyebe",
+    "slight_rain_showers": "Mahinang pagbugso ng ulan",
+    "moderate_rain_showers": "Katamtamang pagbugso ng ulan",
+    "violent_rain_showers": "Matinding pagbugso ng ulan",
+    "slight_snow_showers": "Mahinang pagbugso ng niyebe",
+    "heavy_snow_showers": "Malakas na pagbugso ng niyebe",
+    "thunderstorm": "Pagkulog at pagkidlat",
+    "thunderstorm_slight_hail": "Pagkulog at pagkidlat na may bahagyang yelong ulan",
+    "thunderstorm_heavy_hail": "Pagkulog at pagkidlat na may malakas na yelong ulan"
+  }
+}

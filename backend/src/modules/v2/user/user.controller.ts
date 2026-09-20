@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getUserById, getUserByIdOrUsername, updateProfile, updateVisibilitySettings } from "./user.service";
+import { getUserById, getUserByIdOrUsername, updateProfile, updateVisibilitySettings, setupUser } from "./user.service";
 import { detectLanguage } from "../localization/localization.service";
 import { AuthRequest } from "../auth/auth.types";
 
@@ -115,6 +115,51 @@ export const updateProfileController = async (req: AuthRequest, res: Response): 
     res.status(200).json({
       success: true,
       message: "Profile updated successfully",
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const setupUserAccount = async (req: AuthRequest, res: Response): Promise<void> => {
+  const lang = detectLanguage(req.headers['accept-language']);
+  try {
+    const userId = req.user?.sub;
+
+    if (!userId) {
+      res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+      return;
+    }
+
+    const updates = req.body ?? {};
+    const allowedFields = ["fname", "lname", "bdate", "gender", "username", "interests"];
+    const profileUpdates = allowedFields.reduce((acc, field) => {
+      if (Object.prototype.hasOwnProperty.call(updates, field)) {
+        acc[field as keyof typeof acc] = updates[field];
+      }
+      return acc;
+    }, {} as Record<string, unknown>);
+
+    if (Object.keys(profileUpdates).length === 0) {
+      res.status(400).json({
+        success: false,
+        message: "No fields provided",
+      });
+      return;
+    }
+
+    const user = await setupUser(userId, profileUpdates as any);
+
+    res.status(200).json({
+      success: true,
+      message: "User account setup successfully",
+      data: user,
     });
   } catch (error: any) {
     res.status(500).json({

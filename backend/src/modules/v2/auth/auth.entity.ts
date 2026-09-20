@@ -16,6 +16,8 @@ import { AuthProvider } from "./auth.types";
 @Index(["provider", "providerId"], {
   unique: true,
 })
+@Index(["email"])
+@Index(["userId"])
 export class Auth {
   // ======================
   // ID

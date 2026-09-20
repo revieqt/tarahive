@@ -34,9 +34,17 @@ async function bootstrap() {
     // await connectMongoDB();
     await connectPostgres();
     initializeFirebase();
-    app.listen(PORT, () => {
-      console.log(`Bootstrap Completed!`);
+    app.get('/health', (_req, res) => {
+      res.send('Tarahive Backend is Running');
     });
+
+    server.listen(PORT, () => {
+      console.log(`🚀 Server running at http://localhost:${PORT}`);
+      console.log(`🔌 Socket.IO listening on port ${PORT}`);
+    });
+
+    await initializeEmailDeliveryWorker();
+    console.log('Bootstrap Completed!');
   } catch (error) {
     console.error("Bootstrap failed:", error);
     process.exit(1);
@@ -44,16 +52,4 @@ async function bootstrap() {
 }
 
 bootstrap();
-
-app.get('/health', (_req, res) => {
-  res.send('Tarahive Backend is Running');
-});
-
-(async () => {
-  await initializeEmailDeliveryWorker();
-  server.listen(PORT, () => {
-    console.log(`🚀 Server running at http://localhost:${PORT}`);
-    console.log(`🔌 Socket.IO listening on port ${PORT}`);
-  });
-})();
 

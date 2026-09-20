@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { sendVerificationCode, verifyUserEmail } from './auth.service';
+import { generateAccessToken, generateRefreshToken } from './token.service';
 import { LogAction } from '../audit/audit.service';
 
 export const useEmailAuth = async (req: Request, res: Response) => {
@@ -75,7 +76,9 @@ export const verifyEmail = async (req: Request, res: Response) => {
       });
     }
 
-    const user = await verifyUserEmail(email, code);
+    const { user, newAccount } = await verifyUserEmail(email, code, device);
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
 
     await LogAction.info({
       userId: user.id,
@@ -101,6 +104,10 @@ export const verifyEmail = async (req: Request, res: Response) => {
     res.status(200).json({ 
       success: true,
       message: res.locals.t('auth.verify_email.success'),
+      provider: "email",
+      newAccount,
+      accessToken,
+      refreshToken,
       user,
     });
   } catch (error: any) {

@@ -1,0 +1,27 @@
+{
+  "tabs": {
+    "home_button": "Home",
+    "maps_button": "Mapa",
+    "explore_button": "Explore",
+    "account_button": "Account"
+  },
+  "account": {
+    "personalization_title": "Pag-personalize",
+    "edit_profile_button": "I-edit ang Profile",
+    "theme_button": "Tema ng App",
+    "language_button": "Wika ng App",
+    "privacy_title": "Privacy",
+    "change_password_button": "Palitan ang Password",
+    "visibility_button": "Mga Setting ng Visibility",
+    "logs_button": "Mga Activity Log",
+    "privacy_button": "Patakaran sa Privacy",
+    "terms_button": "Mga Tuntunin at Kundisyon",
+    "help_title": "Tulong at Suporta",
+    "manual_button": "User Manual",
+    "support_button": "Makipag-ugnayan sa Suporta",
+    "about_button": "Tungkol sa App",
+    "developer_title": "Mga Opsyon para sa Developer",
+    "cache_button": "I-clear ang Cache",
+    "logout_button": "Mag-logout"
+  }
+}

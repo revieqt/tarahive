@@ -1,0 +1,116 @@
+{
+  "common": {
+    "welcome": "Tarahive에 오신 것을 환영합니다",
+    "cancel": "취소",
+    "continue": "계속",
+    "hello": "안녕하세요",
+    "save": "변경 사항 저장",
+    "na": "해당 없음",
+    "prev": "이전",
+    "next": "다음"
+  },
+
+  "months": {
+    "january": "1월",
+    "february": "2월",
+    "march": "3월",
+    "april": "4월",
+    "may": "5월",
+    "june": "6월",
+    "july": "7월",
+    "august": "8월",
+    "september": "9월",
+    "october": "10월",
+    "november": "11월",
+    "december": "12월"
+  },
+
+  "days": {
+    "sunday": "일요일",
+    "monday": "월요일",
+    "tuesday": "화요일",
+    "wednesday": "수요일",
+    "thursday": "목요일",
+    "friday": "금요일",
+    "saturday": "토요일"
+  },
+
+  "days_short": {
+    "sun": "일",
+    "mon": "월",
+    "tue": "화",
+    "wed": "수",
+    "thu": "목",
+    "fri": "금",
+    "sat": "토"
+  },
+
+  "genders": {
+    "male": "남성",
+    "female": "여성",
+    "non_binary": "논바이너리",
+    "prefer_not_to_say": "응답하지 않음",
+    "other": "기타"
+  },
+
+  "no_internet": {
+    "title": "인터넷 연결 없음",
+    "subtitle": "현재 오프라인 모드로 Tarahive를 사용하고 있습니다. 인터넷에 다시 연결할 때까지 일부 기능이 제한될 수 있습니다."
+  },
+
+  "dev": {
+    "cache_clear_title": "캐시 삭제",
+    "cache_clear_subtitle": "모든 캐시된 데이터가 삭제되고 로그아웃됩니다. 계속하시겠습니까?"
+  },
+
+  "conditions": {
+    "clear_sky": "맑음",
+    "mainly_clear": "대체로 맑음",
+    "partly_cloudy": "구름 조금",
+    "cloudy": "흐림",
+    "fog": "안개",
+    "depositing_rime_fog": "상고대 안개",
+    "light_drizzle": "약한 이슬비",
+    "moderate_drizzle": "보통 이슬비",
+    "heavy_drizzle": "강한 이슬비",
+    "light_freezing_drizzle": "약한 어는 이슬비",
+    "heavy_freezing_drizzle": "강한 어는 이슬비",
+    "slight_rain": "약한 비",
+    "moderate_rain": "보통 비",
+    "heavy_rain": "강한 비",
+    "light_freezing_rain": "약한 어는 비",
+    "heavy_freezing_rain": "강한 어는 비",
+    "slight_snow_fall": "약한 눈",
+    "moderate_snow_fall": "보통 눈",
+    "heavy_snow_fall": "강한 눈",
+    "snow_grains": "싸락눈",
+    "slight_rain_showers": "약한 소나기",
+    "moderate_rain_showers": "보통 소나기",
+    "violent_rain_showers": "매우 강한 소나기",
+    "slight_snow_showers": "약한 눈 소나기",
+    "heavy_snow_showers": "강한 눈 소나기",
+    "thunderstorm": "뇌우",
+    "thunderstorm_slight_hail": "약한 우박을 동반한 뇌우",
+    "thunderstorm_heavy_hail": "강한 우박을 동반한 뇌우"
+  },
+
+  "login": {
+    "title1": "여행을",
+    "title2": "더 편리하게",
+    "google_prompt": "Google로 계속하기",
+    "apple_prompt": "Apple로 계속하기",
+    "email_prompt": "이메일로 계속하기",
+    "terms_prompt": "계속하면 서비스 이용약관 및 개인정보 처리방침에 동의하는 것으로 간주됩니다."
+  },
+
+  "email_login": {
+    "title1": "이메일로 계속하기",
+    "subtitle1": "Tarahive의 맞춤형 여행 서비스를 이용하려면 이메일 주소를 입력해 주세요.",
+    "email_placeholder": "이메일 주소",
+    "title2": "이메일 인증",
+    "subtitle2": "다음 주소로 인증 링크를 보냈습니다: ",
+    "resend_prompt": "이메일을 받지 못하셨나요? 여기에서 다시 보내세요.",
+    "cooldown_prompt": "이메일을 다시 보냈습니다. 다시 요청하려면",
+    "verify_button": "이메일 인증"
+  }
+}

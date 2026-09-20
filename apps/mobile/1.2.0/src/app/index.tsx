@@ -6,7 +6,7 @@ export default function Index() {
 
   if ( loading ) return null;
 
-  if (session?.user) return <Redirect href="/(tabs)/home" />;
+  if (session?.user) return <Redirect href="/(protected)" />;
 
   return <Redirect href="/login" />;
 }

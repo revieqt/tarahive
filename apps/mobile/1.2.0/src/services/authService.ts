@@ -1,27 +1,9 @@
 import { api } from '@/api/client';
 import { formatDeviceInfo } from '@/utils/deviceFormatter';
 import { DeviceInfo } from '@/hooks/shared/useDeviceInfo';
-import { RegisterRequest, RegisterResponse, VerificationResponse, LoginRequest, LoginResponse, ChangePasswordRequest, ChangePasswordResponse } from '@/types/auth.types';
+import { VerificationResponse } from '@/types/auth.types';
 
 const API_URL = '/v2/auth';
-
-/**
- * Register a new user
- * Backend automatically sends verification code to email
- */
-export const registerUser = async (data: RegisterRequest): Promise<RegisterResponse> => {
-  const payload = {
-    fname: data.fname,
-    lname: data.lname || undefined,
-    email: data.email,
-    password: data.password,
-    bdate: data.bdate,
-    gender: data.gender,
-    device: data.device ? formatDeviceInfo(data.device) : undefined,
-  };
-
-  return await api.post<RegisterResponse>(`${API_URL}/register`, payload);
-};
 
 /**
  * Send email verification code (for resending)
@@ -35,7 +17,7 @@ export const sendEmailVerificationCode = async (
     device: device ? formatDeviceInfo(device) : undefined,
   };
 
-  return await api.post<VerificationResponse>(`${API_URL}/send-verification`, payload);
+  return await api.post<VerificationResponse>(`${API_URL}/email/request`, payload);
 };
 
 /**
@@ -52,41 +34,5 @@ export const verifyEmail = async (
     device: device ? formatDeviceInfo(device) : undefined,
   };
 
-  return await api.post<VerificationResponse>(`${API_URL}/verify`, payload);
-};
-
-/**
- * Login user with email/username and password
- */
-export const loginUser = async (
-  identifier: string,
-  password: string,
-  device?: DeviceInfo
-): Promise<LoginResponse> => {
-  const payload = {
-    identifier,
-    password,
-    device: device ? formatDeviceInfo(device) : undefined,
-  };
-
-  return await api.post<LoginResponse>(`${API_URL}/login`, payload);
-};
-
-/**
- * Change user password
- */
-export const changePassword = async (
-  oldPassword: string,
-  newPassword: string,
-  confirmPassword: string,
-  device?: DeviceInfo
-): Promise<ChangePasswordResponse> => {
-  const payload = {
-    oldPassword,
-    newPassword,
-    confirmPassword,
-    device: device ? formatDeviceInfo(device) : undefined,
-  };
-
-  return await api.post<ChangePasswordResponse>(`${API_URL}/change-password`, payload);
+  return await api.post<VerificationResponse>(`${API_URL}/email/verify`, payload);
 };
