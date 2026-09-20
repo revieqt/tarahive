@@ -85,5 +85,23 @@
     "thunderstorm": "Thunderstorm",
     "thunderstorm_slight_hail": "Thunderstorm with slight hail",
     "thunderstorm_heavy_hail": "Thunderstorm with heavy hail"
+  },
+  "login": {
+    "title1": "Your Travels,",
+    "title2": "Made Easier",
+    "google_prompt": "Continue with Google",
+    "apple_prompt": "Continue with Apple",
+    "email_prompt": "Continue with Email",
+    "terms_prompt": "By continuing, you agree to our Terms of Service and Privacy Policy."
+  },
+  "email_login": {
+    "title1": "Continue with Email",
+    "subtitle1": "Please enter your email address to enjoy Tarahive's personalized travel experience.",
+    "email_placeholder": "Email Address",
+    "title2": "Verify your Email",
+    "subtitle2": "We've sent a verification link to: ",
+    "resend_prompt": "Didn't receive the email? Resend it here.",
+    "cooldown_prompt": "Email resent. You can request another one in",
+    "verify_button": "Verify Email"
   }
 }

@@ -1,9 +1,7 @@
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { TIcon, TText, TView } from '@/components/ui/Themed';
-import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
-import LangButton from '@/components/common/LanguageButton';
 import { useLanguage } from '@/context/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import HiveBg from '@/components/common/HiveBg';
@@ -12,14 +10,13 @@ import { Image } from 'expo-image';
 export default function LoginScreen() {
   const router = useRouter();
   const accentColor = useThemeColor({}, 'accent');
-  const { currentLanguage } = useLanguage();
+  const { currentLanguage, t } = useLanguage();
 
   return (
     <TView style={{ flex: 1 }}>
       <TouchableOpacity style={styles.languageButton} onPress={() => router.push('/settings/language')}>
         <TText style={{color: '#fff'}}>{currentLanguage.code[0].toUpperCase() + currentLanguage.code.slice(1)}</TText>
         <TIcon name="earth" size={15} style={{color: '#fff'}} />
-        
       </TouchableOpacity>
 
       <Image
@@ -34,39 +31,37 @@ export default function LoginScreen() {
       >
         <View style={styles.titleContainer}>
           <View style={styles.titleRow}>
-            <TText style={styles.title}>Your Travels,</TText>
-            <TText style={styles.titleAccent}>Made Easier</TText>
+            <TText style={styles.title}>{t("common.login.title1")}</TText>
+            <TText style={styles.titleAccent}>{t("common.login.title2")}</TText>
           </View>
-          <TText style={styles.subtitle}>Welcome to Tarahive</TText>
+          <TText style={styles.subtitle}>{t("common.common.welcome")}</TText>
         </View>
         
         <TouchableOpacity style={styles.button} onPress={() => router.push('/home')}>
           <TIcon name="google" size={20} style={{color: accentColor}} />
-          <TText style={{color: '#fff'}}>Continue with Google</TText>
+          <TText style={{color: '#fff'}}>{t("common.login.google_prompt")}</TText>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.button}>
           <TIcon name="apple" size={20} style={{color: accentColor}} />
-          <TText style={{color: '#fff'}}>Continue with Apple</TText>
+          <TText style={{color: '#fff'}}>{t("common.login.apple_prompt")}</TText>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => router.push('/login/email')}>
-          <TText style={styles.emailOption}>Continue with Email</TText>
+          <TText style={styles.emailOption}>{t("common.login.email_prompt")}</TText>
         </TouchableOpacity>
 
         <TouchableOpacity>
           <TText style={styles.termsText}>
-            By continuing, you agree to our Terms & Conditions and Privacy Policy.
+            {t("common.login.terms_prompt")}
           </TText>
         </TouchableOpacity>
 
         <View style={styles.hiveBgContainer}>
           <HiveBg fade={false}/>
         </View>
-
       </LinearGradient>
     </TView>
-    
   );
 }
 
