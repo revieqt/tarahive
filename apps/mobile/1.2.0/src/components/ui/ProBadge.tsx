@@ -6,7 +6,7 @@ interface ProBadgeProps {
   size?: number;
 }
 
-export const ProBadge = ({ isProUser, size = 50 }: ProBadgeProps) => {
+export default function ProBadge({ isProUser, size = 20 }: ProBadgeProps) {
   if (!isProUser) {
     return null;
   }

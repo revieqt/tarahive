@@ -161,7 +161,7 @@ export default function DocsScreen() {
               <TView key={group.name} style={styles.groupContainer}>
                 <Header
                   title={group.name}
-                  subtitle={`${formatDateToString(index.created_on)} (v${index.version})`}
+                  subtitle={`${index.created_on} (v${index.version})`}
                 />
                 {group.sections.map((item) => (
                   <TouchableOpacity

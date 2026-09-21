@@ -1,5 +1,5 @@
 import Button from '@/components/ui/Button';
-import ProBadge from '@/components/common/ProBadge';
+import ProBadge from '@/components/ui/ProBadge';
 import { TIcon, TText, TView } from '@/components/ui/Themed';
 // import { SUPPORT_FORM_URL } from '@/config';
 import { useSession } from '@/context/SessionContext';
