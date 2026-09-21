@@ -157,7 +157,7 @@ const MonthlyCalendar: React.FC = () => {
       <View style={[styles.header, { backgroundColor: `${secondaryColor}20` }]}>
         <View style={{ marginLeft: 3, marginVertical: 3 }}>
           <TText>{monthLabel}</TText>
-          <TText style={{ fontSize: 10, opacity: 0.5 }}>{todayLabel}</TText>
+          <TText style={{ fontSize: 10, opacity: 0.5 }}>{selectedDateLabel ? selectedDateLabel : todayLabel}</TText>
         </View>
 
         <TouchableOpacity onPress={() => router.push('/itinerary/new')} style={[styles.newItineraryButton, { backgroundColor }]}>
@@ -182,18 +182,6 @@ const MonthlyCalendar: React.FC = () => {
         scrollEnabled={false}
         contentContainerStyle={styles.cellsContainer}
       />
-
-      <View style={styles.header}>
-        <View style={{ marginLeft: 3, marginVertical: 3 }}>
-          <TText>{selectedDateLabel}</TText>
-          <TText style={{ fontSize: 10, opacity: 0.5 }}>{t('tabs.home.menu_itinerary')}</TText>
-        </View>
-
-        <TouchableOpacity onPress={() => router.push('/itinerary')} style={styles.viewAllButton}>
-          <TText style={{ fontSize: 11 }}>{t('tabs.home.calendar_view_all')}</TText>
-          <TIcon name='arrow-right' size={15} />
-        </TouchableOpacity>
-      </View>
 
       <View style={styles.dailyItineraryContainer}>
         {monthQuery.isLoading ? (
@@ -311,9 +299,13 @@ const styles = StyleSheet.create({
   emptyStateText: {
     fontSize: 12,
     opacity: 0.5,
-    paddingBottom: 8,
     textAlign: 'center',
     textDecorationLine: 'underline',
+    borderRadius: 10,
+    backgroundColor: '#ccc5',
+    padding: 10,
+    marginBottom: 8,
+    overflow: 'hidden',
   },
   viewAllButton: {
     flexDirection: 'row',
