@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { TARA_AI_SUGGESTIONS } from '@/constants/Tara';
 import SidebarAlerts from '@/components/common/Sidebar';
-// import MonthlyCalendar from '@/components/common/MonthlyCalendar';
+import MonthlyCalendar from '@/components/cards/MonthlyCalendarCard';
 
 export default function HomeScreen() {
   const isConnected = useInternetConnection();
@@ -78,14 +78,6 @@ export default function HomeScreen() {
                 <TText style={{ opacity: .5, fontSize: 10 }}>{t('tabs.home.menu_itinerary_desc')}</TText>
                 <TText style={{ opacity: .85, fontSize: 14 }}>{t('tabs.home.menu_itinerary')}</TText>
               </View>
-
-              <LinearGradient
-                colors={[accentColor + '60', 'transparent']}
-                start={{ x: 1, y: 0 }}
-                end={{ x: 0, y: 0 }}
-                style={styles.gridCircle}
-                pointerEvents="none"
-              />
               <Image source={require('../../../../assets/images/slide2-img.png')} style={styles.leftGridImage} />
             </TouchableOpacity>
             <View
@@ -96,13 +88,6 @@ export default function HomeScreen() {
               >
                 <TText style={{ opacity: .5, fontSize: 10 }}>{t('tabs.home.menu_sos_desc')}</TText>
                 <TText style={{ opacity: .85 }}>{t('tabs.home.menu_sos')}</TText>
-                <LinearGradient
-                  colors={[accentColor + '60', 'transparent']}
-                  start={{ x: 1, y: 0 }}
-                  end={{ x: 0, y: 0 }}
-                  style={styles.rightGridCircle}
-                  pointerEvents="none"
-                />
                 <Image source={require('../../../../assets/images/slide4-img.png')} style={styles.rightGridImage} />
               </TouchableOpacity>
               <TouchableOpacity
@@ -111,20 +96,13 @@ export default function HomeScreen() {
               >
                 <TText style={{ opacity: .5, fontSize: 10 }}>{t('tabs.home.menu_tara_desc')}</TText>
                 <TText style={{ opacity: .85 }}>{t('tabs.home.menu_tara')}</TText>
-                <LinearGradient
-                  colors={[accentColor + '60', 'transparent']}
-                  start={{ x: 1, y: 0 }}
-                  end={{ x: 0, y: 0 }}
-                  style={styles.rightGridCircle}
-                  pointerEvents="none"
-                />
                 <Image source={require('../../../../assets/images/icon.png')} style={styles.rightGridImage} />
               </TouchableOpacity>
             </View>
           </View>
         </View>
         <TView style={styles.content}>
-          {/* <MonthlyCalendar/> */}
+          <MonthlyCalendar/>
 
           <TouchableOpacity style={[styles.rateContainer, {backgroundColor: primaryColor}]}>
             <TText>{t('tabs.home.rate_title')}</TText>
@@ -237,22 +215,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc0',
     padding: 10,
-  },
-  gridCircle: {
-    height: '150%',
-    aspectRatio: 1,
-    borderRadius: 1000,
-    position: 'absolute',
-    bottom: '-75%',
-    right: '-50%',
-  },
-  rightGridCircle: {
-    height: '170%',
-    aspectRatio: 1,
-    borderRadius: 1000,
-    position: 'absolute',
-    bottom: '-60%',
-    right: '-20%',
   },
   leftGridImage: {
     width: '100%',

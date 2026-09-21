@@ -65,16 +65,6 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="scan"
-        options={{
-          title: 'Scan',
-          tabBarIcon: ({ color, focused }) => (
-            <TIcon name='line-scan' size={20} color={color}/>
-          ),
-        }}
-      />
-
-      <Tabs.Screen
         name="account"
         options={{
           title: t('tabs.tabs.account_button'),

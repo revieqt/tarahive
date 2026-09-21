@@ -57,14 +57,14 @@ export default function HomeHeaderCard() {
           <Skeleton style={styles.weatherTypeLoading} />
         </> :
           <>
-            <TText style={{ opacity: 0.5, fontSize: 12 }}>
+            <TText style={{ opacity: 0.5, fontSize: 12,color: '#fff'}}>
               { t('tabs.home.header_title') }
             </TText>
             <TText type='subtitle' style={{ color: '#fff', fontSize: 17 }}>
               {displayCity}
             </TText>
 
-            <TText style={{ opacity: 0.5, fontSize: 12 }}>
+            <TText style={{ opacity: 0.5, fontSize: 12,color: '#fff'}}>
               {t(displayWeather?.weatherType || 'No data')}
             </TText>
           </>
@@ -86,6 +86,7 @@ export default function HomeHeaderCard() {
             humidValue={displayWeather?.humidity || 0}
             windValue={displayWeather?.windSpeed || 0}
             loading={showLoading}
+            textColor='white'
           />
         </View>
 

@@ -42,7 +42,7 @@ export default function LoginScreen() {
         <View style={styles.titleContainer}>
           <View style={styles.titleRow}>
             <TText style={styles.title}>{t("common.login.title1")}</TText>
-            <TText style={styles.titleAccent}>{t("common.login.title2")}</TText>
+            <TText style={[styles.titleAccent, {color: accentColor}]}>{t("common.login.title2")}</TText>
           </View>
           <TText style={styles.subtitle}>{t("common.common.welcome")}</TText>
         </View>
@@ -96,7 +96,6 @@ const styles = StyleSheet.create({
     letterSpacing: -0.8,
   },
   titleAccent: {
-    color: '#FFD166',
     fontSize: 25,
     fontWeight: '900',
     letterSpacing: -0.8,

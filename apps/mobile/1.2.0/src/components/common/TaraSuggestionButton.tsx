@@ -84,7 +84,8 @@ const ActiveRouteSidebarButton: React.FC = () => {
                         styles.messageOverlay,
                         {
                             opacity: fadeAnimation,
-                            backgroundColor: accentColor,
+                            backgroundColor: primaryColor,
+                            borderColor: accentColor,
                             transform: [
                                 {
                                     translateY: fadeAnimation.interpolate({
@@ -170,6 +171,7 @@ const styles = StyleSheet.create({
         shadowRadius: 24,
         elevation: 10,
         borderRadius: 30,
+        borderWidth: 3,
     },
     messageText: {
         textAlign: 'center',

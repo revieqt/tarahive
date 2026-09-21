@@ -126,9 +126,9 @@ export default function AccountScreen() {
             <SettingsOption icon='eye' label={t('tabs.account.visibility_button')}
               onPress={() => router.push('/settings/visibility')}
             />
-            {/* <SettingsOption icon='key' label={t('tabs.account.logs_button')}
-              onPress={() => router.push('/settings/request-logs')}
-            /> */}
+            <SettingsOption icon='key' label={t('tabs.account.logs_button')}
+              onPress={() => router.push('/settings/logs-request')}
+            />
             <SettingsOption icon='file-eye' label={t('tabs.account.privacy_button')}
               onPress={handleDocs('policies-terms', 'privacy-policy')}
             />

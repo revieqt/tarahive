@@ -63,7 +63,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({
     <View style={[styles.container, {}]}>
       <View style={styles.weatherDetailsContainer}>
         <View style={[styles.weather, { backgroundColor: backgroundColor }]}>
-          <TIcon name='thermometer' size={20} color="#B36B6B" />
+          <TIcon name='thermometer' size={20} color="#ffb09c" />
           <TText style={[styles.weatherValue, { color }]}>
             {heatValue !== null && heatValue !== undefined
               ? `${Math.round(heatValue)}°C`
@@ -72,7 +72,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({
           <TText style={[styles.weatherLabel, { color }]}>{ t('tabs.home.header_heat') }</TText>
         </View>
         <View style={[styles.weather, { backgroundColor: backgroundColor }]}>
-          <TIcon name='cloud' size={20} color="#5A7D9A" />
+          <TIcon name='cloud' size={20} color="#309BCF" />
           <TText style={[styles.weatherValue, { color }]}>
             {rainValue !== null && rainValue !== undefined
               ? `${rainValue}mm`
@@ -81,7 +81,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({
           <TText style={[styles.weatherLabel, { color }]}>{ t('tabs.home.header_rain') }</TText>
         </View>
         <View style={[styles.weather, { backgroundColor: backgroundColor }]}>
-          <TIcon name='water' size={20} color="#5A7D9A" />
+          <TIcon name='water' size={20} color="#309BCF" />
           <TText style={[styles.weatherValue, { color }]}>
             {humidValue !== null && humidValue !== undefined
               ? `${humidValue.toFixed(0)}%`
@@ -90,7 +90,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({
           <TText style={[styles.weatherLabel, { color }]}>{ t('tabs.home.header_humid') }</TText>
         </View>
         <View style={[styles.weather, { backgroundColor: backgroundColor }]}>
-          <TIcon name='fan' size={20} color="#5A7D9A" />
+          <TIcon name='fan' size={20} color="#309BCF" />
           <TText style={[styles.weatherValue, { color }]}>
             {windValue !== null && windValue !== undefined
               ? `${Math.round(windValue)}km/h`
