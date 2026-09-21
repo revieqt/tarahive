@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, ScrollView } from 'react-native';
 import * as ExpoRouter from 'expo-router';
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -8,6 +8,8 @@ import { TIcon, TText, TView } from '@/components/ui/Themed';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLanguage } from '@/context/LanguageContext';
 import { useDoc } from '@/hooks/shared/useDoc';
+import HiveBg from '@/components/common/HiveBg';
+import { formatDateToString } from '@/utils/formatDateToString'
 
 type DocsRouteParams = {
   id?: string;
@@ -26,6 +28,8 @@ const getParamValue = (value: string | string[] | undefined) => {
 export default function DocsScreen() {
   const params = (ExpoRouter as any).useLocalSearchParams?.() as DocsRouteParams;
   const router = (ExpoRouter as any).useRouter?.();
+  const secondaryColor = useThemeColor({}, 'secondary');
+  const accentColor = useThemeColor({}, 'accent');
   const { t } = useLanguage();
   const id = getParamValue(params.id);
   const initialSection = getParamValue(params.section);
@@ -79,7 +83,7 @@ export default function DocsScreen() {
   const renderBlock = (block: any, blockIndex: number) => {
     if (block.type === 'heading') {
       return (
-        <TText key={`${block.type}-${blockIndex}`} type="subtitle" style={styles.blockHeading}>
+        <TText key={`${block.type}-${blockIndex}`} style={styles.blockHeading}>
           {block.text}
         </TText>
       );
@@ -95,21 +99,26 @@ export default function DocsScreen() {
 
     if (block.type === 'list') {
       return (
-        <TView key={`${block.type}-${blockIndex}`} style={styles.listContainer}>
+        <View key={`${block.type}-${blockIndex}`} style={styles.listContainer}>
+          
           {(block.items ?? []).map((item: string, index: number) => (
-            <TText key={`${item}-${index}`} style={styles.listItem}>
-              • {item}
-            </TText>
+            <View key={`${item}-${index}`} style={styles.listItem}>
+              <TText>•</TText>   
+              <TText style={{marginLeft: 6, lineHeight: 20}}>
+                {item}
+              </TText>
+            </View>
           ))}
-        </TView>
+        </View>
       );
     }
 
     if (block.type === 'note') {
       return (
-        <TText key={`${block.type}-${blockIndex}`} style={styles.noteText}>
-          {block.text}
-        </TText>
+        <View key={`${block.type}-${blockIndex}`} style={[styles.noteBlock, { borderColor: accentColor }]}>
+          <TIcon name='information' size={20} color={accentColor}/>
+          <TText style={{lineHeight: 19 }}>{block.text}</TText>
+        </View>
       );
     }
 
@@ -125,13 +134,11 @@ export default function DocsScreen() {
   };
 
   return (
-    <>
-      <StickyScrollView
+    <TView style={{ flex: 1 }}>
+      <HiveBg/>
+      <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ padding: '3%' }}
-        headerAppearOn={200}
-        title={title}
-        subtitle={isSectionView ? section?.subtitle ?? section?.title : 'Profile'}
+        contentContainerStyle={{ padding: '3%', paddingBottom: 80 }}
       >
         {isLoading ? (
           <TView style={styles.centeredState}>
@@ -143,16 +150,19 @@ export default function DocsScreen() {
           </TView>
         ) : isSectionView ? (
           <>
-            <Header title={section?.title ?? title} />
-            {section?.subtitle ? <TText style={styles.subtitle}>{section.subtitle}</TText> : null}
+            <Header title={section?.title ?? title} 
+              subtitle={section?.subtitle}
+            />
             {section?.blocks?.map((block, index) => renderBlock(block, index))}
           </>
         ) : (
           <>
-            <Header title={title} />
             {index?.groups?.map((group) => (
               <TView key={group.name} style={styles.groupContainer}>
-                <TText type="subtitle">{group.name}</TText>
+                <Header
+                  title={group.name}
+                  subtitle={`${formatDateToString(index.created_on)} (v${index.version})`}
+                />
                 {group.sections.map((item) => (
                   <TouchableOpacity
                     key={item.id}
@@ -167,7 +177,7 @@ export default function DocsScreen() {
             ))}
           </>
         )}
-      </StickyScrollView>
+      </ScrollView>
 
       {isSectionView && (
         <LinearGradient
@@ -201,7 +211,7 @@ export default function DocsScreen() {
           </TouchableOpacity>
         </LinearGradient>
       )}
-    </>
+    </TView>
   );
 }
 
@@ -218,11 +228,10 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   subtitle: {
-    opacity: 0.7,
-    marginBottom: 16,
+    opacity: 0.8,
+    marginBottom: 10,
   },
   groupContainer: {
-    marginTop: 12,
     gap: 8,
   },
   sectionButton: {
@@ -238,6 +247,11 @@ const styles = StyleSheet.create({
   blockHeading: {
     marginTop: 16,
     marginBottom: 8,
+    fontWeight: '700',
+    fontSize: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc9',
+    paddingBottom: 5,
   },
   blockText: {
     lineHeight: 22,
@@ -246,15 +260,20 @@ const styles = StyleSheet.create({
   listContainer: {
     marginBottom: 10,
     gap: 6,
+    marginLeft: 8
   },
-  listItem: {
-    lineHeight: 20,
+  listItem:{
+    flexDirection: 'row'
   },
-  noteText: {
-    marginVertical: 12,
-    padding: 10,
-    borderRadius: 10,
-    backgroundColor: '#ccc2',
+  noteBlock:{
+    padding: 12,
+    borderRadius: 15,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    borderLeftWidth: 4,
+    borderWidth: 1,
+    backgroundColor: 'rgba(255,255,255,.6)'
   },
   imageCaption: {
     marginBottom: 12,

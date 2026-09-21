@@ -10,6 +10,7 @@ import { DataSource } from "typeorm";
 import { Log } from "../modules/v2/audit/audit.entity";
 import { User } from "../modules/v2/user/user.entity";
 import { Auth } from "../modules/v2/auth/auth.entity";
+import { Itinerary } from "../modules/v2/itinerary/itinerary.entity";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -23,7 +24,7 @@ export const AppDataSource = new DataSource({
   extra: { max: 10 },
   
   // entities: [User, Log, Itinerary, ItineraryCollaborator],
-  entities: [User, Auth, Log ],
+  entities: [User, Auth, Log, Itinerary ],
   
 });
 

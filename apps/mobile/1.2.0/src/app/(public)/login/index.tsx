@@ -12,6 +12,16 @@ export default function LoginScreen() {
   const accentColor = useThemeColor({}, 'accent');
   const { currentLanguage, t } = useLanguage();
 
+  const handleDocs = (id: string, section?: string) => () => {
+    router.push({
+      pathname: "/docs/[id]" as any,
+      params: {
+        id: id,
+        section: section,
+      },
+    } as any);
+  };
+
   return (
     <TView style={{ flex: 1 }}>
       <TouchableOpacity style={styles.languageButton} onPress={() => router.push('/settings/language')}>
@@ -51,7 +61,7 @@ export default function LoginScreen() {
           <TText style={styles.emailOption}>{t("common.login.email_prompt")}</TText>
         </TouchableOpacity>
 
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleDocs('policies-terms')}>
           <TText style={styles.termsText}>
             {t("common.login.terms_prompt")}
           </TText>

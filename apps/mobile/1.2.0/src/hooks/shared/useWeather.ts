@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { BACKEND_URL } from '../../config';
 
-const API_URL = `${BACKEND_URL}/v1/weather`;
+const API_URL = `${BACKEND_URL}/v2/weather`;
 
 const weatherCodeKeyMap: Record<number, string> = {  // 2. rename map + swap values to keys
   0:  'common.conditions.clear_sky',
