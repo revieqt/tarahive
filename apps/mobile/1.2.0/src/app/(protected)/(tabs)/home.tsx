@@ -101,20 +101,11 @@ export default function HomeScreen() {
             </View>
           </View>
         </View>
+
         <TView style={styles.content}>
           <MonthlyCalendar/>
 
-          <TouchableOpacity style={[styles.rateContainer, {backgroundColor: primaryColor}]}>
-            <TText>{t('tabs.home.rate_title')}</TText>
-            <TText style={{fontSize: 10, opacity: .5}}>{t('tabs.home.rate_subtitle')}</TText>
-            <View style={{flexDirection: 'row', gap: 3}}>
-              <TIcon name='star' size={13} color={accentColor}/>
-              <TIcon name='star' size={13} color={accentColor}/>
-              <TIcon name='star' size={13} color={accentColor}/>
-              <TIcon name='star' size={13} color={accentColor}/>
-              <TIcon name='star' size={13} color={accentColor}/>
-            </View>
-          </TouchableOpacity>
+
         </TView>
         
       </ScrollView>
@@ -132,7 +123,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     zIndex: 5,
-    paddingTop: 185,
+    paddingTop: 180,
   },
   menuContainer: {
     position: 'relative',
@@ -171,7 +162,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   menuGradient: {
-    height: '93%',
+    height: '105%',
     position: 'absolute',
     bottom: 0,
     left: 0,
@@ -233,17 +224,6 @@ const styles = StyleSheet.create({
     opacity: .8,
   },
   content:{
-  },
-  rateContainer:{
-    marginTop: '3%',
-    marginHorizontal: '3%',
-    padding: '3%',
-    height: 60,
-    borderRadius: 15,
-    justifyContent: 'center',
-    marginBottom: 9,
-    paddingRight: 60,
-    overflow: 'hidden',
-    gap: 1
+    marginBottom: 20
   },
 });

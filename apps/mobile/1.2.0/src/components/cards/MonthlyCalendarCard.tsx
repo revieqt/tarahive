@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     fontSize: 12
   },
   todayCell: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FF6B6B' + '60',
     borderRadius: 100,
   },
   todayText: {

@@ -65,6 +65,16 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
+        name="rooms"
+        options={{
+          title: 'Rooms',
+          tabBarIcon: ({ color, focused }) => (
+            <TIcon name={focused ? 'account' : 'account-outline'} size={22} color={color}/>
+          ),
+        }}
+      />
+
+      <Tabs.Screen
         name="account"
         options={{
           title: t('tabs.tabs.account_button'),

@@ -6,7 +6,6 @@ import { useCurrentWeather, type WeatherData } from '@/hooks/shared/useWeather';
 import Skeleton from '@/components/ui/Skeleton';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
-import HiveBg from '../common/HiveBg';
 import WeatherDisplay from '../common/WeatherDisplay';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -48,8 +47,6 @@ export default function HomeHeaderCard() {
 
   return (
     <LinearGradient colors={[accentColor, secondaryColor]} style={styles.locationContent}>
-      <HiveBg flipHorizontal blur={false} />
-      <HiveBg blur={false} />
       <View style={{ gap: 5 }}>
         {showLoading ? <>
           <Skeleton style={styles.descLoading} />
@@ -79,7 +76,7 @@ export default function HomeHeaderCard() {
           />
         )}
 
-        <View style={{marginTop: 20}}>
+        <View style={{marginTop: 10}}>
           <WeatherDisplay
             heatValue={displayWeather?.temperature || 0}
             rainValue={displayWeather?.precipitation || 0}
