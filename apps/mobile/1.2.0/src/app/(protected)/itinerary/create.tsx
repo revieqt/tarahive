@@ -36,6 +36,7 @@ export default function CreateRoomScreen() {
   const primaryColor = useThemeColor({}, "primary");
   const secondaryColor = useThemeColor({}, "secondary");
   const accentColor = useThemeColor({}, "accent");
+  const textColor = useThemeColor({}, "text");
   const [title, setTitle] = useState("");
   const [type] = useState("Solo");
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -175,7 +176,7 @@ export default function CreateRoomScreen() {
                 placeholderTextColor="#999"
                 multiline
                 onFocus={focus}
-                style={[styles.textBlock, { height: blockHeights[block.id] || 30 }]}
+                style={[styles.textBlock, { height: blockHeights[block.id] || 30, color: textColor }]}
                 onContentSizeChange={(event) => updateBlockHeight(block.id, event.nativeEvent.contentSize.height)}
               />
             </Pressable>
@@ -291,25 +292,13 @@ export default function CreateRoomScreen() {
           }
           multiline
           autoFocus={!content.length}
-          style={[styles.textBlock, { height: composerId ? blockHeights[composerId] || 30 : 30 }]}
+          style={[styles.textBlock, { height: composerId ? blockHeights[composerId] || 30 : 30 , color: textColor }]}
           onFocus={startComposer}
           onChangeText={updateComposer}
           onContentSizeChange={(event) => composerId && updateBlockHeight(composerId, event.nativeEvent.contentSize.height)}
           onBlur={finishComposer}
         />
       )}
-      <TView color="primary" style={styles.debugPanel}>
-        <TText style={styles.debugTitle}>content</TText>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          nestedScrollEnabled
-        >
-          <TText style={styles.debugText}>
-            {JSON.stringify(content, null, 2)}
-          </TText>
-        </ScrollView>
-      </TView>
     </View>
   );
 
@@ -322,39 +311,43 @@ export default function CreateRoomScreen() {
         return false;
       }}
     >
-      <LinearGradient
-        style={styles.topButtons}
-        colors={[backgroundColor, "transparent"]}
-        onTouchStart={() => setFocusedId(null)}
-      >
-        <BackButton
-          style={[styles.backButton, { backgroundColor: primaryColor }]}
-        />
-        <TouchableOpacity
-          style={[styles.doneButton, { backgroundColor: accentColor }]}
-          onPress={() => router.back()}
+        <LinearGradient
+            style={styles.topButtons}
+            colors={[backgroundColor, "transparent"]}
+            onTouchStart={() => setFocusedId(null)}
         >
-          <TIcon name="check" size={16} color="#fff" />
-          <TText style={styles.white}>Done</TText>
-        </TouchableOpacity>
-      </LinearGradient>
-      <DraggableFlatList
-        data={visibleContent}
-        keyExtractor={(item) => item.id}
-        renderItem={renderBlock}
-        onDragEnd={({ data }) =>
-          setContent(
-            composerId
-              ? [...data, content.find((block) => block.id === composerId)!]
-              : data,
-          )
-        }
-        ListHeaderComponent={listHeader}
-        ListFooterComponent={listFooter}
-        contentContainerStyle={styles.listContent}
-        keyboardShouldPersistTaps="handled"
-        activationDistance={8}
-      />
+            <BackButton
+            style={[styles.backButton, styles.shadow, { backgroundColor: primaryColor }]}
+            />
+            <TouchableOpacity
+            style={[styles.doneButton, styles.shadow,{ backgroundColor: accentColor }]}
+            onPress={() => router.back()}
+            >
+            <TIcon name="check" size={16} color="#fff" />
+            <TText style={styles.white}>Done</TText>
+            </TouchableOpacity>
+        </LinearGradient>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        
+        <DraggableFlatList
+            data={visibleContent}
+            keyExtractor={(item) => item.id}
+            renderItem={renderBlock}
+            onDragEnd={({ data }) =>
+            setContent(
+                composerId
+                ? [...data, content.find((block) => block.id === composerId)!]
+                : data,
+            )
+            }
+            ListHeaderComponent={listHeader}
+            ListFooterComponent={listFooter}
+            contentContainerStyle={styles.listContent}
+            keyboardShouldPersistTaps="handled"
+            activationDistance={8}
+        />
+      </ScrollView>
+      
       <LinearGradient
         style={styles.bottomButtons}
         colors={["transparent", backgroundColor]}
@@ -395,6 +388,8 @@ const styles = StyleSheet.create({
     zIndex: 10,
     flexDirection: "row",
     padding: "3%",
+    paddingLeft: 16,
+    paddingBottom: 15,
     justifyContent: "space-between",
   },
   backButton: { borderRadius: 20, padding: 3 },
@@ -410,9 +405,10 @@ const styles = StyleSheet.create({
   white: { color: "#fff" },
   header: {
     marginTop: 47,
-    marginHorizontal: "1%",
     borderRadius: 15,
     overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#ccc"
   },
   titleContainer: { padding: 8 },
   titleInput: {
@@ -424,16 +420,14 @@ const styles = StyleSheet.create({
     width: "92%",
   },
   headerButtonContainer: {
-    marginTop: 5,
-    marginHorizontal: 5,
-    marginBottom: 10,
-    height: 44,
+    margin: 5,
+    height: 30,
     gap: 4,
   },
   headerButton: {
     borderWidth: 1,
     borderColor: "#ccc",
-    paddingVertical: 8,
+    paddingVertical: 2,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 8,
@@ -454,8 +448,17 @@ const styles = StyleSheet.create({
     minHeight: 30,
     padding: 0,
     fontFamily: "Inter",
-    fontSize: 14,
-    color: "#222",
+    fontSize: 13,
+  },
+  shadow: {
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+    elevation: 3,
   },
   composer: { flexGrow: 1, minHeight: 220, textAlignVertical: "top" },
   debugPanel: { borderRadius: 10, padding: 12, marginTop: 8 },
@@ -470,5 +473,6 @@ const styles = StyleSheet.create({
     left: 0,
     zIndex: 10,
     padding: "3%",
+    paddingTop: 50
   },
 });

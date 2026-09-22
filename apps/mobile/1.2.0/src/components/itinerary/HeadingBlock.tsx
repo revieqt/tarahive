@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Pressable, StyleSheet, TextInput } from "react-native";
 import { HeaderBlock as HeaderBlockData } from "./types";
+import { useThemeColor } from "@/hooks/shared/useThemeColor";
 
 interface HeadingBlockProps {
   block: HeaderBlockData;
@@ -19,6 +20,7 @@ export default function HeadingBlock({
 }: HeadingBlockProps) {
   const sizes = { header1: 22, header2: 18, header3: 15 };
   const [height, setHeight] = useState(30);
+  const textColor = useThemeColor({}, "text");
   return (
     <Pressable onPress={onPress} onLongPress={onLongPress} delayLongPress={350}>
       <TextInput
@@ -33,7 +35,7 @@ export default function HeadingBlock({
             : "Header 3"
         }
         placeholderTextColor="#999"
-        style={[styles.input, { fontSize: sizes[block.type], height }]}
+        style={[styles.input, { fontSize: sizes[block.type], height, color: textColor }]}
         multiline
         textAlignVertical="top"
         onContentSizeChange={(event) => {
@@ -47,5 +49,5 @@ export default function HeadingBlock({
 }
 
 const styles = StyleSheet.create({
-  input: { padding: 0, fontFamily: "Inter", fontWeight: "800", color: "#222" },
+  input: { padding: 0, fontFamily: "Inter", fontWeight: "800" },
 });

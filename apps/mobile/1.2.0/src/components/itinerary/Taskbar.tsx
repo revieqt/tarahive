@@ -71,7 +71,16 @@ export default function Taskbar({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, borderRadius: 10 },
+  container: { flex: 1, borderRadius: 10 ,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+    elevation: 3,
+  },
   content: { padding: 8, gap: 5 },
   option: {
     padding: 5,

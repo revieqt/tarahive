@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Pressable, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 import { TIcon } from "@/components/ui/Themed";
 import { ChecklistBlock as ChecklistBlockData } from "./types";
+import { useThemeColor } from "@/hooks/shared/useThemeColor";
 
 interface ChecklistBlockProps {
   block: ChecklistBlockData;
@@ -19,6 +20,7 @@ export default function ChecklistBlock({
   onContentSizeChange,
 }: ChecklistBlockProps) {
   const [height, setHeight] = useState(30);
+  const textColor = useThemeColor({}, "text");
   return (
     <Pressable style={styles.row} onPress={onPress} onLongPress={onLongPress} delayLongPress={350}>
       <TouchableOpacity
@@ -35,7 +37,7 @@ export default function ChecklistBlock({
         onChangeText={(value) => onChange({ value })}
         placeholder="Checklist item"
         placeholderTextColor="#999"
-        style={[styles.input, { height }, block.checked && styles.completed]}
+        style={[styles.input, { height, color: textColor }, block.checked && styles.completed]}
         onFocus={onPress}
         multiline
         textAlignVertical="top"
@@ -57,7 +59,6 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     fontFamily: "Inter",
     fontSize: 14,
-    color: "#222",
   },
   completed: { textDecorationLine: "line-through", opacity: 0.55 },
 });
