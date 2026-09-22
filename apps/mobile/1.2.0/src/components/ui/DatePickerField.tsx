@@ -6,10 +6,13 @@ import {
   Animated,
   FlatList,
   Modal,
+  StyleProp,
   StyleSheet,
+  TextStyle,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  ViewStyle,
 } from 'react-native';
 import { TIcon, TText } from './Themed';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -27,6 +30,9 @@ interface DatePickerProps {
   minimumDate?: Date;
   maximumDate?: Date;
   style?: any;
+  custom?: boolean;
+  customButtonStyle?: StyleProp<ViewStyle>;
+  customLabelStyle?: StyleProp<TextStyle>;
 }
 
 const DatePickerField: React.FC<DatePickerProps> = ({
@@ -39,6 +45,9 @@ const DatePickerField: React.FC<DatePickerProps> = ({
   minimumDate,
   maximumDate,
   style,
+  custom = false,
+  customButtonStyle,
+  customLabelStyle,
 }) => {
   const backgroundColor = useThemeColor({}, 'primary');
   const textColor = useThemeColor({}, 'text');
@@ -263,6 +272,74 @@ const DatePickerField: React.FC<DatePickerProps> = ({
     </View>
   );
 
+  // ── Shared spinner modal ─────────────────────────────────────────────────────
+
+  const spinnerModal = (
+    <Modal
+      transparent
+      animationType="fade"
+      visible={showPicker}
+      onRequestClose={handleClose}
+    >
+      <SafeAreaView style={{ flex: 1 }} edges={['bottom']} pointerEvents="box-none">
+        <TouchableWithoutFeedback onPress={handleClose}>
+          <View style={styles.modalOverlay} />
+        </TouchableWithoutFeedback>
+
+        <View style={[styles.modalContainer, { backgroundColor }]}>
+          <View style={styles.pickerContainer}>
+            {/* Month */}
+            <SpinnerColumn
+              data={months}
+              selected={selectedMonth !== null ? allMonths[selectedMonth] : null}
+              onSelect={(m: string) => setSelectedMonth(allMonths.indexOf(m))}
+              listRef={monthRef}
+              offsetRef={monthOffset}
+            />
+            {/* Day */}
+            <SpinnerColumn
+              data={days}
+              selected={selectedDay}
+              onSelect={setSelectedDay}
+              listRef={dayRef}
+              offsetRef={dayOffset}
+            />
+            {/* Year */}
+            <SpinnerColumn
+              data={years}
+              selected={selectedYear}
+              onSelect={setSelectedYear}
+              listRef={yearRef}
+              offsetRef={yearOffset}
+            />
+          </View>
+        </View>
+      </SafeAreaView>
+    </Modal>
+  );
+
+  // ── Custom trigger variant ───────────────────────────────────────────────────
+
+  if (custom) {
+    return (
+      <>
+        <TouchableOpacity
+          style={customButtonStyle}
+          onPress={handleOpen}
+          activeOpacity={0.7}
+        >
+          <TText style={customLabelStyle}>
+            {formattedDisplay || placeholder}
+          </TText>
+        </TouchableOpacity>
+
+        {spinnerModal}
+      </>
+    );
+  }
+
+  // ── Default input variant ────────────────────────────────────────────────────
+
   return (
     <TouchableOpacity
       style={[
@@ -294,47 +371,7 @@ const DatePickerField: React.FC<DatePickerProps> = ({
       </TText>
 
       {/* Spinner Modal */}
-      <Modal
-        transparent
-        animationType="fade"
-        visible={showPicker}
-        onRequestClose={handleClose}
-      >
-        <SafeAreaView style={{ flex: 1 }} edges={['bottom']} pointerEvents="box-none">
-          <TouchableWithoutFeedback onPress={handleClose}>
-            <View style={styles.modalOverlay} />
-          </TouchableWithoutFeedback>
-
-          <View style={[styles.modalContainer, { backgroundColor }]}>
-            <View style={styles.pickerContainer}>
-              {/* Month */}
-              <SpinnerColumn
-                data={months}
-                selected={selectedMonth !== null ? allMonths[selectedMonth] : null}
-                onSelect={(m: string) => setSelectedMonth(allMonths.indexOf(m))}
-                listRef={monthRef}
-                offsetRef={monthOffset}
-              />
-              {/* Day */}
-              <SpinnerColumn
-                data={days}
-                selected={selectedDay}
-                onSelect={setSelectedDay}
-                listRef={dayRef}
-                offsetRef={dayOffset}
-              />
-              {/* Year */}
-              <SpinnerColumn
-                data={years}
-                selected={selectedYear}
-                onSelect={setSelectedYear}
-                listRef={yearRef}
-                offsetRef={yearOffset}
-              />
-            </View>
-          </View>
-        </SafeAreaView>
-      </Modal>
+      {spinnerModal}
     </TouchableOpacity>
   );
 };

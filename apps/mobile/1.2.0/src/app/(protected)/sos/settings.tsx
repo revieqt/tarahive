@@ -1,0 +1,161 @@
+import React, { useEffect, useState } from "react";
+import { StyleSheet } from "react-native";
+import { TView } from "@/components/ui/Themed";
+import { useLanguage } from "@/context/LanguageContext";
+import Header from "@/components/common/Header";
+import TextField from "@/components/ui/TextField";
+import Button from "@/components/ui/Button";
+import ContactNumberField from "@/components/ui/ContactNumberField";
+import Switch from "@/components/ui/Switch";
+import { useSession } from "@/context/SessionContext";
+import { useUpdateSafetySettings } from "@/hooks/sos/useSafetySettings";
+import { router } from "expo-router";
+import DropDownField from "@/components/ui/DropDownField";
+import { LANGUAGES } from "@/constants/Languages";
+
+export default function SOSSettingsScreen() {
+    const { t } = useLanguage();
+    const [message, setMessage] = useState<string>('');
+    const [areaCode, setAreaCode] = useState('+63');
+    const [contactNumber, setContactNumber] = useState('');
+    const [isEmailEnabled, setIsEmailEnabled] = useState(false);
+    const [isSmsEnabled, setIsSmsEnabled] = useState(false);
+    const [preferredLanguage, setPreferredLanguage] = useState<string>('en');
+    const { session } = useSession();
+    const { updateSafetySettings, isPending } = useUpdateSafetySettings();
+
+    const languageOptions = LANGUAGES.map((lang) => ({
+        label: lang.name + " (" + lang.nativeName + ")",
+        value: lang.code,
+    }));
+
+    useEffect(() => {
+        const delivery = session?.user?.safetyState?.delivery;
+        if (delivery) {
+            setIsEmailEnabled(Boolean(delivery.isEmailEnabled));
+            setIsSmsEnabled(Boolean(delivery.isSMSEnabled));
+            if (delivery.alertLang) {
+                setPreferredLanguage(delivery.alertLang);
+            }
+        }
+
+        const emergencyContact = session?.user?.safetyState?.emergencyContact;
+        if (emergencyContact?.email) {
+            setMessage(emergencyContact.email);
+        }
+        if (emergencyContact?.phone) {
+            setContactNumber(emergencyContact.phone);
+        }
+    }, [session?.user?.safetyState?.delivery?.isEmailEnabled, session?.user?.safetyState?.delivery?.isSMSEnabled, session?.user?.safetyState?.delivery?.alertLang, session?.user?.safetyState?.emergencyContact?.email, session?.user?.safetyState?.emergencyContact?.phone]);
+
+    const handleEnableSMS = () => {
+        if (session?.user?.isProUser) {
+            setIsSmsEnabled(!isSmsEnabled);
+        }else{
+            router.push('/pro');
+        }
+    }
+
+
+    const handleSaveSettings = () => {
+        const nextEmail = message.trim() || session?.user?.safetyState?.emergencyContact?.email;
+        const nextPhone = contactNumber.trim()
+            ? `${areaCode}${contactNumber}`
+            : session?.user?.safetyState?.emergencyContact?.phone;
+        const nextAlertLang = preferredLanguage || session?.user?.safetyState?.delivery?.alertLang || 'en';
+
+        updateSafetySettings({
+            delivery: {
+                isEmailEnabled,
+                isSMSEnabled: isSmsEnabled,
+                alertLang: nextAlertLang,
+            },
+            emergencyContact: {
+                email: nextEmail,
+                phone: nextPhone,
+            },
+        });
+    };
+
+    return (
+        <TView style={styles.container}>
+            <Header title={t("sos.settings.title")} subtitle={t("sos.settings.subtitle")} />
+
+            <TView style={styles.emergencyAlertContainer} color="primary" shadow>
+                <Switch
+                    value={isEmailEnabled}
+                    onValueChange={() => setIsEmailEnabled(!isEmailEnabled)}
+                    label={isEmailEnabled ? t("sos.settings.email_label_enabled") : t("sos.settings.email_label_disabled")}
+                    description={t("sos.settings.email_description")}
+                />
+
+                {isEmailEnabled && (
+                    <TextField
+                        placeholder={t("sos.settings.email_placeholder")}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        value={message}
+                        onChangeText={setMessage}
+                        style={{ marginBottom: 0 }}
+                    />
+                )}
+
+            </TView>
+
+            <TView style={styles.emergencyAlertContainer} color="primary" shadow>
+                <Switch
+                    value={isSmsEnabled}
+                    onValueChange={handleEnableSMS}
+                    label={isSmsEnabled ? t("sos.settings.sms_label_enabled") : t("sos.settings.sms_label_disabled")}
+                    description={t("sos.settings.sms_description")}
+                />
+
+                {isSmsEnabled && (
+                    <ContactNumberField
+                        areaCode={areaCode}
+                        onAreaCodeChange={setAreaCode}
+                        number={contactNumber}
+                        onNumberChange={setContactNumber}
+                        placeholder={t("sos.settings.sms_placeholder")}
+                        style={{ marginBottom: 0 }}
+                    />
+                )}
+            </TView>
+
+            <DropDownField
+                placeholder={t("sos.settings.language")}
+                value={preferredLanguage} // should hold the code, e.g. "en"
+                onValueChange={setPreferredLanguage}
+                values={languageOptions}
+            />
+
+            <Button
+                title={isPending ? "Saving..." : t("sos.settings.save_button")}
+                onPress={handleSaveSettings}
+                disabled={isPending}
+                type="primary"
+                buttonStyle={styles.saveButton}
+            />
+        </TView>
+    );
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        padding: '3%',
+    },
+    saveButton: {
+        position: 'absolute',
+        bottom: 20,
+        left: '3%',
+        right: '3%',
+    },
+    emergencyAlertContainer: {
+        marginBottom: 8,
+        padding: 10,
+        borderRadius: 12,
+        paddingHorizontal: 15,
+        gap: 10,
+    },
+});

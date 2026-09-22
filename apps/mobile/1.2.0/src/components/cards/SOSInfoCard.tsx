@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity, View, Platform, Linking, Alert } from 're
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
 import { TIcon, TText, TView } from '../ui/Themed';
 import { useLanguage } from '@/context/LanguageContext';
-import { EMERGENCY_TYPES } from '@/features/sos/types/emergencyTypes';
+import { EMERGENCY_TYPES } from '@/types/sosTypes';
 import { User } from '@/context/SessionContext';
 import OSMMapView from '../ui/OSMMapView';
 import { LinearGradient } from 'expo-linear-gradient';
