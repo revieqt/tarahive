@@ -20,7 +20,7 @@ export default function FocusBar({
       </TouchableOpacity>
       <TouchableOpacity style={[styles.option, {backgroundColor: '#EE4B2B'}]} onPress={onDelete}>
         <TIcon name="trash-can" size={20} color='white'/>
-        <TText style={{color: 'white'}}>Delete Block</TText>
+        <TText style={{color: 'white'}}>Delete</TText>
       </TouchableOpacity>
     </View>
   );

@@ -163,11 +163,11 @@ export default function CreateRoomScreen() {
     return (
       <View style={[styles.blockRow, block.type === "divider" && styles.dividerRow, isActive && styles.activeBlock]}>
         <View
-          style={focusedId === block.id ? styles.dragHandle : styles.hiddenDragHandle}
+          style={focusedId === block.id ? [styles.dragHandle, {backgroundColor: themeColor + '30'}] : styles.hiddenDragHandle}
           pointerEvents={focusedId === block.id ? "auto" : "none"}
         >
           <TouchableOpacity onPressIn={beginDrag} accessibilityLabel="Reorder block">
-            <TIcon name="drag-vertical-variant" size={22} />
+            <TIcon name="drag-vertical-variant" size={18} color='#fff8'/>
           </TouchableOpacity>
         </View>
         <View style={styles.block}>
@@ -393,7 +393,15 @@ const styles = StyleSheet.create({
   listContent: { paddingBottom: 140, paddingHorizontal: "3%" },
   blockRow: { flexDirection: "row-reverse", alignItems: "stretch", marginBottom: 16 },
   block: { flex: 1 },
-  dragHandle: { width: 30, alignSelf: "stretch", alignItems: "center", justifyContent: "center", marginLeft: 4, borderLeftWidth: 1, borderLeftColor: "#9996" },
+  dragHandle: { 
+    width: 10, 
+    alignSelf: "stretch", 
+    alignItems: "center", 
+    justifyContent: "center", 
+    marginLeft: 4, 
+    borderTopRightRadius: 5,
+    borderBottomRightRadius: 5,
+  },
   hiddenDragHandle: { width: 0, opacity: 0, overflow: "hidden" },
   activeBlock: { opacity: 0.75 },
   footer: { gap: 16, flexGrow: 1, minHeight: 220 },

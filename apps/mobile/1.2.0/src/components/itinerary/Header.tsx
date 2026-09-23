@@ -171,11 +171,12 @@ export default function ItineraryHeader({
 
 const styles = StyleSheet.create({
   header: {
-    marginTop: 47,
+    marginTop: 50,
     borderRadius: 15,
     overflow: "hidden",
     borderWidth: 1,
     borderColor: "#ccc4",
+    marginBottom: 12
   },
   titleContainer: {
     padding: 8,
