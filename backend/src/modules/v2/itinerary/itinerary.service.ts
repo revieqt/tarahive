@@ -1,12 +1,13 @@
 import { AppDataSource } from '../../../config/postgres';
 import { Itinerary } from './itinerary.entity';
+import { ItineraryCollaborator } from './itinerary-collaborator.entity';
 import {
   CreateItineraryRequest,
+  CollaboratorPermissions,
+  CollaboratorStatus,
   ItineraryStatus,
   ItineraryPrivacy,
 } from './itinerary.types';
-
-const itineraryRepository = AppDataSource.getRepository(Itinerary);
 
 export const createItineraryService = async (
   userId: string,
@@ -20,18 +21,29 @@ export const createItineraryService = async (
       itineraryData
     );
 
-    const itinerary = itineraryRepository.create({
-      user: userId as any,
-      title: itineraryData.title,
-      type: itineraryData.type,
-      startDate: itineraryData.startDate,
-      endDate: itineraryData.endDate,
-      content: itineraryData.content,
-      privacy: itineraryData.privacy
-    });
+    const savedItinerary = await AppDataSource.transaction(async (manager) => {
+      const itinerary = manager.create(Itinerary, {
+        user: { id: userId } as any,
+        title: itineraryData.title,
+        type: itineraryData.type,
+        startDate: itineraryData.startDate,
+        endDate: itineraryData.endDate,
+        content: itineraryData.content,
+        privacy: itineraryData.privacy,
+        themeColor: itineraryData.themeColor,
+      });
 
-    const savedItinerary =
-      await itineraryRepository.save(itinerary);
+      const savedItinerary = await manager.save(Itinerary, itinerary);
+      const collaborator = manager.create(ItineraryCollaborator, {
+        itinerary: savedItinerary,
+        user: { id: userId } as any,
+        permission: CollaboratorPermissions.EDIT,
+        status: CollaboratorStatus.ACCEPTED,
+      });
+      await manager.save(ItineraryCollaborator, collaborator);
+
+      return savedItinerary;
+    });
 
     console.log(
       '✅ Itinerary created successfully:',
@@ -60,7 +72,7 @@ export const getItineraryService = async (
       userId
     );
 
-    const itinerary = await itineraryRepository
+    const itinerary = await AppDataSource.getRepository(Itinerary)
       .createQueryBuilder('itinerary')
       .leftJoin('itinerary.user', 'user')
       .addSelect(['user.id', 'user.username', 'user.isProUser'])
@@ -116,7 +128,7 @@ export const getAllUserItinerariesService = async (
       filters
     );
 
-    const query = itineraryRepository
+    const query = AppDataSource.getRepository(Itinerary)
       .createQueryBuilder('itinerary')
       .select([
         'itinerary.id',
@@ -179,7 +191,7 @@ export const deleteItineraryService = async (itineraryID: string): Promise<void>
   try {
     console.log('🟡 deleteItineraryService - Deleting itinerary:', itineraryID);
 
-    const deletedItinerary = await itineraryRepository.delete(itineraryID);
+    const deletedItinerary = await AppDataSource.getRepository(Itinerary).delete(itineraryID);
 
     if (!deletedItinerary.affected) {
       console.log('❌ Itinerary not found:', itineraryID);

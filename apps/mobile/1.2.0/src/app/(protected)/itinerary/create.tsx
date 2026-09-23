@@ -30,10 +30,12 @@ import {
   TextBlock,
 } from "@/components/itinerary/types";
 import { useThemeColor } from "@/hooks/shared/useThemeColor";
+import { useCreateItinerary } from "@/hooks/itinerary/useCreateItinerary";
 
 const newId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
 export default function CreateRoomScreen() {
+  const { create, isPending } = useCreateItinerary();
   const backgroundColor = useThemeColor({}, "background");
   const primaryColor = useThemeColor({}, "primary");
   const secondaryColor = useThemeColor({}, "secondary");
@@ -50,6 +52,10 @@ export default function CreateRoomScreen() {
   const [locationVisible, setLocationVisible] = useState(false);
   const [composerId, setComposerId] = useState<string | null>(null);
   const [blockHeights, setBlockHeights] = useState<Record<string, number>>({});
+
+  const handleCreate = () => {
+    create({ title, startDate, endDate, type, themeColor, content });
+  };
 
   const updateBlock = (id: string, changes: Partial<ItineraryBlock>) => {
     setContent((current) =>
@@ -293,7 +299,8 @@ export default function CreateRoomScreen() {
             />
             <TouchableOpacity
             style={[styles.doneButton, styles.shadow,{ backgroundColor: themeColor }]}
-            onPress={() => router.back()}
+            onPress={handleCreate}
+            disabled={isPending}
             >
             <TIcon name="check" size={16} color="#fff" />
             <TText style={styles.white}>Done</TText>

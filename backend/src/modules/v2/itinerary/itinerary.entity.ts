@@ -65,6 +65,12 @@ export class Itinerary {
   privacy!: ItineraryPrivacy;
 
   @Column({
+    type: 'varchar',
+    default: '#FF6B6B',
+  })
+  themeColor!: string;
+
+  @Column({
     type: 'enum',
     enum: CollaboratorPermissions,
     default: CollaboratorPermissions.VIEW,

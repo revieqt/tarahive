@@ -1,14 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createItinerary } from '@/services/itineraryService';
 import { showError, showSuccess } from '@/services/toast.service';
-import { CreateItineraryRequest, Itinerary } from '@/types/itineraryTypes';
+import { CreateItineraryForm, CreateItineraryRequest, CreateItineraryResponse } from '@/types/itineraryTypes';
 import { router } from 'expo-router';
 
 export const useCreateItinerary = () => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (data: CreateItineraryRequest) => {
+    mutationFn: async (data: CreateItineraryForm) => {
       // Validation
       if (!data.title?.trim()) {
         throw new Error('Title is required');
@@ -30,14 +30,24 @@ export const useCreateItinerary = () => {
         throw new Error('Start date must be before end date');
       }
 
-      return await createItinerary(data);
+      if (!data.themeColor?.trim()) {
+        throw new Error('Theme color is required');
+      }
+
+      const request: CreateItineraryRequest = {
+        ...data,
+        startDate: data.startDate,
+        endDate: data.endDate,
+      };
+
+      return await createItinerary(request);
     },
 
-    onSuccess: (data: Itinerary) => {
-      showSuccess('Success', `Itinerary "${data.title}" created successfully`);
+    onSuccess: (data: CreateItineraryResponse) => {
+      showSuccess('Success', data.message);
       // Invalidate all user itineraries queries (all status filters)
       queryClient.invalidateQueries({ queryKey: ['user-itineraries'] });
-      router.replace(`/itinerary/${data.id}`);
+      router.replace(`/itinerary/${data.itineraryID}`);
     },
 
     onError: (error: any) => {

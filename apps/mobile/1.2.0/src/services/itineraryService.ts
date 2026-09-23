@@ -2,6 +2,7 @@ import { api } from '@/api/client';
 import {
   Itinerary,
   CreateItineraryRequest,
+  CreateItineraryResponse,
   ItineraryResponse,
   AllItinerariesResponse,
 } from '../types/itineraryTypes';
@@ -53,18 +54,18 @@ export const getItineraryById = async (id: string): Promise<Itinerary | null> =>
  */
 export const createItinerary = async (
   data: CreateItineraryRequest
-): Promise<Itinerary> => {
+): Promise<CreateItineraryResponse> => {
   const payload = {
     title: data.title,
     type: data.type,
     startDate: data.startDate.toISOString(),
     endDate: data.endDate.toISOString(),
     content: data.content,
-    privacy: data.privacy,
+    themeColor: data.themeColor,
+    privacy: data.privacy ?? 'private',
   };
 
-  const response = await api.post<ItineraryResponse>(`${API_URL}/create`, payload);
-  return response.data;
+  return api.post<CreateItineraryResponse>(`${API_URL}/create`, payload);
 };
 
 /**

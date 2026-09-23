@@ -30,13 +30,29 @@ export interface CreateItineraryRequest {
   startDate: Date;
   endDate: Date;
   content?: unknown;
-  privacy: 'private' | 'collaborators' | 'public';
+  themeColor: string;
+  privacy?: 'private' | 'collaborators' | 'public';
+}
+
+export interface CreateItineraryForm {
+  title: string;
+  type: string;
+  startDate: Date | null;
+  endDate: Date | null;
+  themeColor: string;
+  content?: unknown;
 }
 
 export interface ItineraryResponse {
   success: boolean;
   message: string;
   data: Itinerary;
+}
+
+export interface CreateItineraryResponse {
+  success: boolean;
+  message: string;
+  itineraryID: string;
 }
 
 export interface AllItinerariesResponse {

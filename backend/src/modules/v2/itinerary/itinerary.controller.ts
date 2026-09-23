@@ -22,7 +22,7 @@ interface AuthRequest extends Request {
 export const createItinerary = async (req: AuthRequest, res: Response) => {
   try {
     console.log('🟡 createItinerary - req.user:', req.user);
-    const { title, type, content, startDate, endDate, privacy } = req.body;
+    const { title, type, content, startDate, endDate, privacy, themeColor } = req.body;
 
     // Get userID from authenticated token 'sub' payload
     const userID = req.user?.sub;
@@ -31,10 +31,10 @@ export const createItinerary = async (req: AuthRequest, res: Response) => {
     }
 
     // Validate required fields
-    if (!title || !type || !startDate || !endDate || !privacy ) {
+    if (!title || !type || !startDate || !endDate || !privacy || !themeColor) {
       return res.status(400).json({
         success: false,
-        message: 'Missing required fields: title, type, startDate, endDate, privacy',
+        message: 'Missing required fields: title, type, startDate, endDate, privacy, themeColor',
       });
     }
 
@@ -44,7 +44,8 @@ export const createItinerary = async (req: AuthRequest, res: Response) => {
       startDate: new Date(startDate),
       endDate: new Date(endDate),
       content,
-      privacy: privacy
+      privacy,
+      themeColor,
     };
 
     const newItinerary = await createItineraryService(userID, itineraryData);
@@ -52,7 +53,7 @@ export const createItinerary = async (req: AuthRequest, res: Response) => {
     res.status(201).json({
       success: true,
       message: 'Itinerary created successfully',
-      data: newItinerary,
+      itineraryID: newItinerary.id,
     });
   } catch (error) {
     console.error('❌ Error creating itinerary:', error);

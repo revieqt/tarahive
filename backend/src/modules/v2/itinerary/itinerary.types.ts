@@ -27,6 +27,7 @@ export interface CreateItineraryRequest {
   endDate: Date;
   content: unknown;
   privacy: ItineraryPrivacy;
+  themeColor: string;
 }
 
 // export interface UpdateItineraryRequest {

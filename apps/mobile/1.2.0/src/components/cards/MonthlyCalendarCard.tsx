@@ -217,8 +217,6 @@ const styles = StyleSheet.create({
     width: 35,
     borderRadius: 50,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ccc5'
   },
   weekdayRow: {
     flexDirection: 'row',
