@@ -57,3 +57,18 @@ export const getStatusColor = (status: string): string => {
       return '#000000';
   }
 };
+
+export const THEME_COLORS = [
+  { label: 'Rose Pink (Default)', value: '#FF6B6B' },
+  { label: 'Coral Red', value: '#E76F51' },
+  { label: 'Sunset Orange', value: '#F2994A' },
+  { label: 'Sunny Yellow', value: '#F4C95D' },
+  { label: 'Lime Green', value: '#7CB342' },
+  { label: 'Forest Green', value: '#4CAF7D' },
+  { label: 'Tropical Teal', value: '#5BB8C9' },
+  { label: 'Ocean Blue', value: '#4A90E2' },
+  { label: 'Lavender', value: '#8E7CC3' },
+  { label: 'Twilight Purple', value: '#6C63A8' },
+  { label: 'Slate Gray', value: '#78909C' },
+  { label: 'Earth Brown', value: '#A67C52' },
+];

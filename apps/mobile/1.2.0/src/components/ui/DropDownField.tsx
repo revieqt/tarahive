@@ -8,6 +8,9 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  StyleProp,
+  ViewStyle,
+  TextStyle
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
@@ -22,6 +25,12 @@ interface DropDownFieldProps {
   values?: Array<string | { label: string; value: string }>;
   style?: any;
   enabled?: boolean;
+  custom?: boolean;
+  customButtonStyle?: StyleProp<ViewStyle>;
+  customLabelStyle?: StyleProp<TextStyle>;
+  customIconName?: string;
+  customIconSize?: number;
+  customIconColor?: string;
 }
 
 const DropDownField: React.FC<DropDownFieldProps> = ({
@@ -31,6 +40,12 @@ const DropDownField: React.FC<DropDownFieldProps> = ({
   values = [],
   style,
   enabled = true,
+  custom = false,
+  customButtonStyle,
+  customLabelStyle,
+  customIconName,
+  customIconSize = 15,
+  customIconColor,
 }) => {
   const backgroundColor = useThemeColor({}, 'primary');
   const textColor = useThemeColor({}, 'text');
@@ -118,6 +133,117 @@ const DropDownField: React.FC<DropDownFieldProps> = ({
   const displayLabel =
     options.find((o) => o.value === value)?.label ?? '';
 
+  const spinnerModal = (
+    <Modal
+      visible={modalVisible}
+      transparent
+      animationType="fade"
+      onRequestClose={closeModal}
+    >
+      <SafeAreaView style={{ flex: 1 }} edges={['bottom']} pointerEvents="box-none">
+        <TouchableWithoutFeedback onPress={closeModal}>
+          <View style={styles.modalOverlay} />
+        </TouchableWithoutFeedback>
+
+        <View style={[styles.modalContainer, { backgroundColor }]}>
+          {/* Up arrow */}
+          <TouchableOpacity
+            style={styles.arrowButton}
+            onPress={() => scrollBy('up')}
+            activeOpacity={0.7}
+          >
+            <TIcon name="chevron-up" size={20} color={textColor} />
+          </TouchableOpacity>
+
+          {/* Top gradient */}
+          <LinearGradient
+            colors={[backgroundColor, 'transparent']}
+            style={[styles.gradient, { top: 36 }]}
+            pointerEvents="none"
+          />
+
+          {/* Scrollable Options */}
+          <FlatList
+            ref={flatRef}
+            data={options}
+            keyExtractor={(item) => item.value}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingVertical: 20 }}
+            getItemLayout={(_, index) => ({
+              length: itemHeight,
+              offset: itemHeight * index,
+              index,
+            })}
+            onScroll={(e) => {
+              scrollOffsetRef.current = e.nativeEvent.contentOffset.y;
+            }}
+            scrollEventThrottle={16}
+            renderItem={({ item }) => {
+              const isSelected = item.value === value;
+              return (
+                <Pressable
+                  onPress={() => handleSelect(item.value)}
+                  style={({ pressed }) => [
+                    styles.optionItem,
+                    pressed && { opacity: 0.7 },
+                  ]}
+                >
+                  <TText
+                    style={[
+                      styles.optionText,
+                      isSelected && styles.optionTextSelected,
+                      { color: textColor },
+                    ]}
+                  >
+                    {t(item.label)}
+                  </TText>
+                </Pressable>
+              );
+            }}
+          />
+
+          {/* Bottom gradient */}
+          <LinearGradient
+            colors={['transparent', backgroundColor]}
+            style={[styles.gradient, { bottom: 36 }]}
+            pointerEvents="none"
+          />
+
+          {/* Down arrow */}
+          <TouchableOpacity
+            style={styles.arrowButton}
+            onPress={() => scrollBy('down')}
+            activeOpacity={0.7}
+          >
+            <TIcon name="chevron-down" size={20} color={textColor} />
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </Modal>
+  );
+
+  if (custom) {
+    return (
+      <>
+        <TouchableOpacity
+          style={customButtonStyle}
+          onPress={openModal}
+          activeOpacity={0.7}
+        >
+          { customIconName && 
+            <TIcon name={customIconName} size={customIconSize ? customIconSize : 15}/> 
+          }
+          
+          <TText style={customLabelStyle}>
+            {value}
+          </TText>
+        </TouchableOpacity>
+
+        {spinnerModal}
+      </>
+    );
+  }
+
   return (
     <>
       {/* Field Button */}
@@ -168,93 +294,7 @@ const DropDownField: React.FC<DropDownFieldProps> = ({
         </View>
       </TouchableWithoutFeedback>
 
-      {/* Modal for List */}
-      <Modal
-        visible={modalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={closeModal}
-      >
-        <SafeAreaView style={{ flex: 1 }} edges={['bottom']} pointerEvents="box-none">
-          <TouchableWithoutFeedback onPress={closeModal}>
-            <View style={styles.modalOverlay} />
-          </TouchableWithoutFeedback>
-
-          <View style={[styles.modalContainer, { backgroundColor }]}>
-            {/* Up arrow */}
-            <TouchableOpacity
-              style={styles.arrowButton}
-              onPress={() => scrollBy('up')}
-              activeOpacity={0.7}
-            >
-              <TIcon name="chevron-up" size={20} color={textColor} />
-            </TouchableOpacity>
-
-            {/* Top gradient */}
-            <LinearGradient
-              colors={[backgroundColor, 'transparent']}
-              style={[styles.gradient, { top: 36 }]}
-              pointerEvents="none"
-            />
-
-            {/* Scrollable Options */}
-            <FlatList
-              ref={flatRef}
-              data={options}
-              keyExtractor={(item) => item.value}
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={{ paddingVertical: 20 }}
-              getItemLayout={(_, index) => ({
-                length: itemHeight,
-                offset: itemHeight * index,
-                index,
-              })}
-              onScroll={(e) => {
-                scrollOffsetRef.current = e.nativeEvent.contentOffset.y;
-              }}
-              scrollEventThrottle={16}
-              renderItem={({ item }) => {
-                const isSelected = item.value === value;
-                return (
-                  <Pressable
-                    onPress={() => handleSelect(item.value)}
-                    style={({ pressed }) => [
-                      styles.optionItem,
-                      pressed && { opacity: 0.7 },
-                    ]}
-                  >
-                    <TText
-                      style={[
-                        styles.optionText,
-                        isSelected && styles.optionTextSelected,
-                        { color: textColor },
-                      ]}
-                    >
-                      {t(item.label)}
-                    </TText>
-                  </Pressable>
-                );
-              }}
-            />
-
-            {/* Bottom gradient */}
-            <LinearGradient
-              colors={['transparent', backgroundColor]}
-              style={[styles.gradient, { bottom: 36 }]}
-              pointerEvents="none"
-            />
-
-            {/* Down arrow */}
-            <TouchableOpacity
-              style={styles.arrowButton}
-              onPress={() => scrollBy('down')}
-              activeOpacity={0.7}
-            >
-              <TIcon name="chevron-down" size={20} color={textColor} />
-            </TouchableOpacity>
-          </View>
-        </SafeAreaView>
-      </Modal>
+      {spinnerModal}
     </>
   );
 };

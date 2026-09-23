@@ -1,22 +1,18 @@
-import { router, Stack } from 'expo-router';
-import { KeyboardAvoidingView, StyleSheet, ScrollView, TouchableOpacity, View, TextInput } from 'react-native';
-import React, { useState, useRef, useCallback, useEffect } from "react";
-import { TIcon, TText, TView } from '@/components/ui/Themed';
-import HiveBg from '@/components/common/HiveBg';
-import Button from '@/components/ui/Button';
-import EmptyMessage from '@/components/common/EmptyMessage';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { KeyboardAvoidingView, StyleSheet, ScrollView, TouchableOpacity, View } from 'react-native';
+import React, { useState } from "react";
+import { TIcon, TText } from '@/components/ui/Themed';
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
 import { LinearGradient } from 'expo-linear-gradient';
 import BackButton from '@/components/common/BackButton';
-import DatePickerField from '@/components/ui/DatePickerField';
-import OptionsPopup from "@/components/ui/OptionsPopup";
+import ItineraryHeader from '@/components/itinerary/Header';
 
 export default function CreateRoomScreen() {
+  const { id } = useLocalSearchParams<{ id?: string }>();
   const backgroundColor = useThemeColor({}, 'background');
   const primaryColor = useThemeColor({}, 'primary');
   const secondaryColor = useThemeColor({}, 'secondary');
   const accentColor = useThemeColor({}, 'accent');
-  const textColor = useThemeColor({}, 'text');
   const [title, setTitle] = useState("");
   const [type, setType] = useState("Solo");
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -50,69 +46,18 @@ export default function CreateRoomScreen() {
         style={{flexGrow: 1}}
         contentContainerStyle={{paddingBottom: 1000}}
       >
-        <TView style={[styles.header, styles.shadow]}>
-          <LinearGradient
-            colors={[secondaryColor, secondaryColor ]}
-            style={{padding: 8}}
-          >
-            <TextInput
-              placeholder="Title"
-              value={title}
-              onChangeText={setTitle}
-              style={[styles.titleInput, { color: title ? '#fff' : '#fff7' }]}
-            />
-
-            <TText style={{opacity: .7, color: 'white', fontSize: 10}}>Created by revie.dev · Private </TText>
-
-            <OptionsPopup
-              options={[
-                { label: 'Sharing and Privacy', iconName: 'share-variant', onPress: () => router.push({ pathname: '/share', params: { path: `itinerary/` } }) },
-                { label: 'Create Room with Itinerary', iconName: 'tooltip-account', onPress: () => router.push({ pathname: '/share', params: { path: `itinerary/` } }) },
-                { label: 'Mark Itinerary as Complete', iconName: 'check-circle', onPress: () => router.push({ pathname: '/share', params: { path: `itinerary/` } }) },
-                { label: 'Cancel Itinerary', iconName: 'close-circle', onPress: () => router.push({ pathname: '/share', params: { path: `itinerary/` } }) },
-                { label: 'Delete Itinerary', iconName: 'trash-can', onPress: () => router.push({ pathname: '/share', params: { path: `itinerary/` } }) },
-              ]}
-              style={styles.optionsButton}
-            >
-              <TIcon name="dots-vertical" size={20} color="white"/>
-            </OptionsPopup>
-
-          </LinearGradient>
-
-          <ScrollView 
-            contentContainerStyle={styles.headerButtonContainer}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-          >
-            
-
-            <View style={styles.headerButton}>
-              <DatePickerField
-                placeholder="Start Date"
-                value={startDate}
-                onChange={setStartDate}
-                minimumDate={new Date()}
-                maximumDate={endDate || undefined}
-                custom
-                customLabelStyle={[styles.headerButtonText, {textDecorationLine: 'underline'}]}
-              />
-
-              <TIcon name='chevron-right' size={15}/>
-              <DatePickerField
-                placeholder="End Date"
-                value={endDate}
-                onChange={setEndDate}
-                minimumDate={startDate || new Date()}
-                custom
-                customLabelStyle={[styles.headerButtonText, {textDecorationLine: 'underline'}]}
-              />
-            </View>
-            <TouchableOpacity style={styles.headerButton}>
-              <TIcon name='pen' size={12}/>
-              <TText style={styles.headerButtonText}>{type}</TText>
-            </TouchableOpacity>
-          </ScrollView>
-        </TView>
+        <ItineraryHeader
+          itineraryId={typeof id === 'string' ? id : undefined}
+          title={title}
+          onTitleChange={setTitle}
+          type={type}
+          onTypeChange={setType}
+          startDate={startDate}
+          onStartDateChange={setStartDate}
+          endDate={endDate}
+          onEndDateChange={setEndDate}
+          showOptionsMenu
+        />
         
         
 
@@ -187,47 +132,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.22,
     shadowRadius: 2.22,
     elevation: 3,
-  },
-  header:{
-    marginTop: 47,
-    marginHorizontal: '1%',
-    borderRadius: 15,
-    overflow: 'hidden'
-  },
-  titleInput: {
-    fontFamily: 'Inter',
-    fontSize: 20,
-    fontWeight: 'bold',
-    borderColor: 'transparent',
-    height: 30,
-    width: '92%',
-    marginRight: 40
-  },
-  headerButtonContainer:{
-    marginTop: 5,
-    marginHorizontal: 5,
-    marginBottom: 10,
-    height: 20,
-    gap: 4
-  },
-  headerButton:{
-    borderWidth: 1,
-    borderColor: '#ccc',
-    paddingVertical: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    flexDirection: 'row',
-    borderRadius: 40,
-    gap: 4,
-  },
-  headerButtonText:{
-    fontSize: 12,
-    opacity: .7
-  },
-  optionsButton:{
-    position: 'absolute',
-    right: 0,
-    top: -31
   },
 });

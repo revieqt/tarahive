@@ -20,8 +20,10 @@ import LocationPickerModal, {
 import HeadingBlock from "@/components/itinerary/HeadingBlock";
 import LocationBlock from "@/components/itinerary/LocationBlock";
 import ChecklistBlock from "@/components/itinerary/ChecklistBlock";
-import Taskbar from "@/components/itinerary/Taskbar";
+import Toolbar from "@/components/itinerary/Toolbar";
 import FocusBar from "@/components/itinerary/FocusBar";
+import ColorBar from "@/components/itinerary/ColorBar";
+import ItineraryHeader from "@/components/itinerary/Header";
 import {
   HeaderType,
   ItineraryBlock,
@@ -38,9 +40,11 @@ export default function CreateRoomScreen() {
   const accentColor = useThemeColor({}, "accent");
   const textColor = useThemeColor({}, "text");
   const [title, setTitle] = useState("");
-  const [type] = useState("Solo");
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
+  const [type, setType] = useState("Solo");
+  const [themeColor, setThemeColor] = useState(accentColor);
+  const [colorBarVisible, setColorBarVisible] = useState(false);
   const [content, setContent] = useState<ItineraryBlock[]>([]);
   const [focusedId, setFocusedId] = useState<string | null>(null);
   const [locationVisible, setLocationVisible] = useState(false);
@@ -232,50 +236,18 @@ export default function CreateRoomScreen() {
     : content;
 
   const listHeader = (
-    <TView style={styles.header} onTouchStart={() => setFocusedId(null)}>
-      <LinearGradient
-        colors={[secondaryColor, secondaryColor]}
-        style={styles.titleContainer}
-      >
-        <TextInput
-          placeholder="Title"
-          value={title}
-          onChangeText={setTitle}
-          style={styles.titleInput}
-          placeholderTextColor="#fff7"
-        />
-      </LinearGradient>
-      <ScrollView
-        contentContainerStyle={styles.headerButtonContainer}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-      >
-        <View style={styles.headerButton}>
-          <DatePickerField
-            placeholder="Start Date"
-            value={startDate}
-            onChange={setStartDate}
-            minimumDate={new Date()}
-            maximumDate={endDate || undefined}
-            custom
-            customLabelStyle={[styles.headerButtonText, styles.underline]}
-          />
-          <TIcon name="chevron-right" size={15} />
-          <DatePickerField
-            placeholder="End Date"
-            value={endDate}
-            onChange={setEndDate}
-            minimumDate={startDate || new Date()}
-            custom
-            customLabelStyle={[styles.headerButtonText, styles.underline]}
-          />
-        </View>
-        <TouchableOpacity style={styles.headerButton}>
-          <TIcon name="pen" size={12} />
-          <TText style={styles.headerButtonText}>{type}</TText>
-        </TouchableOpacity>
-      </ScrollView>
-    </TView>
+    <ItineraryHeader
+      title={title}
+      onTitleChange={setTitle}
+      type={type}
+      onTypeChange={setType}
+      startDate={startDate}
+      onStartDateChange={setStartDate}
+      endDate={endDate}
+      onEndDateChange={setEndDate}
+      themeColor={themeColor}
+      onThemeColorPress={() => setColorBarVisible(true)}
+    />
   );
 
   const listFooter = (
@@ -320,7 +292,7 @@ export default function CreateRoomScreen() {
             style={[styles.backButton, styles.shadow, { backgroundColor: primaryColor }]}
             />
             <TouchableOpacity
-            style={[styles.doneButton, styles.shadow,{ backgroundColor: accentColor }]}
+            style={[styles.doneButton, styles.shadow,{ backgroundColor: themeColor }]}
             onPress={() => router.back()}
             >
             <TIcon name="check" size={16} color="#fff" />
@@ -347,19 +319,34 @@ export default function CreateRoomScreen() {
             activationDistance={8}
         />
       </ScrollView>
+
+      {colorBarVisible && (
+        <Pressable
+          style={styles.colorBarDismissArea}
+          onPress={() => setColorBarVisible(false)}
+        />
+      )}
       
       <LinearGradient
-        style={styles.bottomButtons}
+        style={[styles.bottomButtons, colorBarVisible && styles.colorBarLayer]}
         colors={["transparent", backgroundColor]}
       >
-        {focusedId ? (
+        {colorBarVisible ? (
+          <ColorBar
+            primaryColor={primaryColor}
+            selectedColor={themeColor}
+            onSelect={(color) => {
+              setThemeColor(color);
+            }}
+          />
+        ) : focusedId ? (
           <FocusBar
             primaryColor={primaryColor}
             onDone={() => setFocusedId(null)}
             onDelete={deleteFocused}
           />
         ) : (
-          <Taskbar
+          <Toolbar
             primaryColor={primaryColor}
             onText={() => addText()}
             onHeading={addHeading}
@@ -403,44 +390,10 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   white: { color: "#fff" },
-  header: {
-    marginTop: 47,
-    borderRadius: 15,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "#ccc"
-  },
-  titleContainer: { padding: 8 },
-  titleInput: {
-    fontFamily: "Inter",
-    fontSize: 20,
-    fontWeight: "bold",
-    height: 30,
-    color: "#fff",
-    width: "92%",
-  },
-  headerButtonContainer: {
-    margin: 5,
-    height: 30,
-    gap: 4,
-  },
-  headerButton: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    paddingVertical: 2,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 8,
-    flexDirection: "row",
-    borderRadius: 40,
-    gap: 4,
-  },
-  headerButtonText: { fontSize: 12, opacity: 0.7 },
-  underline: { textDecorationLine: "underline" },
   listContent: { paddingBottom: 140, paddingHorizontal: "3%" },
-  blockRow: { flexDirection: "row", alignItems: "stretch", marginBottom: 16 },
+  blockRow: { flexDirection: "row-reverse", alignItems: "stretch", marginBottom: 16 },
   block: { flex: 1 },
-  dragHandle: { width: 30, alignSelf: "stretch", alignItems: "center", justifyContent: "center", marginRight: 4, borderRightWidth: 1, borderRightColor: "#9996" },
+  dragHandle: { width: 30, alignSelf: "stretch", alignItems: "center", justifyContent: "center", marginLeft: 4, borderLeftWidth: 1, borderLeftColor: "#9996" },
   hiddenDragHandle: { width: 0, opacity: 0, overflow: "hidden" },
   activeBlock: { opacity: 0.75 },
   footer: { gap: 16, flexGrow: 1, minHeight: 220 },
@@ -461,9 +414,6 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   composer: { flexGrow: 1, minHeight: 220, textAlignVertical: "top" },
-  debugPanel: { borderRadius: 10, padding: 12, marginTop: 8 },
-  debugTitle: { fontWeight: "800", marginBottom: 8 },
-  debugText: { fontFamily: "monospace", fontSize: 11, lineHeight: 16 },
   dividerRow: { marginBottom: 4 },
   dividerLine: { height: 1, backgroundColor: "#999", width: "100%", marginVertical: 4 },
   bottomButtons: {
@@ -474,5 +424,12 @@ const styles = StyleSheet.create({
     zIndex: 10,
     padding: "3%",
     paddingTop: 50
+  },
+  colorBarDismissArea: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 20,
+  },
+  colorBarLayer: {
+    zIndex: 30,
   },
 });
