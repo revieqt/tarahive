@@ -161,8 +161,7 @@ const MonthlyCalendar: React.FC = () => {
         </View>
 
         <TouchableOpacity onPress={() => router.push('/itinerary/new')} style={[styles.newItineraryButton, { backgroundColor }]}>
-          <TIcon name='plus' size={12} />
-          <TText style={{ fontSize: 10 }}>{t('tabs.home.calendar_new_itinerary')}</TText>
+          <TIcon name='plus' size={20} />
         </TouchableOpacity>
       </View>
 
@@ -214,8 +213,9 @@ const styles = StyleSheet.create({
   },
   newItineraryButton: {
     flexDirection: 'row',
-    padding: 5,
-    borderRadius: 10,
+    justifyContent: 'center',
+    width: 35,
+    borderRadius: 50,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#ccc5'
