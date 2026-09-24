@@ -6,8 +6,9 @@ import { LocationBlockData } from "./types";
 interface LocationBlockProps {
   block: LocationBlockData;
   onPress: () => void;
-  onMapPress: () => void;
+  onMapPress?: () => void;
   onLongPress: () => void;
+  editable?: boolean;
 }
 
 export default function LocationBlock({
@@ -15,12 +16,13 @@ export default function LocationBlock({
   onPress,
   onMapPress,
   onLongPress,
+  editable = true,
 }: LocationBlockProps) {
   return (
     <TouchableOpacity
       activeOpacity={0.8}
-      onPress={onPress}
-      onLongPress={onLongPress}
+      onPress={editable ? onPress : undefined}
+      onLongPress={editable ? onLongPress : undefined}
     >
       <TView color="primary" style={styles.container}>
         <View style={styles.copy}>
@@ -30,7 +32,7 @@ export default function LocationBlock({
               "Selected location"}
           </TText>
         </View>
-        <TouchableOpacity onPress={onMapPress} style={styles.mapButton}>
+        <TouchableOpacity onPress={editable ? onMapPress : undefined} style={styles.mapButton}>
           <TIcon name="map-search" size={20} />
         </TouchableOpacity>
       </TView>

@@ -33,6 +33,7 @@ interface DatePickerProps {
   custom?: boolean;
   customButtonStyle?: StyleProp<ViewStyle>;
   customLabelStyle?: StyleProp<TextStyle>;
+  disabled?: boolean;
 }
 
 const DatePickerField: React.FC<DatePickerProps> = ({
@@ -48,6 +49,7 @@ const DatePickerField: React.FC<DatePickerProps> = ({
   custom = false,
   customButtonStyle,
   customLabelStyle,
+  disabled = false,
 }) => {
   const backgroundColor = useThemeColor({}, 'primary');
   const textColor = useThemeColor({}, 'text');
@@ -157,6 +159,7 @@ const DatePickerField: React.FC<DatePickerProps> = ({
   // ── Handlers ────────────────────────────────────────────────────────────────
 
   const handleOpen = () => {
+    if (disabled) return;
     if (selectedDay === null || selectedMonth === null || selectedYear === null) {
       const now = new Date();
       setSelectedDay(now.getDate());
@@ -326,6 +329,7 @@ const DatePickerField: React.FC<DatePickerProps> = ({
         <TouchableOpacity
           style={customButtonStyle}
           onPress={handleOpen}
+          disabled={disabled}
           activeOpacity={0.7}
         >
           <TText style={customLabelStyle}>
@@ -349,6 +353,7 @@ const DatePickerField: React.FC<DatePickerProps> = ({
         style,
       ]}
       onPress={handleOpen}
+      disabled={disabled}
       activeOpacity={0.7}
     >
       {/* Floating label */}

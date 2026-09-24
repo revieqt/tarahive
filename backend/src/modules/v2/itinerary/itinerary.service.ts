@@ -135,6 +135,7 @@ export const getAllUserItinerariesService = async (
         'itinerary.title',
         'itinerary.type',
         'itinerary.content',
+        'itinerary.themeColor',
         'itinerary.startDate',
         'itinerary.endDate',
         'itinerary.status',

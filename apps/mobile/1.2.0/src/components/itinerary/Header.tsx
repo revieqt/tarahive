@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { TIcon, TText, TView } from "@/components/ui/Themed";
 import DatePickerField from "@/components/ui/DatePickerField";
@@ -14,6 +13,7 @@ import DropDownField from "@/components/ui/DropDownField";
 import OptionsPopup from "@/components/ui/OptionsPopup";
 import { ITINERARY_TYPES } from "@/constants/Itinerary";
 import { useThemeColor } from "@/hooks/shared/useThemeColor";
+import { ItineraryViewType } from "@/types/itineraryTypes"
 
 type ItineraryHeaderProps = {
   itineraryId?: string;
@@ -27,7 +27,9 @@ type ItineraryHeaderProps = {
   onEndDateChange: (value: Date | null) => void;
   themeColor?: string;
   onThemeColorPress?: () => void;
-  showOptionsMenu?: boolean;
+  viewType?: ItineraryViewType;
+  createMode?: boolean;
+  editable?: boolean;
 };
 
 export default function ItineraryHeader({
@@ -42,10 +44,11 @@ export default function ItineraryHeader({
   onEndDateChange,
   themeColor,
   onThemeColorPress,
-  showOptionsMenu = false,
+  viewType = 'viewer',
+  createMode = false,
+  editable = true,
 }: ItineraryHeaderProps) {
-  const secondaryColor = useThemeColor({}, "secondary");
-
+  const canEdit = viewType === "owner" || viewType === "editor";
   const sharePath = itineraryId ? `itinerary/${itineraryId}` : "itinerary/";
 
   return (
@@ -57,68 +60,95 @@ export default function ItineraryHeader({
           placeholder="Title"
           value={title}
           onChangeText={onTitleChange}
+          editable={editable}
           style={styles.titleInput}
           placeholderTextColor="#fff7"
         />
 
-        {showOptionsMenu && (
-          <>
-            <TText style={styles.metaText}>Created by revie.dev · Private</TText>
+        { !createMode && <>
+          <TText style={styles.metaText}>Created by revie.dev · Private</TText>
 
-            <OptionsPopup
-              options={[
-                {
-                  label: "Sharing and Privacy",
-                  iconName: "share-variant",
-                  onPress: () =>
-                    router.push({
-                      pathname: "/share",
-                      params: { path: sharePath },
-                    }),
-                },
-                {
-                  label: "Create Room with Itinerary",
-                  iconName: "tooltip-account",
-                  onPress: () =>
-                    router.push({
-                      pathname: "/share",
-                      params: { path: sharePath },
-                    }),
-                },
-                {
-                  label: "Mark Itinerary as Complete",
-                  iconName: "check-circle",
-                  onPress: () =>
-                    router.push({
-                      pathname: "/share",
-                      params: { path: sharePath },
-                    }),
-                },
-                {
-                  label: "Cancel Itinerary",
-                  iconName: "close-circle",
-                  onPress: () =>
-                    router.push({
-                      pathname: "/share",
-                      params: { path: sharePath },
-                    }),
-                },
-                {
-                  label: "Delete Itinerary",
-                  iconName: "trash-can",
-                  onPress: () =>
-                    router.push({
-                      pathname: "/share",
-                      params: { path: sharePath },
-                    }),
-                },
-              ]}
-              style={styles.optionsButton}
-            >
-              <TIcon name="dots-vertical" size={20} color="white" />
-            </OptionsPopup>
-          </>
-        )}
+          <OptionsPopup
+            options={[
+              {
+                label: "Share",
+                iconName: "share-variant",
+                onPress: () =>
+                  router.push({
+                    pathname: "/share",
+                    params: { path: sharePath },
+                  }),
+              },
+              
+              {
+                label: "Make a Copy",
+                iconName: "content-copy",
+                onPress: () =>
+                  router.push({
+                    pathname: "/share",
+                    params: { path: sharePath },
+                  }),
+              },
+              ...(viewType === "owner"
+                ? [
+                    {
+                      label: "Privacy and Access",
+                      iconName: "account-lock",
+                      onPress: () =>
+                        router.push({
+                          pathname: "/share",
+                          params: { path: sharePath },
+                        }),
+                    },
+                    {
+                      label: "Create Room with this Itinerary",
+                      iconName: "tooltip-account",
+                      onPress: () =>
+                        router.push({
+                          pathname: "/share",
+                          params: { path: sharePath },
+                        }),
+                    },
+                    {
+                      label: "Mark Itinerary as Complete",
+                      iconName: "check-circle",
+                      onPress: () =>
+                        router.push({
+                          pathname: "/share",
+                          params: { path: sharePath },
+                        }),
+                    },
+                    {
+                      label: "Cancel Itinerary",
+                      iconName: "close-circle",
+                      onPress: () =>
+                        router.push({
+                          pathname: "/share",
+                          params: { path: sharePath },
+                        }),
+                    },
+                    {
+                      label: "Delete Itinerary",
+                      iconName: "trash-can",
+                      onPress: () =>
+                        router.push({
+                          pathname: "/share",
+                          params: { path: sharePath },
+                        }),
+                    },
+                  ]
+                : []),
+            ]}
+            style={styles.optionsButton}
+          >
+            <TIcon name="dots-vertical" size={20} color="white" />
+          </OptionsPopup>
+        </> 
+        }
+
+            
+
+            
       </View>
       <View style={styles.headerBottom}>
             <ScrollView
@@ -132,6 +162,7 @@ export default function ItineraryHeader({
                 placeholder="Start Date"
                 value={startDate}
                 onChange={onStartDateChange}
+                disabled={!editable}
                 minimumDate={new Date()}
                 maximumDate={endDate || undefined}
                 custom
@@ -144,6 +175,7 @@ export default function ItineraryHeader({
                 placeholder="End Date"
                 value={endDate}
                 onChange={onEndDateChange}
+                disabled={!editable}
                 minimumDate={startDate || new Date()}
                 custom
                 customLabelStyle={[styles.headerButtonText, styles.underline]}
@@ -154,6 +186,7 @@ export default function ItineraryHeader({
             placeholder="Type"
             value={type}
             onValueChange={onTypeChange}
+            enabled={editable}
             values={ITINERARY_TYPES}
             custom
             customLabelStyle={styles.headerButtonText}
@@ -162,7 +195,8 @@ export default function ItineraryHeader({
             />
         </ScrollView>
 
-        <TouchableOpacity style={[styles.colorView, {backgroundColor: themeColor}]} onPress={onThemeColorPress}/>
+        { canEdit && <TouchableOpacity style={[styles.colorView, {backgroundColor: themeColor}]} onPress={editable ? onThemeColorPress : undefined}/> }
+        
       </View>
       
     </TView>

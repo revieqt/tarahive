@@ -9,6 +9,7 @@ interface HeadingBlockProps {
   onPress: () => void;
   onLongPress: () => void;
   onContentSizeChange?: (height: number) => void;
+  editable?: boolean;
 }
 
 export default function HeadingBlock({
@@ -17,15 +18,17 @@ export default function HeadingBlock({
   onPress,
   onLongPress,
   onContentSizeChange,
+  editable = true,
 }: HeadingBlockProps) {
   const sizes = { header1: 22, header2: 18, header3: 15 };
   const [height, setHeight] = useState(30);
   const textColor = useThemeColor({}, "text");
   return (
-    <Pressable onPress={onPress} onLongPress={onLongPress} delayLongPress={350}>
+    <Pressable onPress={editable ? onPress : undefined} onLongPress={editable ? onLongPress : undefined} delayLongPress={350}>
       <TextInput
         value={block.value}
         onChangeText={onChange}
+        editable={editable}
         onFocus={onPress}
         placeholder={
           block.type === "header1"

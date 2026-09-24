@@ -6,10 +6,11 @@ import { useThemeColor } from "@/hooks/shared/useThemeColor";
 
 interface ChecklistBlockProps {
   block: ChecklistBlockData;
-  onChange: (changes: Partial<ChecklistBlockData>) => void;
+  onChange?: (changes: Partial<ChecklistBlockData>) => void;
   onPress: () => void;
   onLongPress: () => void;
   onContentSizeChange?: (height: number) => void;
+  editable?: boolean;
 }
 
 export default function ChecklistBlock({
@@ -18,13 +19,14 @@ export default function ChecklistBlock({
   onPress,
   onLongPress,
   onContentSizeChange,
+  editable = true,
 }: ChecklistBlockProps) {
   const [height, setHeight] = useState(30);
   const textColor = useThemeColor({}, "text");
   return (
-    <Pressable style={styles.row} onPress={onPress} onLongPress={onLongPress} delayLongPress={350}>
+    <Pressable style={styles.row} onPress={editable ? onPress : undefined} onLongPress={editable ? onLongPress : undefined} delayLongPress={350}>
       <TouchableOpacity
-        onPress={() => onChange({ checked: !block.checked })}
+        onPress={editable ? () => onChange?.({ checked: !block.checked }) : undefined}
         style={styles.check}
       >
         <TIcon
@@ -34,7 +36,8 @@ export default function ChecklistBlock({
       </TouchableOpacity>
       <TextInput
         value={block.value}
-        onChangeText={(value) => onChange({ value })}
+        onChangeText={(value) => onChange?.({ value })}
+        editable={editable}
         placeholder="Checklist item"
         placeholderTextColor="#999"
         style={[styles.input, { height, color: textColor }, block.checked && styles.completed]}
