@@ -122,6 +122,7 @@ const styles = StyleSheet.create({
   },
   weatherValue: {
     marginTop: 5,
+    opacity: .85
   },
   weatherLabel: {
     fontSize: 9,

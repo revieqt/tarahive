@@ -133,11 +133,11 @@ export default function ItineraryHeader({
 
           <View style={styles.divider}/>
           <TouchableOpacity style={styles.bottomButton}>
-            <TIcon name='share-variant' size={20}/>
+            <TIcon name='share' size={18}/>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.bottomButton}>
-            <TIcon name='content-copy' size={20}/>
+            <TIcon name='content-copy' size={15}/>
           </TouchableOpacity>
         </TView>
       }

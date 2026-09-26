@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, ScrollView, TouchableOpacity } from 'react-native';
+import { Linking, StyleSheet, View, ScrollView, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { TText, TView, TIcon } from '@/components/ui/Themed';
 import WeatherDisplay from '@/components/common/WeatherDisplay';
@@ -8,6 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import BackButton from '@/components/common/BackButton';
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
 import OSMMapView from '@/components/ui/OSMMapView';
+import { openDirections } from '@/utils/openDirections';
 
 export default function PlacesScreen() {
 	const { id, address: addressParam, latitude, longitude, locationName, locationID } =
@@ -31,6 +32,15 @@ export default function PlacesScreen() {
 		city,
 	);
 	const accentColor = useThemeColor({}, 'accent');
+	const searchQuery = [
+		locationName,
+		address?.neighborhood,
+		address?.district,
+		address?.city,
+		address?.postal_code,
+		address?.region,
+		address?.country,
+	].filter(Boolean).join(', ');
 
 	return (
 		<View style={styles.container}>
@@ -61,12 +71,24 @@ export default function PlacesScreen() {
 					showsHorizontalScrollIndicator={false}
 					contentContainerStyle={styles.tabsContainer}
 				>
-					<TouchableOpacity style={[styles.tabs, {backgroundColor: accentColor}]}>
+					<TouchableOpacity
+						style={[styles.tabs, {backgroundColor: accentColor}]}
+						onPress={() => openDirections({
+							latitude: latitudeValue as number,
+							longitude: longitudeValue as number,
+							label: searchQuery,
+						})}
+					>
 						<TIcon name='directions' size={15} color='white'/>
 						<TText style={styles.tabsText}>Directions</TText>
 					</TouchableOpacity>
 
-					<TouchableOpacity style={styles.tabs}>
+					<TouchableOpacity
+						style={styles.tabs}
+						onPress={() => Linking.openURL(
+							`https://www.google.com/search?q=${encodeURIComponent(searchQuery || city)}`,
+						)}
+					>
 						<TIcon name='magnify' size={15} color='white'/>
 						<TText style={styles.tabsText}>Search</TText>
 					</TouchableOpacity>
