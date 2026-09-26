@@ -12,8 +12,8 @@ import DatePickerField from "@/components/ui/DatePickerField";
 import DropDownField from "@/components/ui/DropDownField";
 import OptionsPopup from "@/components/ui/OptionsPopup";
 import { ITINERARY_TYPES } from "@/constants/Itinerary";
-import { useThemeColor } from "@/hooks/shared/useThemeColor";
 import { ItineraryViewType } from "@/types/itineraryTypes"
+import { formatDateToString } from "@/utils/formatDateToString";
 
 type ItineraryHeaderProps = {
   itineraryId?: string;
@@ -49,7 +49,6 @@ export default function ItineraryHeader({
   editable = true,
 }: ItineraryHeaderProps) {
   const canEdit = viewType === "owner" || viewType === "editor";
-  const sharePath = itineraryId ? `itinerary/${itineraryId}` : "itinerary/";
 
   return (
     <TView style={styles.header}>
@@ -65,147 +64,90 @@ export default function ItineraryHeader({
           placeholderTextColor="#fff7"
         />
 
-        { !createMode && <>
-          <TText style={styles.metaText}>Created by revie.dev · Private</TText>
+        { !createMode && <TText style={styles.metaText}>Created by revie.dev · Private</TText>}
 
-          <OptionsPopup
-            options={[
-              {
-                label: "Share",
-                iconName: "share-variant",
-                onPress: () =>
-                  router.push({
-                    pathname: "/share",
-                    params: { path: sharePath },
-                  }),
-              },
-              
-              {
-                label: "Make a Copy",
-                iconName: "content-copy",
-                onPress: () =>
-                  router.push({
-                    pathname: "/share",
-                    params: { path: sharePath },
-                  }),
-              },
-              ...(viewType === "owner"
-                ? [
-                    {
-                      label: "Privacy and Access",
-                      iconName: "account-lock",
-                      onPress: () =>
-                        router.push({
-                          pathname: "/share",
-                          params: { path: sharePath },
-                        }),
-                    },
-                    {
-                      label: "Create Room with this Itinerary",
-                      iconName: "tooltip-account",
-                      onPress: () =>
-                        router.push({
-                          pathname: "/share",
-                          params: { path: sharePath },
-                        }),
-                    },
-                    {
-                      label: "Mark Itinerary as Complete",
-                      iconName: "check-circle",
-                      onPress: () =>
-                        router.push({
-                          pathname: "/share",
-                          params: { path: sharePath },
-                        }),
-                    },
-                    {
-                      label: "Cancel Itinerary",
-                      iconName: "close-circle",
-                      onPress: () =>
-                        router.push({
-                          pathname: "/share",
-                          params: { path: sharePath },
-                        }),
-                    },
-                    {
-                      label: "Delete Itinerary",
-                      iconName: "trash-can",
-                      onPress: () =>
-                        router.push({
-                          pathname: "/share",
-                          params: { path: sharePath },
-                        }),
-                    },
-                  ]
-                : []),
-            ]}
-            style={styles.optionsButton}
-          >
-            <TIcon name="dots-vertical" size={20} color="white" />
-          </OptionsPopup>
-        </> 
-        }
-
-            
-
-            
-      </View>
-      <View style={styles.headerBottom}>
-            <ScrollView
-            contentContainerStyle={styles.headerButtonContainer}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-        >
-            <View style={styles.headerButton}>
-            <TIcon name="calendar" size={15} />
-            <DatePickerField
-                placeholder="Start Date"
-                value={startDate}
-                onChange={onStartDateChange}
-                disabled={!editable}
-                minimumDate={new Date()}
-                maximumDate={endDate || undefined}
-                custom
-                customLabelStyle={[styles.headerButtonText, styles.underline]}
-            />
-
-            <TIcon name="chevron-right" size={15} />
-
-            <DatePickerField
-                placeholder="End Date"
-                value={endDate}
-                onChange={onEndDateChange}
-                disabled={!editable}
-                minimumDate={startDate || new Date()}
-                custom
-                customLabelStyle={[styles.headerButtonText, styles.underline]}
-            />
+        {
+          !canEdit ? <>
+            <View style={styles.details}>
+              <TIcon name="pencil" size={15} color='white'/>
+              <TText style={styles.detailsText}>{type}</TText>
             </View>
 
+            <View style={styles.details}>
+              <TIcon name="calendar" size={15} color='white'/>
+              <TText style={styles.detailsText}>
+                {startDate ? formatDateToString(startDate) : ''} - {endDate ? formatDateToString(endDate) : ''}
+              </TText>
+            </View>
+            
+          </> : <>
             <DropDownField
-            placeholder="Type"
-            value={type}
-            onValueChange={onTypeChange}
-            enabled={editable}
-            values={ITINERARY_TYPES}
-            custom
-            customLabelStyle={styles.headerButtonText}
-            customButtonStyle={styles.headerButton}
-            customIconName="pencil"
-            />
-        </ScrollView>
+              placeholder="Type"
+              value={type}
+              onValueChange={onTypeChange}
+              enabled={editable}
+              values={ITINERARY_TYPES}
+              custom
+              customLabelStyle={styles.detailsText}
+              customButtonStyle={styles.headerButton}
+            />   
 
-        { canEdit && <TouchableOpacity style={[styles.colorView, {backgroundColor: themeColor}]} onPress={editable ? onThemeColorPress : undefined}/> }
-        
+            <View style={styles.headerButton}>
+              <DatePickerField
+                  placeholder="Start Date"
+                  value={startDate}
+                  onChange={onStartDateChange}
+                  disabled={!editable}
+                  minimumDate={new Date()}
+                  maximumDate={endDate || undefined}
+                  custom
+                  customLabelStyle={[styles.detailsText, styles.underline]}
+              />
+
+              <TIcon name="chevron-right" size={15} color="#fff"/>
+
+              <DatePickerField
+                  placeholder="End Date"
+                  value={endDate}
+                  onChange={onEndDateChange}
+                  disabled={!editable}
+                  minimumDate={startDate || new Date()}
+                  custom
+                  customLabelStyle={[styles.detailsText, styles.underline]}
+              />
+            </View> 
+          </>
+        }
+
+         { canEdit && <TouchableOpacity style={[styles.colorView, {backgroundColor: themeColor}]} onPress={editable ? onThemeColorPress : undefined}/> }
       </View>
-      
+
+      {
+        !createMode &&
+
+        <TView style={styles.headerBottom} color='primary'>
+          <TouchableOpacity style={[styles.bottomButton, {flex: 1}]}>
+            <TIcon name='star-outline' size={20}/>
+            <TText>99</TText>
+          </TouchableOpacity>
+
+          <View style={styles.divider}/>
+          <TouchableOpacity style={styles.bottomButton}>
+            <TIcon name='share-variant' size={20}/>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.bottomButton}>
+            <TIcon name='content-copy' size={20}/>
+          </TouchableOpacity>
+        </TView>
+      }
     </TView>
   );
 }
 
 const styles = StyleSheet.create({
   header: {
-    marginTop: 50,
+    marginTop: 53,
     borderRadius: 15,
     overflow: "hidden",
     borderWidth: 1,
@@ -228,30 +170,17 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 10,
   },
-  optionsButton: {
-    position: "absolute",
-    right: 0,
-    top: -31,
-  },
-  headerButtonContainer: {
-    margin: 5,
-    height: 30,
-    gap: 4,
-  },
   headerButton: {
     borderWidth: 1,
     borderColor: "#ccc4",
-    paddingVertical: 2,
+    backgroundColor: "#fff4",
+    paddingVertical: 4,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 8,
     flexDirection: "row",
-    borderRadius: 40,
+    borderRadius: 8,
     gap: 4,
-  },
-  headerButtonText: {
-    fontSize: 12,
-    opacity: 0.7,
+    marginTop: 4
   },
   underline: {
     textDecorationLine: "underline",
@@ -260,8 +189,6 @@ const styles = StyleSheet.create({
     width: 25,
     height: 25,
     borderRadius: 30,
-    marginTop: 7,
-    marginHorizontal: 7,
     borderColor: '#ccc',
     borderWidth: 3,
     shadowColor: '#000',
@@ -272,8 +199,36 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.22,
     shadowRadius: 2.22,
     elevation: 3,
+    position: 'absolute',
+    right: 8,
+    top: 11
   },
   headerBottom:{
-    flexDirection: 'row'
-  }
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    padding: 2,
+    alignItems: 'center'
+  },
+  bottomButton:{
+    padding: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4
+  },
+  divider:{
+    width: 1,
+    backgroundColor: '#ccc4',
+    height: '70%'
+  },
+  details:{
+    flexDirection: 'row',
+    gap: 5,
+    alignItems: 'center',
+    marginBottom: 5
+  },
+  detailsText:{
+    color: '#fff',
+    opacity: .7,
+    fontSize: 12
+  },
 });

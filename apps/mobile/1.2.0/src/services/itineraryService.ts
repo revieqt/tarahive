@@ -14,6 +14,8 @@ export interface GetAllUserItinerariesOptions {
   date?: string;
 }
 
+export const newItinerayId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
 /**
  * Get all user itineraries
  * @param status - Filter by status: 'active' (default), 'done', or 'cancelled'

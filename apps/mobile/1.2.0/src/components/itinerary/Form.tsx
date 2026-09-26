@@ -3,7 +3,7 @@ import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, TextInput, Tou
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import DraggableFlatList from "react-native-draggable-flatlist";
-import { TIcon, TText } from "@/components/ui/Themed";
+import { TIcon, TText, TView } from "@/components/ui/Themed";
 import BackButton from "@/components/common/BackButton";
 import LocationPickerModal, { LocationItemWithAddress } from "@/components/modals/LocationPickerModal";
 import HeadingBlock from "@/components/itinerary/HeadingBlock";
@@ -14,6 +14,8 @@ import FocusBar from "@/components/itinerary/FocusBar";
 import ColorBar from "@/components/itinerary/ColorBar";
 import ItineraryHeader from "@/components/itinerary/Header";
 import { useThemeColor } from "@/hooks/shared/useThemeColor";
+import OptionsPopup from "@/components/ui/OptionsPopup";
+import { newItinerayId } from "@/services/itineraryService";
 import { CreateItineraryForm, ItineraryViewType, HeaderType, ItineraryBlock, TextBlock } from "@/types/itineraryTypes";
 
 type ItineraryFormProps = {
@@ -23,8 +25,6 @@ type ItineraryFormProps = {
   onSubmit?: (values: CreateItineraryForm) => void;
   createMode?: boolean;
 };
-
-const newId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
 export default function ItineraryForm({
   viewType = "editor",
@@ -53,27 +53,25 @@ export default function ItineraryForm({
   const updateBlock = (id: string, changes: Partial<ItineraryBlock>) => {
     if (!canEdit) return;
     setContent((current) =>
-      current.map((block) =>
-        block.id === id ? ({ ...block, ...changes } as ItineraryBlock) : block,
-      ),
+      current.map((block) => block.id === id ? ({ ...block, ...changes } as ItineraryBlock) : block)
     );
   };
 
   const addText = () => {
-    const block: TextBlock = { id: newId(), type: "text", value: "" };
+    const block: TextBlock = { id: newItinerayId(), type: "text", value: "" };
     setContent((current) => [...current, block]);
     setFocusedId(block.id);
   };
 
   const addHeading = (blockType: HeaderType) => {
-    const block: ItineraryBlock = { id: newId(), type: blockType, value: "" };
+    const block: ItineraryBlock = { id: newItinerayId(), type: blockType, value: "" };
     setContent((current) => [...current, block]);
     setFocusedId(block.id);
   };
 
   const addChecklist = () => {
     const block: ItineraryBlock = {
-      id: newId(),
+      id: newItinerayId(),
       type: "toggle",
       value: "",
       checked: false,
@@ -83,7 +81,7 @@ export default function ItineraryForm({
   };
 
   const addDivider = () => {
-    const block: ItineraryBlock = { id: newId(), type: "divider" };
+    const block: ItineraryBlock = { id: newItinerayId(), type: "divider" };
     setContent((current) => [...current, block]);
     setFocusedId(block.id);
   };
@@ -92,7 +90,7 @@ export default function ItineraryForm({
     if (!canEdit || location.latitude == null || location.longitude == null)
       return;
     const block: ItineraryBlock = {
-      id: newId(),
+      id: newItinerayId(),
       type: "location",
       latitude: location.latitude,
       longitude: location.longitude,
@@ -112,7 +110,7 @@ export default function ItineraryForm({
   const startComposer = () => {
     if (!canEdit) return null;
     if (composerId) return composerId;
-    const block: TextBlock = { id: newId(), type: "text", value: "" };
+    const block: TextBlock = { id: newItinerayId(), type: "text", value: "" };
     setContent((current) => [...current, block]);
     setComposerId(block.id);
     setFocusedId(block.id);
@@ -125,7 +123,7 @@ export default function ItineraryForm({
       updateBlock(composerId, { value });
       return;
     }
-    const block: TextBlock = { id: newId(), type: "text", value };
+    const block: TextBlock = { id: newItinerayId(), type: "text", value };
     setContent((current) => [...current, block]);
     setComposerId(block.id);
     setFocusedId(block.id);
@@ -134,13 +132,10 @@ export default function ItineraryForm({
   const finishComposer = () => {
     if (!canEdit) return;
     const composer = content.find(
-      (block): block is TextBlock =>
-        block.id === composerId && block.type === "text",
+      (block): block is TextBlock => block.id === composerId && block.type === "text"
     );
     if (composerId && !composer?.value) {
-      setContent((current) =>
-        current.filter((block) => block.id !== composerId),
-      );
+      setContent((current) => current.filter((block) => block.id !== composerId));
       setFocusedId(null);
     }
     setComposerId(null);
@@ -220,9 +215,7 @@ export default function ItineraryForm({
               onChange={(value) => updateBlock(block.id, { value })}
               onPress={focus}
               onLongPress={beginDrag}
-              onContentSizeChange={(height) =>
-                updateBlockHeight(block.id, height)
-              }
+              onContentSizeChange={(height) => updateBlockHeight(block.id, height)}
               editable={canEdit}
             />
           )}
@@ -254,9 +247,7 @@ export default function ItineraryForm({
               }
               onPress={focus}
               onLongPress={beginDrag}
-              onContentSizeChange={(height) =>
-                updateBlockHeight(block.id, height + 10)
-              }
+              onContentSizeChange={(height) => updateBlockHeight(block.id, height + 10)}
               editable={canEdit}
             />
           )}
@@ -274,13 +265,9 @@ export default function ItineraryForm({
   };
 
   const lastBlock = content[content.length - 1];
-  const showComposer =
-    canEdit && (!lastBlock || lastBlock.type !== "text" || Boolean(composerId));
-  const visibleContent = composerId
-    ? content.filter((block) => block.id !== composerId)
-    : content;
-  const submit = () =>
-    onSubmit?.({ title, startDate, endDate, type, themeColor, content });
+  const showComposer = canEdit && (!lastBlock || lastBlock.type !== "text" || Boolean(composerId));
+  const visibleContent = composerId ? content.filter((block) => block.id !== composerId) : content;
+  const submit = () => onSubmit?.({ title, startDate, endDate, type, themeColor, content });
 
   return (
     <KeyboardAvoidingView
@@ -291,33 +278,61 @@ export default function ItineraryForm({
         return false;
       }}
     >
-      <LinearGradient
-        style={styles.topButtons}
-        colors={[backgroundColor, "transparent"]}
-        onTouchStart={() => canEdit && setFocusedId(null)}
-      >
-        <BackButton
-          style={[
-            styles.backButton,
-            styles.shadow,
-            { backgroundColor: primaryColor },
-          ]}
-        />
-        {canEdit && (
-          <TouchableOpacity
-            style={[
-              styles.doneButton,
-              styles.shadow,
-              { backgroundColor: themeColor },
-            ]}
-            onPress={submit}
-            disabled={isSubmitting}
-          >
-            <TIcon name="check" size={16} color="#fff" />
-            <TText style={styles.white}>Done</TText>
-          </TouchableOpacity>
-        )}
-      </LinearGradient>
+      <TView color='primary' style={styles.topButtons}>
+        <BackButton style={styles.backButton}/>
+
+        {canEdit && 
+          <View style={{flexDirection: 'row', gap: 5, alignItems: 'center'}}>
+            <OptionsPopup
+              options={[
+                {
+                  label: "Privacy and Access",
+                  iconName: "account-lock",
+                  onPress: () => router.push({ pathname: "/share"})
+                },
+                {
+                  label: "Create Room with this Itinerary",
+                  iconName: "tooltip-account",
+                  onPress: () => router.push({ pathname: "/share"})
+                },
+                {
+                  label: "Mark Itinerary as Complete",
+                  iconName: "check-circle",
+                  onPress: () => router.push({ pathname: "/share"})
+                },
+                {
+                  label: "Cancel Itinerary",
+                  iconName: "close-circle",
+                  onPress: () => router.push({ pathname: "/share"})
+                },
+                {
+                  label: "Delete Itinerary",
+                  iconName: "trash-can",
+                  onPress: () => router.push({ pathname: "/share"})
+                },
+              ]}
+              style={styles.optionsButton}
+            >
+              <TIcon name="dots-vertical" size={20}/>
+            </OptionsPopup>
+              <TouchableOpacity
+                style={[styles.doneButton, { backgroundColor: themeColor }]}
+                onPress={submit}
+                disabled={isSubmitting}
+              >
+                { createMode ? <>
+                  <TIcon name="check" size={16} color="#fff" />
+                  <TText style={styles.white}>Done</TText>
+                </> : <>
+                  <TIcon name="content-save" size={16} color="#fff" />
+                  <TText style={styles.white}>Save Changes</TText>
+                </>}
+                
+              </TouchableOpacity>
+          </View>
+        }
+      </TView>
+
       <ScrollView showsVerticalScrollIndicator={false}>
         <DraggableFlatList
           data={visibleContent}
@@ -360,9 +375,7 @@ export default function ItineraryForm({
                   value={
                     composerId
                       ? content.find(
-                          (block): block is TextBlock =>
-                            block.id === composerId && block.type === "text",
-                        )?.value
+                          (block): block is TextBlock => block.id === composerId && block.type === "text")?.value
                       : ""
                   }
                   multiline
@@ -452,12 +465,19 @@ const styles = StyleSheet.create({
     left: 0,
     zIndex: 10,
     flexDirection: "row",
-    padding: "3%",
-    paddingLeft: 16,
-    paddingBottom: 15,
+    paddingHorizontal: "3%",
+    height: 45,
     justifyContent: "space-between",
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+    elevation: 3,
   },
-  backButton: { borderRadius: 20, padding: 3 },
+  backButton: { borderRadius: 20, padding: 3, marginTop: 7 },
   doneButton: {
     flexDirection: "row",
     gap: 4,
@@ -467,7 +487,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     borderRadius: 16,
   },
-  white: { color: "#fff" },
+  white: { 
+    color: "#fff",
+    fontSize: 11,
+  },
   listContent: { paddingBottom: 140, paddingHorizontal: "3%" },
   blockRow: {
     flexDirection: "row-reverse",
@@ -513,4 +536,10 @@ const styles = StyleSheet.create({
   },
   colorBarDismissArea: { ...StyleSheet.absoluteFillObject, zIndex: 20 },
   colorBarLayer: { zIndex: 30 },
+  optionsButton: {
+    borderColor: '#ccc4',
+    borderWidth: 1,
+    padding: 4,
+    borderRadius: 20
+  },
 });

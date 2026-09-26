@@ -5,5 +5,5 @@ import ItineraryForm from "@/components/itinerary/Form";
 export default function CreateRoomScreen() {
   const { create, isPending } = useCreateItinerary();
 
-  return <ItineraryForm onSubmit={create} isSubmitting={isPending} viewType="viewer" createMode={false}/>;
+  return <ItineraryForm onSubmit={create} isSubmitting={isPending} viewType="owner" createMode/>;
 }
