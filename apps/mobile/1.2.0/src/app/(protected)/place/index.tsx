@@ -7,6 +7,7 @@ import { usePlaceWeather } from '@/hooks/shared/useWeather';
 import { LinearGradient } from 'expo-linear-gradient';
 import BackButton from '@/components/common/BackButton';
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
+import OSMMapView from '@/components/ui/OSMMapView';
 
 export default function PlacesScreen() {
 	const { id, address: addressParam, latitude, longitude, locationName, locationID } =
@@ -32,7 +33,13 @@ export default function PlacesScreen() {
 	const accentColor = useThemeColor({}, 'accent');
 
 	return (
-		<View style={{flex: 1, backgroundColor: 'blue'}}>
+		<View style={styles.container}>
+			<View pointerEvents='box-none' style={styles.mapBackground}>
+				<OSMMapView
+					latitude={latitudeValue}
+					longitude={longitudeValue}
+				/>
+			</View>
 			<BackButton type='floating' color='white' style={styles.back}/>
 
 			<LinearGradient
@@ -41,12 +48,12 @@ export default function PlacesScreen() {
 			>
 				<TText style={styles.name}>{locationName}</TText>
 				<TText style={styles.address}>
-					{address.neighborhood ? address.neighborhood + ', ' : null}
-					{address.district ? address.district + ', ' : null}
-					{address.city ? address.city + ' ' : null}
-					{address.postal_code ? address.postal_code + ', ' : ', '}
-					{address.region ? address.region + ', ' : null}
-					{address.country ? address.country : null}
+					{address?.neighborhood ? address.neighborhood + ', ' : null}
+					{address?.district ? address.district + ', ' : null}
+					{address?.city ? address.city + ' ' : null}
+					{address?.postal_code ? address.postal_code + ', ' : address ? ', ' : null}
+					{address?.region ? address.region + ', ' : null}
+					{address?.country ? address.country : null}
 				</TText>
 
 				<ScrollView 
@@ -80,9 +87,19 @@ export default function PlacesScreen() {
 }
 
 const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		position: 'relative',
+		backgroundColor: '#000',
+	},
+	mapBackground: {
+		...StyleSheet.absoluteFillObject,
+		zIndex: 0,
+	},
 	back:{
 		backgroundColor: '#0007',
-		borderRadius: 20
+		borderRadius: 20,
+		elevation: 2,
 	},
 	footer:{
 		paddingHorizontal: '3%',
@@ -91,7 +108,9 @@ const styles = StyleSheet.create({
 		position: 'absolute',
 		bottom: 0,
 		left: 0,
-		right: 0
+		right: 0,
+		zIndex: 1,
+		elevation: 1,
 	},
 	name:{
 		color: '#fff',
