@@ -13,6 +13,7 @@ import EmptyMessage from "@/components/common/EmptyMessage";
 import ItineraryCardSkeleton from "@/components/feedback/CalendarCardSkeleton";
 import StickyScrollView from "@/components/ui/StickyScrollView";
 import { LinearGradient } from "expo-linear-gradient";
+import OptionsPopup from "@/components/ui/OptionsPopup";
 
 const ItineraryOptions = [
   { value: 'active', icon: 'cards-heart', label: 'Active' },
@@ -24,7 +25,7 @@ export default function ItineraryScreen() {
   const { t } = useLanguage();
   const primaryColor = useThemeColor({}, 'primary');
   const secondaryColor = useThemeColor({}, 'secondary');
-  const accentColor = useThemeColor({}, 'secondary');
+  const accentColor = useThemeColor({}, 'accent');
   const [selectedStatus, setSelectedStatus] = useState<'active' | 'done' | 'cancelled'>('active');
   const { itineraries, isLoading, isError } = useGetUserItineraries(selectedStatus);
 
@@ -37,19 +38,50 @@ export default function ItineraryScreen() {
       onPress={() => handleItineraryPress(item.id)}
       style={[styles.itineraryCard, { backgroundColor: primaryColor, borderColor: getStatusColor(item.status) }]}
     >
-      <TText style={styles.cardTitle} numberOfLines={1}>{item.title}</TText>
-      <TText style={styles.dateText}>
-        {formatDateToString(new Date(item.startDate))} - {formatDateToString(new Date(item.endDate))}
-      </TText>
+        <TText style={styles.cardTitle} numberOfLines={1}>{item.title}</TText>
+        <TText style={styles.dateText}>
+          {formatDateToString(new Date(item.startDate))} - {formatDateToString(new Date(item.endDate))}
+        </TText>
 
-      <View style={styles.cardTabs}>
-        <View style={[styles.cardBubble, { backgroundColor: getStatusColor(item.status) }]}>
-          <TText style={[styles.cardBubbleText, { color: '#FFF' }]}>{item.status[0].toUpperCase() + item.status.slice(1)}</TText>
+        <View style={styles.cardTabs}>
+          <TView style={[styles.cardBubble, {backgroundColor: accentColor + '80'}]}>
+            <TText style={styles.cardBubbleText}>{item.type}</TText>
+          </TView>
         </View>
-        <TView style={styles.cardBubble}>
-          <TText style={[styles.cardBubbleText, { opacity: 0.7 }]}>{item.type}</TText>
-        </TView>
-      </View>
+
+      <OptionsPopup
+        options={[
+          {
+            label: "Privacy and Access",
+            iconName: "account-lock",
+            onPress: () => router.push({ pathname: "/share"})
+          },
+          {
+            label: "Create Room with this Itinerary",
+            iconName: "tooltip-account",
+            onPress: () => router.push({ pathname: "/share"})
+          },
+          {
+            label: "Mark Itinerary as Complete",
+            iconName: "check-circle",
+            onPress: () => router.push({ pathname: "/share"})
+          },
+          {
+            label: "Cancel Itinerary",
+            iconName: "close-circle",
+            onPress: () => router.push({ pathname: "/share"})
+          },
+          {
+            label: "Delete Itinerary",
+            iconName: "trash-can",
+            onPress: () => router.push({ pathname: "/share"})
+          },
+        ]}
+        style={styles.optionsButton}
+      >
+        <TIcon name="dots-vertical" size={20}/>
+      </OptionsPopup>
+      
     </TouchableOpacity>
   );
 
@@ -62,7 +94,7 @@ export default function ItineraryScreen() {
         subtitle="Manage your travel plans"
       > 
         <LinearGradient
-          colors={[accentColor + '60', 'transparent']}
+          colors={[secondaryColor + '60', 'transparent']}
           start={{ x: 1, y: 0 }}
           end={{ x: 0, y: 0 }}
           style={styles.gridCircle}
@@ -140,8 +172,8 @@ const styles = StyleSheet.create({
   },
   itineraryCard: {
     borderRadius: 10,
-    padding: '4%',
-    gap: 5,
+    padding: '3%',
+    gap: 4
   },
   cardTitle: {
     fontSize: 15,
@@ -168,7 +200,7 @@ const styles = StyleSheet.create({
   },
   cardBubbleText: {
     fontSize: 11,
-    fontWeight: '600',
+    color: '#fff'
   },
   tabsContainer: {
     flexDirection: 'row',
@@ -189,5 +221,16 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 16,
     right: 16,
+  },
+  optionsButton: {
+    borderColor: '#ccc3',
+    borderLeftWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    right: -10,
+    bottom: -10,
+    top: -78,
+    width: 30
   },
 });
