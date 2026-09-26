@@ -13,7 +13,7 @@ const router = express.Router();
 router.get('/', rateLimiter('MODERATE'), authMiddleware, getAllUserItineraries);
 
 // Create a new itinerary
-router.post('/create',rateLimiter('MODERATE'), authMiddleware, createItinerary);
+router.post('/',rateLimiter('MODERATE'), authMiddleware, createItinerary);
 
 // Get a specific itinerary by ID
 router.get('/:id', rateLimiter('MODERATE'), authMiddleware, getItinerary);

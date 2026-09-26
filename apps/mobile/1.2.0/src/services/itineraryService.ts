@@ -67,7 +67,7 @@ export const createItinerary = async (
     privacy: data.privacy ?? 'private',
   };
 
-  return api.post<CreateItineraryResponse>(`${API_URL}/create`, payload);
+  return api.post<CreateItineraryResponse>(`${API_URL}/`, payload);
 };
 
 /**

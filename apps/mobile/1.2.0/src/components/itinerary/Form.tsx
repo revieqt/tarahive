@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
-import { router } from "expo-router";
+import { router } from "@/hooks/shared/useRouter";
 import { LinearGradient } from "expo-linear-gradient";
 import DraggableFlatList from "react-native-draggable-flatlist";
 import { TIcon, TText, TView } from "@/components/ui/Themed";

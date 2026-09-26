@@ -12,6 +12,7 @@ import { SessionProvider } from '@/context/SessionContext';
 import { LocationProvider } from '@/context/LocationContext';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { LoaderProvider } from '@/context/LoaderContext';
 
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
 
@@ -27,6 +28,7 @@ import {
 import { Dialog as DialogService } from '@/services/dialog.service';
 
 import { useLoginBg } from '@/hooks/shared/useLoginBg';
+import { RouterLoadingOverlay } from '@/hooks/shared/useRouter';
 
 // Leaflet only on web
 if (Platform.OS === 'web') {
@@ -103,14 +105,18 @@ export default function RootLayout() {
         <ThemeProvider>
           <LanguageProvider>
             <SessionProvider>
-              <AppContent />
+              <LoaderProvider>
+                <AppContent />
 
-              <Toast config={toastConfig} />
+                <Toast config={toastConfig} />
 
-              <Dialog
-                state={dialogState}
-                onDismiss={handleDismiss}
-              />
+                <Dialog
+                  state={dialogState}
+                  onDismiss={handleDismiss}
+                />
+
+                <RouterLoadingOverlay />
+              </LoaderProvider>
             </SessionProvider>
           </LanguageProvider>
         </ThemeProvider>

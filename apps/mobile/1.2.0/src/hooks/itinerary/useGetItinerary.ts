@@ -27,6 +27,7 @@ export const useGetItinerary = (id: string | null) => {
   return {
     itinerary: query.data as Itinerary | null | undefined,
     isLoading: query.isLoading,
+    isFetching: query.isFetching,
     isError: query.isError,
     error: query.error,
     refetch: query.refetch,

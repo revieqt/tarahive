@@ -1,48 +1,41 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useCallback } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { useGetItinerary } from '@/hooks/itinerary/useGetItinerary';
 import ItineraryForm from '@/components/itinerary/Form';
-import { TText } from '@/components/ui/Themed';
+import { useRouter } from '@/hooks/shared/useRouter';
 
 export default function ItineraryScreen() {
 	const { id } = useLocalSearchParams<{ id: string }>();
 	const itineraryId = Array.isArray(id) ? id[0] : id;
-	const { itinerary, isLoading, isError } = useGetItinerary(itineraryId ?? null);
-
-	if (isLoading) {
-		return (
-			<View style={styles.container}>
-				<Text>Loading itinerary...</Text>
-			</View>
-		);
-	}
-
-	if (isError || !itinerary) {
-		return (
-			<View style={styles.container}>
-				<Text>Unable to load itinerary.</Text>
-			</View>
-		);
-	}
+	const {
+		itinerary,
+		isLoading,
+		isFetching,
+		isError,
+		refetch,
+	} = useGetItinerary(itineraryId ?? null);
+	const retryItinerary = useCallback(() => {
+		void refetch();
+	}, [refetch]);
+	useRouter({
+		isLoading: isLoading || isFetching,
+		hasError: Boolean(isError || (itinerary === null && !isLoading)),
+		onRetry: retryItinerary,
+		errorMessage: 'The itinerary could not be fetched. Try again or go back.',
+	});
 
 	return (
 		<ItineraryForm
+			key={itinerary ? 'loaded' : 'pending'}
 			viewType="owner"
 			initialValues={{
-				title: itinerary.title,
-				type: itinerary.type,
-				startDate: new Date(itinerary.startDate),
-				endDate: new Date(itinerary.endDate),
-				themeColor: itinerary.themeColor,
-				content: itinerary.content,
+				title: itinerary?.title ?? '',
+				type: itinerary?.type ?? 'Solo',
+				startDate: itinerary?.startDate ? new Date(itinerary.startDate) : null,
+				endDate: itinerary?.endDate ? new Date(itinerary.endDate) : null,
+				themeColor: itinerary?.themeColor,
+				content: itinerary?.content ?? [],
 			}}
 		/>
 	);
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-	},
-});
