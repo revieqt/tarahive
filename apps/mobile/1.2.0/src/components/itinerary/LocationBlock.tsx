@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { TIcon, TText, TView } from "@/components/ui/Themed";
-import { LocationBlockData } from "./types";
+import { LocationBlockData } from "@/types/itineraryTypes";
 
 interface LocationBlockProps {
   block: LocationBlockData;
@@ -32,7 +32,7 @@ export default function LocationBlock({
               "Selected location"}
           </TText>
         </View>
-        <TouchableOpacity onPress={editable ? onMapPress : undefined} style={styles.mapButton}>
+        <TouchableOpacity onPress={onMapPress} style={styles.mapButton}>
           <TIcon name="map-search" size={20} />
         </TouchableOpacity>
       </TView>

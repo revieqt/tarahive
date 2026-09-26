@@ -161,7 +161,7 @@ export default function ItineraryForm({
         style={[
           styles.blockRow,
           block.type === "divider" && styles.dividerRow,
-          isActive && styles.activeBlock,
+          isActive && {opacity: .75},
         ]}
       >
         {canEdit && (
@@ -223,15 +223,17 @@ export default function ItineraryForm({
             <LocationBlock
               block={block}
               onPress={focus}
-              onMapPress={
-                canEdit
-                  ? () =>
-                      router.push({
-                        pathname:
-                          "/itinerary/[id]/location/[location_id]" as any,
-                        params: { id: "draft", location_id: block.id },
-                      })
-                  : undefined
+              onMapPress={() =>
+                router.push({
+                  pathname: "/place",
+                  params: {
+                    id: block.id,
+                    address: JSON.stringify(block.address),
+                    latitude: String(block.latitude),
+                    longitude: String(block.longitude),
+                    locationName: block.locationName,
+                  },
+                })
               }
               onLongPress={beginDrag}
               editable={canEdit}
@@ -271,7 +273,7 @@ export default function ItineraryForm({
 
   return (
     <KeyboardAvoidingView
-      style={[styles.screen, { backgroundColor }]}
+      style={{ backgroundColor, flex: 1 }}
       behavior="padding"
       onStartShouldSetResponderCapture={() => {
         if (canEdit && focusedId) setFocusedId(null);
@@ -457,7 +459,6 @@ export default function ItineraryForm({
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1 },
   topButtons: {
     position: "absolute",
     top: 0,
@@ -477,7 +478,11 @@ const styles = StyleSheet.create({
     shadowRadius: 2.22,
     elevation: 3,
   },
-  backButton: { borderRadius: 20, padding: 3, marginTop: 7 },
+  backButton: { 
+    borderRadius: 20, 
+    padding: 3, 
+    marginTop: 7 
+  },
   doneButton: {
     flexDirection: "row",
     gap: 4,
@@ -491,13 +496,18 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 11,
   },
-  listContent: { paddingBottom: 140, paddingHorizontal: "3%" },
+  listContent: { 
+    paddingBottom: 140, 
+    paddingHorizontal: "3%" 
+  },
   blockRow: {
     flexDirection: "row-reverse",
     alignItems: "stretch",
     marginBottom: 16,
   },
-  block: { flex: 1 },
+  block: { 
+    flex: 1 
+  },
   dragHandle: {
     width: 10,
     alignSelf: "stretch",
@@ -507,10 +517,22 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 5,
     borderBottomRightRadius: 5,
   },
-  hiddenDragHandle: { width: 0, opacity: 0, overflow: "hidden" },
-  activeBlock: { opacity: 0.75 },
-  footer: { gap: 16, flexGrow: 1, minHeight: 220 },
-  textBlock: { minHeight: 30, padding: 0, fontFamily: "Inter", fontSize: 13 },
+  hiddenDragHandle: { 
+    width: 0, 
+    opacity: 0, 
+    overflow: "hidden" 
+  },
+  footer: { 
+    gap: 16, 
+    flexGrow: 1, 
+    minHeight: 220 
+  },
+  textBlock: { 
+    minHeight: 30, 
+    padding: 0, 
+    fontFamily: "Inter", 
+    fontSize: 13 
+  },
   shadow: {
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -518,7 +540,9 @@ const styles = StyleSheet.create({
     shadowRadius: 2.22,
     elevation: 3,
   },
-  dividerRow: { marginBottom: 4 },
+  dividerRow: { 
+    marginBottom: 4 
+  },
   dividerLine: {
     height: 1,
     backgroundColor: "#999",
@@ -534,8 +558,12 @@ const styles = StyleSheet.create({
     padding: "3%",
     paddingTop: 50,
   },
-  colorBarDismissArea: { ...StyleSheet.absoluteFillObject, zIndex: 20 },
-  colorBarLayer: { zIndex: 30 },
+  colorBarDismissArea: { 
+    ...StyleSheet.absoluteFillObject, zIndex: 20 }
+  ,
+  colorBarLayer: { 
+    zIndex: 30 
+  },
   optionsButton: {
     borderColor: '#ccc4',
     borderWidth: 1,

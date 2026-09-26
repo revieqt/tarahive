@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useGetItinerary } from '@/hooks/itinerary/useGetItinerary';
 import ItineraryForm from '@/components/itinerary/Form';
+import { TText } from '@/components/ui/Themed';
 
 export default function ItineraryScreen() {
 	const { id } = useLocalSearchParams<{ id: string }>();
