@@ -7,7 +7,7 @@ import { useInternetConnection } from '@/utils/checkInternetConnection';
 import HomeHeaderCard from '@/components/cards/HomeHeaderCard';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
-import { TARA_AI_SUGGESTIONS } from '@/constants/Tara';
+import { TARA_AI_SUGGESTIONS } from '@/constants/TaraMessages';
 import SidebarAlerts from '@/components/common/Sidebar';
 import MonthlyCalendar from '@/components/cards/MonthlyCalendarCard';
 import HiveBg from '@/components/common/HiveBg';

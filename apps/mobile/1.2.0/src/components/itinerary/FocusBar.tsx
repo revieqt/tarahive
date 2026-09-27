@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
   },
   option: {
     flex: 1,
-    padding: 5,
+    padding: 3,
     borderWidth: 1,
     borderColor: "#ccc1",
     borderRadius: 15,

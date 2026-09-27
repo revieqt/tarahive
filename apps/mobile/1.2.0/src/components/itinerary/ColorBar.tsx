@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   },
   content: { padding: 8, gap: 5 },
   option: {
-    padding: 5,
+    padding: 2,
     borderRadius: 15,
     alignItems: "center",
   },

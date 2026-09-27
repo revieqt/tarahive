@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   },
   content: { padding: 8, gap: 5 },
   option: {
-    paddingVertical: 7,
+    paddingVertical: 5,
     paddingHorizontal: 10,
     borderWidth: 1,
     borderColor: "#ccc1",

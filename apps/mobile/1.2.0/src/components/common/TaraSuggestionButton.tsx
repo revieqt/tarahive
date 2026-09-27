@@ -11,6 +11,7 @@ import {
 import { useSession } from '@/context/SessionContext';
 import { TText } from '@/components/ui/Themed';
 import { useLanguage } from '@/context/LanguageContext';
+import { useTara } from '@/hooks/shared/useTara';
 
 const ActiveRouteSidebarButton: React.FC = () => {
     const primaryColor = useThemeColor({}, 'primary');
@@ -21,6 +22,7 @@ const ActiveRouteSidebarButton: React.FC = () => {
     const [isVisible, setIsVisible] = useState(true);
     const { session } = useSession();
     const { t } = useLanguage();
+    const randomMessage = useTara('messages');
 
     useEffect(() => {
         const startFloatingAnimation = () => {
@@ -55,7 +57,7 @@ const ActiveRouteSidebarButton: React.FC = () => {
                     useNativeDriver: true,
                 }),
             ]),
-            Animated.delay(7000),
+            Animated.delay(8000),
             Animated.parallel([
                 Animated.timing(fadeAnimation, {
                     toValue: 0,
@@ -105,7 +107,7 @@ const ActiveRouteSidebarButton: React.FC = () => {
                 >
                     <TouchableOpacity style={{ flex: 1}} onPress={() => router.push('/suggestion')}>
                         <TText style={styles.messageText}>
-                            {t('common.common.hello')} {session?.user?.fname}! {t('tabs.home.suggestions')}
+                            {t('common.common.hello')} {session?.user?.fname}! {randomMessage}
                         </TText>
                     </TouchableOpacity>
                     

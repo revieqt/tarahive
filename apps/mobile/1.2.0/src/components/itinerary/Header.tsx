@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -14,6 +14,8 @@ import OptionsPopup from "@/components/ui/OptionsPopup";
 import { ITINERARY_TYPES } from "@/constants/Itinerary";
 import { ItineraryViewType } from "@/types/itineraryTypes"
 import { formatDateToString } from "@/utils/formatDateToString";
+import { useThemeColor } from "@/hooks/shared/useThemeColor";
+import BackButton from "../common/BackButton";
 
 type ItineraryHeaderProps = {
   itineraryId?: string;
@@ -49,9 +51,11 @@ export default function ItineraryHeader({
   editable = true,
 }: ItineraryHeaderProps) {
   const canEdit = viewType === "owner" || viewType === "editor";
+  const textColor = useThemeColor({}, "text");
+  const [tab, setTab] = useState(1);
 
   return (
-    <TView style={styles.header}>
+    <TView color='primary'>
       <View
         style={[styles.titleContainer, {backgroundColor: themeColor}]}
       >
@@ -64,98 +68,110 @@ export default function ItineraryHeader({
           placeholderTextColor="#fff7"
         />
 
-        { !createMode && <TText style={styles.metaText}>Created by revie.dev · Private</TText>}
+        
+        <TText style={styles.metaText}>{ !createMode && 'Created by revie.dev · Private'}</TText>
 
-        {
-          !canEdit ? <>
-            <View style={styles.details}>
-              <TIcon name="pencil" size={15} color='white'/>
-              <TText style={styles.detailsText}>{type}</TText>
-            </View>
+        <BackButton type="close" color="white" style={styles.closeButton}/>
+      
+        <View style={{flexDirection: 'row'}}>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{flexDirection: 'row'}}
+            style={{flex: 1}}
+          >
+            { viewType === 'owner' &&
+              <>
+                <TouchableOpacity 
+                  style={[styles.tabs, tab === 1 && {borderColor: '#fff', opacity: 1}]}
+                  onPress={() => setTab(1)}
+                >
+                  <TText style={styles.tabsText}>Details</TText>
+                </TouchableOpacity>
 
-            <View style={styles.details}>
-              <TIcon name="calendar" size={15} color='white'/>
-              <TText style={styles.detailsText}>
-                {startDate ? formatDateToString(startDate) : ''} - {endDate ? formatDateToString(endDate) : ''}
-              </TText>
-            </View>
-            
-          </> : <>
-            <DropDownField
-              placeholder="Type"
-              value={type}
-              onValueChange={onTypeChange}
-              enabled={editable}
-              values={ITINERARY_TYPES}
-              custom
-              customLabelStyle={styles.detailsText}
-              customButtonStyle={styles.headerButton}
-            />   
+                <TouchableOpacity 
+                  style={[styles.tabs, tab === 2 && {borderColor: '#fff', opacity: 1}]}
+                  onPress={() => setTab(2)}
+                >
+                  <TText style={styles.tabsText}>Status</TText>
+                </TouchableOpacity>
 
-            <View style={styles.headerButton}>
-              <DatePickerField
-                  placeholder="Start Date"
-                  value={startDate}
-                  onChange={onStartDateChange}
-                  disabled={!editable}
-                  minimumDate={new Date()}
-                  maximumDate={endDate || undefined}
-                  custom
-                  customLabelStyle={[styles.detailsText, styles.underline]}
-              />
+                <TouchableOpacity 
+                  style={[styles.tabs, tab === 3 && {borderColor: '#fff', opacity: 1}]}
+                  onPress={() => setTab(3)}
+                >
+                  <TText style={styles.tabsText}>Privacy</TText>
+                </TouchableOpacity>
+              </>
+            }
+          </ScrollView>
 
-              <TIcon name="chevron-right" size={15} color="#fff"/>
+          <View style={styles.moreOptionsContainer}>
+            <TouchableOpacity>
+              <TIcon name='share' size={18} color='white'/>
+            </TouchableOpacity>
 
-              <DatePickerField
-                  placeholder="End Date"
-                  value={endDate}
-                  onChange={onEndDateChange}
-                  disabled={!editable}
-                  minimumDate={startDate || new Date()}
-                  custom
-                  customLabelStyle={[styles.detailsText, styles.underline]}
-              />
-            </View> 
-          </>
-        }
+            <TouchableOpacity>
+              <TIcon name='content-copy' size={15} color='white'/>
+            </TouchableOpacity>
 
-         { canEdit && <TouchableOpacity style={[styles.colorView, {backgroundColor: themeColor}]} onPress={editable ? onThemeColorPress : undefined}/> }
+            { canEdit && <TouchableOpacity style={[styles.colorView, {backgroundColor: themeColor}]} onPress={editable ? onThemeColorPress : undefined}/> }
+          </View>
+
+          
+        </View>
+        
       </View>
 
       {
         !createMode &&
 
-        <TView style={styles.headerBottom} color='primary'>
-          <TouchableOpacity style={[styles.bottomButton, {flex: 1}]}>
-            <TIcon name='star-outline' size={20}/>
-            <TText>99</TText>
-          </TouchableOpacity>
+        <ScrollView contentContainerStyle={styles.bottomOptions} horizontal showsHorizontalScrollIndicator={false}>
+          <View style={styles.headerButton}>
+            <DatePickerField
+                placeholder="Start Date"
+                value={startDate}
+                onChange={onStartDateChange}
+                disabled={!editable}
+                minimumDate={new Date()}
+                maximumDate={endDate || undefined}
+                custom
+                customLabelStyle={[styles.detailsText, styles.underline]}
+            />
 
-          <View style={styles.divider}/>
-          <TouchableOpacity style={styles.bottomButton}>
-            <TIcon name='share' size={18}/>
-          </TouchableOpacity>
+            <TIcon name="chevron-right" size={15} color="#fff"/>
 
-          <TouchableOpacity style={styles.bottomButton}>
-            <TIcon name='content-copy' size={15}/>
-          </TouchableOpacity>
-        </TView>
+            <DatePickerField
+                placeholder="End Date"
+                value={endDate}
+                onChange={onEndDateChange}
+                disabled={!editable}
+                minimumDate={startDate || new Date()}
+                custom
+                customLabelStyle={[styles.detailsText, styles.underline]}
+            />
+          </View>
+
+          <DropDownField
+            placeholder="Type"
+            value={type}
+            onValueChange={onTypeChange}
+            enabled={editable}
+            values={ITINERARY_TYPES}
+            custom
+            customLabelStyle={styles.detailsText}
+            customButtonStyle={styles.headerButton}
+          />
+        </ScrollView>
       }
     </TView>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    marginTop: 53,
-    borderRadius: 15,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "#ccc4",
-    marginBottom: 12
-  },
   titleContainer: {
-    padding: 8,
+    paddingHorizontal: '3%',
+    paddingTop: 8
   },
   titleInput: {
     fontFamily: "Inter",
@@ -170,6 +186,12 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 10,
   },
+  closeButton:{
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    padding: '3%'
+  },
   headerButton: {
     borderWidth: 1,
     borderColor: "#ccc4",
@@ -180,55 +202,44 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     borderRadius: 8,
     gap: 4,
-    marginTop: 4
+    marginTop: 4,
   },
   underline: {
     textDecorationLine: "underline",
   },
-  colorView:{
-    width: 25,
-    height: 25,
-    borderRadius: 30,
-    borderColor: '#ccc',
-    borderWidth: 3,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
-    elevation: 3,
-    position: 'absolute',
-    right: 8,
-    top: 11
-  },
-  headerBottom:{
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    padding: 2,
-    alignItems: 'center'
-  },
-  bottomButton:{
-    padding: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4
-  },
-  divider:{
-    width: 1,
-    backgroundColor: '#ccc4',
-    height: '70%'
-  },
-  details:{
-    flexDirection: 'row',
-    gap: 5,
-    alignItems: 'center',
-    marginBottom: 5
-  },
   detailsText:{
-    color: '#fff',
-    opacity: .7,
     fontSize: 12
   },
+  tabs:{
+    paddingHorizontal: 8,
+    borderBottomWidth: 3,
+    paddingTop: 9,
+    borderColor: 'transparent',
+    opacity: .5
+  },
+  tabsText:{
+    color: '#fff',
+    fontSize: 12
+  },
+  moreOptionsContainer:{
+    flexDirection: 'row',
+    borderRadius: 20,
+    backgroundColor: '#fff4',
+    marginBottom: 4,
+    alignItems: 'center',
+    paddingHorizontal: 7,
+    paddingVertical: 4,
+    gap: 7
+  },
+  colorView:{
+    width: 20,
+    height: 20,
+    borderRadius: 30,
+    borderColor: '#fff',
+    borderWidth: 3,
+  },
+  bottomOptions:{
+    gap: 4,
+    padding: 4
+  }
 });

@@ -3,7 +3,7 @@ import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, TextInput, Tou
 import { router } from "@/hooks/shared/useRouter";
 import { LinearGradient } from "expo-linear-gradient";
 import DraggableFlatList from "react-native-draggable-flatlist";
-import { TIcon, TText, TView } from "@/components/ui/Themed";
+import { TIcon, TView } from "@/components/ui/Themed";
 import BackButton from "@/components/common/BackButton";
 import LocationPickerModal, { LocationItemWithAddress } from "@/components/modals/LocationPickerModal";
 import HeadingBlock from "@/components/itinerary/HeadingBlock";
@@ -15,6 +15,7 @@ import ColorBar from "@/components/itinerary/ColorBar";
 import ItineraryHeader from "@/components/itinerary/Header";
 import { useThemeColor } from "@/hooks/shared/useThemeColor";
 import OptionsPopup from "@/components/ui/OptionsPopup";
+import RoundButton from "@/components/ui/RoundButton";
 import { newItinerayId } from "@/services/itineraryService";
 import { CreateItineraryForm, ItineraryViewType, HeaderType, ItineraryBlock, TextBlock } from "@/types/itineraryTypes";
 
@@ -280,59 +281,24 @@ export default function ItineraryForm({
         return false;
       }}
     >
-      <TView color='primary' style={styles.topButtons}>
-        <BackButton style={styles.backButton}/>
-
-        {canEdit && 
-          <View style={{flexDirection: 'row', gap: 5, alignItems: 'center'}}>
-            <OptionsPopup
-              options={[
-                {
-                  label: "Privacy and Access",
-                  iconName: "account-lock",
-                  onPress: () => router.push({ pathname: "/share"})
-                },
-                {
-                  label: "Create Room with this Itinerary",
-                  iconName: "tooltip-account",
-                  onPress: () => router.push({ pathname: "/share"})
-                },
-                {
-                  label: "Mark Itinerary as Complete",
-                  iconName: "check-circle",
-                  onPress: () => router.push({ pathname: "/share"})
-                },
-                {
-                  label: "Cancel Itinerary",
-                  iconName: "close-circle",
-                  onPress: () => router.push({ pathname: "/share"})
-                },
-                {
-                  label: "Delete Itinerary",
-                  iconName: "trash-can",
-                  onPress: () => router.push({ pathname: "/share"})
-                },
-              ]}
-              style={styles.optionsButton}
-            >
-              <TIcon name="dots-vertical" size={20}/>
-            </OptionsPopup>
-              <TouchableOpacity
-                style={[styles.doneButton, { backgroundColor: themeColor }]}
-                onPress={submit}
-                disabled={isSubmitting}
-              >
-                { createMode ? <>
-                  <TIcon name="check" size={16} color="#fff" />
-                  <TText style={styles.white}>Done</TText>
-                </> : <>
-                  <TIcon name="content-save" size={16} color="#fff" />
-                  <TText style={styles.white}>Save Changes</TText>
-                </>}
-                
-              </TouchableOpacity>
-          </View>
-        }
+      <TView color='primary' style={styles.header}>
+        <ItineraryHeader
+          title={title}
+          onTitleChange={setTitle}
+          type={type}
+          onTypeChange={setType}
+          startDate={startDate}
+          onStartDateChange={setStartDate}
+          endDate={endDate}
+          onEndDateChange={setEndDate}
+          themeColor={themeColor}
+          onThemeColorPress={
+            canEdit ? () => setColorBarVisible(true) : undefined
+          }
+          editable={canEdit}
+          createMode={createMode}
+          viewType={viewType}
+        />
       </TView>
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -340,6 +306,7 @@ export default function ItineraryForm({
           data={visibleContent}
           keyExtractor={(item) => item.id}
           renderItem={renderBlock}
+          style={{marginTop: 120}}
           onDragEnd={({ data }) =>
             canEdit &&
             setContent(
@@ -347,25 +314,6 @@ export default function ItineraryForm({
                 ? [...data, content.find((block) => block.id === composerId)!]
                 : data,
             )
-          }
-          ListHeaderComponent={
-            <ItineraryHeader
-              title={title}
-              onTitleChange={setTitle}
-              type={type}
-              onTypeChange={setType}
-              startDate={startDate}
-              onStartDateChange={setStartDate}
-              endDate={endDate}
-              onEndDateChange={setEndDate}
-              themeColor={themeColor}
-              onThemeColorPress={
-                canEdit ? () => setColorBarVisible(true) : undefined
-              }
-              editable={canEdit}
-              createMode={createMode}
-              viewType={viewType}
-            />
           }
           ListFooterComponent={
             showComposer ? (
@@ -423,28 +371,37 @@ export default function ItineraryForm({
           ]}
           colors={["transparent", backgroundColor]}
         >
-          {colorBarVisible ? (
-            <ColorBar
-              primaryColor={primaryColor}
-              selectedColor={themeColor}
-              onSelect={setThemeColor}
+          <View style={styles.bottomBarRow}>
+            {colorBarVisible ? (
+              <ColorBar
+                primaryColor={primaryColor}
+                selectedColor={themeColor}
+                onSelect={setThemeColor}
+              />
+            ) : focusedId ? (
+              <FocusBar
+                primaryColor={primaryColor}
+                onDone={() => setFocusedId(null)}
+                onDelete={deleteFocused}
+              />
+            ) : (
+              <Toolbar
+                primaryColor={primaryColor}
+                onText={addText}
+                onHeading={addHeading}
+                onLocation={() => setLocationVisible(true)}
+                onChecklist={addChecklist}
+                onDivider={addDivider}
+              />
+            )}
+            <RoundButton
+              iconName={createMode ? "check" : "content-save"}
+              onPress={submit}
+              disabled={isSubmitting}
+              loading={isSubmitting}
+              style={{ width: 44, height: 44, backgroundColor: themeColor }}
             />
-          ) : focusedId ? (
-            <FocusBar
-              primaryColor={primaryColor}
-              onDone={() => setFocusedId(null)}
-              onDelete={deleteFocused}
-            />
-          ) : (
-            <Toolbar
-              primaryColor={primaryColor}
-              onText={addText}
-              onHeading={addHeading}
-              onLocation={() => setLocationVisible(true)}
-              onChecklist={addChecklist}
-              onDivider={addDivider}
-            />
-          )}
+          </View>
         </LinearGradient>
       )}
       {canEdit && (
@@ -459,16 +416,12 @@ export default function ItineraryForm({
 }
 
 const styles = StyleSheet.create({
-  topButtons: {
+  header: {
     position: "absolute",
     top: 0,
     right: 0,
     left: 0,
     zIndex: 10,
-    flexDirection: "row",
-    paddingHorizontal: "3%",
-    height: 45,
-    justifyContent: "space-between",
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -482,19 +435,6 @@ const styles = StyleSheet.create({
     borderRadius: 20, 
     padding: 3, 
     marginTop: 7 
-  },
-  doneButton: {
-    flexDirection: "row",
-    gap: 4,
-    justifyContent: "center",
-    alignItems: "center",
-    height: 30,
-    paddingHorizontal: 8,
-    borderRadius: 16,
-  },
-  white: { 
-    color: "#fff",
-    fontSize: 11,
   },
   listContent: { 
     paddingBottom: 140, 
@@ -557,6 +497,11 @@ const styles = StyleSheet.create({
     zIndex: 10,
     padding: "3%",
     paddingTop: 50,
+  },
+  bottomBarRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
   },
   colorBarDismissArea: { 
     ...StyleSheet.absoluteFillObject, zIndex: 20 }

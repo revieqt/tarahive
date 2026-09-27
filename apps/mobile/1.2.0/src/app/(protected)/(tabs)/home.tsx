@@ -7,7 +7,7 @@ import { useInternetConnection } from '@/utils/checkInternetConnection';
 import HomeHeaderCard from '@/components/cards/HomeHeaderCard';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
-import { TARA_AI_SUGGESTIONS } from '@/constants/Tara';
+import { useTara } from '@/hooks/shared/useTara';
 import SidebarAlerts from '@/components/common/Sidebar';
 import MonthlyCalendar from '@/components/cards/MonthlyCalendarCard';
 
@@ -19,22 +19,21 @@ export default function HomeScreen() {
   const accentColor = useThemeColor({}, 'accent');
   const secondaryColor = useThemeColor({}, 'secondary');
   const [searchAi, setSearchAi] = useState('');
+  const [animatedSuggestion, setAnimatedSuggestion] = useState('');
+  const suggestion = useTara('suggestions');
   const { t } = useLanguage();
 
   useEffect(() => {
-    const randomSuggestion = TARA_AI_SUGGESTIONS[Math.floor(Math.random() * TARA_AI_SUGGESTIONS.length)];
+    setAnimatedSuggestion('');
     let currentIndex = 0;
     const typingInterval = setInterval(() => {
-      if (currentIndex < randomSuggestion.length) {
-        setSearchAi(randomSuggestion.slice(0, currentIndex + 1));
-        currentIndex++;
-      } else {
-        clearInterval(typingInterval);
-      }
-    }, 50);
+      currentIndex += 1;
+      setAnimatedSuggestion(suggestion.slice(0, currentIndex));
+      if (currentIndex >= suggestion.length) clearInterval(typingInterval);
+    }, 20);
 
     return () => clearInterval(typingInterval);
-  }, []);
+  }, [suggestion]);
   return (
     <TView style={{ flex: 1 }}>
       <HomeHeaderCard />
@@ -46,6 +45,7 @@ export default function HomeScreen() {
               <TextInput
                 value={searchAi}
                 onChangeText={setSearchAi}
+                placeholder={animatedSuggestion}
                 autoCapitalize="words"
                 style={[styles.searchField, { color: textColor }]}
               />
