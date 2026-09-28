@@ -78,7 +78,7 @@ export default function HomeScreen() {
                 <TText style={{ opacity: .5, fontSize: 10 }}>{t('tabs.home.menu_itinerary_desc')}</TText>
                 <TText style={{ opacity: .85, fontSize: 14 }}>{t('tabs.home.menu_itinerary')}</TText>
               </View>
-              <Image source={require('../../../../assets/images/slide2-img.png')} style={styles.leftGridImage} />
+              <Image source={require('../../../../assets/images/itinerary-icon.png')} style={styles.leftGridImage} />
             </TouchableOpacity>
             <View
               style={[styles.gridChildContainer, styles.leftGridContainer]}>
@@ -88,7 +88,7 @@ export default function HomeScreen() {
               >
                 <TText style={{ opacity: .5, fontSize: 10 }}>{t('tabs.home.menu_sos_desc')}</TText>
                 <TText style={{ opacity: .85 }}>{t('tabs.home.menu_sos')}</TText>
-                <Image source={require('../../../../assets/images/slide4-img.png')} style={styles.rightGridImage} />
+                <Image source={require('../../../../assets/images/sos-icon.png')} style={styles.rightGridImage} />
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => router.push('/tara')}
@@ -208,11 +208,11 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   leftGridImage: {
-    width: '100%',
-    height: '100%',
+    width: '85%',
+    height: '85%',
     position: 'absolute',
-    bottom: '-30%',
-    right: '-30%',
+    bottom: '-15%',
+    right: '-15%',
     opacity: .9,
   },
   rightGridImage: {

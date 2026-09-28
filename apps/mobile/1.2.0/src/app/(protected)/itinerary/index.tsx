@@ -100,7 +100,7 @@ export default function ItineraryScreen() {
           style={styles.gridCircle}
           pointerEvents="none"
         />
-        <Image source={require('../../../../assets/images/slide2-img.png')} style={styles.image} />
+        <Image source={require('../../../../assets/images/itinerary-icon.png')} style={styles.image} />
         <Header title='Itinerary' subtitle='Manage your travel plans'/>
         <View style={styles.tabsContainer}>
           {ItineraryOptions.map((option, index) => (

@@ -28,6 +28,7 @@ export default function ItineraryScreen() {
 		<ItineraryForm
 			key={itinerary ? 'loaded' : 'pending'}
 			viewType="owner"
+			itineraryId={itineraryId}
 			initialValues={{
 				title: itinerary?.title ?? '',
 				type: itinerary?.type ?? 'Solo',

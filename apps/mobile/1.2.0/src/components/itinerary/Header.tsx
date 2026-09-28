@@ -58,7 +58,7 @@ export default function ItineraryHeader({
   const [tab, setTab] = useState(1);
 
   return (
-    <TView color='primary' style={style}>
+    <TView style={style}>
       <View
         style={[styles.titleContainer, {backgroundColor: themeColor}]}
       >
@@ -187,18 +187,34 @@ export default function ItineraryHeader({
         }
 
         { tab === 3 && <>
-          <TouchableOpacity style={styles.headerButton}>
+          <OptionsPopup
+            options={[
+              { label: "Public", iconName: "earth" },
+              { label: "Private", iconName: "lock" },
+              { label: "Invited Collaborators Only", iconName: "account-lock-open" }
+            ]}
+            style={styles.headerButton}
+          >
             <TIcon name="lock" size={12}/>
             <TText style={styles.detailsText}>Private</TText>
-          </TouchableOpacity>
+          </OptionsPopup>
 
-          <TouchableOpacity style={styles.headerButton}>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() =>
+              router.push({
+                pathname: '/itinerary/[id]/collaborators',
+                params: {
+                  id: itineraryId || '',
+                },
+              })
+            }
+          >
             <TIcon name="account" size={12}/>
             <TText style={styles.detailsText}>Collaborators</TText>
           </TouchableOpacity>
         </>
         }
-        
       </ScrollView>
     </TView>
   );

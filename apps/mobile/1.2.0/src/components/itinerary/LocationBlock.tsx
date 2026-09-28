@@ -46,6 +46,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     flexDirection: "row",
     justifyContent: "space-between",
+    borderWidth: 1,
+    borderColor: '#ccc4'
   },
   copy: { flex: 1, paddingRight: 8 },
   name: { fontSize: 13, fontWeight: "600" },

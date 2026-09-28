@@ -14,7 +14,6 @@ import FocusBar from "@/components/itinerary/FocusBar";
 import ColorBar from "@/components/itinerary/ColorBar";
 import ItineraryHeader from "@/components/itinerary/Header";
 import { useThemeColor } from "@/hooks/shared/useThemeColor";
-import OptionsPopup from "@/components/ui/OptionsPopup";
 import RoundButton from "@/components/ui/RoundButton";
 import { newItinerayId } from "@/services/itineraryService";
 import { CreateItineraryForm, ItineraryViewType, HeaderType, ItineraryBlock, TextBlock } from "@/types/itineraryTypes";
@@ -25,6 +24,7 @@ type ItineraryFormProps = {
   isSubmitting?: boolean;
   onSubmit?: (values: CreateItineraryForm) => void;
   createMode?: boolean;
+  itineraryId?: string;
 };
 
 export default function ItineraryForm({
@@ -33,6 +33,7 @@ export default function ItineraryForm({
   createMode = false,
   isSubmitting = false,
   onSubmit,
+  itineraryId
 }: ItineraryFormProps) {
   const canEdit = !(viewType === "viewer");
   const backgroundColor = useThemeColor({}, "background");
@@ -283,6 +284,7 @@ export default function ItineraryForm({
     >
       <TView color='primary' style={styles.header}>
         <ItineraryHeader
+          itineraryId={itineraryId}
           title={title}
           onTitleChange={setTitle}
           type={type}
