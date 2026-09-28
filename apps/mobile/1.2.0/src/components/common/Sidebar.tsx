@@ -8,6 +8,7 @@ import { useSession } from '@/context/SessionContext';
 import { router } from 'expo-router';
 import TaraSuggestionButton from './TaraSuggestionButton';
 import SOSSidebarButton from './SOSSidebarButton';
+import NotificationsButton from './NotificationsButton';
 
 const SidebarAlerts: React.FC = () => {
     const [hideAlert, setHideAlert] = useState(false);
@@ -182,6 +183,7 @@ const SidebarAlerts: React.FC = () => {
                 }}
             >
                 { session?.user?.safetyState?.isInAnEmergency && <SOSSidebarButton/> }
+                <NotificationsButton/>
                 <TaraSuggestionButton/>
             </Animated.View>
 
@@ -214,7 +216,7 @@ const styles = StyleSheet.create({
         bottom: 5,
         right: 7,
         zIndex: 1000,
-        width: 60,
+        width: 55,
         alignItems: 'flex-end',
         flexDirection: 'column-reverse',
         gap: 7,
@@ -234,19 +236,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 30,
-    },
-    alertButton: {
-        width: '100%',
-        aspectRatio: 1,
-        borderRadius: 100,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'orange',
-        borderWidth: 3,
-        borderColor: 'white',
-        overflow: 'hidden',
-        paddingTop: 45,
-        paddingLeft: 5,
     },
     hideButton: {
         width: '100%',
@@ -268,11 +257,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'red',
         borderWidth: 2,
         borderColor: 'white',
-    },
-    taraImage: {
-        width: 50,
-        height: 100,
-        resizeMode: 'contain',
     },
 });
 

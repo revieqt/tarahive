@@ -8,6 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
 import WeatherDisplay from '../common/WeatherDisplay';
 import { useLanguage } from '@/context/LanguageContext';
+import HiveBg from '../common/HiveBg';
 
 const getWeatherImage = (weatherCode: number): any => {
   if (weatherCode === 0) {
@@ -47,6 +48,7 @@ export default function HomeHeaderCard() {
 
   return (
     <LinearGradient colors={[accentColor, secondaryColor]} style={styles.locationContent}>
+      <HiveBg/>
       <View style={{ gap: 5 }}>
         {showLoading ? <>
           <Skeleton style={styles.descLoading} />

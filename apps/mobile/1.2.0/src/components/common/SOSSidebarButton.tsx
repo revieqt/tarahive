@@ -81,12 +81,17 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     button: {
-        width: '100%',
+        width: 55,
         aspectRatio: 1,
         borderRadius: 50,
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 3,
         marginBottom: 4,
+        shadowColor: 'rgba(120,120,120,0.6)',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.18,
+        shadowRadius: 24,
+        elevation: 10,
     },
 });

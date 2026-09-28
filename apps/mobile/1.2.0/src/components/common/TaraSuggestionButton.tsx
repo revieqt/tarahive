@@ -90,12 +90,6 @@ const ActiveRouteSidebarButton: React.FC = () => {
                             borderColor: accentColor,
                             transform: [
                                 {
-                                    translateY: fadeAnimation.interpolate({
-                                        inputRange: [0, 1],
-                                        outputRange: [8, 0],
-                                    }),
-                                },
-                                {
                                     translateX: slideAnimation.interpolate({
                                         inputRange: [0, 24],
                                         outputRange: [0, 24],
@@ -105,7 +99,7 @@ const ActiveRouteSidebarButton: React.FC = () => {
                         },
                     ]}
                 >
-                    <TouchableOpacity style={{ flex: 1}} onPress={() => router.push('/suggestion')}>
+                    <TouchableOpacity style={{ flex: 1}} onPress={() => router.push('/tara')}>
                         <TText style={styles.messageText}>
                             {t('common.common.hello')} {session?.user?.fname}! {randomMessage}
                         </TText>
@@ -115,7 +109,7 @@ const ActiveRouteSidebarButton: React.FC = () => {
             ) : null}
             <TouchableOpacity
                 style={styles.wrapper}
-                onPress={() => router.push('/suggestion')}
+                onPress={() => router.push('/tara')}
             >
                 <Animated.Image
                     source={require('../../../assets/images/mascot-side.png')}
@@ -159,7 +153,7 @@ const styles = StyleSheet.create({
         top: 0,
         left: Dimensions.get('window').width * -0.8,
         right: 10,
-        height: 60,
+        height: 55,
         zIndex: 10,
         paddingVertical: 14,
         paddingLeft: 16,
@@ -181,7 +175,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
     },
     wrapper: {
-        width: 60,
+        width: 55,
         aspectRatio: 1,
         borderRadius: 100,
         justifyContent: 'center',

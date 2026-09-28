@@ -160,7 +160,7 @@ const MonthlyCalendar: React.FC = () => {
           <TText style={{ fontSize: 10, opacity: 0.5 }}>{selectedDateLabel ? selectedDateLabel : todayLabel}</TText>
         </View>
 
-        <TouchableOpacity onPress={() => router.push('/itinerary/new')} style={[styles.newItineraryButton, { backgroundColor }]}>
+        <TouchableOpacity onPress={() => router.push('/itinerary/create')} style={[styles.newItineraryButton, { backgroundColor }]}>
           <TIcon name='plus' size={20} />
         </TouchableOpacity>
       </View>
