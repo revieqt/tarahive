@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Modal, View, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { WebView } from 'react-native-webview';
 import { LinearGradient } from 'expo-linear-gradient';
 import { TView, TText } from '@/components/ui/Themed';
+import WeatherDisplay from '@/components/common/WeatherDisplay';
 import LocationAutocomplete, { LocationItem } from '@/components/ui/LocationField';
 import RoundButton from '@/components/ui/RoundButton';
+import OSMMapView, { OSMMapViewRef } from '@/components/ui/OSMMapView';
 import { useLocation } from '@/context/LocationContext';
+import { usePlaceWeather } from '@/hooks/shared/useWeather';
 
 export interface Address {
   country?: string;
@@ -30,45 +32,6 @@ interface LocationPickerModalProps {
   initialLocation?: LocationItemWithAddress;
 }
 
-function buildLeafletHTML(lat: number, lng: number): string {
-  return `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-        <style>
-          * { margin: 0; padding: 0; box-sizing: border-box; }
-          html, body, #map { width: 100%; height: 100%; }
-        </style>
-      </head>
-      <body>
-        <div id="map"></div>
-        <script>
-          const map = L.map('map', { center: [${lat}, ${lng}], zoom: 16, zoomControl: true });
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors',
-            maxZoom: 19,
-          }).addTo(map);
-          let debounceTimer = null;
-          map.on('moveend', () => {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => {
-              const center = map.getCenter();
-              window.ReactNativeWebView.postMessage(JSON.stringify({
-                type: 'regionChange',
-                latitude: center.lat,
-                longitude: center.lng,
-              }));
-            }, 500);
-          });
-        </script>
-      </body>
-    </html>
-  `;
-}
-
 export default function LocationPickerModal({
   visible,
   onClose,
@@ -76,16 +39,23 @@ export default function LocationPickerModal({
   isEditingLocation = false,
   initialLocation,
 }: LocationPickerModalProps) {
-  const { latitude, longitude } = useLocation();
+  const { latitude, longitude, city: currentCity } = useLocation();
 
   const [centerCoords, setCenterCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [locationName, setLocationName] = useState('');
   const [locationData, setLocationData] = useState<Partial<LocationItemWithAddress>>({});
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
-  const [leafletHTML, setLeafletHTML] = useState('');
 
-  const webViewRef = useRef<WebView>(null);
+  const mapRef = useRef<OSMMapViewRef>(null);
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const weatherLatitude = locationData.latitude ?? latitude;
+  const weatherLongitude = locationData.longitude ?? longitude;
+  const weatherCity = locationData.address?.city || locationData.locationName || locationName || currentCity;
+  const { data: weather, isLoading: weatherLoading } = usePlaceWeather(
+    weatherLatitude,
+    weatherLongitude,
+    weatherCity,
+  );
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -120,9 +90,7 @@ export default function LocationPickerModal({
   };
 
   const panMapTo = (lat: number, lng: number) => {
-    webViewRef.current?.injectJavaScript(
-      `map.setView([${lat}, ${lng}], 16, { animate: true }); true;`
-    );
+    mapRef.current?.setCenter(lat, lng);
   };
 
   // ── Init on open ───────────────────────────────────────────────────────────
@@ -146,41 +114,37 @@ export default function LocationPickerModal({
     }
 
     setCenterCoords({ lat: initLat, lng: initLng });
-    setLeafletHTML(buildLeafletHTML(initLat, initLng));
+    panMapTo(initLat, initLng);
 
     return () => {
       if (debounceTimer.current) clearTimeout(debounceTimer.current);
     };
   }, [visible, isEditingLocation, initialLocation, latitude, longitude]);
 
-  // ── WebView messages ───────────────────────────────────────────────────────
-
-  const handleWebViewMessage = async (event: any) => {
-    try {
-      const msg = JSON.parse(event.nativeEvent.data);
-      if (msg.type !== 'regionChange') return;
-      const { latitude: lat, longitude: lng } = msg;
-      setCenterCoords({ lat, lng });
-      if (debounceTimer.current) clearTimeout(debounceTimer.current);
-      debounceTimer.current = setTimeout(async () => {
-        const { name, address } = await reverseGeocode(lat, lng);
-        setLocationName(name);
-        setLocationData({ locationName: name, latitude: lat, longitude: lng, address });
-      }, 0);
-    } catch {}
+  const handleRegionChange = (lat: number, lng: number) => {
+    setCenterCoords({ lat, lng });
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(async () => {
+      const { name, address } = await reverseGeocode(lat, lng);
+      setLocationName(name);
+      setLocationData({ locationName: name, latitude: lat, longitude: lng, address });
+    }, 0);
   };
 
   // ── Autocomplete selection ─────────────────────────────────────────────────
 
   const handleLocationSelect = async (loc: LocationItem) => {
     setLocationName(loc.locationName ?? '');
-    if (loc.latitude && loc.longitude && (!loc.address || Object.keys(loc.address).length === 0)) {
+    if (loc.latitude !== null && loc.longitude !== null) {
       const { address } = await reverseGeocode(loc.latitude, loc.longitude);
       setLocationData({ ...loc, address });
     } else {
       setLocationData(loc);
     }
-    if (loc.latitude && loc.longitude) panMapTo(loc.latitude, loc.longitude);
+    if (loc.latitude !== null && loc.longitude !== null) {
+      setCenterCoords({ lat: loc.latitude, lng: loc.longitude });
+      panMapTo(loc.latitude, loc.longitude);
+    }
   };
 
   // ── Confirm ────────────────────────────────────────────────────────────────
@@ -206,20 +170,17 @@ export default function LocationPickerModal({
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <SafeAreaView style={{ flex: 1 }}>
         <TView style={{ flex: 1 }}>
-          {leafletHTML ? (
+          {centerCoords ? (
             <View style={styles.mapContainer}>
-              <WebView
-                ref={webViewRef}
-                style={styles.map}
-                originWhitelist={['*']}
-                source={{ html: leafletHTML }}
-                onMessage={handleWebViewMessage}
-                scrollEnabled={false}
-                javaScriptEnabled
+              <OSMMapView
+                ref={mapRef}
+                latitude={centerCoords.lat}
+                longitude={centerCoords.lng}
+                onRegionChange={handleRegionChange}
+                showMarker={false}
+                showCenterMarker
+                zoom={16}
               />
-              <View style={styles.centerMarkerContainer} pointerEvents="none">
-                <View style={styles.centerMarker} />
-              </View>
             </View>
           ) : null}
 
@@ -248,6 +209,17 @@ export default function LocationPickerModal({
                 {isLoadingLocation ? 'Getting location...' : locationName}
               </TText>
               <TText style={{ color: '#fff' }}>Your Chosen Location</TText>
+              {weatherCity ? (
+                <WeatherDisplay
+                  heatValue={weather?.temperature ?? undefined}
+                  rainValue={weather?.precipitation ?? undefined}
+                  humidValue={weather?.humidity ?? undefined}
+                  windValue={weather?.windSpeed ?? undefined}
+                  loading={weatherLoading || isLoadingLocation}
+                  textColor="#fff"
+                  backgroundColor="#0004"
+                />
+              ) : null}
             </View>
             <RoundButton iconName="check" onPress={handleConfirm} />
           </LinearGradient>
@@ -263,35 +235,12 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     position: 'relative',
   },
-  map: {
-    position: 'absolute',
-    top: 0, bottom: 0, left: 0, right: 0,
-  },
   topSection: {
     position: 'absolute',
     top: 0, left: 0, right: 0,
     paddingHorizontal: 16,
     paddingVertical: 12,
     zIndex: 100,
-  },
-  centerMarkerContainer: {
-    position: 'absolute',
-    top: 0, left: 0, right: 0, bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  centerMarker: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#00CAFF',
-    borderWidth: 3,
-    borderColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 5,
   },
   bottomContainer: {
     position: 'absolute',
