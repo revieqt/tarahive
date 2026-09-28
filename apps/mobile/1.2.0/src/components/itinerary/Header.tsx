@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ViewStyle
 } from "react-native";
 import { router } from "expo-router";
 import { TIcon, TText, TView } from "@/components/ui/Themed";
@@ -32,6 +33,7 @@ type ItineraryHeaderProps = {
   viewType?: ItineraryViewType;
   createMode?: boolean;
   editable?: boolean;
+  style?: ViewStyle | ViewStyle[];
 };
 
 export default function ItineraryHeader({
@@ -49,13 +51,14 @@ export default function ItineraryHeader({
   viewType = 'viewer',
   createMode = false,
   editable = true,
+  style
 }: ItineraryHeaderProps) {
   const canEdit = viewType === "owner" || viewType === "editor";
   const textColor = useThemeColor({}, "text");
   const [tab, setTab] = useState(1);
 
   return (
-    <TView color='primary'>
+    <TView color='primary' style={style}>
       <View
         style={[styles.titleContainer, {backgroundColor: themeColor}]}
       >
@@ -80,29 +83,29 @@ export default function ItineraryHeader({
             contentContainerStyle={{flexDirection: 'row'}}
             style={{flex: 1}}
           >
-            { viewType === 'owner' &&
-              <>
-                <TouchableOpacity 
-                  style={[styles.tabs, tab === 1 && {borderColor: '#fff', opacity: 1}]}
-                  onPress={() => setTab(1)}
-                >
-                  <TText style={styles.tabsText}>Details</TText>
-                </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.tabs, tab === 1 && {borderColor: '#fff', opacity: 1}]}
+              onPress={() => setTab(1)}
+            >
+              <TText style={styles.tabsText}>Details</TText>
+            </TouchableOpacity>
 
-                <TouchableOpacity 
-                  style={[styles.tabs, tab === 2 && {borderColor: '#fff', opacity: 1}]}
-                  onPress={() => setTab(2)}
-                >
-                  <TText style={styles.tabsText}>Status</TText>
-                </TouchableOpacity>
+            { !createMode  &&
+              <TouchableOpacity 
+                style={[styles.tabs, tab === 2 && {borderColor: '#fff', opacity: 1}]}
+                onPress={() => setTab(2)}
+              >
+                <TText style={styles.tabsText}>Status</TText>
+              </TouchableOpacity>
+            }
 
-                <TouchableOpacity 
-                  style={[styles.tabs, tab === 3 && {borderColor: '#fff', opacity: 1}]}
-                  onPress={() => setTab(3)}
-                >
-                  <TText style={styles.tabsText}>Privacy</TText>
-                </TouchableOpacity>
-              </>
+            { (!createMode && canEdit) &&
+              <TouchableOpacity 
+                style={[styles.tabs, tab === 3 && {borderColor: '#fff', opacity: 1}]}
+                onPress={() => setTab(3)}
+              >
+                <TText style={styles.tabsText}>Privacy</TText>
+              </TouchableOpacity>
             }
           </ScrollView>
 
@@ -117,38 +120,36 @@ export default function ItineraryHeader({
 
             { canEdit && <TouchableOpacity style={[styles.colorView, {backgroundColor: themeColor}]} onPress={editable ? onThemeColorPress : undefined}/> }
           </View>
-
-          
         </View>
-        
       </View>
 
-      {
-        !createMode &&
 
-        <ScrollView contentContainerStyle={styles.bottomOptions} horizontal showsHorizontalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={styles.bottomOptions} horizontal showsHorizontalScrollIndicator={false}>
+        { tab === 1 && <>
           <View style={styles.headerButton}>
+            <TIcon name="calendar" size={12}/>
+
             <DatePickerField
-                placeholder="Start Date"
-                value={startDate}
-                onChange={onStartDateChange}
-                disabled={!editable}
-                minimumDate={new Date()}
-                maximumDate={endDate || undefined}
-                custom
-                customLabelStyle={[styles.detailsText, styles.underline]}
+              placeholder="Start Date"
+              value={startDate}
+              onChange={onStartDateChange}
+              disabled={!editable}
+              minimumDate={new Date()}
+              maximumDate={endDate || undefined}
+              custom
+              customLabelStyle={styles.detailsText}
             />
 
-            <TIcon name="chevron-right" size={15} color="#fff"/>
+            <TIcon name="chevron-right" size={12}/>
 
             <DatePickerField
-                placeholder="End Date"
-                value={endDate}
-                onChange={onEndDateChange}
-                disabled={!editable}
-                minimumDate={startDate || new Date()}
-                custom
-                customLabelStyle={[styles.detailsText, styles.underline]}
+              placeholder="End Date"
+              value={endDate}
+              onChange={onEndDateChange}
+              disabled={!editable}
+              minimumDate={startDate || new Date()}
+              custom
+              customLabelStyle={styles.detailsText}
             />
           </View>
 
@@ -161,9 +162,44 @@ export default function ItineraryHeader({
             custom
             customLabelStyle={styles.detailsText}
             customButtonStyle={styles.headerButton}
+            customIconName="pencil"
+            customIconSize={12}
           />
-        </ScrollView>
-      }
+          </>
+        }
+
+        { tab === 2 && <>
+          <TouchableOpacity style={[styles.headerButton, {backgroundColor: '#5BCB78'}]}>
+            <TIcon name="check" size={12} color="white"/>
+            <TText style={[styles.detailsText, {color: '#fff'}]}>Mark as Complete</TText>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={[styles.headerButton, {backgroundColor: '#F5C84B'}]}>
+            <TIcon name="close" size={12} color="white"/>
+            <TText style={[styles.detailsText, {color: '#fff'}]}>Cancel Itinerary</TText>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={[styles.headerButton, {backgroundColor: '#F06A6A'}]}>
+            <TIcon name="close" size={12} color="white"/>
+            <TText style={[styles.detailsText, {color: '#fff'}]}>Delete Itinerary</TText>
+          </TouchableOpacity>
+        </>
+        }
+
+        { tab === 3 && <>
+          <TouchableOpacity style={styles.headerButton}>
+            <TIcon name="lock" size={12}/>
+            <TText style={styles.detailsText}>Private</TText>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.headerButton}>
+            <TIcon name="account" size={12}/>
+            <TText style={styles.detailsText}>Collaborators</TText>
+          </TouchableOpacity>
+        </>
+        }
+        
+      </ScrollView>
     </TView>
   );
 }
@@ -193,22 +229,18 @@ const styles = StyleSheet.create({
     padding: '3%'
   },
   headerButton: {
-    borderWidth: 1,
-    borderColor: "#ccc4",
-    backgroundColor: "#fff4",
+    backgroundColor: "#ccc2",
     paddingVertical: 4,
+    paddingHorizontal: 8,
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
-    borderRadius: 8,
-    gap: 4,
-    marginTop: 4,
-  },
-  underline: {
-    textDecorationLine: "underline",
+    borderRadius: 20,
+    gap: 2,
+    opacity: .8
   },
   detailsText:{
-    fontSize: 12
+    fontSize: 11,
   },
   tabs:{
     paddingHorizontal: 8,
@@ -239,7 +271,8 @@ const styles = StyleSheet.create({
     borderWidth: 3,
   },
   bottomOptions:{
-    gap: 4,
-    padding: 4
+    gap: 2,
+    paddingVertical: 8,
+    paddingHorizontal: '3%',
   }
 });

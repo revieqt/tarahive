@@ -15,12 +15,12 @@ export default function FocusBar({
   return (
     <View style={[styles.container, { backgroundColor: primaryColor }]}>
       <TouchableOpacity style={styles.option} onPress={onDone}>
-        <TIcon name="check" size={20} />
-        <TText>Done</TText>
+        <TIcon name="check" size={15} />
+        <TText style={{fontSize: 12}}>Done</TText>
       </TouchableOpacity>
       <TouchableOpacity style={[styles.option, {backgroundColor: '#EE4B2B'}]} onPress={onDelete}>
-        <TIcon name="trash-can" size={20} color='white'/>
-        <TText style={{color: 'white'}}>Delete</TText>
+        <TIcon name="trash-can" size={15} color='white'/>
+        <TText style={{color: 'white', fontSize: 12}}>Delete</TText>
       </TouchableOpacity>
     </View>
   );
@@ -44,9 +44,7 @@ const styles = StyleSheet.create({
   },
   option: {
     flex: 1,
-    padding: 3,
-    borderWidth: 1,
-    borderColor: "#ccc1",
+    padding: 5,
     borderRadius: 15,
     flexDirection: "row",
     justifyContent: "center",

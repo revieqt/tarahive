@@ -42,8 +42,6 @@ export default function LocationBlock({
 
 const styles = StyleSheet.create({
   container: {
-    borderWidth: 1,
-    borderColor: "#9994",
     padding: 8,
     borderRadius: 10,
     flexDirection: "row",

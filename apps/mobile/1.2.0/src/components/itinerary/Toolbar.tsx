@@ -28,8 +28,7 @@ export default function Toolbar({
       showsHorizontalScrollIndicator={false}
     >
       <TouchableOpacity style={styles.option} onPress={onText}>
-        <TIcon name="format-text-variant" size={15} />
-        <TText>Text</TText>
+        <TIcon name="format-text-variant" size={20} />
       </TouchableOpacity>
       <OptionsPopup
         options={[
@@ -51,20 +50,16 @@ export default function Toolbar({
         ]}
         style={styles.option}
       >
-        <TIcon name="format-text-variant-outline" size={15} />
-        <TText>Heading</TText>
+        <TIcon name="format-text-variant-outline" size={20} />
       </OptionsPopup>
       <TouchableOpacity style={styles.option} onPress={onLocation}>
-        <TIcon name="map-marker" size={15} />
-        <TText>Location</TText>
+        <TIcon name="map-marker" size={20} />
       </TouchableOpacity>
       <TouchableOpacity style={styles.option} onPress={onChecklist}>
-        <TIcon name="checkbox-marked-outline" size={15} />
-        <TText>Checklist</TText>
+        <TIcon name="checkbox-marked-outline" size={20} />
       </TouchableOpacity>
       <TouchableOpacity style={styles.option} onPress={onDivider}>
-        <TIcon name="format-horizontal-align-center" size={15} />
-        <TText>Divider</TText>
+        <TIcon name="format-horizontal-align-center" size={20} />
       </TouchableOpacity>
     </ScrollView>
   );
@@ -85,10 +80,8 @@ const styles = StyleSheet.create({
   },
   content: { padding: 8, gap: 5 },
   option: {
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderWidth: 1,
-    borderColor: "#ccc1",
+    paddingVertical: 3,
+    paddingHorizontal: 8,
     borderRadius: 15,
     flexDirection: "row",
     justifyContent: "center",

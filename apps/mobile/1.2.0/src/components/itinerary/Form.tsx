@@ -306,7 +306,6 @@ export default function ItineraryForm({
           data={visibleContent}
           keyExtractor={(item) => item.id}
           renderItem={renderBlock}
-          style={{marginTop: 120}}
           onDragEnd={({ data }) =>
             canEdit &&
             setContent(
@@ -315,6 +314,7 @@ export default function ItineraryForm({
                 : data,
             )
           }
+          style={ createMode ? {marginTop: 113} : {marginTop: 125}}
           ListFooterComponent={
             showComposer ? (
               <View
