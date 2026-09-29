@@ -106,10 +106,10 @@ export default function ItineraryScreen() {
         </View>
 
         {isLoading ? (
-          <View style={styles.listContent}>
+          <>
             <ItineraryCardSkeleton />
             <ItineraryCardSkeleton />
-          </View>
+          </>
         ) : isError || !itineraries || itineraries.length === 0 ? (
           <View style={styles.errorContainer}>
             <EmptyMessage

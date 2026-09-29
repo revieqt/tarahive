@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Pressable, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 import { TIcon } from "@/components/ui/Themed";
-import { ChecklistBlock as ChecklistBlockData } from "./types";
+import { ChecklistBlock as ChecklistBlockData } from "@/types/itineraryTypes";
 import { useThemeColor } from "@/hooks/shared/useThemeColor";
 
 interface ChecklistBlockProps {

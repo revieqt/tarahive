@@ -14,8 +14,6 @@ import DropDownField from "@/components/ui/DropDownField";
 import OptionsPopup from "@/components/ui/OptionsPopup";
 import { ITINERARY_TYPES } from "@/constants/Itinerary";
 import { ItineraryViewType } from "@/types/itineraryTypes"
-import { formatDateToString } from "@/utils/formatDateToString";
-import { useThemeColor } from "@/hooks/shared/useThemeColor";
 import BackButton from "../common/BackButton";
 
 type ItineraryHeaderProps = {
@@ -54,7 +52,6 @@ export default function ItineraryHeader({
   style
 }: ItineraryHeaderProps) {
   const canEdit = viewType === "owner" || viewType === "editor";
-  const textColor = useThemeColor({}, "text");
   const [tab, setTab] = useState(1);
 
   return (
@@ -71,7 +68,6 @@ export default function ItineraryHeader({
           placeholderTextColor="#fff7"
         />
 
-        
         <TText style={styles.metaText}>{ !createMode && 'Created by revie.dev · Private'}</TText>
 
         <BackButton type="close" color="white" style={styles.closeButton}/>
@@ -95,7 +91,7 @@ export default function ItineraryHeader({
                 style={[styles.tabs, tab === 2 && {borderColor: '#fff', opacity: 1}]}
                 onPress={() => setTab(2)}
               >
-                <TText style={styles.tabsText}>Status</TText>
+                <TText style={styles.tabsText}>Actions</TText>
               </TouchableOpacity>
             }
 
@@ -177,6 +173,11 @@ export default function ItineraryHeader({
           <TouchableOpacity style={[styles.headerButton, {backgroundColor: '#F5C84B'}]}>
             <TIcon name="close" size={12} color="white"/>
             <TText style={[styles.detailsText, {color: '#fff'}]}>Cancel Itinerary</TText>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.headerButton}>
+            <TIcon name="account-group" size={12} color="white"/>
+            <TText style={styles.detailsText}>Create Room with Itinerary</TText>
           </TouchableOpacity>
 
           <TouchableOpacity style={[styles.headerButton, {backgroundColor: '#F06A6A'}]}>

@@ -6,7 +6,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useThemeColor } from "@/hooks/shared/useThemeColor";
 import { useSession } from "@/context/SessionContext";
 import BackButton from "@/components/common/BackButton";
-import HiveBg from "@/components/common/HiveBg";
 import { router } from "expo-router";
 import { useSafety } from "@/hooks/sos/useSOS"
 import SOSInfoCard from "@/components/cards/SOSInfoCard";

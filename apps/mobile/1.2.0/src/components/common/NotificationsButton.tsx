@@ -42,9 +42,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden'
     },
     icon: {
-        width: '140%',
-        height: '140%',
-        marginTop: 10,
-        marginLeft: 10
+        width: '100%',
+        height: '100%',
     },
 });
