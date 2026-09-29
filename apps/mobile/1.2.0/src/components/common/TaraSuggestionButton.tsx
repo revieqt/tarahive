@@ -99,7 +99,7 @@ const ActiveRouteSidebarButton: React.FC = () => {
                         },
                     ]}
                 >
-                    <TouchableOpacity style={{ flex: 1}} onPress={() => router.push('/tara')}>
+                    <TouchableOpacity style={styles.messageButton} onPress={() => router.push('/tara')}>
                         <TText style={styles.messageText}>
                             {t('common.common.hello')} {session?.user?.fname}! {randomMessage}
                         </TText>
@@ -155,7 +155,6 @@ const styles = StyleSheet.create({
         right: 10,
         height: 55,
         zIndex: 10,
-        paddingVertical: 14,
         paddingLeft: 16,
         paddingRight: 55,
         backgroundColor: 'rgba(0, 0, 0, 0.72)',
@@ -173,6 +172,11 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         opacity: .7,
         fontSize: 12,
+        alignItems: 'center'
+    },
+    messageButton: {
+        flex: 1,
+        justifyContent: 'center',
     },
     wrapper: {
         width: 55,

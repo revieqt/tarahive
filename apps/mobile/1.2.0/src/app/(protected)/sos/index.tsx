@@ -50,10 +50,7 @@ export default function SOSSection() {
   return (
     <TView style={{ flex: 1 }}>
       <BackButton type='floating' color='#fff' />
-      <LinearGradient colors={gradientColors} style={styles.background}>
-        <HiveBg flipHorizontal fade={false} />
-        <HiveBg fade={false} />
-      </LinearGradient>
+      <LinearGradient colors={gradientColors} style={styles.background}/>
 
       <View style={styles.container}>
         <View style={styles.titleContainer}>
@@ -131,8 +128,8 @@ const styles = StyleSheet.create({
   },
   messageContainer: {
     marginHorizontal: '3%',
-    borderRadius: 12,
-    marginBottom: 16,
+    borderRadius: 15,
+    marginBottom: '3%',
     gap: 5,
   },
   openSettings: {

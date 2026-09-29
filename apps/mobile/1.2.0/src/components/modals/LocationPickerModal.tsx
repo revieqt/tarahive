@@ -168,63 +168,61 @@ export default function LocationPickerModal({
 
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <TView style={{ flex: 1 }}>
-          {centerCoords ? (
-            <View style={styles.mapContainer}>
-              <OSMMapView
-                ref={mapRef}
-                latitude={centerCoords.lat}
-                longitude={centerCoords.lng}
-                onRegionChange={handleRegionChange}
-                showMarker={false}
-                showCenterMarker
-                zoom={16}
-              />
-            </View>
-          ) : null}
-
-          {/* Top overlay */}
-          <LinearGradient colors={['#000', 'transparent']} style={styles.topSection}>
-            <TText style={{ marginBottom: 8, color: '#fff' }}>
-              Select a location or navigate through the map
-            </TText>
-            <LocationAutocomplete
-              value={locationName}
-              onSelect={handleLocationSelect}
-              placeholder="Search for a location or move the map"
+      <TView style={{ flex: 1 }}>
+        {centerCoords ? (
+          <View style={styles.mapContainer}>
+            <OSMMapView
+              ref={mapRef}
+              latitude={centerCoords.lat}
+              longitude={centerCoords.lng}
+              onRegionChange={handleRegionChange}
+              showMarker={false}
+              showCenterMarker
+              zoom={16}
             />
-            <TText style={{ fontSize: 11, opacity: 0.5, marginTop: 8 }}>
-              Move the map to pin a location
-            </TText>
-          </LinearGradient>
+          </View>
+        ) : null}
 
-          {/* Bottom overlay */}
-          <LinearGradient
-            colors={['transparent', '#000']}
-            style={styles.bottomContainer}
-          >
-            <View style={{ width: '80%' }}>
-              <TText type="subtitle" style={{ color: '#fff' }}>
-                {isLoadingLocation ? 'Getting location...' : locationName}
-              </TText>
-              <TText style={{ color: '#fff' }}>Your Chosen Location</TText>
-              {weatherCity ? (
-                <WeatherDisplay
-                  heatValue={weather?.temperature ?? undefined}
-                  rainValue={weather?.precipitation ?? undefined}
-                  humidValue={weather?.humidity ?? undefined}
-                  windValue={weather?.windSpeed ?? undefined}
-                  loading={weatherLoading || isLoadingLocation}
-                  textColor="#fff"
-                  backgroundColor="#0004"
-                />
-              ) : null}
-            </View>
-            <RoundButton iconName="check" onPress={handleConfirm} />
-          </LinearGradient>
-        </TView>
-      </SafeAreaView>
+        {/* Top overlay */}
+        <LinearGradient colors={['#000', 'transparent']} style={styles.topSection}>
+          <TText style={{ marginBottom: 8, color: '#fff' }}>
+            Select a location or navigate through the map
+          </TText>
+          <LocationAutocomplete
+            value={locationName}
+            onSelect={handleLocationSelect}
+            placeholder="Search for a location or move the map"
+          />
+          <TText style={{ fontSize: 11, opacity: 0.5, marginTop: 8 }}>
+            Move the map to pin a location
+          </TText>
+        </LinearGradient>
+
+        {/* Bottom overlay */}
+        <LinearGradient
+          colors={['transparent', '#000']}
+          style={styles.bottomContainer}
+        >
+          <View style={{ width: '80%' }}>
+            <TText type="subtitle" style={{ color: '#fff' }}>
+              {isLoadingLocation ? 'Getting location...' : locationName}
+            </TText>
+            <TText style={{ color: '#fff' }}>{locationData.address?.city}</TText>
+            {weatherCity ? (
+              <WeatherDisplay
+                heatValue={weather?.temperature ?? undefined}
+                rainValue={weather?.precipitation ?? undefined}
+                humidValue={weather?.humidity ?? undefined}
+                windValue={weather?.windSpeed ?? undefined}
+                loading={weatherLoading || isLoadingLocation}
+                textColor="#fff"
+                backgroundColor="#0004"
+              />
+            ) : null}
+          </View>
+          <RoundButton iconName="check" onPress={handleConfirm} />
+        </LinearGradient>
+      </TView>
     </Modal>
   );
 }

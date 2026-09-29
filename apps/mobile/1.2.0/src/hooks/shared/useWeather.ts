@@ -70,6 +70,53 @@ const normalizeWeatherData = (responseData: any): WeatherData => {
   };
 };
 
+const getSuggestion = (
+  weatherCode: number,
+  temperature: number,
+  humidity: number,
+  wind: number,
+  precipitation: number,
+  t: (key: string) => string,
+) => {
+  // Rain / precipitation
+  if (precipitation >= 10) {
+    return t("weather.suggestions.rain");
+  }
+
+  // Thunderstorm
+  if ([95, 96, 99].includes(weatherCode)) {
+    return t("weather.suggestions.thunderstorm");
+  }
+
+  // Very hot and humid
+  if (temperature >= 32 && humidity >= 70) {
+    return t("weather.suggestions.hotHumid");
+  }
+
+  // Very hot
+  if (temperature >= 35) {
+    return t("weather.suggestions.veryHot");
+  }
+
+  // Strong wind
+  if (wind >= 30) {
+    return t("weather.suggestions.strongWind");
+  }
+
+  // Cold
+  if (temperature <= 18) {
+    return t("weather.suggestions.cold");
+  }
+
+  // Cloudy / overcast
+  if ([1, 2, 3].includes(weatherCode)) {
+    return t("weather.suggestions.cloudy");
+  }
+
+  // Default
+  return t("weather.suggestions.pleasant");
+};
+
 const fetchWeather = async (
   city: string,
   latitude: number,

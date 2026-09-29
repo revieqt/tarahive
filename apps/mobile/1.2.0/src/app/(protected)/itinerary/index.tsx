@@ -24,7 +24,6 @@ const ItineraryOptions = [
 export default function ItineraryScreen() {
   const { t } = useLanguage();
   const primaryColor = useThemeColor({}, 'primary');
-  const secondaryColor = useThemeColor({}, 'secondary');
   const accentColor = useThemeColor({}, 'accent');
   const [selectedStatus, setSelectedStatus] = useState<'active' | 'done' | 'cancelled'>('active');
   const { itineraries, isLoading, isError } = useGetUserItineraries(selectedStatus);
@@ -92,24 +91,16 @@ export default function ItineraryScreen() {
         contentContainerStyle={{padding: '3%', flex: 1}}
         title="Itinerary"
         subtitle="Manage your travel plans"
-      > 
-        <LinearGradient
-          colors={[secondaryColor + '60', 'transparent']}
-          start={{ x: 1, y: 0 }}
-          end={{ x: 0, y: 0 }}
-          style={styles.gridCircle}
-          pointerEvents="none"
-        />
-        <Image source={require('../../../../assets/images/itinerary-icon.png')} style={styles.image} />
+      >
         <Header title='Itinerary' subtitle='Manage your travel plans'/>
         <View style={styles.tabsContainer}>
           {ItineraryOptions.map((option, index) => (
             <TouchableOpacity
-              style={[styles.tabs, selectedStatus === option.value && { borderBottomColor: secondaryColor, borderBottomWidth: 2 }]}
+              style={[styles.tabs, selectedStatus === option.value && { borderBottomColor: accentColor, borderBottomWidth: 2 }]}
               onPress={() => setSelectedStatus(option.value as 'active' | 'done' | 'cancelled')}
             >
-              <TIcon name={option.icon} size={13} color={selectedStatus === option.value ? secondaryColor : 'gray'} />
-              <TText style={{ color: selectedStatus === option.value ? secondaryColor : 'gray', fontSize: 12 }}>{option.label}</TText>
+              <TIcon name={option.icon} size={13} color={selectedStatus === option.value ? accentColor : 'gray'} />
+              <TText style={{ color: selectedStatus === option.value ? accentColor : 'gray', fontSize: 11 }}>{option.label}</TText>
             </TouchableOpacity>
           ))}
         </View>
@@ -141,29 +132,13 @@ export default function ItineraryScreen() {
       <RoundButton
         iconName='plus'
         onPress={() => router.push('/itinerary/create')}
-        style={styles.addButton}
+        style={[styles.addButton, styles.shadow]}
       />
     </TView>
   );
 }
 
 const styles = StyleSheet.create({
-  image:{
-    position: 'absolute',
-    width: '60%',
-    height: '20%',
-    top: '-3%',
-    right: '-20%',
-    objectFit: 'contain'
-  },
-  gridCircle: {
-    height: '50%',
-    aspectRatio: 1,
-    borderRadius: 1000,
-    position: 'absolute',
-    top: '-5%',
-    right: '-50%',
-  },
   errorContainer: {
     marginTop: 50,
   },
@@ -171,22 +146,24 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   itineraryCard: {
-    borderRadius: 10,
+    borderRadius: 15,
     padding: '3%',
-    gap: 4
+    gap: 3,
+  },
+  shadow:{
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+    elevation: 3,
   },
   cardTitle: {
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: '700',
     flex: 1,
   },
-  cardDescription: {
-    fontSize: 12,
-    opacity: 0.6,
-    marginTop: 4,
-  },
   dateText: {
-    fontSize: 12,
+    fontSize: 11,
     opacity: 0.7,
   },
   cardTabs: {
@@ -213,14 +190,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    height: 30,
-    paddingBottom: 8,
+    height: 20,
+    paddingBottom: 12,
     gap: 5,
   },
   addButton: {
     position: 'absolute',
     bottom: 16,
-    right: 16,
+    right: '3%',
   },
   optionsButton: {
     borderColor: '#ccc3',
