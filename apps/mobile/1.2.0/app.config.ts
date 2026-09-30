@@ -1,4 +1,5 @@
 import 'dotenv/config';
+
 import { ExpoConfig } from 'expo/config';
 
 const config: ExpoConfig = {
@@ -7,38 +8,29 @@ const config: ExpoConfig = {
   scheme: 'tarahiveapp',
   version: '1.1.0',
   orientation: 'portrait',
-  icon: './shared/assets/images/icon.png',
+  icon: './assets/images/icon.png',
 
   splash: {
-    image: './shared/assets/images/icon.png',
+    image: './assets/images/icon.png',
     resizeMode: 'contain',
-    backgroundColor: '#FFD65A',
+    backgroundColor: '#FF6B6B',
   },
 
-  plugins: ['expo-router'],
+  plugins: [
+    'expo-router',
+    [
+      'react-native-google-mobile-ads',
+      {
+        androidAppId: process.env.ADMOB_ANDROID_APP_ID,
+        iosAppId: process.env.ADMOB_IOS_APP_ID,
+      },
+    ],
+  ],
 
-  // Example of exposing values to your app (optional)
   extra: {
     apiUrl: process.env.API_URL,
     mapTilerKey: process.env.MAPTILER_KEY,
   },
-
-  // Example of using env vars for native config (optional)
-  // android: {
-  //   package: 'com.tarahive.app',
-  //   config: {
-  //     googleMaps: {
-  //       apiKey: process.env.GOOGLE_MAPS_API_KEY,
-  //     },
-  //   },
-  // },
-
-  // ios: {
-  //   bundleIdentifier: 'com.tarahive.app',
-  //   config: {
-  //     googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
-  //   },
-  // },
 };
 
 export default config;

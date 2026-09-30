@@ -16,6 +16,7 @@ import ItineraryHeader from "@/components/itinerary/Header";
 import { useThemeColor } from "@/hooks/shared/useThemeColor";
 import RoundButton from "@/components/ui/RoundButton";
 import { newItinerayId } from "@/services/itineraryService";
+import { useLanguage } from "@/context/LanguageContext";
 import { CreateItineraryForm, ItineraryViewType, HeaderType, ItineraryBlock, TextBlock } from "@/types/itineraryTypes";
 
 type ItineraryFormProps = {
@@ -51,6 +52,7 @@ export default function ItineraryForm({
   const [locationVisible, setLocationVisible] = useState(false);
   const [composerId, setComposerId] = useState<string | null>(null);
   const [blockHeights, setBlockHeights] = useState<Record<string, number>>({});
+  const { t } = useLanguage();
 
   const updateBlock = (id: string, changes: Partial<ItineraryBlock>) => {
     if (!canEdit) return;
@@ -191,7 +193,7 @@ export default function ItineraryForm({
               <TextInput
                 value={block.value}
                 onChangeText={(value) => updateBlock(block.id, { value })}
-                placeholder="Text"
+                placeholder={t('itinerary.form.text_block')}
                 placeholderTextColor="#999"
                 multiline
                 editable={canEdit}

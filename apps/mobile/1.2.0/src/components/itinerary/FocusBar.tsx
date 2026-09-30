@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { TIcon, TText } from "@/components/ui/Themed";
+import { useLanguage } from '@/context/LanguageContext';
 
 interface FocusBarProps {
   primaryColor: string;
@@ -12,15 +13,16 @@ export default function FocusBar({
   onDone,
   onDelete,
 }: FocusBarProps) {
+  const { t } = useLanguage();
   return (
     <View style={[styles.container, { backgroundColor: primaryColor }]}>
       <TouchableOpacity style={styles.option} onPress={onDone}>
         <TIcon name="check" size={15} />
-        <TText style={{fontSize: 12}}>Done</TText>
+        <TText style={{fontSize: 12}}>{t('itinerary.form.focus_done')}</TText>
       </TouchableOpacity>
       <TouchableOpacity style={[styles.option, {backgroundColor: '#EE4B2B'}]} onPress={onDelete}>
         <TIcon name="trash-can" size={15} color='white'/>
-        <TText style={{color: 'white', fontSize: 12}}>Delete</TText>
+        <TText style={{color: 'white', fontSize: 12}}>{t('itinerary.form.focus_delete')}</TText>
       </TouchableOpacity>
     </View>
   );

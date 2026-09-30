@@ -9,6 +9,7 @@ import BackButton from '@/components/common/BackButton';
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
 import OSMMapView from '@/components/ui/OSMMapView';
 import { openDirections } from '@/utils/openDirections';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function PlacesScreen() {
 	const { id, address: addressParam, latitude, longitude, locationName, locationID } =
@@ -41,6 +42,7 @@ export default function PlacesScreen() {
 		address?.region,
 		address?.country,
 	].filter(Boolean).join(', ');
+	const { t } = useLanguage();
 
 	return (
 		<View style={styles.container}>
@@ -80,7 +82,7 @@ export default function PlacesScreen() {
 						})}
 					>
 						<TIcon name='directions' size={15} color='white'/>
-						<TText style={styles.tabsText}>Directions</TText>
+						<TText style={styles.tabsText}>{t('itinerary.form.directions')}</TText>
 					</TouchableOpacity>
 
 					<TouchableOpacity
@@ -90,7 +92,7 @@ export default function PlacesScreen() {
 						)}
 					>
 						<TIcon name='magnify' size={15} color='white'/>
-						<TText style={styles.tabsText}>Search</TText>
+						<TText style={styles.tabsText}>{t('itinerary.form.search')}</TText>
 					</TouchableOpacity>
 				</ScrollView>
 

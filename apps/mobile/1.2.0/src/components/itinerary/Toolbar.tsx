@@ -2,6 +2,7 @@ import React from "react";
 import { ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import { TIcon, TText } from "@/components/ui/Themed";
 import OptionsPopup from "@/components/ui/OptionsPopup";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface ToolbarProps {
   primaryColor: string;
@@ -20,6 +21,7 @@ export default function Toolbar({
   onChecklist,
   onDivider,
 }: ToolbarProps) {
+  const { t } = useLanguage();
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: primaryColor }]}
@@ -33,17 +35,17 @@ export default function Toolbar({
       <OptionsPopup
         options={[
           {
-            label: "Header 1",
+            label: t('itinerary.form.header_block') + " 1",
             iconName: "format-text-variant-outline",
             onPress: () => onHeading("header1"),
           },
           {
-            label: "Header 2",
+            label: t('itinerary.form.header_block') + " 2",
             iconName: "format-text-variant-outline",
             onPress: () => onHeading("header2"),
           },
           {
-            label: "Header 3",
+            label: t('itinerary.form.header_block') + " 3",
             iconName: "format-text-variant-outline",
             onPress: () => onHeading("header3"),
           },

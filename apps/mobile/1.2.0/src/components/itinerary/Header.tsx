@@ -15,6 +15,7 @@ import OptionsPopup from "@/components/ui/OptionsPopup";
 import { ITINERARY_TYPES } from "@/constants/Itinerary";
 import { ItineraryViewType } from "@/types/itineraryTypes"
 import BackButton from "../common/BackButton";
+import { useLanguage } from "@/context/LanguageContext"
 
 type ItineraryHeaderProps = {
   itineraryId?: string;
@@ -53,6 +54,7 @@ export default function ItineraryHeader({
 }: ItineraryHeaderProps) {
   const canEdit = viewType === "owner" || viewType === "editor";
   const [tab, setTab] = useState(1);
+  const { t } = useLanguage();
 
   return (
     <TView style={style}>
@@ -60,7 +62,7 @@ export default function ItineraryHeader({
         style={[styles.titleContainer, {backgroundColor: themeColor}]}
       >
         <TextInput
-          placeholder="Title"
+          placeholder={t('itinerary.form.title_placeholder')}
           value={title}
           onChangeText={onTitleChange}
           editable={editable}
@@ -83,7 +85,7 @@ export default function ItineraryHeader({
               style={[styles.tabs, tab === 1 && {borderColor: '#fff', opacity: 1}]}
               onPress={() => setTab(1)}
             >
-              <TText style={styles.tabsText}>Details</TText>
+              <TText style={styles.tabsText}>{t('itinerary.form.details_tab')}</TText>
             </TouchableOpacity>
 
             { !createMode  &&
@@ -91,7 +93,7 @@ export default function ItineraryHeader({
                 style={[styles.tabs, tab === 2 && {borderColor: '#fff', opacity: 1}]}
                 onPress={() => setTab(2)}
               >
-                <TText style={styles.tabsText}>Actions</TText>
+                <TText style={styles.tabsText}>{t('itinerary.form.actions_tab')}</TText>
               </TouchableOpacity>
             }
 
@@ -100,7 +102,7 @@ export default function ItineraryHeader({
                 style={[styles.tabs, tab === 3 && {borderColor: '#fff', opacity: 1}]}
                 onPress={() => setTab(3)}
               >
-                <TText style={styles.tabsText}>Privacy</TText>
+                <TText style={styles.tabsText}>{t('itinerary.form.privacy_tab')}</TText>
               </TouchableOpacity>
             }
           </ScrollView>
@@ -126,7 +128,7 @@ export default function ItineraryHeader({
             <TIcon name="calendar" size={12}/>
 
             <DatePickerField
-              placeholder="Start Date"
+              placeholder={t('itinerary.form.start_placeholder')}
               value={startDate}
               onChange={onStartDateChange}
               disabled={!editable}
@@ -139,7 +141,7 @@ export default function ItineraryHeader({
             <TIcon name="chevron-right" size={12}/>
 
             <DatePickerField
-              placeholder="End Date"
+              placeholder={t('itinerary.form.end_placeholder')}
               value={endDate}
               onChange={onEndDateChange}
               disabled={!editable}
@@ -167,22 +169,22 @@ export default function ItineraryHeader({
         { tab === 2 && <>
           <TouchableOpacity style={[styles.headerButton, {backgroundColor: '#5BCB78'}]}>
             <TIcon name="check" size={12} color="white"/>
-            <TText style={[styles.detailsText, {color: '#fff'}]}>Mark as Complete</TText>
+            <TText style={[styles.detailsText, {color: '#fff'}]}>{t('itinerary.form.complete_button')}</TText>
           </TouchableOpacity>
 
           <TouchableOpacity style={[styles.headerButton, {backgroundColor: '#F5C84B'}]}>
             <TIcon name="close" size={12} color="white"/>
-            <TText style={[styles.detailsText, {color: '#fff'}]}>Cancel Itinerary</TText>
+            <TText style={[styles.detailsText, {color: '#fff'}]}>{t('itinerary.form.cancel_button')}</TText>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.headerButton}>
             <TIcon name="account-group" size={12} color="white"/>
-            <TText style={styles.detailsText}>Create Room with Itinerary</TText>
+            <TText style={styles.detailsText}>{t('itinerary.form.room_button')}</TText>
           </TouchableOpacity>
 
           <TouchableOpacity style={[styles.headerButton, {backgroundColor: '#F06A6A'}]}>
             <TIcon name="close" size={12} color="white"/>
-            <TText style={[styles.detailsText, {color: '#fff'}]}>Delete Itinerary</TText>
+            <TText style={[styles.detailsText, {color: '#fff'}]}>{t('itinerary.form.delete_button')}</TText>
           </TouchableOpacity>
         </>
         }
@@ -212,7 +214,7 @@ export default function ItineraryHeader({
             }
           >
             <TIcon name="account" size={12}/>
-            <TText style={styles.detailsText}>Collaborators</TText>
+            <TText style={styles.detailsText}>{t('itinerary.form.collaborators_button')}</TText>
           </TouchableOpacity>
         </>
         }

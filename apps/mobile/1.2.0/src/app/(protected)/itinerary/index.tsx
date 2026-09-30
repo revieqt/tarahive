@@ -12,17 +12,16 @@ import { formatDateToString } from "@/utils/formatDateToString";
 import EmptyMessage from "@/components/common/EmptyMessage";
 import ItineraryCardSkeleton from "@/components/feedback/CalendarCardSkeleton";
 import StickyScrollView from "@/components/ui/StickyScrollView";
-import { LinearGradient } from "expo-linear-gradient";
 import OptionsPopup from "@/components/ui/OptionsPopup";
 
 const ItineraryOptions = [
-  { value: 'active', icon: 'cards-heart', label: 'Active' },
-  { value: 'done', icon: 'check-circle', label: 'Completed' },
-  { value: 'cancelled', icon: 'close-circle', label: 'Cancelled' },
+  { value: 'active', icon: 'cards-heart', label: 'itinerary.main.active' },
+  { value: 'done', icon: 'check-circle', label: 'itinerary.main.completed' },
+  { value: 'cancelled', icon: 'close-circle', label: 'itinerary.main.cancelled' },
 ];
 
 export default function ItineraryScreen() {
-  const { t } = useLanguage();
+  const { t , currentLanguage } = useLanguage();
   const primaryColor = useThemeColor({}, 'primary');
   const accentColor = useThemeColor({}, 'accent');
   const [selectedStatus, setSelectedStatus] = useState<'active' | 'done' | 'cancelled'>('active');
@@ -39,7 +38,7 @@ export default function ItineraryScreen() {
     >
         <TText style={styles.cardTitle} numberOfLines={1}>{item.title}</TText>
         <TText style={styles.dateText}>
-          {formatDateToString(new Date(item.startDate))} - {formatDateToString(new Date(item.endDate))}
+          {formatDateToString(new Date(item.startDate), currentLanguage.code)} - {formatDateToString(new Date(item.endDate), currentLanguage.code)}
         </TText>
 
         <View style={styles.cardTabs}>
@@ -51,27 +50,22 @@ export default function ItineraryScreen() {
       <OptionsPopup
         options={[
           {
-            label: "Privacy and Access",
-            iconName: "account-lock",
-            onPress: () => router.push({ pathname: "/share"})
-          },
-          {
-            label: "Create Room with this Itinerary",
+            label: t('itinerary.form.room_button'),
             iconName: "tooltip-account",
             onPress: () => router.push({ pathname: "/share"})
           },
           {
-            label: "Mark Itinerary as Complete",
+            label: t('itinerary.form.complete_button'),
             iconName: "check-circle",
             onPress: () => router.push({ pathname: "/share"})
           },
           {
-            label: "Cancel Itinerary",
+            label: t('itinerary.form.cancel_button'),
             iconName: "close-circle",
             onPress: () => router.push({ pathname: "/share"})
           },
           {
-            label: "Delete Itinerary",
+            label: t('itinerary.form.delete_button'),
             iconName: "trash-can",
             onPress: () => router.push({ pathname: "/share"})
           },
@@ -92,7 +86,7 @@ export default function ItineraryScreen() {
         title="Itinerary"
         subtitle="Manage your travel plans"
       >
-        <Header title='Itinerary' subtitle='Manage your travel plans'/>
+        <Header title={t('itinerary.main.title')} subtitle={t('itinerary.main.subtitle')}/>
         <View style={styles.tabsContainer}>
           {ItineraryOptions.map((option, index) => (
             <TouchableOpacity
@@ -100,7 +94,7 @@ export default function ItineraryScreen() {
               onPress={() => setSelectedStatus(option.value as 'active' | 'done' | 'cancelled')}
             >
               <TIcon name={option.icon} size={13} color={selectedStatus === option.value ? accentColor : 'gray'} />
-              <TText style={{ color: selectedStatus === option.value ? accentColor : 'gray', fontSize: 11 }}>{option.label}</TText>
+              <TText style={{ color: selectedStatus === option.value ? accentColor : 'gray', fontSize: 11 }}>{t(option.label)}</TText>
             </TouchableOpacity>
           ))}
         </View>

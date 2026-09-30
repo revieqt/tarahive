@@ -1,0 +1,58 @@
+{
+  "main": {
+    "title": "Itinerary",
+    "subtitle": "Manage your travel plans",
+    "active": "Active",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "form": {
+    "title_placeholder": "Title",
+    "details_tab": "Details",
+    "start_placeholder": "Start Date",
+    "end_placeholder": "End Date",
+    "actions_tab": "Actions",
+    "complete_button": "Mark as Completed",
+    "cancel_button": "Cancel Itinerary",
+    "room_button": "Create Room with Itinerary",
+    "delete_button": "Delete Itinerary",
+    "privacy_tab": "Privacy",
+    "collaborators_button": "Collaborators",
+    "directions": "Directions",
+    "search": "Search",
+    "focus_done": "Done",
+    "focus_delete": "Delete",
+    "header_block": "Header",
+    "text_block": "Text",
+    "checklist_block": "Checklist",
+    "location_select_prompt": "Search for a location or move the map"
+  },
+  "type":{
+    "city": "City Trip",
+    "beach": "Weekend Trip",
+    "road": "Road Trip",
+    "business": "Business Trip",
+    "education": "Educational Trip",
+    "couple": "Couple Trip",
+    "family": "Family Trip",
+    "weekend": "Weekend Trip",
+    "vacation": "Vacation",
+    "adventure": "Adventure",
+    "backpacking": "Backpacking",
+    "event": "Event",
+    "pilgrimage": "Pilgrimage",
+    "cruise": "Cruise",
+    "staycation": "Staycation",
+    "other": "Others"
+  },
+  "privacy":{
+    "public": "Public",
+    "private": "Private",
+    "invited": "Invited Collaborators Only"
+  },
+  "viewType":{
+    "viewer": "Viewer",
+    "collaborator": "Collaborator",
+    "owner": "Owner"
+  }
+}

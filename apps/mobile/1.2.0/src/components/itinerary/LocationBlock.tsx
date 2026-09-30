@@ -28,8 +28,12 @@ export default function LocationBlock({
         <View style={styles.copy}>
           <TText style={styles.name}>{block.locationName}</TText>
           <TText numberOfLines={1} style={styles.address}>
-            {Object.values(block.address).filter(Boolean).join(", ") ||
-              "Selected location"}
+            {block.address?.neighborhood ? block.address.neighborhood + ', ' : null}
+            {block.address?.district ? block.address.district + ', ' : null}
+            {block.address?.city ? block.address.city + ' ' : null}
+            {block.address?.postal_code ? block.address.postal_code + ', ' : block.address ? ', ' : null}
+            {block.address?.region ? block.address.region + ', ' : null}
+            {block.address?.country ? block.address.country : null}
           </TText>
         </View>
         <TouchableOpacity onPress={onMapPress} style={styles.mapButton}>

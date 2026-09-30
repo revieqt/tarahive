@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, TextInput, TouchableOpacity, View } from "react-
 import { TIcon } from "@/components/ui/Themed";
 import { ChecklistBlock as ChecklistBlockData } from "@/types/itineraryTypes";
 import { useThemeColor } from "@/hooks/shared/useThemeColor";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface ChecklistBlockProps {
   block: ChecklistBlockData;
@@ -23,6 +24,7 @@ export default function ChecklistBlock({
 }: ChecklistBlockProps) {
   const [height, setHeight] = useState(30);
   const textColor = useThemeColor({}, "text");
+  const { t } = useLanguage();
   return (
     <Pressable style={styles.row} onPress={editable ? onPress : undefined} onLongPress={editable ? onLongPress : undefined} delayLongPress={350}>
       <TouchableOpacity
@@ -38,7 +40,7 @@ export default function ChecklistBlock({
         value={block.value}
         onChangeText={(value) => onChange?.({ value })}
         editable={editable}
-        placeholder="Checklist item"
+        placeholder={t('itinerary.form.checklist_block')}
         placeholderTextColor="#999"
         style={[styles.input, { height, color: textColor }, block.checked && styles.completed]}
         onFocus={onPress}

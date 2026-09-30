@@ -45,7 +45,7 @@ export async function getPreloadTranslations(
     throw new Error(`Language ${lang} not found`);
   }
 
-  const namespaces = ['common', 'auth', 'settings', 'tabs', 'sos'];
+  const namespaces = ['common', 'auth', 'settings', 'tabs', 'sos', 'itinerary'];
   const result: Record<string, any> = {};
 
   for (const namespace of namespaces) {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Modal, View, StyleSheet } from 'react-native';
+import { Modal, View, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { TView, TText } from '@/components/ui/Themed';
@@ -9,6 +9,9 @@ import RoundButton from '@/components/ui/RoundButton';
 import OSMMapView, { OSMMapViewRef } from '@/components/ui/OSMMapView';
 import { useLocation } from '@/context/LocationContext';
 import { usePlaceWeather } from '@/hooks/shared/useWeather';
+import { useLanguage } from '@/context/LanguageContext';
+import { useThemeColor } from '@/hooks/shared/useThemeColor';
+import Skeleton from '../ui/Skeleton';
 
 export interface Address {
   country?: string;
@@ -40,12 +43,12 @@ export default function LocationPickerModal({
   initialLocation,
 }: LocationPickerModalProps) {
   const { latitude, longitude, city: currentCity } = useLocation();
-
+  const { t } = useLanguage();
   const [centerCoords, setCenterCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [locationName, setLocationName] = useState('');
   const [locationData, setLocationData] = useState<Partial<LocationItemWithAddress>>({});
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
-
+  const accentColor = useThemeColor({}, 'accent');
   const mapRef = useRef<OSMMapViewRef>(null);
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const weatherLatitude = locationData.latitude ?? latitude;
@@ -184,19 +187,13 @@ export default function LocationPickerModal({
         ) : null}
 
         {/* Top overlay */}
-        <LinearGradient colors={['#000', 'transparent']} style={styles.topSection}>
-          <TText style={{ marginBottom: 8, color: '#fff' }}>
-            Select a location or navigate through the map
-          </TText>
+        <View style={styles.topSection}>
           <LocationAutocomplete
             value={locationName}
             onSelect={handleLocationSelect}
-            placeholder="Search for a location or move the map"
+            placeholder={t("itinerary.form.location_select_prompt")}
           />
-          <TText style={{ fontSize: 11, opacity: 0.5, marginTop: 8 }}>
-            Move the map to pin a location
-          </TText>
-        </LinearGradient>
+        </View>
 
         {/* Bottom overlay */}
         <LinearGradient
@@ -204,23 +201,37 @@ export default function LocationPickerModal({
           style={styles.bottomContainer}
         >
           <View style={{ width: '80%' }}>
-            <TText type="subtitle" style={{ color: '#fff' }}>
-              {isLoadingLocation ? 'Getting location...' : locationName}
+            <TText style={{ color: '#fff', fontWeight: 800, fontSize: 15 }}>
+              {isLoadingLocation ? <Skeleton style={{width: '70%'}}/> : locationName}
             </TText>
-            <TText style={{ color: '#fff' }}>{locationData.address?.city}</TText>
-            {weatherCity ? (
-              <WeatherDisplay
-                heatValue={weather?.temperature ?? undefined}
-                rainValue={weather?.precipitation ?? undefined}
-                humidValue={weather?.humidity ?? undefined}
-                windValue={weather?.windSpeed ?? undefined}
-                loading={weatherLoading || isLoadingLocation}
-                textColor="#fff"
-                backgroundColor="#0004"
-              />
-            ) : null}
+            <TText style={{ color: '#fff', marginBottom: 8, opacity: .7}}>
+              { !locationName && !isLoadingLocation && t("itinerary.form.location_select_prompt")}
+              {isLoadingLocation ? <Skeleton style={{height: 10, width: '30%'}}/> : locationData.address?.city}
+            </TText>
+            
           </View>
-          <RoundButton iconName="check" onPress={handleConfirm} />
+
+          {weatherCity ? (
+            <WeatherDisplay
+              heatValue={weather?.temperature ?? undefined}
+              rainValue={weather?.precipitation ?? undefined}
+              humidValue={weather?.humidity ?? undefined}
+              windValue={weather?.windSpeed ?? undefined}
+              loading={weatherLoading || isLoadingLocation}
+              textColor="#fff"
+              backgroundColor="#0004"
+            />
+          ) : null}
+
+          <View style={{flexDirection: 'row', gap: 2}}>
+            <TouchableOpacity style={styles.bottomButtons} onPress={onClose}>
+              <TText style={{color: "#fff"}}>{t("common.common.cancel")}</TText>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={[styles.bottomButtons, {backgroundColor: accentColor}]} onPress={handleConfirm}>
+              <TText style={{color: "#fff"}}>{t("common.common.continue")}</TText>
+            </TouchableOpacity>
+          </View>
         </LinearGradient>
       </TView>
     </Modal>
@@ -236,18 +247,23 @@ const styles = StyleSheet.create({
   topSection: {
     position: 'absolute',
     top: 0, left: 0, right: 0,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    padding: '3%',
     zIndex: 100,
   },
   bottomContainer: {
     position: 'absolute',
     bottom: 0, left: 0, right: 0,
-    padding: 16,
+    padding:'3%',
     paddingTop: 50,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
     zIndex: 100,
   },
+  bottomButtons:{
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 8,
+    backgroundColor: '#fff4',
+    borderRadius: 20,
+    marginTop: 8
+  }
 });
