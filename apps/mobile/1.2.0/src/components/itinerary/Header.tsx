@@ -14,12 +14,13 @@ import DropDownField from "@/components/ui/DropDownField";
 import OptionsPopup from "@/components/ui/OptionsPopup";
 import CopyModal from "@/components/itinerary/CopyModal";
 import { ITINERARY_TYPES } from "@/constants/Itinerary";
-import { ItineraryPrivacy, ItineraryViewType } from "@/types/itineraryTypes"
+import { ItineraryGeneralPermissions, ItineraryPrivacy, ItineraryViewType } from "@/types/itineraryTypes"
 import BackButton from "../common/BackButton";
 import { useLanguage } from "@/context/LanguageContext"
 
 type ItineraryHeaderProps = {
   itineraryId?: string;
+  ownerUsername?: string;
   title: string;
   onTitleChange: (value: string) => void;
   type: string;
@@ -30,6 +31,8 @@ type ItineraryHeaderProps = {
   onEndDateChange: (value: Date | null) => void;
   privacy: ItineraryPrivacy;
   onPrivacyChange: (value: ItineraryPrivacy) => void;
+  generalPermissions: ItineraryGeneralPermissions;
+  onGeneralPermissionsChange: (key: keyof ItineraryGeneralPermissions, value: boolean) => void;
   themeColor?: string;
   onThemeColorPress?: () => void;
   viewType?: ItineraryViewType;
@@ -40,6 +43,7 @@ type ItineraryHeaderProps = {
 
 export default function ItineraryHeader({
   itineraryId,
+  ownerUsername,
   title,
   onTitleChange,
   type,
@@ -50,6 +54,8 @@ export default function ItineraryHeader({
   onEndDateChange,
   privacy,
   onPrivacyChange,
+  generalPermissions,
+  onGeneralPermissionsChange,
   themeColor,
   onThemeColorPress,
   viewType = 'viewer',
@@ -84,7 +90,24 @@ export default function ItineraryHeader({
           placeholderTextColor="#fff7"
         />
 
-        <TText style={styles.metaText}>{ !createMode && 'Created by revie.dev · Private'}</TText>
+        {!createMode && ownerUsername ? (
+          <View style={styles.metaRow}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              accessibilityRole="link"
+              accessibilityLabel={ownerUsername}
+              onPress={() =>
+                router.push({
+                  pathname: '/user/[id]',
+                  params: { id: ownerUsername },
+                } as any)
+              }
+            >
+              <TText style={styles.metaText}>{ownerUsername}</TText>
+            </TouchableOpacity>
+            <TText style={styles.metaText}> · {t(privacyLabel)}</TText>
+          </View>
+        ) : null}
 
         <BackButton type="close" color="white" style={styles.closeButton}/>
       
@@ -111,7 +134,7 @@ export default function ItineraryHeader({
               </TouchableOpacity>
             }
 
-            { canEdit &&
+            { canEdit && !createMode &&
               <TouchableOpacity 
                 style={[styles.tabs, tab === 3 && {borderColor: '#fff', opacity: 1}]}
                 onPress={() => setTab(3)}
@@ -233,6 +256,50 @@ export default function ItineraryHeader({
             <TIcon name="account" size={12}/>
             <TText style={styles.detailsText}>{t('itinerary.form.collaborators_button')}</TText>
           </TouchableOpacity>
+
+          <OptionsPopup
+            options={[
+              {
+                label: t("itinerary.form.sharing_enabled"),
+                iconName: "share",
+                onPress: () => onGeneralPermissionsChange("allowSharing", true),
+              },
+              {
+                label: t("itinerary.form.sharing_disabled"),
+                iconName: "share-off",
+                onPress: () => onGeneralPermissionsChange("allowSharing", false),
+              },
+            ]}
+            style={styles.headerButton}
+            disabled={!editable}
+          >
+            <TIcon name={generalPermissions.allowSharing ? "share" : "share-off"} size={12}/>
+            <TText style={styles.detailsText}>
+              {t(generalPermissions.allowSharing ? "itinerary.form.sharing_enabled" : "itinerary.form.sharing_disabled")}
+            </TText>
+          </OptionsPopup>
+
+          <OptionsPopup
+            options={[
+              {
+                label: t("itinerary.form.allow_others_to_copy"),
+                iconName: "content-copy",
+                onPress: () => onGeneralPermissionsChange("allowCopying", true),
+              },
+              {
+                label: t("itinerary.form.dont_allow_others_to_copy"),
+                iconName: "close",
+                onPress: () => onGeneralPermissionsChange("allowCopying", false),
+              },
+            ]}
+            style={styles.headerButton}
+            disabled={!editable}
+          >
+            <TIcon name={generalPermissions.allowCopying ? "content-copy" : "close"} size={12}/>
+            <TText style={styles.detailsText}>
+              {t(generalPermissions.allowCopying ? "itinerary.form.allow_others_to_copy" : "itinerary.form.dont_allow_others_to_copy")}
+            </TText>
+          </OptionsPopup>
         </>
         }
       </ScrollView>
@@ -264,6 +331,10 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     color: "white",
     fontSize: 10,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   closeButton:{
     position: 'absolute',

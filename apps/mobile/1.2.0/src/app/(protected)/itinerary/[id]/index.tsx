@@ -29,12 +29,15 @@ export default function ItineraryScreen() {
 			key={itinerary ? 'loaded' : 'pending'}
 			viewType="owner"
 			itineraryId={itineraryId}
+			ownerUsername={itinerary?.user?.username}
+			initialItinerary={itinerary ?? undefined}
 			initialValues={{
 				title: itinerary?.title ?? '',
 				type: itinerary?.type ?? 'Solo',
 				startDate: itinerary?.startDate ? new Date(itinerary.startDate) : null,
 				endDate: itinerary?.endDate ? new Date(itinerary.endDate) : null,
 				privacy: itinerary?.privacy ?? 'private',
+				generalPermissions: itinerary?.generalPermissions ?? { allowSharing: true, allowCopying: true },
 				themeColor: itinerary?.themeColor,
 				content: itinerary?.content ?? [],
 			}}

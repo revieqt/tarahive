@@ -35,9 +35,12 @@ export const useCreateItinerary = () => {
       }
 
       const request: CreateItineraryRequest = {
-        ...data,
+        title: data.title,
+        type: data.type,
         startDate: data.startDate,
         endDate: data.endDate,
+        content: data.content,
+        themeColor: data.themeColor,
       };
 
       return await createItinerary(request);

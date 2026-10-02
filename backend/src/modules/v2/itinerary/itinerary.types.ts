@@ -26,9 +26,26 @@ export interface CreateItineraryRequest {
   startDate: Date;
   endDate: Date;
   content: unknown;
-  privacy: ItineraryPrivacy;
   themeColor: string;
 }
+
+export interface UpdateItineraryRequest {
+  itineraryId: string;
+  title?: string;
+  type?: string;
+  startDate?: string;
+  endDate?: string;
+  content?: unknown;
+  privacy?: ItineraryPrivacy;
+  themeColor?: string;
+  allowSharing?: boolean;
+  allowCopying?: boolean;
+}
+
+export type UpdateItineraryData = Omit<UpdateItineraryRequest, 'itineraryId' | 'startDate' | 'endDate'> & {
+  startDate?: Date;
+  endDate?: Date;
+};
 
 // export interface UpdateItineraryRequest {
 //   title?: string;

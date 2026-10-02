@@ -18,9 +18,12 @@ import RoundButton from "@/components/ui/RoundButton";
 import { ITINERARY_TYPES } from "@/constants/Itinerary";
 import { newItinerayId } from "@/services/itineraryService";
 import { useLanguage } from "@/context/LanguageContext";
-import { CreateItineraryForm, ItineraryPrivacy, ItineraryViewType, HeaderType, ItineraryBlock, TextBlock } from "@/types/itineraryTypes";
+import { CreateItineraryForm, Itinerary, ItineraryGeneralPermissions, ItineraryPrivacy, ItineraryUpdateValues, ItineraryViewType, HeaderType, ItineraryBlock, TextBlock } from "@/types/itineraryTypes";
+import { useUpdateItinerary } from "@/hooks/itinerary/useUpdateItinerary";
 
 type ItineraryFormProps = {
+  ownerUsername?: string;
+  initialItinerary?: Itinerary;
   viewType?: ItineraryViewType;
   initialValues?: Partial<CreateItineraryForm>;
   isSubmitting?: boolean;
@@ -30,6 +33,8 @@ type ItineraryFormProps = {
 };
 
 export default function ItineraryForm({
+  ownerUsername,
+  initialItinerary,
   viewType = "editor",
   initialValues,
   createMode = false,
@@ -47,6 +52,9 @@ export default function ItineraryForm({
   const [endDate, setEndDate] = useState<Date | null>(initialValues?.endDate ?? null);
   const [type, setType] = useState(initialValues?.type ?? ITINERARY_TYPES[0].value);
   const [privacy, setPrivacy] = useState<ItineraryPrivacy>(initialValues?.privacy ?? "private");
+  const [generalPermissions, setGeneralPermissions] = useState<ItineraryGeneralPermissions>(
+    initialValues?.generalPermissions ?? { allowSharing: true, allowCopying: true }
+  );
   const [themeColor, setThemeColor] = useState(initialValues?.themeColor ?? accentColor);
   const [colorBarVisible, setColorBarVisible] = useState(false);
   const [content, setContent] = useState<ItineraryBlock[]>((initialValues?.content as ItineraryBlock[] | undefined) ?? [],);
@@ -55,6 +63,18 @@ export default function ItineraryForm({
   const [composerId, setComposerId] = useState<string | null>(null);
   const [blockHeights, setBlockHeights] = useState<Record<string, number>>({});
   const { t } = useLanguage();
+  const updateValues: ItineraryUpdateValues = {
+    title,
+    type,
+    startDate,
+    endDate,
+    content,
+    privacy,
+    themeColor,
+    allowSharing: generalPermissions.allowSharing,
+    allowCopying: generalPermissions.allowCopying,
+  };
+  const itineraryUpdate = useUpdateItinerary(initialItinerary, updateValues);
 
   const updateBlock = (id: string, changes: Partial<ItineraryBlock>) => {
     if (!canEdit) return;
@@ -275,15 +295,21 @@ export default function ItineraryForm({
   const lastBlock = content[content.length - 1];
   const showComposer = canEdit && (!lastBlock || lastBlock.type !== "text" || Boolean(composerId));
   const visibleContent = composerId ? content.filter((block) => block.id !== composerId) : content;
-  const submit = () => onSubmit?.({
-    title,
-    startDate,
-    endDate,
-    type: ITINERARY_TYPES.find((option) => option.value === type)?.value ?? type,
-    privacy,
-    themeColor,
-    content,
-  });
+  const submit = () => {
+    if (!createMode) {
+      itineraryUpdate.save();
+      return;
+    }
+
+    onSubmit?.({
+      title,
+      startDate,
+      endDate,
+      type: ITINERARY_TYPES.find((option) => option.value === type)?.value ?? type,
+      themeColor,
+      content,
+    });
+  };
 
   return (
     <KeyboardAvoidingView
@@ -297,6 +323,7 @@ export default function ItineraryForm({
       <TView color='primary' style={styles.header}>
         <ItineraryHeader
           itineraryId={itineraryId}
+          ownerUsername={ownerUsername}
           title={title}
           onTitleChange={setTitle}
           type={type}
@@ -307,6 +334,10 @@ export default function ItineraryForm({
           onEndDateChange={setEndDate}
           privacy={privacy}
           onPrivacyChange={setPrivacy}
+          generalPermissions={generalPermissions}
+          onGeneralPermissionsChange={(key, value) =>
+            setGeneralPermissions((current) => ({ ...current, [key]: value }))
+          }
           themeColor={themeColor}
           onThemeColorPress={
             canEdit ? () => setColorBarVisible(true) : undefined
@@ -413,8 +444,8 @@ export default function ItineraryForm({
             <RoundButton
               iconName={createMode ? "check" : "content-save"}
               onPress={submit}
-              disabled={isSubmitting}
-              loading={isSubmitting}
+              disabled={createMode ? isSubmitting : isSubmitting || itineraryUpdate.isPending || !itineraryUpdate.hasChanges}
+              loading={isSubmitting || itineraryUpdate.isPending}
               style={{ width: 44, height: 44, backgroundColor: themeColor }}
             />
           </View>

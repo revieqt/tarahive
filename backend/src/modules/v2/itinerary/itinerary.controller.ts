@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import {
   createItineraryService,
+  updateItineraryService,
   getItineraryService,
   getAllUserItinerariesService,
-  deleteItineraryService,
 } from './itinerary.service';
-import { CreateItineraryRequest } from './itinerary.types';
+import { CreateItineraryRequest, ItineraryPrivacy, UpdateItineraryData, UpdateItineraryRequest } from './itinerary.types';
 
 interface AuthRequest extends Request {
   user?: {
@@ -22,7 +22,7 @@ interface AuthRequest extends Request {
 export const createItinerary = async (req: AuthRequest, res: Response) => {
   try {
     console.log('🟡 createItinerary - req.user:', req.user);
-    const { title, type, content, startDate, endDate, privacy, themeColor } = req.body;
+    const { title, type, content, startDate, endDate, themeColor } = req.body;
 
     // Get userID from authenticated token 'sub' payload
     const userID = req.user?.sub;
@@ -31,10 +31,10 @@ export const createItinerary = async (req: AuthRequest, res: Response) => {
     }
 
     // Validate required fields
-    if (!title || !type || !startDate || !endDate || !privacy || !themeColor) {
+    if (!title || !type || !startDate || !endDate || !themeColor) {
       return res.status(400).json({
         success: false,
-        message: 'Missing required fields: title, type, startDate, endDate, privacy, themeColor',
+        message: 'Missing required fields: title, type, startDate, endDate, themeColor',
       });
     }
 
@@ -44,7 +44,6 @@ export const createItinerary = async (req: AuthRequest, res: Response) => {
       startDate: new Date(startDate),
       endDate: new Date(endDate),
       content,
-      privacy,
       themeColor,
     };
 
@@ -62,6 +61,99 @@ export const createItinerary = async (req: AuthRequest, res: Response) => {
       message: 'Internal server error',
       error: error instanceof Error ? error.message : 'Unknown error',
     });
+  }
+};
+
+export const updateItinerary = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.sub;
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'User not authenticated' });
+    }
+
+    if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
+      return res.status(400).json({ success: false, message: 'A valid JSON request body is required' });
+    }
+
+    const body = req.body as Partial<UpdateItineraryRequest>;
+    const allowedFields = new Set([
+      'itineraryId', 'title', 'type', 'startDate', 'endDate', 'content',
+      'privacy', 'themeColor', 'allowSharing', 'allowCopying',
+    ]);
+    const unexpectedField = Object.keys(body).find((field) => !allowedFields.has(field));
+
+    if (unexpectedField) {
+      return res.status(400).json({ success: false, message: `Unexpected field: ${unexpectedField}` });
+    }
+
+    if (typeof body.itineraryId !== 'string' || !body.itineraryId.trim()) {
+      return res.status(400).json({ success: false, message: 'itineraryId is required' });
+    }
+
+    const updateFields = [...allowedFields].filter((field) => field !== 'itineraryId');
+    if (!updateFields.some((field) => Object.prototype.hasOwnProperty.call(body, field))) {
+      return res.status(400).json({ success: false, message: 'At least one itinerary field must be provided' });
+    }
+
+    for (const field of ['title', 'type', 'themeColor'] as const) {
+      const value = body[field];
+      if (value !== undefined && (typeof value !== 'string' || !value.trim())) {
+        return res.status(400).json({ success: false, message: `${field} must be a non-empty string` });
+      }
+    }
+
+    const updates: UpdateItineraryData = {};
+    if (body.title !== undefined) updates.title = body.title;
+    if (body.type !== undefined) updates.type = body.type;
+    if (body.content !== undefined) updates.content = body.content;
+    if (body.privacy !== undefined) {
+      if (!Object.values(ItineraryPrivacy).includes(body.privacy)) {
+        return res.status(400).json({ success: false, message: 'privacy is invalid' });
+      }
+      updates.privacy = body.privacy;
+    }
+    if (body.themeColor !== undefined) updates.themeColor = body.themeColor;
+
+    for (const field of ['startDate', 'endDate'] as const) {
+      const value = body[field];
+      if (value !== undefined) {
+        if (typeof value !== 'string' || !value.trim()) {
+          return res.status(400).json({ success: false, message: `${field} must be a valid date` });
+        }
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) {
+          return res.status(400).json({ success: false, message: `${field} must be a valid date` });
+        }
+        updates[field] = date;
+      }
+    }
+
+    for (const field of ['allowSharing', 'allowCopying'] as const) {
+      const value = body[field];
+      if (value !== undefined) {
+        if (typeof value !== 'boolean') {
+          return res.status(400).json({ success: false, message: `${field} must be a boolean` });
+        }
+        updates[field] = value;
+      }
+    }
+
+    const itinerary = await updateItineraryService(userId, body.itineraryId, updates);
+    if (!itinerary) {
+      return res.status(404).json({ success: false, message: 'Itinerary not found or not editable' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Itinerary updated successfully',
+      data: itinerary,
+    });
+  } catch (error) {
+    if (error instanceof RangeError) {
+      return res.status(400).json({ success: false, message: error.message });
+    }
+    console.error('❌ Error updating itinerary:', error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
 
@@ -151,37 +243,5 @@ export const getAllUserItineraries = async (req: AuthRequest, res: Response) => 
       message: 'Internal server error',
       error: error instanceof Error ? error.message : 'Unknown error',
     });
-  }
-};
-
-/**
- * Delete an itinerary
- * DELETE /v1/itinerary/delete/:itineraryID
- */
-export const deleteItinerary = async (req: AuthRequest, res: Response) => {
-  try {
-    console.log('🟡 deleteItinerary - req.user:', req.user);
-    const { itineraryID } = req.params;
-    const itineraryIDStr = (Array.isArray(itineraryID) ? itineraryID[0] : itineraryID) as string;
-
-    if (!itineraryIDStr) {
-      return res.status(400).json({ message: 'Itinerary ID is required' });
-    }
-
-    await deleteItineraryService(itineraryIDStr);
-
-    res.status(200).json({
-      message: 'Itinerary deleted successfully',
-    });
-  } catch (error) {
-    console.error('❌ Error deleting itinerary:', error);
-    if (error instanceof Error && error.message === 'Itinerary not found') {
-      return res.status(404).json({ message: 'Itinerary not found' });
-    }
-    res.status(500).json({
-      message: 'Internal server error',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
-
   }
 };

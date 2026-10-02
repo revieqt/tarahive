@@ -8,7 +8,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { User } from '../user/user.entity';
-import { ItineraryPrivacy, ItineraryStatus, CollaboratorPermissions } from './itinerary.types';
+import { ItineraryPrivacy, ItineraryStatus } from './itinerary.types';
 
 @Entity({ name: 'itineraries' })
 export class Itinerary {
@@ -71,11 +71,13 @@ export class Itinerary {
   themeColor!: string;
 
   @Column({
-    type: 'enum',
-    enum: CollaboratorPermissions,
-    default: CollaboratorPermissions.VIEW,
+    type: 'jsonb',
+    default: () => `'{"allowSharing": true, "allowCopying": true}'`,
   })
-  collaboratorPermissions!: CollaboratorPermissions;
+  generalPermissions!: {
+    allowSharing: boolean;
+    allowCopying: boolean;
+  };
 
   @Column({
     type: 'integer',

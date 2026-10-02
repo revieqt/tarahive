@@ -7,6 +7,7 @@ import {
   CollaboratorStatus,
   ItineraryStatus,
   ItineraryPrivacy,
+  UpdateItineraryData,
 } from './itinerary.types';
 
 export const createItineraryService = async (
@@ -29,7 +30,7 @@ export const createItineraryService = async (
         startDate: itineraryData.startDate,
         endDate: itineraryData.endDate,
         content: itineraryData.content,
-        privacy: itineraryData.privacy,
+        privacy: ItineraryPrivacy.PRIVATE,
         themeColor: itineraryData.themeColor,
       });
 
@@ -60,6 +61,61 @@ export const createItineraryService = async (
   }
 };
 
+export const updateItineraryService = async (
+  userId: string,
+  itineraryId: string,
+  updates: UpdateItineraryData
+): Promise<Itinerary | null> => {
+  return AppDataSource.transaction(async (manager) => {
+    const collaborator = await manager.findOne(ItineraryCollaborator, {
+      where: {
+        itinerary: { id: itineraryId },
+        user: { id: userId },
+        permission: CollaboratorPermissions.EDIT,
+        status: CollaboratorStatus.ACCEPTED,
+      },
+    });
+
+    if (!collaborator) {
+      return null;
+    }
+
+    const itineraryRepository = manager.getRepository(Itinerary);
+    const itinerary = await itineraryRepository.findOne({
+      where: { id: itineraryId },
+      lock: { mode: 'pessimistic_write' },
+    });
+
+    if (!itinerary) {
+      return null;
+    }
+
+    if (updates.title !== undefined) itinerary.title = updates.title;
+    if (updates.type !== undefined) itinerary.type = updates.type;
+    if (updates.startDate !== undefined) itinerary.startDate = updates.startDate;
+    if (updates.endDate !== undefined) itinerary.endDate = updates.endDate;
+    if (updates.content !== undefined) itinerary.content = updates.content;
+    if (updates.privacy !== undefined) itinerary.privacy = updates.privacy;
+    if (updates.themeColor !== undefined) itinerary.themeColor = updates.themeColor;
+
+    if (updates.allowSharing !== undefined || updates.allowCopying !== undefined) {
+      itinerary.generalPermissions = {
+        allowSharing: updates.allowSharing ?? itinerary.generalPermissions?.allowSharing ?? true,
+        allowCopying: updates.allowCopying ?? itinerary.generalPermissions?.allowCopying ?? true,
+      };
+    }
+
+    if (itinerary.startDate > itinerary.endDate) {
+      throw new RangeError('Start date must not be after end date');
+    }
+
+    itinerary.updatedOn = new Date();
+    itinerary.v += 1;
+
+    return itineraryRepository.save(itinerary);
+  });
+};
+
 export const getItineraryService = async (
   itineraryId: string,
   userId: string
@@ -76,19 +132,17 @@ export const getItineraryService = async (
       .createQueryBuilder('itinerary')
       .leftJoin('itinerary.user', 'user')
       .addSelect(['user.id', 'user.username', 'user.isProUser'])
+      .innerJoin(
+        ItineraryCollaborator,
+        'collaborator',
+        'collaborator."itineraryId" = itinerary.id AND collaborator."userId" = :userId AND collaborator.status = :collaboratorStatus',
+        { userId, collaboratorStatus: CollaboratorStatus.ACCEPTED }
+      )
       .where('itinerary.id = :id', { id: itineraryId })
       .getOne();
 
     if (!itinerary) {
       console.log('🟡 Itinerary not found:', itineraryId);
-      return null;
-    }
-
-    // Check authorization: allow if user is owner or itinerary is public
-    if (itinerary.privacy === ItineraryPrivacy.PRIVATE && itinerary.user.id !== userId) {
-      console.log(
-        '🟡 User not authorized to view this private itinerary'
-      );
       return null;
     }
 
@@ -140,7 +194,12 @@ export const getAllUserItinerariesService = async (
         'itinerary.endDate',
         'itinerary.status',
       ])
-      .where('itinerary.user.id = :userId', { userId })
+      .innerJoin(
+        ItineraryCollaborator,
+        'collaborator',
+        'collaborator."itineraryId" = itinerary.id AND collaborator."userId" = :userId AND collaborator.status = :collaboratorStatus',
+        { userId, collaboratorStatus: CollaboratorStatus.ACCEPTED }
+      )
       .andWhere('itinerary.status = :status', {
         status: hasDateFilter ? ItineraryStatus.ACTIVE : defaultStatus,
       });
@@ -181,27 +240,6 @@ export const getAllUserItinerariesService = async (
       '❌ Error retrieving user itineraries:',
       error
     );
-    throw error;
-  }
-};
-
-/**
- * Delete an itinerary
- */
-export const deleteItineraryService = async (itineraryID: string): Promise<void> => {
-  try {
-    console.log('🟡 deleteItineraryService - Deleting itinerary:', itineraryID);
-
-    const deletedItinerary = await AppDataSource.getRepository(Itinerary).delete(itineraryID);
-
-    if (!deletedItinerary.affected) {
-      console.log('❌ Itinerary not found:', itineraryID);
-      throw new Error('Itinerary not found');
-    }
-
-    console.log('✅ Itinerary deleted successfully:', itineraryID);
-  } catch (error) {
-    console.error('❌ Error deleting itinerary:', error);
     throw error;
   }
 };

@@ -12,6 +12,11 @@ export interface UserItinerary {
 
 export type ItineraryPrivacy = 'private' | 'collaborators' | 'public';
 
+export interface ItineraryGeneralPermissions {
+  allowSharing: boolean;
+  allowCopying: boolean;
+}
+
 export interface Itinerary {
   id: string;
   title: string;
@@ -23,7 +28,8 @@ export interface Itinerary {
   status: 'active' | 'cancelled' | 'done';
   createdOn: string;
   updatedOn: string;
-  privacy: ItineraryPrivacy;
+  privacy?: ItineraryPrivacy;
+  generalPermissions?: ItineraryGeneralPermissions;
   user?: UserItinerary;
 }
 
@@ -34,7 +40,37 @@ export interface CreateItineraryRequest {
   endDate: Date;
   content?: unknown;
   themeColor: string;
+}
+
+export interface ItineraryUpdateValues {
+  title: string;
+  type: string;
+  startDate: Date | null;
+  endDate: Date | null;
+  content: unknown;
+  privacy: ItineraryPrivacy;
+  themeColor: string;
+  allowSharing: boolean;
+  allowCopying: boolean;
+}
+
+export interface UpdateItineraryPayload {
+  itineraryId: string;
+  title?: string;
+  type?: string;
+  startDate?: string;
+  endDate?: string;
+  content?: unknown;
   privacy?: ItineraryPrivacy;
+  themeColor?: string;
+  allowSharing?: boolean;
+  allowCopying?: boolean;
+}
+
+export interface UpdateItineraryResponse {
+  success: boolean;
+  message: string;
+  data: Itinerary;
 }
 
 export interface CreateItineraryForm {
@@ -44,6 +80,7 @@ export interface CreateItineraryForm {
   endDate: Date | null;
   themeColor: string;
   privacy?: ItineraryPrivacy;
+  generalPermissions?: ItineraryGeneralPermissions;
   content?: unknown;
 }
 

@@ -15,9 +15,8 @@ import { CollaboratorStatus } from './itinerary.types';
 
 @Entity({ name: 'itinerary_collaborators' })
 @Index(['itinerary', 'user'], { unique: true })
-@Index(['user'])
+@Index(['user', 'status'])
 @Index(['status'])
-@Index(['itinerary'])
 
 export class ItineraryCollaborator {
   @PrimaryGeneratedColumn('uuid')

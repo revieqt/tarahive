@@ -5,6 +5,8 @@ import {
   CreateItineraryResponse,
   ItineraryResponse,
   AllItinerariesResponse,
+  UpdateItineraryPayload,
+  UpdateItineraryResponse,
 } from '../types/itineraryTypes';
 
 const API_URL = '/v2/itinerary';
@@ -64,15 +66,11 @@ export const createItinerary = async (
     endDate: data.endDate.toISOString(),
     content: data.content,
     themeColor: data.themeColor,
-    privacy: data.privacy ?? 'private',
   };
 
   return api.post<CreateItineraryResponse>(`${API_URL}/`, payload);
 };
 
-/**
- * Delete an itinerary
- */
-export const deleteItinerary = async (id: string): Promise<void> => {
-  await api.delete(`${API_URL}/delete/${id}`);
-};
+export const updateItinerary = async (
+  payload: UpdateItineraryPayload
+): Promise<UpdateItineraryResponse> => api.patch<UpdateItineraryResponse>(`${API_URL}/`, payload);
