@@ -16,6 +16,7 @@
     "cancel_button": "Cancel Itinerary",
     "room_button": "Create Room with Itinerary",
     "delete_button": "Delete Itinerary",
+    "copy_button": "Copy Itinerary",
     "privacy_tab": "Privacy",
     "collaborators_button": "Collaborators",
     "directions": "Directions",
@@ -25,7 +26,8 @@
     "header_block": "Header",
     "text_block": "Text",
     "checklist_block": "Checklist",
-    "location_select_prompt": "Search for a location or move the map"
+    "location_select_prompt": "Search for a location or move the map",
+    "copy_title": "Make a copy of"
   },
   "type":{
     "city": "City Trip",

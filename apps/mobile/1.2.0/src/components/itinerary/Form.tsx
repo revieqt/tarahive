@@ -15,9 +15,10 @@ import ColorBar from "@/components/itinerary/ColorBar";
 import ItineraryHeader from "@/components/itinerary/Header";
 import { useThemeColor } from "@/hooks/shared/useThemeColor";
 import RoundButton from "@/components/ui/RoundButton";
+import { ITINERARY_TYPES } from "@/constants/Itinerary";
 import { newItinerayId } from "@/services/itineraryService";
 import { useLanguage } from "@/context/LanguageContext";
-import { CreateItineraryForm, ItineraryViewType, HeaderType, ItineraryBlock, TextBlock } from "@/types/itineraryTypes";
+import { CreateItineraryForm, ItineraryPrivacy, ItineraryViewType, HeaderType, ItineraryBlock, TextBlock } from "@/types/itineraryTypes";
 
 type ItineraryFormProps = {
   viewType?: ItineraryViewType;
@@ -44,7 +45,8 @@ export default function ItineraryForm({
   const [title, setTitle] = useState(initialValues?.title ?? "");
   const [startDate, setStartDate] = useState<Date | null>(initialValues?.startDate ?? null);
   const [endDate, setEndDate] = useState<Date | null>(initialValues?.endDate ?? null);
-  const [type, setType] = useState(initialValues?.type ?? "Solo");
+  const [type, setType] = useState(initialValues?.type ?? ITINERARY_TYPES[0].value);
+  const [privacy, setPrivacy] = useState<ItineraryPrivacy>(initialValues?.privacy ?? "private");
   const [themeColor, setThemeColor] = useState(initialValues?.themeColor ?? accentColor);
   const [colorBarVisible, setColorBarVisible] = useState(false);
   const [content, setContent] = useState<ItineraryBlock[]>((initialValues?.content as ItineraryBlock[] | undefined) ?? [],);
@@ -273,7 +275,15 @@ export default function ItineraryForm({
   const lastBlock = content[content.length - 1];
   const showComposer = canEdit && (!lastBlock || lastBlock.type !== "text" || Boolean(composerId));
   const visibleContent = composerId ? content.filter((block) => block.id !== composerId) : content;
-  const submit = () => onSubmit?.({ title, startDate, endDate, type, themeColor, content });
+  const submit = () => onSubmit?.({
+    title,
+    startDate,
+    endDate,
+    type: ITINERARY_TYPES.find((option) => option.value === type)?.value ?? type,
+    privacy,
+    themeColor,
+    content,
+  });
 
   return (
     <KeyboardAvoidingView
@@ -295,6 +305,8 @@ export default function ItineraryForm({
           onStartDateChange={setStartDate}
           endDate={endDate}
           onEndDateChange={setEndDate}
+          privacy={privacy}
+          onPrivacyChange={setPrivacy}
           themeColor={themeColor}
           onThemeColorPress={
             canEdit ? () => setColorBarVisible(true) : undefined

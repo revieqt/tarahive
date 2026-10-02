@@ -1,58 +1,60 @@
 {
-  "main": {
-    "title": "여행 일정",
-    "subtitle": "여행 계획을 관리하세요",
-    "active": "진행 중",
-    "completed": "완료됨",
-    "cancelled": "취소됨"
-  },
-  "form": {
-    "title_placeholder": "제목",
-    "details_tab": "세부 정보",
-    "start_placeholder": "시작 날짜",
-    "end_placeholder": "종료 날짜",
-    "actions_tab": "작업",
-    "complete_button": "완료로 표시",
-    "cancel_button": "여행 일정 취소",
-    "room_button": "여행 일정으로 방 만들기",
-    "delete_button": "여행 일정 삭제",
-    "privacy_tab": "공개 설정",
-    "collaborators_button": "공동 작업자",
-    "directions": "길찾기",
-    "search": "검색",
-    "focus_done": "완료",
-    "focus_delete": "삭제",
-    "header_block": "제목",
-    "text_block": "텍스트",
-    "checklist_block": "체크리스트",
-    "location_select_prompt": "장소를 검색하거나 지도를 이동하세요"
-  },
-  "type": {
-    "city": "도시 여행",
-    "beach": "주말 여행",
-    "road": "로드트립",
-    "business": "출장",
-    "education": "교육 여행",
-    "couple": "커플 여행",
-    "family": "가족 여행",
-    "weekend": "주말 여행",
-    "vacation": "휴가",
-    "adventure": "모험 여행",
-    "backpacking": "배낭여행",
-    "event": "이벤트",
-    "pilgrimage": "성지순례",
-    "cruise": "크루즈",
-    "staycation": "스테이케이션",
-    "other": "기타"
-  },
-  "privacy": {
-    "public": "공개",
-    "private": "비공개",
-    "invited": "초대된 공동 작업자만"
-  },
-  "viewType": {
-    "viewer": "열람자",
-    "collaborator": "공동 작업자",
-    "owner": "소유자"
-  }
+"main": {
+"title": "여행 일정",
+"subtitle": "여행 계획을 관리하세요",
+"active": "진행 중",
+"completed": "완료됨",
+"cancelled": "취소됨"
+},
+"form": {
+"title_placeholder": "제목",
+"details_tab": "상세 정보",
+"start_placeholder": "시작 날짜",
+"end_placeholder": "종료 날짜",
+"actions_tab": "작업",
+"complete_button": "완료로 표시",
+"cancel_button": "일정 취소",
+"room_button": "일정으로 방 만들기",
+"delete_button": "일정 삭제",
+"copy_button": "일정 복사",
+"privacy_tab": "공개 설정",
+"collaborators_button": "공동 작업자",
+"directions": "길찾기",
+"search": "검색",
+"focus_done": "완료",
+"focus_delete": "삭제",
+"header_block": "제목",
+"text_block": "텍스트",
+"checklist_block": "체크리스트",
+"location_select_prompt": "장소를 검색하거나 지도를 이동하세요",
+"copy_title": "복사할 일정"
+},
+"type": {
+"city": "도시 여행",
+"beach": "주말 여행",
+"road": "로드 트립",
+"business": "출장",
+"education": "교육 여행",
+"couple": "커플 여행",
+"family": "가족 여행",
+"weekend": "주말 여행",
+"vacation": "휴가",
+"adventure": "모험 여행",
+"backpacking": "배낭여행",
+"event": "이벤트",
+"pilgrimage": "성지순례",
+"cruise": "크루즈 여행",
+"staycation": "스테이케이션",
+"other": "기타"
+},
+"privacy": {
+"public": "공개",
+"private": "비공개",
+"invited": "초대된 공동 작업자만"
+},
+"viewType": {
+"viewer": "뷰어",
+"collaborator": "공동 작업자",
+"owner": "소유자"
+}
 }

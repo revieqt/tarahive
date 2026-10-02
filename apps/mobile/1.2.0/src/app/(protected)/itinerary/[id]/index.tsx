@@ -34,6 +34,7 @@ export default function ItineraryScreen() {
 				type: itinerary?.type ?? 'Solo',
 				startDate: itinerary?.startDate ? new Date(itinerary.startDate) : null,
 				endDate: itinerary?.endDate ? new Date(itinerary.endDate) : null,
+				privacy: itinerary?.privacy ?? 'private',
 				themeColor: itinerary?.themeColor,
 				content: itinerary?.content ?? [],
 			}}

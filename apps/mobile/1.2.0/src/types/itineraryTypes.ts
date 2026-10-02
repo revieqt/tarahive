@@ -10,6 +10,8 @@ export interface UserItinerary {
   isProUser: boolean;
 }
 
+export type ItineraryPrivacy = 'private' | 'collaborators' | 'public';
+
 export interface Itinerary {
   id: string;
   title: string;
@@ -21,7 +23,7 @@ export interface Itinerary {
   status: 'active' | 'cancelled' | 'done';
   createdOn: string;
   updatedOn: string;
-  privacy: 'private' | 'collaborators' | 'public';
+  privacy: ItineraryPrivacy;
   user?: UserItinerary;
 }
 
@@ -32,7 +34,7 @@ export interface CreateItineraryRequest {
   endDate: Date;
   content?: unknown;
   themeColor: string;
-  privacy?: 'private' | 'collaborators' | 'public';
+  privacy?: ItineraryPrivacy;
 }
 
 export interface CreateItineraryForm {
@@ -41,6 +43,7 @@ export interface CreateItineraryForm {
   startDate: Date | null;
   endDate: Date | null;
   themeColor: string;
+  privacy?: ItineraryPrivacy;
   content?: unknown;
 }
 

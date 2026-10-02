@@ -235,7 +235,7 @@ const DropDownField: React.FC<DropDownFieldProps> = ({
           }
           
           <TText style={customLabelStyle}>
-            {value}
+            {t(displayLabel)}
           </TText>
         </TouchableOpacity>
 

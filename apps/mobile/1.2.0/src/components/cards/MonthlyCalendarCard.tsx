@@ -148,7 +148,7 @@ const MonthlyCalendar: React.FC = () => {
       <TText style={styles.dailyItineraryDetails}>
         {formatDateToString(new Date(item.startDate), currentLanguage.code)} - {formatDateToString(new Date(item.endDate), currentLanguage.code)}
       </TText>
-      <TText style={styles.dailyItineraryDetails}>{item.type}</TText>
+      <TText style={styles.dailyItineraryDetails}>{t(`itinerary.type.${item.type}`)}</TText>
     </TouchableOpacity>
   );
 

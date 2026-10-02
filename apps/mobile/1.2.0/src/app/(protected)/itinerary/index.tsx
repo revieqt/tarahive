@@ -43,7 +43,7 @@ export default function ItineraryScreen() {
 
         <View style={styles.cardTabs}>
           <TView style={[styles.cardBubble, {backgroundColor: accentColor + '80'}]}>
-            <TText style={styles.cardBubbleText}>{item.type}</TText>
+            <TText style={styles.cardBubbleText}>{t(`itinerary.type.${item.type}`)}</TText>
           </TView>
         </View>
 

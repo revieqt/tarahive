@@ -12,8 +12,9 @@ import { TIcon, TText, TView } from "@/components/ui/Themed";
 import DatePickerField from "@/components/ui/DatePickerField";
 import DropDownField from "@/components/ui/DropDownField";
 import OptionsPopup from "@/components/ui/OptionsPopup";
+import CopyModal from "@/components/itinerary/CopyModal";
 import { ITINERARY_TYPES } from "@/constants/Itinerary";
-import { ItineraryViewType } from "@/types/itineraryTypes"
+import { ItineraryPrivacy, ItineraryViewType } from "@/types/itineraryTypes"
 import BackButton from "../common/BackButton";
 import { useLanguage } from "@/context/LanguageContext"
 
@@ -27,6 +28,8 @@ type ItineraryHeaderProps = {
   onStartDateChange: (value: Date | null) => void;
   endDate: Date | null;
   onEndDateChange: (value: Date | null) => void;
+  privacy: ItineraryPrivacy;
+  onPrivacyChange: (value: ItineraryPrivacy) => void;
   themeColor?: string;
   onThemeColorPress?: () => void;
   viewType?: ItineraryViewType;
@@ -45,6 +48,8 @@ export default function ItineraryHeader({
   onStartDateChange,
   endDate,
   onEndDateChange,
+  privacy,
+  onPrivacyChange,
   themeColor,
   onThemeColorPress,
   viewType = 'viewer',
@@ -54,7 +59,16 @@ export default function ItineraryHeader({
 }: ItineraryHeaderProps) {
   const canEdit = viewType === "owner" || viewType === "editor";
   const [tab, setTab] = useState(1);
+  const [copyModalVisible, setCopyModalVisible] = useState(false);
   const { t } = useLanguage();
+  const privacyLabel = privacy === "collaborators"
+    ? "itinerary.privacy.invited"
+    : `itinerary.privacy.${privacy}`;
+  const privacyIcon = privacy === "public"
+    ? "earth"
+    : privacy === "collaborators"
+      ? "account-lock-open"
+      : "lock";
 
   return (
     <TView style={style}>
@@ -97,7 +111,7 @@ export default function ItineraryHeader({
               </TouchableOpacity>
             }
 
-            { (!createMode && canEdit) &&
+            { canEdit &&
               <TouchableOpacity 
                 style={[styles.tabs, tab === 3 && {borderColor: '#fff', opacity: 1}]}
                 onPress={() => setTab(3)}
@@ -112,7 +126,10 @@ export default function ItineraryHeader({
               <TIcon name='share' size={18} color='white'/>
             </TouchableOpacity>
 
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setCopyModalVisible(true)}
+              accessibilityLabel={t("itinerary.form.copy_button")}
+            >
               <TIcon name='content-copy' size={15} color='white'/>
             </TouchableOpacity>
 
@@ -192,14 +209,14 @@ export default function ItineraryHeader({
         { tab === 3 && <>
           <OptionsPopup
             options={[
-              { label: "Public", iconName: "earth" },
-              { label: "Private", iconName: "lock" },
-              { label: "Invited Collaborators Only", iconName: "account-lock-open" }
+              { label: t("itinerary.privacy.public"), iconName: "earth", onPress: () => onPrivacyChange("public") },
+              { label: t("itinerary.privacy.private"), iconName: "lock", onPress: () => onPrivacyChange("private") },
+              { label: t("itinerary.privacy.invited"), iconName: "account-lock-open", onPress: () => onPrivacyChange("collaborators") }
             ]}
             style={styles.headerButton}
           >
-            <TIcon name="lock" size={12}/>
-            <TText style={styles.detailsText}>Private</TText>
+            <TIcon name={privacyIcon} size={12}/>
+            <TText style={styles.detailsText}>{t(privacyLabel)}</TText>
           </OptionsPopup>
 
           <TouchableOpacity
@@ -219,6 +236,13 @@ export default function ItineraryHeader({
         </>
         }
       </ScrollView>
+      <CopyModal
+        visible={copyModalVisible}
+        onClose={() => setCopyModalVisible(false)}
+        itineraryId={itineraryId}
+        title={title}
+        themeColor={themeColor}
+      />
     </TView>
   );
 }
