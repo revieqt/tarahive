@@ -18,8 +18,9 @@ import RoundButton from "@/components/ui/RoundButton";
 import { ITINERARY_TYPES } from "@/constants/Itinerary";
 import { newItinerayId } from "@/services/itineraryService";
 import { useLanguage } from "@/context/LanguageContext";
-import { CreateItineraryForm, Itinerary, ItineraryGeneralPermissions, ItineraryPrivacy, ItineraryUpdateValues, ItineraryViewType, HeaderType, ItineraryBlock, TextBlock } from "@/types/itineraryTypes";
+import { CreateItineraryForm, Itinerary, ItineraryGeneralPermissions, ItineraryPrivacy, ItineraryStatus, ItineraryUpdateValues, ItineraryViewType, HeaderType, ItineraryBlock, TextBlock } from "@/types/itineraryTypes";
 import { useUpdateItinerary } from "@/hooks/itinerary/useUpdateItinerary";
+import { useItineraryStatus } from "@/hooks/itinerary/useItineraryStatus";
 
 type ItineraryFormProps = {
   ownerUsername?: string;
@@ -75,6 +76,7 @@ export default function ItineraryForm({
     allowCopying: generalPermissions.allowCopying,
   };
   const itineraryUpdate = useUpdateItinerary(initialItinerary, updateValues);
+  const itineraryStatus = useItineraryStatus(initialItinerary?.id, initialItinerary?.status);
 
   const updateBlock = (id: string, changes: Partial<ItineraryBlock>) => {
     if (!canEdit) return;
@@ -338,6 +340,9 @@ export default function ItineraryForm({
           onGeneralPermissionsChange={(key, value) =>
             setGeneralPermissions((current) => ({ ...current, [key]: value }))
           }
+          status={initialItinerary?.status ?? ItineraryStatus.ACTIVE}
+          onStatusChange={itineraryStatus.updateStatus}
+          isUpdatingStatus={itineraryStatus.isPending}
           themeColor={themeColor}
           onThemeColorPress={
             canEdit ? () => setColorBarVisible(true) : undefined

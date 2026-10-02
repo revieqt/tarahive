@@ -14,7 +14,7 @@ import DropDownField from "@/components/ui/DropDownField";
 import OptionsPopup from "@/components/ui/OptionsPopup";
 import CopyModal from "@/components/itinerary/CopyModal";
 import { ITINERARY_TYPES } from "@/constants/Itinerary";
-import { ItineraryGeneralPermissions, ItineraryPrivacy, ItineraryViewType } from "@/types/itineraryTypes"
+import { ItineraryGeneralPermissions, ItineraryPrivacy, ItineraryStatus, ItineraryViewType } from "@/types/itineraryTypes"
 import BackButton from "../common/BackButton";
 import { useLanguage } from "@/context/LanguageContext"
 
@@ -33,6 +33,9 @@ type ItineraryHeaderProps = {
   onPrivacyChange: (value: ItineraryPrivacy) => void;
   generalPermissions: ItineraryGeneralPermissions;
   onGeneralPermissionsChange: (key: keyof ItineraryGeneralPermissions, value: boolean) => void;
+  status: ItineraryStatus;
+  onStatusChange: (status: ItineraryStatus) => void;
+  isUpdatingStatus?: boolean;
   themeColor?: string;
   onThemeColorPress?: () => void;
   viewType?: ItineraryViewType;
@@ -56,6 +59,9 @@ export default function ItineraryHeader({
   onPrivacyChange,
   generalPermissions,
   onGeneralPermissionsChange,
+  status,
+  onStatusChange,
+  isUpdatingStatus = false,
   themeColor,
   onThemeColorPress,
   viewType = 'viewer',
@@ -207,12 +213,20 @@ export default function ItineraryHeader({
         }
 
         { tab === 2 && <>
-          <TouchableOpacity style={[styles.headerButton, {backgroundColor: '#5BCB78'}]}>
+          <TouchableOpacity
+            style={[styles.headerButton, {backgroundColor: '#5BCB78'}, status === ItineraryStatus.DONE && styles.disabledAction]}
+            onPress={() => onStatusChange(ItineraryStatus.DONE)}
+            disabled={isUpdatingStatus || status === ItineraryStatus.DONE}
+          >
             <TIcon name="check" size={12} color="white"/>
             <TText style={[styles.detailsText, {color: '#fff'}]}>{t('itinerary.form.complete_button')}</TText>
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.headerButton, {backgroundColor: '#F5C84B'}]}>
+          <TouchableOpacity
+            style={[styles.headerButton, {backgroundColor: '#F5C84B'}, status === ItineraryStatus.CANCELLED && styles.disabledAction]}
+            onPress={() => onStatusChange(ItineraryStatus.CANCELLED)}
+            disabled={isUpdatingStatus || status === ItineraryStatus.CANCELLED}
+          >
             <TIcon name="close" size={12} color="white"/>
             <TText style={[styles.detailsText, {color: '#fff'}]}>{t('itinerary.form.cancel_button')}</TText>
           </TouchableOpacity>
@@ -352,6 +366,9 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     gap: 2,
     opacity: .8
+  },
+  disabledAction: {
+    opacity: 0.5,
   },
   detailsText:{
     fontSize: 11,

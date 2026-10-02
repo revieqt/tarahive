@@ -25,7 +25,7 @@ export interface Itinerary {
   endDate: string;
   content?: unknown;
   themeColor?: string;
-  status: 'active' | 'cancelled' | 'done';
+  status: ItineraryStatus;
   createdOn: string;
   updatedOn: string;
   privacy?: ItineraryPrivacy;
@@ -71,6 +71,11 @@ export interface UpdateItineraryResponse {
   success: boolean;
   message: string;
   data: Itinerary;
+}
+
+export interface UpdateItineraryStatusPayload {
+  itineraryId: string;
+  status: ItineraryStatus;
 }
 
 export interface CreateItineraryForm {

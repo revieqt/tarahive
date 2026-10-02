@@ -7,6 +7,7 @@ import {
   AllItinerariesResponse,
   UpdateItineraryPayload,
   UpdateItineraryResponse,
+  UpdateItineraryStatusPayload,
 } from '../types/itineraryTypes';
 
 const API_URL = '/v2/itinerary';
@@ -74,3 +75,7 @@ export const createItinerary = async (
 export const updateItinerary = async (
   payload: UpdateItineraryPayload
 ): Promise<UpdateItineraryResponse> => api.patch<UpdateItineraryResponse>(`${API_URL}/`, payload);
+
+export const updateItineraryStatus = async (
+  payload: UpdateItineraryStatusPayload
+): Promise<UpdateItineraryResponse> => api.patch<UpdateItineraryResponse>(`${API_URL}/status`, payload);

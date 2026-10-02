@@ -47,6 +47,11 @@ export type UpdateItineraryData = Omit<UpdateItineraryRequest, 'itineraryId' | '
   endDate?: Date;
 };
 
+export interface UpdateItineraryStatusRequest {
+  itineraryId: string;
+  status: ItineraryStatus;
+}
+
 // export interface UpdateItineraryRequest {
 //   title?: string;
 //   type?: string;

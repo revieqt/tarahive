@@ -2,10 +2,11 @@ import { Request, Response } from 'express';
 import {
   createItineraryService,
   updateItineraryService,
+  updateItineraryStatusService,
   getItineraryService,
   getAllUserItinerariesService,
 } from './itinerary.service';
-import { CreateItineraryRequest, ItineraryPrivacy, UpdateItineraryData, UpdateItineraryRequest } from './itinerary.types';
+import { CreateItineraryRequest, ItineraryPrivacy, ItineraryStatus, UpdateItineraryData, UpdateItineraryRequest, UpdateItineraryStatusRequest } from './itinerary.types';
 
 interface AuthRequest extends Request {
   user?: {
@@ -153,6 +154,51 @@ export const updateItinerary = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ success: false, message: error.message });
     }
     console.error('❌ Error updating itinerary:', error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+export const updateItineraryStatus = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.sub;
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'User not authenticated' });
+    }
+
+    if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
+      return res.status(400).json({ success: false, message: 'A valid JSON request body is required' });
+    }
+
+    const body = req.body as Partial<UpdateItineraryStatusRequest>;
+    const unexpectedField = Object.keys(body).find((field) => !['itineraryId', 'status'].includes(field));
+    if (unexpectedField) {
+      return res.status(400).json({ success: false, message: `Unexpected field: ${unexpectedField}` });
+    }
+
+    if (typeof body.itineraryId !== 'string' || !body.itineraryId.trim()) {
+      return res.status(400).json({ success: false, message: 'itineraryId is required' });
+    }
+    if (!Object.values(ItineraryStatus).includes(body.status as ItineraryStatus)) {
+      return res.status(400).json({ success: false, message: 'status is invalid' });
+    }
+
+    const update: UpdateItineraryStatusRequest = {
+      itineraryId: body.itineraryId,
+      status: body.status as ItineraryStatus,
+    };
+    const itinerary = await updateItineraryStatusService(userId, update);
+
+    if (!itinerary) {
+      return res.status(404).json({ success: false, message: 'Itinerary not found or not owned by user' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Itinerary status updated successfully',
+      data: itinerary,
+    });
+  } catch (error) {
+    console.error('❌ Error updating itinerary status:', error);
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };

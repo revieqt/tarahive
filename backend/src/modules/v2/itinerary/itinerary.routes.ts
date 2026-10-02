@@ -2,6 +2,7 @@ import express from 'express';
 import {
   createItinerary,
   updateItinerary,
+  updateItineraryStatus,
   getItinerary,
   getAllUserItineraries,
 } from './itinerary.controller';
@@ -15,6 +16,7 @@ router.get('/', rateLimiter('MODERATE'), authMiddleware, getAllUserItineraries);
 // Create a new itinerary
 router.post('/',rateLimiter('MODERATE'), authMiddleware, createItinerary);
 router.patch('/', rateLimiter('MODERATE'), authMiddleware, updateItinerary);
+router.patch('/status', rateLimiter('MODERATE'), authMiddleware, updateItineraryStatus);
 
 // Get a specific itinerary by ID
 router.get('/:id', rateLimiter('MODERATE'), authMiddleware, getItinerary);

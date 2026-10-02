@@ -8,6 +8,7 @@ import {
   ItineraryStatus,
   ItineraryPrivacy,
   UpdateItineraryData,
+  UpdateItineraryStatusRequest,
 } from './itinerary.types';
 
 export const createItineraryService = async (
@@ -109,6 +110,29 @@ export const updateItineraryService = async (
       throw new RangeError('Start date must not be after end date');
     }
 
+    itinerary.updatedOn = new Date();
+    itinerary.v += 1;
+
+    return itineraryRepository.save(itinerary);
+  });
+};
+
+export const updateItineraryStatusService = async (
+  userId: string,
+  update: UpdateItineraryStatusRequest
+): Promise<Itinerary | null> => {
+  return AppDataSource.transaction(async (manager) => {
+    const itineraryRepository = manager.getRepository(Itinerary);
+    const itinerary = await itineraryRepository.findOne({
+      where: { id: update.itineraryId, user: { id: userId } },
+      lock: { mode: 'pessimistic_write' },
+    });
+
+    if (!itinerary) {
+      return null;
+    }
+
+    itinerary.status = update.status;
     itinerary.updatedOn = new Date();
     itinerary.v += 1;
 
