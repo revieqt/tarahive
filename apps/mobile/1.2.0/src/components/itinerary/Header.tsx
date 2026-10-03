@@ -12,7 +12,7 @@ import { TIcon, TText, TView } from "@/components/ui/Themed";
 import DatePickerField from "@/components/ui/DatePickerField";
 import DropDownField from "@/components/ui/DropDownField";
 import OptionsPopup from "@/components/ui/OptionsPopup";
-import CopyModal from "@/components/itinerary/CopyModal";
+import ShareModal from "@/components/modals/ShareModal";
 import { ITINERARY_TYPES } from "@/constants/Itinerary";
 import { ItineraryGeneralPermissions, ItineraryPrivacy, ItineraryStatus, ItineraryViewType } from "@/types/itineraryTypes"
 import BackButton from "../common/BackButton";
@@ -73,7 +73,7 @@ export default function ItineraryHeader({
 }: ItineraryHeaderProps) {
   const canEdit = editable && (viewType === "owner" || viewType === "editor");
   const [tab, setTab] = useState(1);
-  const [copyModalVisible, setCopyModalVisible] = useState(false);
+  const [shareModalVisible, setShareModalVisible] = useState(false);
   const { t } = useLanguage();
   const privacyLabel = privacy === "collaborators"
     ? "itinerary.privacy.invited"
@@ -159,12 +159,17 @@ export default function ItineraryHeader({
           </ScrollView>
 
           <View style={styles.moreOptionsContainer}>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setShareModalVisible(true)}
+              disabled={!itineraryId}
+              accessibilityLabel="Share itinerary"
+            >
               <TIcon name='share' size={18} color='white'/>
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => setCopyModalVisible(true)}
+              onPress={onRepeatItinerary}
+              disabled={!onRepeatItinerary}
               accessibilityLabel={t("itinerary.form.copy_button")}
             >
               <TIcon name='content-copy' size={15} color='white'/>
@@ -339,12 +344,10 @@ export default function ItineraryHeader({
         </>
         }
       </ScrollView>
-      <CopyModal
-        visible={copyModalVisible}
-        onClose={() => setCopyModalVisible(false)}
-        itineraryId={itineraryId}
-        title={title}
-        themeColor={themeColor}
+      <ShareModal
+        visible={shareModalVisible}
+        onClose={() => setShareModalVisible(false)}
+        path={`/itinerary/${itineraryId ?? ''}`}
       />
     </TView>
   );
