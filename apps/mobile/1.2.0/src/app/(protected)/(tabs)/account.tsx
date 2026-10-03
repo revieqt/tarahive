@@ -15,7 +15,7 @@ import NoInternetCard from '@/components/cards/NoInternetCard';
 import HiveBg from '@/components/common/HiveBg';
 import StickyScrollView from '@/components/ui/StickyScrollView';
 
-const SettingsOption = ({ icon, label, onPress }: { icon: string; label: string; onPress: () => void }) => (
+export const SettingsOption = ({ icon, label, onPress }: { icon: string; label: string; onPress: () => void }) => (
   <TouchableOpacity onPress={onPress} style={styles.optionsChild}>
     <View style={styles.optionsLabel}>
       <TIcon name={icon} size={15} />
@@ -172,6 +172,10 @@ export default function AccountScreen() {
             <TText style={styles.optionsTitle}> {t('tabs.account.developer_title')} </TText>
             <SettingsOption icon='layers-remove' label={t('tabs.account.cache_button')}
               onPress={clearCache}
+            />
+
+            <SettingsOption icon='account-lock' label="Adminstrator Panel"
+              onPress={() => router.push('/admin')}
             />
           </>}
 

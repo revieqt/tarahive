@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSession } from '@/context/SessionContext';
 import {
   aiChatService,
@@ -42,6 +42,7 @@ const mapStoredMessages = (messages: AiMessage[] = []): Message[] =>
 
 export const useAiChat = () => {
   const { session } = useSession();
+  const usageLimitsEnabled = process.env.EXPO_PUBLIC_ENABLE_AI_USAGE_LIMITS === 'true';
   const maxMessages = useMemo(
     () => parseInt(process.env.EXPO_PUBLIC_MAX_FREE_AI_MESSAGES_PER_DAY || '5', 10),
     [],
@@ -49,10 +50,12 @@ export const useAiChat = () => {
 
   const [messages, setMessages] = useState<Message[]>([createWelcomeMessage()]);
   const [isSending, setIsSending] = useState(false);
+  const [isWaitingForResponse, setIsWaitingForResponse] = useState(false);
   const [inputText, setInputText] = useState('');
   const [inputError, setInputError] = useState<string | null>(null);
   const [rateLimitError, setRateLimitError] = useState<string | null>(null);
   const [todayMessageCount, setTodayMessageCount] = useState(0);
+  const typingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const loadTodayMessageCount = useCallback(async () => {
     try {
@@ -102,7 +105,7 @@ export const useAiChat = () => {
   useEffect(() => {
     const isProUser = Boolean(session?.user?.isProUser);
 
-    if (!isProUser && todayMessageCount >= maxMessages) {
+    if (usageLimitsEnabled && !isProUser && todayMessageCount >= maxMessages) {
       setRateLimitError(
         `You've reached your daily limit of ${maxMessages} messages. Upgrade to Pro for unlimited access.`,
       );
@@ -110,7 +113,7 @@ export const useAiChat = () => {
     }
 
     setRateLimitError(null);
-  }, [maxMessages, session?.user?.isProUser, todayMessageCount]);
+  }, [maxMessages, session?.user?.isProUser, todayMessageCount, usageLimitsEnabled]);
 
   const validateMessage = useCallback((text: string): string | null => {
     const trimmed = text.trim();
@@ -127,7 +130,7 @@ export const useAiChat = () => {
   }, []);
 
   const incrementFreeMessageCount = useCallback(async () => {
-    if (session?.user?.isProUser) {
+    if (!usageLimitsEnabled || session?.user?.isProUser) {
       return;
     }
 
@@ -139,7 +142,7 @@ export const useAiChat = () => {
     } catch (error) {
       console.error('Failed to save message count:', error);
     }
-  }, [session?.user?.isProUser, todayMessageCount]);
+  }, [session?.user?.isProUser, todayMessageCount, usageLimitsEnabled]);
 
   const handleSendMessage = useCallback(
     async (rawText: string) => {
@@ -152,7 +155,7 @@ export const useAiChat = () => {
       setInputError(null);
 
       const isProUser = Boolean(session?.user?.isProUser);
-      if (!isProUser && todayMessageCount >= maxMessages) {
+      if (usageLimitsEnabled && !isProUser && todayMessageCount >= maxMessages) {
         setRateLimitError(
           `You've reached your daily limit of ${maxMessages} messages. Upgrade to Pro for unlimited access.`,
         );
@@ -180,6 +183,15 @@ export const useAiChat = () => {
       setMessages((prev) => prev.filter((item) => item.id !== 'welcome-message').concat(userMessage, assistantPlaceholder));
       setInputText('');
       setIsSending(true);
+      setIsWaitingForResponse(true);
+
+      let targetText = '';
+      let displayedText = '';
+      let streamComplete = false;
+      let finishTyping!: () => void;
+      const typingFinished = new Promise<void>((resolve) => {
+        finishTyping = resolve;
+      });
 
       const updateAssistantMessage = (nextText: string, finalType: 'chat' | 'itinerary' = 'chat', finalItineraryData?: Record<string, any>) => {
         setMessages((prev) => {
@@ -209,29 +221,60 @@ export const useAiChat = () => {
         });
       };
 
+      typingIntervalRef.current = setInterval(() => {
+        if (displayedText.length < targetText.length) {
+          displayedText = targetText.slice(0, displayedText.length + 1);
+          updateAssistantMessage(displayedText);
+          return;
+        }
+
+        if (streamComplete) {
+          if (typingIntervalRef.current) {
+            clearInterval(typingIntervalRef.current);
+            typingIntervalRef.current = null;
+          }
+          finishTyping();
+        }
+      }, 24);
+
       try {
         const response = await aiChatService.sendMessageStream(trimmedText, (partialText, isComplete) => {
-          updateAssistantMessage(partialText);
-
+          if (partialText.trim()) {
+            setIsWaitingForResponse(false);
+          }
+          targetText = partialText.startsWith(targetText)
+            ? partialText
+            : `${targetText}${partialText}`;
           if (isComplete) {
-            setIsSending(false);
+            streamComplete = true;
           }
         });
 
         if (response?.message?.content) {
-          updateAssistantMessage(response.message.content);
+          targetText = response.message.content;
         }
+        streamComplete = true;
+        await typingFinished;
 
         await incrementFreeMessageCount();
       } catch (error: any) {
+        if (typingIntervalRef.current) {
+          clearInterval(typingIntervalRef.current);
+          typingIntervalRef.current = null;
+        }
         updateAssistantMessage(
           `Sorry, I encountered an error: ${error?.message || 'Unknown error'}. Please try again.`,
         );
       } finally {
+        if (typingIntervalRef.current) {
+          clearInterval(typingIntervalRef.current);
+          typingIntervalRef.current = null;
+        }
+        setIsWaitingForResponse(false);
         setIsSending(false);
       }
     },
-    [incrementFreeMessageCount, maxMessages, session?.user?.isProUser, todayMessageCount, validateMessage],
+    [incrementFreeMessageCount, maxMessages, session?.user?.isProUser, todayMessageCount, usageLimitsEnabled, validateMessage],
   );
 
   const clearChat = useCallback(async () => {
@@ -244,6 +287,11 @@ export const useAiChat = () => {
       setInputText('');
       setInputError(null);
       setRateLimitError(null);
+      setIsWaitingForResponse(false);
+      if (typingIntervalRef.current) {
+        clearInterval(typingIntervalRef.current);
+        typingIntervalRef.current = null;
+      }
       setIsSending(false);
     }
   }, []);
@@ -251,6 +299,7 @@ export const useAiChat = () => {
   return {
     messages,
     isSending,
+    isWaitingForResponse,
     inputText,
     setInputText,
     inputError,

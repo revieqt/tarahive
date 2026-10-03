@@ -16,6 +16,7 @@ export default function AiChatScreen() {
   const {
     messages,
     isSending,
+    isWaitingForResponse,
     inputText,
     setInputText,
     inputError,
@@ -215,7 +216,7 @@ export default function AiChatScreen() {
                 );
               })}
 
-              {isSending && (
+              {isSending && isWaitingForResponse && (
                 <View style={{ paddingVertical: 30, padding: 10, opacity: 0.7 }}>
                   <TText>Thinking{'.'.repeat(dotCount)}</TText>
                 </View>

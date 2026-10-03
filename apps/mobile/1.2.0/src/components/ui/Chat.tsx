@@ -202,7 +202,7 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
             {!isCurrentUser && name && (
               <TText style={styles.bubbleName}>{name}</TText>
             )}
-            <TText>{message}</TText>
+            <TText style={isCurrentUser && { color: '#fff'}}>{message}</TText>
           </View>
         </TouchableOpacity>
 

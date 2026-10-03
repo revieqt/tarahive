@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, StyleSheet } from "react-native";
+import { Linking, Text, View, StyleSheet } from "react-native";
 import { TText } from "./Themed";
 
 interface Props {
@@ -11,12 +11,38 @@ export const Markdown: React.FC<Props> = ({ children, fontSize = 13 }) => {
   const lines = children.split("\n");
 
   const renderInline = (text: string) => {
-    const parts = text.split(/(\*\*.*?\*\*|\*.*?\*|`.*?`)/g);
+    const parts = text.split(/(\[[^\]]+\]\([^)]+\)|https?:\/\/[^\s<>()]+|\*\*.*?\*\*|`.*?`)/g);
 
     return parts.map((part, index) => {
+      const markdownLink = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+      const rawUrl = markdownLink ? null : part.match(/^https?:\/\/[^\s<>()]+$/)?.[0];
+      const url = markdownLink?.[2] ?? rawUrl;
+
+      if (url && /^(https?:\/\/|mailto:)/i.test(url)) {
+        const label = markdownLink?.[1] ?? url.replace(/[.,!?;:]+$/, '');
+        const trailingPunctuation = markdownLink ? '' : url.slice(label.length);
+
+        return (
+          <React.Fragment key={index}>
+            <TText
+              accessibilityRole="link"
+              style={[{ fontSize }, styles.link]}
+              onPress={() => {
+                void Linking.openURL(url.replace(/[.,!?;:]+$/, '')).catch((error) =>
+                  console.warn('Unable to open link:', error),
+                );
+              }}
+            >
+              {label}
+            </TText>
+            {trailingPunctuation ? <TText style={{ fontSize }}>{trailingPunctuation}</TText> : null}
+          </React.Fragment>
+        );
+      }
+
       if (part.startsWith("**") && part.endsWith("**")) {
         return (
-          <TText key={index} style={{fontSize: fontSize}} type='subtitle'>
+          <TText key={index} style={{fontSize: fontSize, fontWeight: 800}}>
             {part.slice(2, -2)}
           </TText>
         );
@@ -120,6 +146,9 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 22,
     fontFamily: 'PoppinsBold',
+  },
+  link: {
+    textDecorationLine: 'underline',
   },
 
   heading1: {
