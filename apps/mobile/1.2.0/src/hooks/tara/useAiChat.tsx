@@ -1,115 +1,262 @@
-import { useCallback, useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { sendMessage, clearConversationHistory, type UnifiedAIResponse } from '@/services/aiChatService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSession } from '@/context/SessionContext';
+import {
+  aiChatService,
+  type AiChatResponse,
+  type AiMessage,
+} from '@/services/aiChatService';
 
 export interface Message {
   id: string;
   text: string;
   isUser: boolean;
   timestamp: Date;
-  type?: 'chat' | 'itinerary'; // Message type from backend
-  itineraryData?: Record<string, any>; // Store itinerary data for display button
+  type?: 'chat' | 'itinerary';
+  itineraryData?: Record<string, any>;
 }
 
-const MESSAGES_QUERY_KEY = ['aiChatMessages'];
+const STORAGE_KEYS = {
+  LAST_MESSAGE_COUNT_DATE: 'last_message_count_date',
+  MESSAGE_COUNT_TODAY: 'message_count_today',
+};
+
+const createWelcomeMessage = (): Message => ({
+  id: 'welcome-message',
+  text: "Hello, I'm Tara! Your personal travel assistant! What would you like to explore today?",
+  isUser: false,
+  timestamp: new Date(),
+  type: 'chat',
+});
+
+const mapStoredMessages = (messages: AiMessage[] = []): Message[] =>
+  messages
+    .filter((message) => message.role === 'user' || message.role === 'assistant')
+    .map((message) => ({
+      id: message.id,
+      text: message.content,
+      isUser: message.role === 'user',
+      timestamp: new Date(message.createdAt ?? Date.now()),
+      type: 'chat',
+    }));
 
 export const useAiChat = () => {
-  const queryClient = useQueryClient();
-  
-  const initialMessages: Message[] = [
-    {
-      id: '1',
-      text: "Hello, I'm Tara! Your personal travel assistant! What would you like to explore today?",
-      isUser: false,
-      timestamp: new Date(),
-      type: 'chat',
-    },
-  ];
+  const { session } = useSession();
+  const maxMessages = useMemo(
+    () => parseInt(process.env.EXPO_PUBLIC_MAX_FREE_AI_MESSAGES_PER_DAY || '5', 10),
+    [],
+  );
 
-  const { data: messages = initialMessages } = useQuery({
-    queryKey: MESSAGES_QUERY_KEY,
-    queryFn: () => initialMessages,
-    staleTime: Infinity,
-    gcTime: Infinity,
-  });
+  const [messages, setMessages] = useState<Message[]>([createWelcomeMessage()]);
+  const [isSending, setIsSending] = useState(false);
+  const [inputText, setInputText] = useState('');
+  const [inputError, setInputError] = useState<string | null>(null);
+  const [rateLimitError, setRateLimitError] = useState<string | null>(null);
+  const [todayMessageCount, setTodayMessageCount] = useState(0);
 
-  const { mutate: sendMessage_mutation, isPending: isSending } = useMutation({
-    mutationFn: async (userMessage: string) => {
-      // Add user message to chat
-      const userMsg: Message = {
-        id: Date.now().toString(),
-        text: userMessage,
+  const loadTodayMessageCount = useCallback(async () => {
+    try {
+      const today = new Date().toDateString();
+      const lastDate = await AsyncStorage.getItem(STORAGE_KEYS.LAST_MESSAGE_COUNT_DATE);
+      const count = await AsyncStorage.getItem(STORAGE_KEYS.MESSAGE_COUNT_TODAY);
+
+      if (lastDate && lastDate !== today) {
+        await AsyncStorage.setItem(STORAGE_KEYS.LAST_MESSAGE_COUNT_DATE, today);
+        await AsyncStorage.setItem(STORAGE_KEYS.MESSAGE_COUNT_TODAY, '0');
+        setTodayMessageCount(0);
+        return;
+      }
+
+      if (!lastDate) {
+        await AsyncStorage.setItem(STORAGE_KEYS.LAST_MESSAGE_COUNT_DATE, today);
+      }
+
+      setTodayMessageCount(count ? parseInt(count, 10) : 0);
+    } catch (error) {
+      console.error('Failed to load message count:', error);
+    }
+  }, []);
+
+  const loadConversation = useCallback(async () => {
+    try {
+      const response = await aiChatService.getConversation();
+      const storedMessages = response.messages ?? [];
+
+      if (!storedMessages.length) {
+        setMessages([createWelcomeMessage()]);
+        return;
+      }
+
+      setMessages(mapStoredMessages(storedMessages));
+    } catch (error) {
+      console.error('Failed to load conversation:', error);
+      setMessages([createWelcomeMessage()]);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadTodayMessageCount();
+    void loadConversation();
+  }, [loadTodayMessageCount, loadConversation]);
+
+  useEffect(() => {
+    const isProUser = Boolean(session?.user?.isProUser);
+
+    if (!isProUser && todayMessageCount >= maxMessages) {
+      setRateLimitError(
+        `You've reached your daily limit of ${maxMessages} messages. Upgrade to Pro for unlimited access.`,
+      );
+      return;
+    }
+
+    setRateLimitError(null);
+  }, [maxMessages, session?.user?.isProUser, todayMessageCount]);
+
+  const validateMessage = useCallback((text: string): string | null => {
+    const trimmed = text.trim();
+
+    if (!trimmed) {
+      return 'Please enter a message before sending.';
+    }
+
+    if (trimmed.length > 2000) {
+      return 'Message must be 2000 characters or fewer.';
+    }
+
+    return null;
+  }, []);
+
+  const incrementFreeMessageCount = useCallback(async () => {
+    if (session?.user?.isProUser) {
+      return;
+    }
+
+    const nextCount = todayMessageCount + 1;
+    setTodayMessageCount(nextCount);
+
+    try {
+      await AsyncStorage.setItem(STORAGE_KEYS.MESSAGE_COUNT_TODAY, String(nextCount));
+    } catch (error) {
+      console.error('Failed to save message count:', error);
+    }
+  }, [session?.user?.isProUser, todayMessageCount]);
+
+  const handleSendMessage = useCallback(
+    async (rawText: string) => {
+      const validationError = validateMessage(rawText);
+      if (validationError) {
+        setInputError(validationError);
+        return;
+      }
+
+      setInputError(null);
+
+      const isProUser = Boolean(session?.user?.isProUser);
+      if (!isProUser && todayMessageCount >= maxMessages) {
+        setRateLimitError(
+          `You've reached your daily limit of ${maxMessages} messages. Upgrade to Pro for unlimited access.`,
+        );
+        return;
+      }
+
+      const trimmedText = rawText.trim();
+      const userMessage: Message = {
+        id: `user-${Date.now()}`,
+        text: trimmedText,
         isUser: true,
         timestamp: new Date(),
         type: 'chat',
       };
-      
-      queryClient.setQueryData(MESSAGES_QUERY_KEY, (prev: Message[] = []) => [
-        ...prev,
-        userMsg,
-      ]);
 
-      // Send to backend unified endpoint
-      const response: UnifiedAIResponse = await sendMessage(userMessage);
-
-      // Add AI response to chat
-      const aiMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        text: response.message,
-        isUser: false,
-        timestamp: new Date(),
-        type: response.type,
-        itineraryData: response.json, // Store JSON data if present (itinerary)
-      };
-      
-      queryClient.setQueryData(MESSAGES_QUERY_KEY, (prev: Message[] = []) => [
-        ...prev,
-        aiMsg,
-      ]);
-
-      return response;
-    },
-    onError: (error) => {
-      const errorMsg: Message = {
-        id: Date.now().toString(),
-        text: `Sorry, I encountered an error: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`,
+      const assistantId = `assistant-${Date.now()}`;
+      const assistantPlaceholder: Message = {
+        id: assistantId,
+        text: '',
         isUser: false,
         timestamp: new Date(),
         type: 'chat',
       };
-      queryClient.setQueryData(MESSAGES_QUERY_KEY, (prev: Message[] = []) => [
-        ...prev,
-        errorMsg,
-      ]);
-    },
-  });
 
-  const handleSendMessage = useCallback(
-    (text: string) => {
-      if (text.trim()) {
-        sendMessage_mutation(text.trim());
+      setMessages((prev) => prev.filter((item) => item.id !== 'welcome-message').concat(userMessage, assistantPlaceholder));
+      setInputText('');
+      setIsSending(true);
+
+      const updateAssistantMessage = (nextText: string, finalType: 'chat' | 'itinerary' = 'chat', finalItineraryData?: Record<string, any>) => {
+        setMessages((prev) => {
+          const next = [...prev];
+          let index = -1;
+
+          for (let i = next.length - 1; i >= 0; i -= 1) {
+            if (next[i].id === assistantId) {
+              index = i;
+              break;
+            }
+          }
+
+          if (index === -1) {
+            return prev;
+          }
+
+          next[index] = {
+            ...next[index],
+            text: nextText,
+            timestamp: new Date(),
+            type: finalType,
+            itineraryData: finalItineraryData,
+          };
+
+          return next;
+        });
+      };
+
+      try {
+        const response = await aiChatService.sendMessageStream(trimmedText, (partialText, isComplete) => {
+          updateAssistantMessage(partialText);
+
+          if (isComplete) {
+            setIsSending(false);
+          }
+        });
+
+        if (response?.message?.content) {
+          updateAssistantMessage(response.message.content);
+        }
+
+        await incrementFreeMessageCount();
+      } catch (error: any) {
+        updateAssistantMessage(
+          `Sorry, I encountered an error: ${error?.message || 'Unknown error'}. Please try again.`,
+        );
+      } finally {
+        setIsSending(false);
       }
     },
-    [sendMessage_mutation]
+    [incrementFreeMessageCount, maxMessages, session?.user?.isProUser, todayMessageCount, validateMessage],
   );
 
   const clearChat = useCallback(async () => {
     try {
-      // Call backend to clear conversation history
-      await clearConversationHistory();
-      // Clear local messages
-      queryClient.setQueryData(MESSAGES_QUERY_KEY, initialMessages);
+      await aiChatService.clearConversation();
     } catch (error) {
       console.error('Failed to clear chat:', error);
-      // Still clear local messages even if API call fails
-      queryClient.setQueryData(MESSAGES_QUERY_KEY, initialMessages);
+    } finally {
+      setMessages([createWelcomeMessage()]);
+      setInputText('');
+      setInputError(null);
+      setRateLimitError(null);
+      setIsSending(false);
     }
-  }, [queryClient]);
+  }, []);
 
   return {
     messages,
     isSending,
+    inputText,
+    setInputText,
+    inputError,
+    rateLimitError,
     handleSendMessage,
     clearChat,
+    refreshConversation: loadConversation,
   };
 };

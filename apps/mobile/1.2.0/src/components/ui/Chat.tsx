@@ -28,12 +28,19 @@ export const ChatArea: React.FC<{ children: React.ReactNode }> = ({ children }) 
 //////////////////////////////
 // ChatHeader
 //////////////////////////////
+interface ChatHeaderOption {
+  label: string;
+  iconName: string;
+  iconColor?: string;
+  onPress?: () => void;
+}
+
 interface ChatHeaderProps {
   title: string;
   description?: string;
   hasBackButton?: boolean;
   onBackPress?: () => void;
-  optionsValue?: React.ReactNode[];
+  optionsValue?: ChatHeaderOption[];
 }
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
