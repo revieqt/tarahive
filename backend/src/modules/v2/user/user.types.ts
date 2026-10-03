@@ -34,3 +34,11 @@ export interface SetupUserPayload {
   username?: string;
   interests?: string[];
 }
+
+export interface UserSearchResult {
+  id: string;
+  profileImage: string;
+  fname: string;
+  lname: string;
+  username: string;
+}

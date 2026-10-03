@@ -4,10 +4,37 @@ export enum ItineraryStatus {
   DONE = 'done',
 }
 
+export enum CollaboratorPermission {
+  OWNER = 'owner',
+  EDIT = 'edit',
+  VIEW = 'view',
+}
+
+export interface ItineraryCollaborator {
+  collaboratorId: string;
+  userId: string;
+  profileImage: string;
+  fname: string;
+  lname: string;
+  username: string;
+  permissions: CollaboratorPermission;
+}
+
+export interface AddItineraryCollaboratorPayload {
+  itineraryId: string;
+  userId: string;
+  permission: CollaboratorPermission.EDIT | CollaboratorPermission.VIEW;
+}
+
+export interface UpdateItineraryCollaboratorPayload {
+  collaboratorId: string;
+  permission: CollaboratorPermission.EDIT | CollaboratorPermission.VIEW;
+}
+
 export interface UserItinerary {
   id: string;
-  username: string;
-  isProUser: boolean;
+  username?: string;
+  isProUser?: boolean;
 }
 
 export type ItineraryPrivacy = 'private' | 'collaborators' | 'public';

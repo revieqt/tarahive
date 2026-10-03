@@ -3,10 +3,24 @@ import {
   createItineraryService,
   updateItineraryService,
   updateItineraryStatusService,
+  getItineraryCollaboratorsService,
+  createItineraryCollaboratorService,
+  updateItineraryCollaboratorService,
+  deleteItineraryCollaboratorService,
   getItineraryService,
   getAllUserItinerariesService,
 } from './itinerary.service';
-import { CreateItineraryRequest, ItineraryPrivacy, ItineraryStatus, UpdateItineraryData, UpdateItineraryRequest, UpdateItineraryStatusRequest } from './itinerary.types';
+import {
+  CollaboratorPermissions,
+  CreateItineraryCollaboratorRequest,
+  CreateItineraryRequest,
+  ItineraryPrivacy,
+  ItineraryStatus,
+  UpdateItineraryCollaboratorRequest,
+  UpdateItineraryData,
+  UpdateItineraryRequest,
+  UpdateItineraryStatusRequest,
+} from './itinerary.types';
 
 interface AuthRequest extends Request {
   user?: {
@@ -15,6 +29,10 @@ interface AuthRequest extends Request {
     st: string;
   };
 }
+
+const isUuid = (value: unknown): value is string =>
+  typeof value === 'string' &&
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 
 /**
  * Create a new itinerary
@@ -200,6 +218,154 @@ export const updateItineraryStatus = async (req: AuthRequest, res: Response) => 
   } catch (error) {
     console.error('❌ Error updating itinerary status:', error);
     return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+export const getItineraryCollaborators = async (req: AuthRequest, res: Response) => {
+  const userId = req.user?.sub;
+  const itineraryId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+
+  if (!userId) {
+    return res.status(401).json({ success: false, message: 'User not authenticated' });
+  }
+  if (!isUuid(itineraryId)) {
+    return res.status(400).json({ success: false, message: 'A valid itinerary ID is required' });
+  }
+
+  try {
+    const collaborators = await getItineraryCollaboratorsService(itineraryId, userId);
+    return res.status(200).json({ success: true, data: collaborators });
+  } catch (error) {
+    console.error('❌ Error retrieving itinerary collaborators:', error);
+    return res.status(500).json({ success: false, message: 'Failed to retrieve collaborators' });
+  }
+};
+
+export const createItineraryCollaborator = async (req: AuthRequest, res: Response) => {
+  const currentUserId = req.user?.sub;
+  if (!currentUserId) {
+    return res.status(401).json({ success: false, message: 'User not authenticated' });
+  }
+  if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
+    return res.status(400).json({ success: false, message: 'A valid JSON request body is required' });
+  }
+
+  const body = req.body as Partial<CreateItineraryCollaboratorRequest>;
+  const allowedFields = ['itineraryId', 'userId', 'permission'];
+  const unexpectedField = Object.keys(body).find((field) => !allowedFields.includes(field));
+  if (unexpectedField) {
+    return res.status(400).json({ success: false, message: `Unexpected field: ${unexpectedField}` });
+  }
+  if (!isUuid(body.itineraryId)) {
+    return res.status(400).json({ success: false, message: 'A valid itineraryId is required' });
+  }
+  if (!isUuid(body.userId)) {
+    return res.status(400).json({ success: false, message: 'A valid userId is required' });
+  }
+  if (!Object.values(CollaboratorPermissions).includes(body.permission as CollaboratorPermissions)) {
+    return res.status(400).json({ success: false, message: 'permission is invalid' });
+  }
+
+  try {
+    const request: CreateItineraryCollaboratorRequest = {
+      itineraryId: body.itineraryId,
+      userId: body.userId,
+      permission: body.permission as CollaboratorPermissions,
+    };
+    const collaborator = await createItineraryCollaboratorService(currentUserId, request);
+    if (!collaborator) {
+      return res.status(404).json({
+        success: false,
+        message: 'Itinerary or user not found, collaborator exists, or user cannot manage collaborators',
+      });
+    }
+    return res.status(201).json({ success: true, data: collaborator });
+  } catch (error) {
+    console.error('❌ Error creating itinerary collaborator:', error);
+    return res.status(500).json({ success: false, message: 'Failed to create collaborator' });
+  }
+};
+
+export const updateItineraryCollaborator = async (req: AuthRequest, res: Response) => {
+  const currentUserId = req.user?.sub;
+  if (!currentUserId) {
+    return res.status(401).json({ success: false, message: 'User not authenticated' });
+  }
+  if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
+    return res.status(400).json({ success: false, message: 'A valid JSON request body is required' });
+  }
+
+  const body = req.body as Partial<UpdateItineraryCollaboratorRequest>;
+  const unexpectedField = Object.keys(body).find((field) => !['collaboratorId', 'permission'].includes(field));
+  if (unexpectedField) {
+    return res.status(400).json({ success: false, message: `Unexpected field: ${unexpectedField}` });
+  }
+  if (!isUuid(body.collaboratorId)) {
+    return res.status(400).json({ success: false, message: 'A valid collaboratorId is required' });
+  }
+  if (!Object.values(CollaboratorPermissions).includes(body.permission as CollaboratorPermissions)) {
+    return res.status(400).json({ success: false, message: 'permission is invalid' });
+  }
+
+  try {
+    const collaborator = await updateItineraryCollaboratorService(
+      currentUserId,
+      body.collaboratorId,
+      body.permission as CollaboratorPermissions
+    );
+    if (!collaborator) {
+      return res.status(404).json({ success: false, message: 'Collaborator not found or cannot be changed' });
+    }
+    return res.status(200).json({ success: true, data: collaborator });
+  } catch (error) {
+    console.error('❌ Error updating itinerary collaborator:', error);
+    return res.status(500).json({ success: false, message: 'Failed to update collaborator' });
+  }
+};
+
+export const deleteItineraryCollaborator = async (req: AuthRequest, res: Response) => {
+  const currentUserId = req.user?.sub;
+  if (!currentUserId) {
+    return res.status(401).json({ success: false, message: 'User not authenticated' });
+  }
+  if (req.body && (typeof req.body !== 'object' || Array.isArray(req.body))) {
+    return res.status(400).json({ success: false, message: 'A valid JSON request body is required' });
+  }
+
+  const body = (req.body ?? {}) as { collaboratorId?: unknown };
+  if (Object.keys(body).some((field) => field !== 'collaboratorId')) {
+    return res.status(400).json({ success: false, message: 'Unexpected request field' });
+  }
+  if (Object.keys(req.query).some((field) => field !== 'collaboratorId')) {
+    return res.status(400).json({ success: false, message: 'Unexpected query parameter' });
+  }
+
+  const queryCollaboratorId = req.query.collaboratorId;
+  if (queryCollaboratorId !== undefined && typeof queryCollaboratorId !== 'string') {
+    return res.status(400).json({ success: false, message: 'A valid collaboratorId is required' });
+  }
+  if (
+    body.collaboratorId !== undefined &&
+    queryCollaboratorId !== undefined &&
+    body.collaboratorId !== queryCollaboratorId
+  ) {
+    return res.status(400).json({ success: false, message: 'Conflicting collaboratorId values' });
+  }
+
+  const collaboratorId = queryCollaboratorId ?? body.collaboratorId;
+  if (!isUuid(collaboratorId)) {
+    return res.status(400).json({ success: false, message: 'A valid collaboratorId is required' });
+  }
+
+  try {
+    const deleted = await deleteItineraryCollaboratorService(currentUserId, collaboratorId);
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: 'Collaborator not found or cannot be deleted' });
+    }
+    return res.status(200).json({ success: true, message: 'Collaborator deleted successfully' });
+  } catch (error) {
+    console.error('❌ Error deleting itinerary collaborator:', error);
+    return res.status(500).json({ success: false, message: 'Failed to delete collaborator' });
   }
 };
 

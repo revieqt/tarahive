@@ -11,13 +11,9 @@ export enum ItineraryPrivacy {
 }
 
 export enum CollaboratorPermissions {
+  OWNER = 'owner',
   EDIT = 'edit',
   VIEW = 'view',
-}
-
-export enum CollaboratorStatus {
-  PENDING = 'pending',
-  ACCEPTED = 'accepted'
 }
 
 export interface CreateItineraryRequest {
@@ -50,6 +46,27 @@ export type UpdateItineraryData = Omit<UpdateItineraryRequest, 'itineraryId' | '
 export interface UpdateItineraryStatusRequest {
   itineraryId: string;
   status: ItineraryStatus;
+}
+
+export interface ItineraryCollaboratorResult {
+  collaboratorId: string;
+  userId: string;
+  profileImage: string;
+  fname: string;
+  lname: string;
+  username: string;
+  permissions: CollaboratorPermissions;
+}
+
+export interface CreateItineraryCollaboratorRequest {
+  itineraryId: string;
+  userId: string;
+  permission: CollaboratorPermissions;
+}
+
+export interface UpdateItineraryCollaboratorRequest {
+  collaboratorId: string;
+  permission: CollaboratorPermissions;
 }
 
 // export interface UpdateItineraryRequest {

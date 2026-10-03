@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getUserById, getUserByIdOrUsername, updateProfile, updateVisibilitySettings, setupUser } from "./user.service";
+import { getUserById, getUserByIdOrUsername, searchUsers, updateProfile, updateVisibilitySettings, setupUser } from "./user.service";
 import { detectLanguage } from "../localization/localization.service";
 import { AuthRequest } from "../auth/auth.types";
 
@@ -49,6 +49,37 @@ export const getUser = async (req: AuthRequest, res: Response): Promise<void> =>
     res.status(500).json({
       success: false,
       message: error.message || "Failed to fetch user",
+    });
+  }
+};
+
+export const searchUsersController = async (req: AuthRequest, res: Response): Promise<void> => {
+  const userId = req.user?.sub;
+  const search = req.query.search;
+
+  if (!userId) {
+    res.status(401).json({ success: false, message: "Unauthorized" });
+    return;
+  }
+
+  if (typeof search !== "string") {
+    res.status(400).json({ success: false, message: "Search query is required" });
+    return;
+  }
+
+  const normalizedSearch = search.trim();
+  if (normalizedSearch.length < 3 || normalizedSearch.length > 100) {
+    res.status(400).json({ success: false, message: "Search query must be between 3 and 100 characters" });
+    return;
+  }
+
+  try {
+    const users = await searchUsers(normalizedSearch, userId);
+    res.status(200).json({ success: true, data: users });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to search users",
     });
   }
 };

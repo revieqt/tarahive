@@ -4,10 +4,20 @@ import {
   SetupAccountPayload,
   UpdateProfilePayload,
   UpdateVisibilitySettingsPayload,
+  UserSearchResult,
 } from '@/types/userTypes';
 
 const API_URL = `/v1/user`;
 const SETUP_API_URL = `/v2/user`;
+const USER_SEARCH_API_URL = `/v2/user/search`;
+
+export const searchUsers = async (search: string): Promise<UserSearchResult[]> => {
+  const response = await api.get<{ success: boolean; data: UserSearchResult[] }>(
+    USER_SEARCH_API_URL,
+    { params: { search } }
+  );
+  return response.data ?? [];
+};
 
 export const setupUserAccount = async (
   payload: SetupAccountPayload & { username: string },

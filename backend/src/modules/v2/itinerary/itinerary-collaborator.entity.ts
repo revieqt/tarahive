@@ -11,12 +11,10 @@ import {
 import { User } from '../user/user.entity';
 import { Itinerary } from './itinerary.entity';
 import { CollaboratorPermissions } from './itinerary.types';
-import { CollaboratorStatus } from './itinerary.types';
 
 @Entity({ name: 'itinerary_collaborators' })
 @Index(['itinerary', 'user'], { unique: true })
-@Index(['user', 'status'])
-@Index(['status'])
+@Index(['user'])
 
 export class ItineraryCollaborator {
   @PrimaryGeneratedColumn('uuid')
@@ -42,13 +40,6 @@ export class ItineraryCollaborator {
     default: CollaboratorPermissions.VIEW,
   })
   permission!: CollaboratorPermissions;
-
-  @Column({
-    type: 'enum',
-    enum: CollaboratorStatus,
-    default: CollaboratorStatus.PENDING,
-  })
-  status!: CollaboratorStatus;
 
   @CreateDateColumn({
     type: 'timestamp',

@@ -12,6 +12,9 @@ import { User } from "../modules/v2/user/user.entity";
 import { Auth } from "../modules/v2/auth/auth.entity";
 import { Itinerary } from "../modules/v2/itinerary/itinerary.entity";
 import { ItineraryCollaborator } from "../modules/v2/itinerary/itinerary-collaborator.entity";
+import { AddUserSearchTrigramIndexes1790976000000 } from "../migrations/1790976000000-AddUserSearchTrigramIndexes";
+import { AddOwnerCollaboratorPermission1790977000000 } from "../migrations/1790977000000-AddOwnerCollaboratorPermission";
+import { RemoveCollaboratorStatusAndAssignOwners1790978000000 } from "../migrations/1790978000000-RemoveCollaboratorStatusAndAssignOwners";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -23,6 +26,12 @@ export const AppDataSource = new DataSource({
   synchronize: true, // ❗ DO NOT use synchronize in production
   logging: false,
   extra: { max: 10 },
+  migrations: [
+    AddUserSearchTrigramIndexes1790976000000,
+    AddOwnerCollaboratorPermission1790977000000,
+    RemoveCollaboratorStatusAndAssignOwners1790978000000,
+  ],
+  migrationsTransactionMode: 'each',
   
   // entities: [User, Log, Itinerary, ItineraryCollaborator],
   entities: [User, Auth, Log, Itinerary, ItineraryCollaborator ],

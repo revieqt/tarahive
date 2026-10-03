@@ -1,6 +1,62 @@
 import { userRepo } from "../../../config/postgres";
 import { User } from "./user.entity";
-import { ProfileUpdatePayload, SetupUserPayload } from "./user.types";
+import { ProfileUpdatePayload, SetupUserPayload, UserSearchResult, UserStatus } from "./user.types";
+
+export const searchUsers = async (
+  search: string,
+  currentUserId: string
+): Promise<UserSearchResult[]> => {
+  const escapedSearch = search.replace(/[\\%_]/g, "\\$&");
+  const pattern = `%${escapedSearch}%`;
+  const normalizedSearch = search.toLowerCase();
+  const prefixPattern = `${escapedSearch.toLowerCase()}%`;
+
+  const users = await userRepo
+    .createQueryBuilder("user")
+    .select([
+      "user.id",
+      "user.profileImage",
+      "user.fname",
+      "user.lname",
+      "user.username",
+    ])
+    .where(
+      "(user.fname ILIKE :pattern ESCAPE E'\\\\' OR user.lname ILIKE :pattern ESCAPE E'\\\\' OR user.username ILIKE :pattern ESCAPE E'\\\\')",
+      { pattern, normalizedSearch, prefixPattern }
+    )
+    .andWhere("user.id <> :currentUserId", { currentUserId })
+    .andWhere("user.status = :status", { status: UserStatus.ACTIVE })
+    .andWhere("user.username IS NOT NULL")
+    .orderBy(
+      `CASE
+        WHEN LOWER(user.username) = :normalizedSearch THEN 0
+        WHEN LOWER(COALESCE(user.fname, '')) = :normalizedSearch OR LOWER(COALESCE(user.lname, '')) = :normalizedSearch THEN 1
+        WHEN LOWER(user.username) LIKE :prefixPattern ESCAPE E'\\\\' THEN 2
+        WHEN LOWER(COALESCE(user.fname, '')) LIKE :prefixPattern ESCAPE E'\\\\' OR LOWER(COALESCE(user.lname, '')) LIKE :prefixPattern ESCAPE E'\\\\' THEN 3
+        ELSE 4
+      END`,
+      "ASC"
+    )
+    .addOrderBy(
+      `GREATEST(
+        similarity(LOWER(COALESCE(user.username, '')), :normalizedSearch),
+        similarity(LOWER(COALESCE(user.fname, '')), :normalizedSearch),
+        similarity(LOWER(COALESCE(user.lname, '')), :normalizedSearch)
+      )`,
+      "DESC"
+    )
+    .addOrderBy("user.username", "ASC")
+    .take(7)
+    .getMany();
+
+  return users.map((user) => ({
+    id: user.id,
+    profileImage: user.profileImage ?? "",
+    fname: user.fname ?? "",
+    lname: user.lname ?? "",
+    username: user.username!,
+  }));
+};
 
 export const getUserById = async (userId: string): Promise<Partial<User>> => {
   const user = await userRepo.findOne({ where: { id: userId } });

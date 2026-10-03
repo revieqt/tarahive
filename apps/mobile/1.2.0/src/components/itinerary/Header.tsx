@@ -35,6 +35,7 @@ type ItineraryHeaderProps = {
   onGeneralPermissionsChange: (key: keyof ItineraryGeneralPermissions, value: boolean) => void;
   status: ItineraryStatus;
   onStatusChange: (status: ItineraryStatus) => void;
+  onRepeatItinerary?: () => void;
   isUpdatingStatus?: boolean;
   themeColor?: string;
   onThemeColorPress?: () => void;
@@ -61,6 +62,7 @@ export default function ItineraryHeader({
   onGeneralPermissionsChange,
   status,
   onStatusChange,
+  onRepeatItinerary,
   isUpdatingStatus = false,
   themeColor,
   onThemeColorPress,
@@ -69,7 +71,7 @@ export default function ItineraryHeader({
   editable = true,
   style
 }: ItineraryHeaderProps) {
-  const canEdit = viewType === "owner" || viewType === "editor";
+  const canEdit = editable && (viewType === "owner" || viewType === "editor");
   const [tab, setTab] = useState(1);
   const [copyModalVisible, setCopyModalVisible] = useState(false);
   const { t } = useLanguage();
@@ -81,6 +83,11 @@ export default function ItineraryHeader({
     : privacy === "collaborators"
       ? "account-lock-open"
       : "lock";
+  const statusLabel = status === ItineraryStatus.DONE
+    ? "itinerary.main.completed"
+    : status === ItineraryStatus.CANCELLED
+      ? "itinerary.main.cancelled"
+      : "itinerary.main.active";
 
   return (
     <TView style={style}>
@@ -111,7 +118,8 @@ export default function ItineraryHeader({
             >
               <TText style={styles.metaText}>{ownerUsername}</TText>
             </TouchableOpacity>
-            <TText style={styles.metaText}> · {t(privacyLabel)}</TText>
+            <TText style={styles.metaText}>{t(statusLabel)}</TText>
+            <TIcon name={privacyIcon} size={11} color="white" />
           </View>
         ) : null}
 
@@ -213,23 +221,36 @@ export default function ItineraryHeader({
         }
 
         { tab === 2 && <>
-          <TouchableOpacity
-            style={[styles.headerButton, {backgroundColor: '#5BCB78'}, status === ItineraryStatus.DONE && styles.disabledAction]}
-            onPress={() => onStatusChange(ItineraryStatus.DONE)}
-            disabled={isUpdatingStatus || status === ItineraryStatus.DONE}
-          >
-            <TIcon name="check" size={12} color="white"/>
-            <TText style={[styles.detailsText, {color: '#fff'}]}>{t('itinerary.form.complete_button')}</TText>
-          </TouchableOpacity>
+          {status === ItineraryStatus.DONE || status === ItineraryStatus.CANCELLED ? (
+            <TouchableOpacity
+              style={styles.headerButton}
+              onPress={onRepeatItinerary}
+              disabled={!onRepeatItinerary}
+            >
+              <TIcon name="repeat" size={12} color="white"/>
+              <TText style={[styles.detailsText, {color: '#fff'}]}>{t('itinerary.form.repeat_button')}</TText>
+            </TouchableOpacity>
+          ) : (
+            <>
+              <TouchableOpacity
+                style={[styles.headerButton, {backgroundColor: '#5BCB78'}]}
+                onPress={() => onStatusChange(ItineraryStatus.DONE)}
+                disabled={isUpdatingStatus}
+              >
+                <TIcon name="check" size={12} color="white"/>
+                <TText style={[styles.detailsText, {color: '#fff'}]}>{t('itinerary.form.complete_button')}</TText>
+              </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.headerButton, {backgroundColor: '#F5C84B'}, status === ItineraryStatus.CANCELLED && styles.disabledAction]}
-            onPress={() => onStatusChange(ItineraryStatus.CANCELLED)}
-            disabled={isUpdatingStatus || status === ItineraryStatus.CANCELLED}
-          >
-            <TIcon name="close" size={12} color="white"/>
-            <TText style={[styles.detailsText, {color: '#fff'}]}>{t('itinerary.form.cancel_button')}</TText>
-          </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.headerButton, {backgroundColor: '#F5C84B'}]}
+                onPress={() => onStatusChange(ItineraryStatus.CANCELLED)}
+                disabled={isUpdatingStatus}
+              >
+                <TIcon name="close" size={12} color="white"/>
+                <TText style={[styles.detailsText, {color: '#fff'}]}>{t('itinerary.form.cancel_button')}</TText>
+              </TouchableOpacity>
+            </>
+          )}
 
           <TouchableOpacity style={styles.headerButton}>
             <TIcon name="account-group" size={12} color="white"/>
@@ -263,6 +284,7 @@ export default function ItineraryHeader({
                 pathname: '/itinerary/[id]/collaborators',
                 params: {
                   id: itineraryId || '',
+                  title,
                 },
               })
             }
@@ -349,6 +371,7 @@ const styles = StyleSheet.create({
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 8,
   },
   closeButton:{
     position: 'absolute',

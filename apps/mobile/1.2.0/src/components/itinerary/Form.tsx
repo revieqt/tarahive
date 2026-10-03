@@ -29,6 +29,7 @@ type ItineraryFormProps = {
   initialValues?: Partial<CreateItineraryForm>;
   isSubmitting?: boolean;
   onSubmit?: (values: CreateItineraryForm) => void;
+  onRepeatItinerary?: () => void;
   createMode?: boolean;
   itineraryId?: string;
 };
@@ -41,9 +42,11 @@ export default function ItineraryForm({
   createMode = false,
   isSubmitting = false,
   onSubmit,
+  onRepeatItinerary,
   itineraryId
 }: ItineraryFormProps) {
-  const canEdit = !(viewType === "viewer");
+  const status = initialItinerary?.status ?? ItineraryStatus.ACTIVE;
+  const canEdit = viewType !== "viewer" && status === ItineraryStatus.ACTIVE;
   const backgroundColor = useThemeColor({}, "background");
   const primaryColor = useThemeColor({}, "primary");
   const accentColor = useThemeColor({}, "accent");
@@ -340,8 +343,9 @@ export default function ItineraryForm({
           onGeneralPermissionsChange={(key, value) =>
             setGeneralPermissions((current) => ({ ...current, [key]: value }))
           }
-          status={initialItinerary?.status ?? ItineraryStatus.ACTIVE}
+          status={status}
           onStatusChange={itineraryStatus.updateStatus}
+          onRepeatItinerary={onRepeatItinerary}
           isUpdatingStatus={itineraryStatus.isPending}
           themeColor={themeColor}
           onThemeColorPress={

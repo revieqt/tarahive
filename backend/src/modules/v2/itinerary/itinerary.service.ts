@@ -1,14 +1,18 @@
+import { In } from 'typeorm';
 import { AppDataSource } from '../../../config/postgres';
+import { User } from '../user/user.entity';
 import { Itinerary } from './itinerary.entity';
 import { ItineraryCollaborator } from './itinerary-collaborator.entity';
 import {
   CreateItineraryRequest,
   CollaboratorPermissions,
-  CollaboratorStatus,
   ItineraryStatus,
   ItineraryPrivacy,
   UpdateItineraryData,
   UpdateItineraryStatusRequest,
+  CreateItineraryCollaboratorRequest,
+  ItineraryCollaboratorResult,
+  UpdateItineraryCollaboratorRequest,
 } from './itinerary.types';
 
 export const createItineraryService = async (
@@ -39,8 +43,7 @@ export const createItineraryService = async (
       const collaborator = manager.create(ItineraryCollaborator, {
         itinerary: savedItinerary,
         user: { id: userId } as any,
-        permission: CollaboratorPermissions.EDIT,
-        status: CollaboratorStatus.ACCEPTED,
+        permission: CollaboratorPermissions.OWNER,
       });
       await manager.save(ItineraryCollaborator, collaborator);
 
@@ -72,8 +75,7 @@ export const updateItineraryService = async (
       where: {
         itinerary: { id: itineraryId },
         user: { id: userId },
-        permission: CollaboratorPermissions.EDIT,
-        status: CollaboratorStatus.ACCEPTED,
+        permission: In([CollaboratorPermissions.OWNER, CollaboratorPermissions.EDIT]),
       },
     });
 
@@ -140,6 +142,128 @@ export const updateItineraryStatusService = async (
   });
 };
 
+const toCollaboratorResult = (
+  collaborator: ItineraryCollaborator
+): ItineraryCollaboratorResult => ({
+  collaboratorId: collaborator.id,
+  userId: collaborator.user.id,
+  profileImage: collaborator.user.profileImage ?? '',
+  fname: collaborator.user.fname ?? '',
+  lname: collaborator.user.lname ?? '',
+  username: collaborator.user.username ?? '',
+  permissions: collaborator.permission,
+});
+
+export const getItineraryCollaboratorsService = async (
+  itineraryId: string,
+  currentUserId: string
+): Promise<ItineraryCollaboratorResult[]> => {
+  const collaborators = await AppDataSource.getRepository(ItineraryCollaborator)
+    .createQueryBuilder('collaborator')
+    .innerJoin('collaborator.itinerary', 'itinerary')
+    .innerJoin('collaborator.user', 'user')
+    .innerJoin(
+      ItineraryCollaborator,
+      'requester',
+      'requester."itineraryId" = itinerary.id AND requester."userId" = :currentUserId',
+      { currentUserId }
+    )
+    .select([
+      'collaborator.id',
+      'collaborator.permission',
+      'user.id',
+      'user.profileImage',
+      'user.fname',
+      'user.lname',
+      'user.username',
+    ])
+    .where('itinerary.id = :itineraryId', { itineraryId })
+    .orderBy('collaborator.createdOn', 'ASC')
+    .getMany();
+
+  return collaborators.map(toCollaboratorResult);
+};
+
+export const createItineraryCollaboratorService = async (
+  currentUserId: string,
+  request: CreateItineraryCollaboratorRequest
+): Promise<ItineraryCollaboratorResult | null> => {
+  return AppDataSource.transaction(async (manager) => {
+    const itinerary = await manager.findOne(Itinerary, {
+      where: { id: request.itineraryId, user: { id: currentUserId } },
+    });
+    if (!itinerary) return null;
+
+    const user = await manager.findOne(User, { where: { id: request.userId } });
+    if (!user) return null;
+
+    if (request.permission === CollaboratorPermissions.OWNER && user.id !== currentUserId) {
+      return null;
+    }
+
+    const existingCollaborator = await manager.findOne(ItineraryCollaborator, {
+      where: { itinerary: { id: request.itineraryId }, user: { id: request.userId } },
+    });
+    if (existingCollaborator) return null;
+
+    const collaborator = manager.create(ItineraryCollaborator, {
+      itinerary,
+      user,
+      permission: request.permission,
+    });
+    return toCollaboratorResult(await manager.save(ItineraryCollaborator, collaborator));
+  });
+};
+
+export const updateItineraryCollaboratorService = async (
+  currentUserId: string,
+  collaboratorId: string,
+  permission: CollaboratorPermissions
+): Promise<ItineraryCollaboratorResult | null> => {
+  return AppDataSource.transaction(async (manager) => {
+    const collaborator = await manager
+      .createQueryBuilder(ItineraryCollaborator, 'collaborator')
+      .innerJoinAndSelect('collaborator.user', 'user')
+      .innerJoin('collaborator.itinerary', 'itinerary')
+      .innerJoin('itinerary.user', 'owner')
+      .where('collaborator.id = :collaboratorId', { collaboratorId })
+      .andWhere('owner.id = :currentUserId', { currentUserId })
+      .setLock('pessimistic_write', undefined, ['collaborator'])
+      .getOne();
+    if (!collaborator) return null;
+
+    const isOwnerRow = collaborator.user.id === currentUserId;
+    if (isOwnerRow && permission !== CollaboratorPermissions.OWNER) return null;
+    if (!isOwnerRow && permission === CollaboratorPermissions.OWNER) return null;
+
+    collaborator.permission = permission;
+    return toCollaboratorResult(await manager.save(ItineraryCollaborator, collaborator));
+  });
+};
+
+export const deleteItineraryCollaboratorService = async (
+  currentUserId: string,
+  collaboratorId: string
+): Promise<boolean> => {
+  return AppDataSource.transaction(async (manager) => {
+    const collaborator = await manager
+      .createQueryBuilder(ItineraryCollaborator, 'collaborator')
+      .innerJoinAndSelect('collaborator.user', 'user')
+      .innerJoin('collaborator.itinerary', 'itinerary')
+      .innerJoin('itinerary.user', 'owner')
+      .where('collaborator.id = :collaboratorId', { collaboratorId })
+      .andWhere('owner.id = :currentUserId', { currentUserId })
+      .setLock('pessimistic_write', undefined, ['collaborator'])
+      .getOne();
+    if (!collaborator || collaborator.user.id === currentUserId) {
+      return false;
+    }
+
+    await manager.remove(ItineraryCollaborator, collaborator);
+    return true;
+  });
+};
+
 export const getItineraryService = async (
   itineraryId: string,
   userId: string
@@ -159,8 +283,8 @@ export const getItineraryService = async (
       .innerJoin(
         ItineraryCollaborator,
         'collaborator',
-        'collaborator."itineraryId" = itinerary.id AND collaborator."userId" = :userId AND collaborator.status = :collaboratorStatus',
-        { userId, collaboratorStatus: CollaboratorStatus.ACCEPTED }
+        'collaborator."itineraryId" = itinerary.id AND collaborator."userId" = :userId',
+        { userId }
       )
       .where('itinerary.id = :id', { id: itineraryId })
       .getOne();
@@ -218,11 +342,13 @@ export const getAllUserItinerariesService = async (
         'itinerary.endDate',
         'itinerary.status',
       ])
+      .leftJoin('itinerary.user', 'user')
+      .addSelect('user.id')
       .innerJoin(
         ItineraryCollaborator,
         'collaborator',
-        'collaborator."itineraryId" = itinerary.id AND collaborator."userId" = :userId AND collaborator.status = :collaboratorStatus',
-        { userId, collaboratorStatus: CollaboratorStatus.ACCEPTED }
+        'collaborator."itineraryId" = itinerary.id AND collaborator."userId" = :userId',
+        { userId }
       )
       .andWhere('itinerary.status = :status', {
         status: hasDateFilter ? ItineraryStatus.ACTIVE : defaultStatus,

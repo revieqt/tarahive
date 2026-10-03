@@ -13,6 +13,7 @@ import EmptyMessage from "@/components/common/EmptyMessage";
 import ItineraryCardSkeleton from "@/components/feedback/CalendarCardSkeleton";
 import StickyScrollView from "@/components/ui/StickyScrollView";
 import OptionsPopup from "@/components/ui/OptionsPopup";
+import { useSession } from "@/context/SessionContext";
 
 const ItineraryOptions = [
   { value: 'active', icon: 'cards-heart', label: 'itinerary.main.active' },
@@ -22,6 +23,7 @@ const ItineraryOptions = [
 
 export default function ItineraryScreen() {
   const { t , currentLanguage } = useLanguage();
+  const { session } = useSession();
   const primaryColor = useThemeColor({}, 'primary');
   const accentColor = useThemeColor({}, 'accent');
   const [selectedStatus, setSelectedStatus] = useState<'active' | 'done' | 'cancelled'>('active');
@@ -31,7 +33,12 @@ export default function ItineraryScreen() {
     router.push(`/itinerary/${id}`);
   };
 
-  const renderItineraryCard = ({ item }: { item: Itinerary }) => (
+  const renderItineraryCard = ({ item }: { item: Itinerary }) => {
+    const isSharedWithUser = Boolean(
+      session?.user?.id && item.user?.id && session.user.id !== item.user.id
+    );
+
+    return (
     <TouchableOpacity
       onPress={() => handleItineraryPress(item.id)}
       style={[styles.itineraryCard, { backgroundColor: primaryColor, borderColor: getStatusColor(item.status) }]}
@@ -45,6 +52,13 @@ export default function ItineraryScreen() {
           <TView style={[styles.cardBubble, {backgroundColor: accentColor + '80'}]}>
             <TText style={styles.cardBubbleText}>{t(`itinerary.type.${item.type}`)}</TText>
           </TView>
+
+          {isSharedWithUser && (
+            <TView style={[styles.cardBubble, {backgroundColor: "#ccc"}]}>
+              <TText style={styles.cardBubbleText}>Shared with you</TText>
+            </TView>
+          )}
+
         </View>
 
       <OptionsPopup
@@ -76,7 +90,8 @@ export default function ItineraryScreen() {
       </OptionsPopup>
       
     </TouchableOpacity>
-  );
+    );
+  };
 
   return (
     <TView style={{ flex: 1 }}>
