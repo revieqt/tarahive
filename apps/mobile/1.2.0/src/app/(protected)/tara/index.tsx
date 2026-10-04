@@ -183,7 +183,7 @@ export default function AiChatScreen() {
                           style={styles.viewItineraryButton}
                           onPress={() => {
                             router.push({
-                              pathname: '/tara/itinerary',
+                              pathname: '/itinerary/create',
                               params: { itineraryData: JSON.stringify(msg.itineraryData) },
                             });
                           }}
