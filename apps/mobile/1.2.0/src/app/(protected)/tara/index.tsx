@@ -178,12 +178,12 @@ export default function AiChatScreen() {
                         <Markdown>{msg.text}</Markdown>
                       </View>
 
-                      {msg.itineraryData && msg.type === 'itinerary' && (
+                      {msg.itineraryData && Object.keys(msg.itineraryData).length > 0 && (
                         <TouchableOpacity
                           style={styles.viewItineraryButton}
                           onPress={() => {
                             router.push({
-                              pathname: '/ai/ai-itinerary',
+                              pathname: '/tara/itinerary',
                               params: { itineraryData: JSON.stringify(msg.itineraryData) },
                             });
                           }}

@@ -29,16 +29,66 @@ const createWelcomeMessage = (): Message => ({
   type: 'chat',
 });
 
+const parseItineraryPayload = (rawContent: string): { text: string; itineraryData?: Record<string, any> } => {
+  const normalized = rawContent?.trim() ?? '';
+
+  if (!normalized) {
+    return { text: '' };
+  }
+
+  try {
+    const trimmed = normalized.replace(/^```json\s*/i, '').replace(/```$/i, '').trim();
+    const parsed = JSON.parse(trimmed);
+
+    if (!parsed || typeof parsed !== 'object') {
+      return { text: rawContent };
+    }
+
+    const itineraryData =
+      parsed.itineraryData ??
+      parsed.itinerary ??
+      parsed.data?.itinerary ??
+      parsed.data;
+
+    if (itineraryData && typeof itineraryData === 'object' && (
+      'title' in itineraryData ||
+      'startDate' in itineraryData ||
+      'endDate' in itineraryData ||
+      'content' in itineraryData
+    )) {
+      const text = typeof parsed.message === 'string'
+        ? parsed.message
+        : typeof parsed.text === 'string'
+          ? parsed.text
+          : 'Here is a draft itinerary for review.';
+
+      return {
+        text,
+        itineraryData: itineraryData as Record<string, any>,
+      };
+    }
+  } catch {
+    // Ignore parse failures and fall back to plain text.
+  }
+
+  return { text: rawContent };
+};
+
 const mapStoredMessages = (messages: AiMessage[] = []): Message[] =>
   messages
     .filter((message) => message.role === 'user' || message.role === 'assistant')
-    .map((message) => ({
-      id: message.id,
-      text: message.content,
-      isUser: message.role === 'user',
-      timestamp: new Date(message.createdAt ?? Date.now()),
-      type: 'chat',
-    }));
+    .map((message) => {
+      const parsed = parseItineraryPayload(message.content);
+
+      return {
+        id: message.id,
+        text: parsed.text,
+        isUser: message.role === 'user',
+        timestamp: new Date(message.createdAt ?? Date.now()),
+        type: parsed.itineraryData ? 'itinerary' : 'chat',
+        itineraryData: parsed.itineraryData,
+      };
+    });
 
 export const useAiChat = () => {
   const { session } = useSession();
@@ -250,8 +300,15 @@ export const useAiChat = () => {
           }
         });
 
-        if (response?.message?.content) {
-          targetText = response.message.content;
+        const responseContent = response?.message?.content ?? '';
+        const parsedResponse = parseItineraryPayload(responseContent);
+        const finalItinerary = response?.message?.itineraryData ?? response?.message?.itinerary ?? parsedResponse.itineraryData;
+
+        if (finalItinerary && typeof finalItinerary === 'object') {
+          targetText = parsedResponse.text || 'Here is a draft itinerary for review.';
+          updateAssistantMessage(targetText, 'itinerary', finalItinerary as Record<string, any>);
+        } else {
+          targetText = parsedResponse.text || responseContent;
         }
         streamComplete = true;
         await typingFinished;

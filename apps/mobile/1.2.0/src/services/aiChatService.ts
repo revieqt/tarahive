@@ -31,6 +31,8 @@ export interface AiChatResponse {
     id: string;
     role: 'assistant';
     content: string;
+    itinerary?: Record<string, any>;
+    itineraryData?: Record<string, any>;
   };
   conversation?: AiConversationPayload | null;
   messages?: AiMessage[];

@@ -1,8 +1,9 @@
 import { AIProviderToolDefinition, ToolCall, ToolExecutionResult } from '../ai.types';
+import { createItineraryDraftTool, executeCreateItineraryDraftTool } from './create-itinerary-draft.tool';
 import { executeWeatherTool, weatherTool } from './weather.tool';
 import { executeWebSearchTool, webSearchTool } from './web-search.tool';
 
-export const aiToolRegistry: AIProviderToolDefinition[] = [weatherTool, webSearchTool];
+export const aiToolRegistry: AIProviderToolDefinition[] = [weatherTool, webSearchTool, createItineraryDraftTool];
 
 export async function executeToolCall(toolCall: ToolCall): Promise<ToolExecutionResult> {
   try {
@@ -11,6 +12,8 @@ export async function executeToolCall(toolCall: ToolCall): Promise<ToolExecution
         return await executeWeatherTool(toolCall);
       case 'web_search':
         return await executeWebSearchTool(toolCall);
+      case 'create_itinerary_draft':
+        return await executeCreateItineraryDraftTool(toolCall);
       default:
         return {
           toolName: toolCall.name,
@@ -35,4 +38,4 @@ export async function executeToolCall(toolCall: ToolCall): Promise<ToolExecution
   }
 }
 
-export { weatherTool, webSearchTool };
+export { weatherTool, webSearchTool, createItineraryDraftTool };

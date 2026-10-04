@@ -60,5 +60,6 @@ export interface ChatApiResponse {
     id: string;
     role: 'assistant';
     content: string;
+    itinerary?: Record<string, any>;
   };
 }

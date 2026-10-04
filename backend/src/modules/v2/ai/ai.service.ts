@@ -89,6 +89,7 @@ export class AiService {
     const providerMessages = await this.buildProviderMessages(conversation.id);
 
     let assistantContent = '';
+    let attachedItinerary: Record<string, any> | undefined;
     let currentMessages = providerMessages;
 
     for (let iteration = 0; iteration < this.maxToolIterations; iteration += 1) {
@@ -101,6 +102,15 @@ export class AiService {
       const toolCalls = response.toolCalls ?? [];
       if (toolCalls.length === 0) {
         assistantContent = response.content.trim() || 'I can help with that.';
+
+        if (attachedItinerary && typeof attachedItinerary === 'object') {
+          const payload = {
+            message: assistantContent,
+            itinerary: attachedItinerary,
+          };
+          assistantContent = JSON.stringify(payload);
+        }
+
         const assistantMessage = await this.saveMessage(conversation.id, 'assistant', assistantContent);
         return {
           conversationId: conversation.id,
@@ -108,6 +118,7 @@ export class AiService {
             id: assistantMessage.id,
             role: 'assistant',
             content: assistantMessage.content,
+            itinerary: attachedItinerary,
           },
         };
       }
@@ -121,6 +132,15 @@ export class AiService {
       for (const toolCall of toolCalls) {
         const toolResult = await executeToolCall(toolCall);
         const toolContent = toolResult.content;
+
+        try {
+          const parsedToolResult = JSON.parse(toolContent);
+          if (parsedToolResult && typeof parsedToolResult === 'object' && parsedToolResult.itinerary) {
+            attachedItinerary = parsedToolResult.itinerary as Record<string, any>;
+          }
+        } catch {
+          // Ignore non-JSON tool outputs and continue.
+        }
 
         await this.saveMessage(conversation.id, 'tool', toolContent, toolCall.name, toolCall.id);
         currentMessages.push({

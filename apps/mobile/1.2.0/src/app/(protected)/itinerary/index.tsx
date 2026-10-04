@@ -158,6 +158,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: '3%',
     gap: 3,
+    overflow: 'hidden',
   },
   shadow:{
     shadowColor: "#000",
@@ -192,7 +193,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginBottom: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc4',
+    borderBottomColor: '#ccc3',
   },
   tabs: {
     justifyContent: 'center',
@@ -209,7 +210,7 @@ const styles = StyleSheet.create({
     right: '3%',
   },
   optionsButton: {
-    borderColor: '#ccc3',
+    borderColor: '#ccc1',
     borderLeftWidth: 1,
     justifyContent: 'center',
     alignItems: 'center',

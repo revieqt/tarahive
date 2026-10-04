@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { aiToolRegistry, weatherTool, webSearchTool } from './tools';
+import { aiToolRegistry, createItineraryDraftTool, weatherTool, webSearchTool } from './tools';
 import { AiService, toProviderMessages } from './ai.service';
 import { AiMessageRole } from './ai-messages.entity';
 
@@ -8,8 +8,10 @@ const service = new AiService();
 assert.ok(Array.isArray(aiToolRegistry));
 assert.ok(aiToolRegistry.some((tool) => tool.name === 'weather'));
 assert.ok(aiToolRegistry.some((tool) => tool.name === 'web_search'));
+assert.ok(aiToolRegistry.some((tool) => tool.name === 'create_itinerary_draft'));
 assert.equal(weatherTool.name, 'weather');
 assert.equal(webSearchTool.name, 'web_search');
+assert.equal(createItineraryDraftTool.name, 'create_itinerary_draft');
 
 const providerMessages = toProviderMessages([
 	{ role: AiMessageRole.USER, content: 'What is the weather?', toolName: null, toolCallId: null },

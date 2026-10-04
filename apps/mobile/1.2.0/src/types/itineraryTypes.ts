@@ -167,6 +167,8 @@ import { Address } from "@/components/modals/LocationPickerModal";
 
 export type HeaderType = "header1" | "header2" | "header3";
 
+
+
 export interface HeaderBlock {
   id: string;
   type: HeaderType;

@@ -118,8 +118,8 @@ export default function ItineraryHeader({
             >
               <TText style={styles.metaText}>{ownerUsername}</TText>
             </TouchableOpacity>
-            <TText style={styles.metaText}>{t(statusLabel)}</TText>
-            <TIcon name={privacyIcon} size={11} color="white" />
+            <TText style={styles.metaText}> · {t(statusLabel)}</TText>
+            <TIcon name={privacyIcon} size={11} color="white" style={{marginLeft: 4}}/>
           </View>
         ) : null}
 
@@ -164,7 +164,7 @@ export default function ItineraryHeader({
               disabled={!itineraryId}
               accessibilityLabel="Share itinerary"
             >
-              <TIcon name='share' size={18} color='white'/>
+              <TIcon name='share' size={20} color='white'/>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -172,7 +172,7 @@ export default function ItineraryHeader({
               disabled={!onRepeatItinerary}
               accessibilityLabel={t("itinerary.form.copy_button")}
             >
-              <TIcon name='content-copy' size={15} color='white'/>
+              <TIcon name='content-copy' size={17} color='white'/>
             </TouchableOpacity>
 
             { canEdit && <TouchableOpacity style={[styles.colorView, {backgroundColor: themeColor}]} onPress={editable ? onThemeColorPress : undefined}/> }
@@ -374,7 +374,6 @@ const styles = StyleSheet.create({
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
   },
   closeButton:{
     position: 'absolute',
@@ -408,17 +407,18 @@ const styles = StyleSheet.create({
   },
   tabsText:{
     color: '#fff',
-    fontSize: 12
+    fontSize: 12,
+    marginBottom: 4
   },
   moreOptionsContainer:{
     flexDirection: 'row',
-    borderRadius: 20,
+    borderTopLeftRadius: 20,
     backgroundColor: '#fff4',
-    marginBottom: 4,
     alignItems: 'center',
     paddingHorizontal: 7,
     paddingVertical: 4,
-    gap: 7
+    gap: 8,
+    marginRight: '-3%'
   },
   colorView:{
     width: 20,
