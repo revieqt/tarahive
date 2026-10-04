@@ -257,7 +257,17 @@ export default function ItineraryHeader({
             </>
           )}
 
-          <TouchableOpacity style={styles.headerButton}>
+          <TouchableOpacity style={styles.headerButton} 
+            onPress={() => router.push({
+              pathname: '/rooms/create',
+              params: { 
+                id: itineraryId ?? '',
+                title: title ?? '',
+                startDate: startDate instanceof Date ? startDate.toISOString() : startDate ?? '',
+                endDate: endDate instanceof Date ? endDate.toISOString() : endDate ?? ''
+              },
+            })}
+          >
             <TIcon name="account-group" size={12} color="white"/>
             <TText style={styles.detailsText}>{t('itinerary.form.room_button')}</TText>
           </TouchableOpacity>
