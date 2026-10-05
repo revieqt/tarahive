@@ -64,7 +64,7 @@ export default function TabLayout() {
         }}
       />
 
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="room"
         options={{
           title: 'Rooms',
@@ -72,7 +72,7 @@ export default function TabLayout() {
             <TIcon name={focused ? 'account' : 'account-outline'} size={22} color={color}/>
           ),
         }}
-      />
+      /> */}
 
       <Tabs.Screen
         name="account"

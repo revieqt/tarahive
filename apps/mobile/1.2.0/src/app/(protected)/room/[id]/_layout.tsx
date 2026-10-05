@@ -15,7 +15,7 @@ export default function RoomLayout() {
   const description = 'This is a test description for the room.';
   const themeColor = '#4A90E2';
 
-  const navigateToTab = (tab: 'details' | 'chat' | 'map') => {
+  const navigateToTab = (tab: 'details' | 'members' | 'chat' | 'map' | 'settings') => {
     const pathname = tab === 'details' ? '/room/[id]' : `/room/[id]/${tab}`;
     router.navigate({ pathname, params: { id } });
   };
@@ -46,6 +46,13 @@ export default function RoomLayout() {
             </TouchableOpacity>
 
             <TouchableOpacity
+              style={[styles.tabs, pathname.endsWith('/members') && styles.activeTab]}
+              onPress={() => navigateToTab('members')}
+            >
+              <TText style={styles.tabsText}>Members</TText>
+            </TouchableOpacity>
+
+            <TouchableOpacity
               style={[styles.tabs, pathname.endsWith('/chat') && styles.activeTab]}
               onPress={() => navigateToTab('chat')}
             >
@@ -58,15 +65,16 @@ export default function RoomLayout() {
             >
               <TText style={styles.tabsText}>Map</TText>
             </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.tabs, pathname.endsWith('/settings') && styles.activeTab]}
+              onPress={() => navigateToTab('settings')}
+            >
+              <TText style={styles.tabsText}>Settings</TText>
+            </TouchableOpacity>
           </ScrollView>
 
           <View style={styles.moreOptionsContainer}>
-            <TouchableOpacity
-              onPress={() => router.push({ pathname: '/room/[id]/edit', params: { id } })}
-              accessibilityLabel="Edit Room"
-            >
-              <TIcon name="pencil" size={20} color="white" />
-            </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => setShareModalVisible(true)}
