@@ -43,6 +43,7 @@ export interface NominatimResponse {
 export type LocationContextType = {
   latitude: number;
   longitude: number;
+  hasLocation: boolean;
   suburb: string;
   city: string;
   state: string;

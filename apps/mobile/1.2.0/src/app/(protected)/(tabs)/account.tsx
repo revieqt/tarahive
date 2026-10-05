@@ -70,6 +70,7 @@ export default function AccountScreen() {
         contentContainerStyle={{ padding: '3%' }}
         title={fullName}
         subtitle={'@'+user?.username}
+        showBackButton={false}
       >
         <TView shadow color='primary' style={styles.header}>
           <View style={styles.headerHive}>

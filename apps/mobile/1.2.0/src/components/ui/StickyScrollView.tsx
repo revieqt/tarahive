@@ -22,6 +22,7 @@ export interface StickyScrollViewProps {
   contentContainerStyle?: StyleProp<ViewStyle>;
   onBack?: () => void;
   children?: ReactNode;
+  showBackButton?: boolean;
 }
 
 const HEADER_HEIGHT = 56;
@@ -36,6 +37,7 @@ export default function StickyScrollView({
   style,
   contentContainerStyle,
   children,
+  showBackButton = true,
 }: StickyScrollViewProps) {
   const scrollY = useRef(new Animated.Value(0)).current;
   const scrollRef = useRef<ScrollView>(null);
@@ -84,7 +86,7 @@ export default function StickyScrollView({
         ]}
         pointerEvents="box-none"
       >
-        <BackButton style={styles.headerSides} />
+        {showBackButton ? <BackButton style={styles.headerSides} /> : <View style={styles.headerSides} />}
 
         {hasHeaderContent && (
           <Pressable
@@ -132,8 +134,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 8,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#ccc4',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.07,

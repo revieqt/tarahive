@@ -1,20 +1,21 @@
-import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { router, Stack } from 'expo-router';
+import { StyleSheet, TouchableOpacity, View, } from 'react-native';
 import { TIcon, TText, TView } from '@/components/ui/Themed';
-import Header from '@/components/common/Header';
-import RoundButton from '@/components/ui/RoundButton';
-import TextField from '@/components/ui/TextField';
+import HiveBg from '@/components/common/HiveBg';
+import Button from '@/components/ui/Button';
+import EmptyMessage from '@/components/common/EmptyMessage';
 import { useState } from 'react';
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
 import { formatDateToString } from '@/utils/formatDateToString';
 import { useLanguage } from '@/context/LanguageContext';
 import ItineraryPickerModal from '@/components/modals/ItineraryPickerModal';
+import { useLocalSearchParams } from 'expo-router';
 import { Itinerary } from '@/types/itineraryTypes';
 
 const firstParam = (value?: string | string[]) =>
   Array.isArray(value) ? value[0] : value;
 
-export default function CreateRoomScreen() {
+export default function MainRoomScreen() {
   const params = useLocalSearchParams<{
     id?: string | string[];
     title?: string | string[];
@@ -38,22 +39,9 @@ export default function CreateRoomScreen() {
     setItineraryEndDate(itinerary.endDate);
   };
 
+
   return (
     <TView style={styles.container}>
-      <Header title='Create Room' subtitle='Fill-out details'/>
-
-      <TextField
-        value={roomName}
-        placeholder='Enter Room Name'
-        onChangeText={setRoomName}
-      />
-
-      <TextField
-        value={description}
-        placeholder='Enter Room Description'
-        onChangeText={setDescription}
-      />
-
       <TouchableOpacity
         style={[styles.itineraryButton, itineraryId && { borderColor: secondaryColor, backgroundColor: secondaryColor + '22' }]}
         onPress={() => setIsPickerVisible(true)}
@@ -82,13 +70,6 @@ export default function CreateRoomScreen() {
         onClose={() => setIsPickerVisible(false)}
         onSelect={handleItinerarySelect}
       />
-
-      <RoundButton
-        iconName='plus'
-        onPress={() => router.push('/(protected)/rooms/create')}
-        type='primary'
-        style={styles.button}
-      />
     </TView>
   );
 }
@@ -96,12 +77,7 @@ export default function CreateRoomScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: '3%'
-  },
-  button: {
-    position: 'absolute',
-    bottom: '3%',
-    right: 16,
+    padding: '3%',
   },
   itineraryButton: {
     padding: 12,

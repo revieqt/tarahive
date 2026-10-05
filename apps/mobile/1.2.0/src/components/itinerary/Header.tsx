@@ -259,7 +259,7 @@ export default function ItineraryHeader({
 
           <TouchableOpacity style={styles.headerButton} 
             onPress={() => router.push({
-              pathname: '/rooms/create',
+              pathname: '/room/create',
               params: { 
                 id: itineraryId ?? '',
                 title: title ?? '',

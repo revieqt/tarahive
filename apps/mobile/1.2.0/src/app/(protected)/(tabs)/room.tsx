@@ -7,10 +7,8 @@ import { useInternetConnection } from '@/utils/checkInternetConnection';
 import HomeHeaderCard from '@/components/cards/HomeHeaderCard';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
-import { TARA_AI_SUGGESTIONS } from '@/constants/TaraMessages';
-import SidebarAlerts from '@/components/common/Sidebar';
-import MonthlyCalendar from '@/components/cards/MonthlyCalendarCard';
-import HiveBg from '@/components/common/HiveBg';
+import StickyScrollView from '@/components/ui/StickyScrollView';
+import { useSession } from '@/context/SessionContext';
 
 export default function RoomsScreen() {
   const isConnected = useInternetConnection();
@@ -20,18 +18,28 @@ export default function RoomsScreen() {
   const accentColor = useThemeColor({}, 'accent');
   const secondaryColor = useThemeColor({}, 'secondary');
   const { t } = useLanguage();
+  const { session } = useSession();
 
   return (
-    <TView style={{ flex: 1 }}>
-      <LinearGradient
-        colors={[accentColor, secondaryColor]}
-        style={styles.header}
-      >
-        <TText type='title' style={{color: '#fff'}}>Rooms</TText>
-        <TText style={{color: '#fff'}}>Rooms dasdasdasda sdasdasdas dasd asdasdasd</TText>
-      </LinearGradient>
+    <StickyScrollView 
+      style={{ flex: 1 }} 
+      contentContainerStyle={{ height: 2000 }} 
+      showBackButton={false}
+      title={"Rooms"}
+      subtitle={'@'+session?.user?.username}
+    >
+      <View style={styles.header}>
+        <View style={{flex: 1}}>
+          <TText type='title'>Rooms</TText>
+          <TText>Rooms dasdasdasda sdasdasdas dasd asdasdasd</TText>
+        </View>
 
-      <ScrollView 
+        <TouchableOpacity onPress={() => router.push('/room/create')} style={styles.createButton}>
+          <TIcon name='plus' size={30} color={accentColor}/>
+        </TouchableOpacity>
+      </View>
+
+      {/* <ScrollView 
         style={styles.scrollView}
         contentContainerStyle={{height: 2000}}
         showsVerticalScrollIndicator={false}
@@ -39,7 +47,7 @@ export default function RoomsScreen() {
         <TView style={{flexGrow: 1}}>
           <View style={[styles.gridContainer, { backgroundColor: primaryColor }]}>
             <TouchableOpacity
-              onPress={() => router.push('/rooms/create')}
+              onPress={() => router.push('/room/create')}
               style={styles.gridChildContainer}
             >
               <TIcon name='account-multiple-plus' size={20} style={styles.gridIcon} color={accentColor}/>
@@ -50,7 +58,7 @@ export default function RoomsScreen() {
             <View style={styles.divider}/>
 
             <TouchableOpacity
-              onPress={() => router.push('/rooms/join')}
+              onPress={() => router.push('/room/join')}
               style={styles.gridChildContainer}
             >
               <TIcon name='account-group' size={20} style={styles.gridIcon} color={accentColor}/>
@@ -61,7 +69,7 @@ export default function RoomsScreen() {
             <View style={styles.divider}/>
 
             <TouchableOpacity
-              onPress={() => router.push('/rooms/search')}
+              onPress={() => router.push('/room/search')}
               style={styles.gridChildContainer}
             >
               <TIcon name='account-search' size={20} style={styles.gridIcon} color={accentColor}/>
@@ -70,58 +78,21 @@ export default function RoomsScreen() {
             </TouchableOpacity>
           </View>
         </TView>
-      </ScrollView>
-    </TView>
+      </ScrollView> */}
+    </StickyScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   header:{
-    height: 310,
-    paddingTop: 40,
-    paddingHorizontal: '3%'
-  },
-  scrollView: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 5,
-    paddingTop: 120,
-  },
-  gridContainer: {
+    height: 100,
+    paddingHorizontal: '3%',
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    height: 85,
-    marginHorizontal: '3%',
-    paddingHorizontal: 3,
-    zIndex: 100,
-    marginTop: -15,
-    borderRadius: 15,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
-    elevation: 3,
   },
-  gridChildContainer: {
-    flex: 1,
-    aspectRatio: 1,
+  createButton: {
+    width: 40,
+    height: '100%',
     justifyContent: 'center',
-    alignItems: 'center'
-  },
-  gridIcon:{
-    marginBottom: 4
-  },
-  divider:{
-    width: 1,
-    height: '50%',
-    backgroundColor: '#ccc4'
+    alignItems: 'center',
   }
 });

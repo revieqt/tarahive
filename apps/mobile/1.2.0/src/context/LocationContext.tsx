@@ -97,6 +97,7 @@ export const LocationProvider = ({ children }: { children: ReactNode }) => {
   const value: LocationContextType = {
     latitude: coordinates?.latitude ?? 0,
     longitude: coordinates?.longitude ?? 0,
+    hasLocation: coordinates !== null,
     suburb: displayFields.suburb,
     city: displayFields.city,
     state: displayFields.state,
