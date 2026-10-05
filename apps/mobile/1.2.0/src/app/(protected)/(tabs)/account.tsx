@@ -1,7 +1,7 @@
 import Button from '@/components/ui/Button';
 import ProBadge from '@/components/ui/ProBadge';
 import { TIcon, TText, TView } from '@/components/ui/Themed';
-// import { SUPPORT_FORM_URL } from '@/config';
+import { SUPPORT_FORM_URL, FEEDBACK_FORM_URL } from '@/constants/Config';
 import { useSession } from '@/context/SessionContext';
 import { useLogout } from '@/hooks/auth/useLogout';
 import { router } from 'expo-router';
@@ -156,7 +156,7 @@ export default function AccountScreen() {
             />
 
             <SettingsOption icon='check-circle' label={t('tabs.account.feedback_button')}
-              onPress={handleWebView('SUPPORT_FORM_URL', t('tabs.account.feedback_button'))}
+              onPress={handleWebView('FEEDBACK_FORM_URL', t('tabs.account.feedback_button'))}
             />
           </>}
 
