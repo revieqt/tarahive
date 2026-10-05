@@ -64,16 +64,6 @@ export default function TabLayout() {
         }}
       />
 
-      {/* <Tabs.Screen
-        name="room"
-        options={{
-          title: 'Rooms',
-          tabBarIcon: ({ color, focused }) => (
-            <TIcon name={focused ? 'account' : 'account-outline'} size={22} color={color}/>
-          ),
-        }}
-      /> */}
-
       <Tabs.Screen
         name="account"
         options={{

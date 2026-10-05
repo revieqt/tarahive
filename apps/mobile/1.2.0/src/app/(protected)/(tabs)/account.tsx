@@ -6,7 +6,7 @@ import { useSession } from '@/context/SessionContext';
 import { useLogout } from '@/hooks/auth/useLogout';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useInternetConnection } from '@/utils/checkInternetConnection';
 import ProfileImage from '@/components/ui/ProfileImage';
 import { useLanguage } from '@/context/LanguageContext';
@@ -14,6 +14,7 @@ import { useDev } from '@/hooks/shared/useDev';
 import NoInternetCard from '@/components/cards/NoInternetCard';
 import HiveBg from '@/components/common/HiveBg';
 import StickyScrollView from '@/components/ui/StickyScrollView';
+import { useThemeColor } from '@/hooks/shared/useThemeColor';
 
 export const SettingsOption = ({ icon, label, onPress }: { icon: string; label: string; onPress: () => void }) => (
   <TouchableOpacity onPress={onPress} style={styles.optionsChild}>
@@ -34,6 +35,7 @@ export default function AccountScreen() {
   const { t } = useLanguage();
   const { clearCache } = useDev();
   const fullName = [user?.fname, user?.lname].filter(Boolean).join(' ');
+  const primaryColor = useThemeColor({}, 'primary');
 
   const handleWebView = (url: string, title: string) => () => {
     router.push({
@@ -72,35 +74,26 @@ export default function AccountScreen() {
         subtitle={'@'+user?.username}
         showBackButton={false}
       >
-        <TView shadow color='primary' style={styles.header}>
-          <View style={styles.headerHive}>
-            <HiveBg fade={false} />
+        <TouchableOpacity
+          style={[styles.header, {backgroundColor: primaryColor}]}
+          onPress={() =>
+            router.push({
+              pathname: '/user/[id]',
+              params: { id: user?.username },
+            } as any)
+          }
+        >
+          <View style={styles.profileImage}>
+            <ProfileImage imagePath={user?.profileImage} />
           </View>
-
-          <TouchableOpacity
-            style={styles.profileButton}
-            onPress={() =>
-              router.push({
-                pathname: '/user/[id]',
-                params: { id: user?.username },
-              } as any)
-            }
-          >
-            <View style={styles.profileImage}>
-              <ProfileImage imagePath={user?.profileImage} />
+          <View style={{ justifyContent: 'center', gap: 2 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <TText style={{ fontWeight: 700}}>{fullName}</TText>
+              <ProBadge isProUser={true} size={14}/>
             </View>
-            <View style={{ justifyContent: 'center' }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                <TText type='subtitle'>{fullName}</TText>
-                <ProBadge isProUser={true} />
-              </View>
-              <TText style={{ opacity: .5 }}>@{user?.username}</TText>
-            </View>
-            <View style={{ position: 'absolute', right: 0 }}>
-              <TIcon name='chevron-right' size={25} />
-            </View>
-          </TouchableOpacity>
-        </TView>
+            <TText style={{ opacity: .5, fontSize: 11 }}>@{user?.username}</TText>
+          </View>
+        </TouchableOpacity>
 
         {!isConnected && <NoInternetCard />}
 
@@ -139,16 +132,12 @@ export default function AccountScreen() {
 
             <TText style={styles.optionsTitle}>{t('tabs.account.help_title')}</TText>
 
-            <SettingsOption icon='pen' label={t('tabs.account.manual_button')}
-              onPress={handleDocs('manual')}
-            />
             <SettingsOption icon='headset' label={t('tabs.account.support_button')}
               onPress={handleWebView('SUPPORT_FORM_URL', t('tabs.account.support_button'))}
             />
             <SettingsOption icon='file-find' label={t('tabs.account.about_button')}
               onPress={handleDocs('about')}
             />
-
           </>}
 
           <Pressable
@@ -174,10 +163,6 @@ export default function AccountScreen() {
             <SettingsOption icon='layers-remove' label={t('tabs.account.cache_button')}
               onPress={clearCache}
             />
-
-            <SettingsOption icon='account-lock' label="Adminstrator Panel"
-              onPress={() => router.push('/admin')}
-            />
           </>}
 
         </View>
@@ -198,35 +183,24 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     width: '100%',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    height: 80,
-    marginVertical: 16,
     padding: 10,
     borderRadius: 15,
-    overflow: 'hidden'
-  },
-  headerHive: {
-    position: 'absolute',
-    top: -80,
-    bottom: 0,
-    left: 0,
-    right: -50,
-  },
-  profileButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
+    overflow: 'hidden',
+    marginTop: 16,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#ccc1',
   },
   profileImage: {
     width: 50,
     aspectRatio: 1,
     borderRadius: 50,
-    marginRight: 16,
+    marginRight: 10,
     overflow: 'hidden',
   },
   options: {
-    gap: 10,
+    gap: 8,
     width: '100%',
   },
   optionsTitle: {
@@ -234,7 +208,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ccc4',
     paddingBottom: 5,
-    fontSize: 14,
+    fontWeight: 600,
   },
   optionsChild: {
     fontSize: 15,
@@ -252,6 +226,7 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     width: '100%',
-    marginVertical: 20,
+    marginTop: 20,
+    marginBottom: 10,
   },
 });

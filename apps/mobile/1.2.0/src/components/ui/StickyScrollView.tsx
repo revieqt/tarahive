@@ -13,6 +13,7 @@ import {
 import BackButton from '../common/BackButton';
 import { TText, TView } from './Themed';
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export interface StickyScrollViewProps {
   title?: string;
@@ -81,11 +82,18 @@ export default function StickyScrollView({
             paddingTop: STATUS_BAR_HEIGHT,
             opacity: headerOpacity,
             transform: [{ translateY: headerTranslateY }],
-            backgroundColor: primaryColor,
           },
         ]}
         pointerEvents="box-none"
       >
+        <LinearGradient
+          style={StyleSheet.absoluteFillObject}
+          colors={[primaryColor, primaryColor,primaryColor, 'transparent']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          pointerEvents="none"
+        />
+        
         {showBackButton ? <BackButton style={styles.headerSides} /> : <View style={styles.headerSides} />}
 
         {hasHeaderContent && (
@@ -96,7 +104,7 @@ export default function StickyScrollView({
             accessibilityRole="button"
           >
             {title && (
-              <TText type="subtitle" numberOfLines={1}>
+              <TText numberOfLines={1} style={styles.headerTitle} >
                 {title}
               </TText>
             )}
@@ -134,22 +142,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.07,
-    shadowRadius: 4,
-    elevation: 3,
     gap: 8,
   },
   headerTextBlock: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 2,
+  },
+  headerTitle: {
+    fontWeight: 'bold',
+    letterSpacing: 1,
   },
   headerSubtitle: {
     fontSize: 11,
-    opacity: 0.7,
+    opacity: 0.5,
   },
   headerSides: {
     width: 20,

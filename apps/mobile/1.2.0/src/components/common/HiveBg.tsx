@@ -91,6 +91,7 @@ function cellCenter(col: number, row: number): { cx: number; cy: number } {
 
 interface HiveBgProps {
   flipHorizontal?: boolean;
+  flipVertical?: boolean;
   blur?: boolean;
   blurAmount?: number;
   fade?: boolean;
@@ -98,6 +99,7 @@ interface HiveBgProps {
 
 const HiveBg: React.FC<HiveBgProps> = ({
   flipHorizontal = false,
+  flipVertical = false,
   blur = true,
   blurAmount = 2,
   fade = true,
@@ -109,7 +111,12 @@ const HiveBg: React.FC<HiveBgProps> = ({
     <View
       style={[
         styles.container,
-        flipHorizontal && { transform: [{ scaleX: -1 }] },
+        (flipHorizontal || flipVertical) && {
+          transform: [
+            { scaleX: flipHorizontal ? -1 : 1 },
+            { scaleY: flipVertical ? -1 : 1 },
+          ],
+        },
         blur && { filter: `blur(${blurAmount}px)` } as any,
       ]}
       pointerEvents="none"
