@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc4',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 15,
+    borderRadius: 50,
     overflow: 'hidden',
     height: 45,
     zIndex: 100,

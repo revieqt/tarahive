@@ -19,15 +19,7 @@
     "menu_tara_desc": "Your AI Travel Buddy",
     "calendar_new_itinerary": "New Itinerary",
     "calendar_view_all": "View All Itineraries",
-    "calendar_no_itineraries": "No itinerary for this day",
-    "rate_title": "Rate us!",
-    "rate_subtitle": "We value your feedback",
-    "suggestions": "I have some helpful suggestions for you. Click Me!",
-    "chat_suggestions1": "What are some must-visit places in Cebu?",
-    "chat_suggestions2": "What is the best way to get around Cebu?",
-    "chat_suggestions3": "What are some local dishes I should try in Cebu?",
-    "chat_suggestions4": "What are some events happening in Cebu?",
-    "chat_suggestions5": "What are the best beaches in Cebu?"
+    "calendar_no_itineraries": "No itinerary for this day"
   },
   "account": {
     "pro_card_title": "Be a Certified Traveller",
@@ -35,6 +27,7 @@
     "pro_card_description": "Get access to exclusive features and benefits by upgrading to a Pro account.",
     "upgrade_button": "Upgrade Now!",
     "personalization_title": "Personalization",
+    "view_profile_button": "Edit Profile",
     "edit_profile_button": "Edit Profile",
     "theme_button": "App Theme",
     "language_button": "App Language",
@@ -47,6 +40,7 @@
     "help_title": "Help and Support",
     "manual_button": "User Manual",
     "support_button": "Contact Support",
+    "feedback_button": "Give us Feedback",
     "about_button": "About the App",
     "developer_title": "Developer Options",
     "cache_button": "Clear Cache",

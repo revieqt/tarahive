@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useSession } from '@/context/SessionContext';
 import { showInfo } from '@/services/toast.service';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
 
 const TOKEN_KEYS = {
   ACCESS_TOKEN: '@tarahive_access_token',
@@ -15,17 +16,12 @@ export const useLogout = () => {
 
   const logout = useCallback(async () => {
     try {
-      // Clear tokens from AsyncStorage
       await AsyncStorage.removeItem(TOKEN_KEYS.ACCESS_TOKEN);
       await AsyncStorage.removeItem(TOKEN_KEYS.REFRESH_TOKEN);
-
-      // Clear session context
       await clearSession();
-
-      // Clear Tanstack Query cache
       queryClient.clear();
-
-      showInfo('Success', 'Logged out successfully');
+      
+      router.replace('/login');
     } catch (error: any) {
       console.error('Logout error:', error);
       throw error;

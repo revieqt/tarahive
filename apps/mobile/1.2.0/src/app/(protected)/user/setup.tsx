@@ -88,21 +88,18 @@ export default function SetupScreen() {
 	return (
 		<TView style={{flex: 1}}>
 			<ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+				
+
+				
 				<View style={styles.header}>
+					<View style={styles.tabs}>
+						{[0, 1, 2].map((item) => (
+							<View key={item} style={[styles.tab, item <= tab && {backgroundColor: accentColor}]} />
+						))}
+					</View>
                     <TText type='title'>{stepCopy.title}</TText>
                     <TText style={{opacity: 0.7}}>{stepCopy.subtitle}</TText>
-
-                    <View style={styles.tabs}>
-                        {[0, 1, 2].map((item) => (
-                            <View key={item} style={[styles.tab, item <= tab && {backgroundColor: accentColor}]} />
-                        ))}
-                    </View>
-                    
-                    <View style={styles.hiveBgContainer}>
-                        <HiveBg/>
-                    </View>
-                    
-                </View>
+				</View>
 
 				{tab === 0 && (
 					<View style={styles.section}>
@@ -188,24 +185,17 @@ const styles = StyleSheet.create({
 	container: { flexGrow: 1},
     header:{
         padding: '3%',
-        paddingTop: 50,
         overflow: 'hidden',
-    },
-    hiveBgContainer:{
-        position: 'absolute',
-        top: -20,
-        left: 0,
-        right: -30,
-        bottom: 0,
-        zIndex: -1,
     },
 	tabs: { 
         flexDirection: 'row', 
         gap: 8,
-        marginTop: 10
+        marginTop: 10,
+		marginBottom: 20,
+		opacity: .5
     },
 	tab: { 
-        height: 4, 
+        height: 3, 
         flex: 1, 
         borderRadius: 2, 
         backgroundColor: '#9996' 

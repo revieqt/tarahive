@@ -30,7 +30,7 @@ export default function LoginScreen() {
       </TouchableOpacity>
 
       <Image
-        source={{ uri: 'https://laurenslighthouse.com/wp-content/uploads/2024/06/Moalboal01.jpg' }}
+        source={require('../../../../assets/images/default-bg-1.2.0.jpg')}
         style={{ flex: 1, width: '100%', height: '100%' }}
         contentFit="cover"
       />

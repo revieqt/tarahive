@@ -7,7 +7,8 @@
     "save": "Save Changes",
     "na": "N/A",
     "prev": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "offline_mode": "Offline Mode"
   },
   "months": {
     "january": "January",

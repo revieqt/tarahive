@@ -6,13 +6,11 @@ import { useSession } from '@/context/SessionContext';
 import { useLogout } from '@/hooks/auth/useLogout';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Pressable, StyleSheet, TouchableOpacity, View, ScrollView } from 'react-native';
 import { useInternetConnection } from '@/utils/checkInternetConnection';
 import ProfileImage from '@/components/ui/ProfileImage';
 import { useLanguage } from '@/context/LanguageContext';
 import { useDev } from '@/hooks/shared/useDev';
-import NoInternetCard from '@/components/cards/NoInternetCard';
-import HiveBg from '@/components/common/HiveBg';
 import StickyScrollView from '@/components/ui/StickyScrollView';
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
 
@@ -36,6 +34,7 @@ export default function AccountScreen() {
   const { clearCache } = useDev();
   const fullName = [user?.fname, user?.lname].filter(Boolean).join(' ');
   const primaryColor = useThemeColor({}, 'primary');
+  const accentColor = useThemeColor({}, 'accent');
 
   const handleWebView = (url: string, title: string) => () => {
     router.push({
@@ -57,15 +56,6 @@ export default function AccountScreen() {
     } as any);
   };
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      router.replace('/login');
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
-
   return (
     <TView style={{ flex: 1 }}>
       <StickyScrollView
@@ -74,37 +64,62 @@ export default function AccountScreen() {
         subtitle={'@'+user?.username}
         showBackButton={false}
       >
-        <TouchableOpacity
-          style={[styles.header, {backgroundColor: primaryColor}]}
-          onPress={() =>
-            router.push({
-              pathname: '/user/[id]',
-              params: { id: user?.username },
-            } as any)
-          }
-        >
-          <View style={styles.profileImage}>
-            <ProfileImage imagePath={user?.profileImage} />
-          </View>
-          <View style={{ justifyContent: 'center', gap: 2 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <TText style={{ fontWeight: 700}}>{fullName}</TText>
-              <ProBadge isProUser={true} size={14}/>
+        <TView style={styles.header} color='primary' shadow>
+          <TouchableOpacity
+            style={{ flexDirection: 'row' }}
+            disabled={!isConnected}
+            onPress={() =>
+              router.push({
+                pathname: '/user/[id]',
+                params: { id: user?.username },
+              } as any)
+            }
+          >
+            <View style={styles.profileImage}>
+              <ProfileImage imagePath={user?.profileImage} />
             </View>
-            <TText style={{ opacity: .5, fontSize: 11 }}>@{user?.username}</TText>
-          </View>
-        </TouchableOpacity>
+            <View style={{ justifyContent: 'center', gap: 2 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <TText style={{ fontWeight: 700}}>{fullName}</TText>
+                <ProBadge isProUser={true} size={14}/>
+              </View>
+              <TText style={{ opacity: .5, fontSize: 11 }}>@{user?.username}</TText>
+            </View>
+          </TouchableOpacity>
+        </TView>
 
-        {!isConnected && <NoInternetCard />}
+        <ScrollView horizontal contentContainerStyle={{gap: 3}} showsHorizontalScrollIndicator={false}>
+          { isConnected ? <>
+              <TouchableOpacity 
+                style={[styles.headerButtons, {backgroundColor: primaryColor}]}
+                onPress={() =>
+                  router.push({
+                    pathname: '/user/[id]',
+                    params: { id: user?.username },
+                  } as any)
+                }
+              >
+                <TIcon name='account' size={15} color={accentColor}/>
+                <TText>{t('tabs.account.view_profile_button')}</TText>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={[styles.headerButtons, {backgroundColor: primaryColor}]}
+                onPress={() => router.push('/settings/edit-profile')}
+              >
+                <TIcon name='pencil' size={15} color={accentColor}/>
+                <TText>{t('tabs.account.edit_profile_button')}</TText>
+              </TouchableOpacity>
+            </> : 
+            <View style={styles.headerButtons}>
+              <TIcon name='wifi-off' size={15}/>
+              <TText>{t('common.common.offline_mode')}</TText>
+            </View>
+          }
+        </ScrollView>
 
         <View style={styles.options}>
           <TText style={styles.optionsTitle}>{t('tabs.account.personalization_title')}</TText>
-
-          {isConnected &&
-            <SettingsOption icon='pen' label={t('tabs.account.edit_profile_button')}
-              onPress={() => router.push('/settings/edit-profile')}
-            />
-          }
 
           <SettingsOption icon='palette' label={t('tabs.account.theme_button')}
             onPress={() => router.push('/settings/theme')}
@@ -135,8 +150,13 @@ export default function AccountScreen() {
             <SettingsOption icon='headset' label={t('tabs.account.support_button')}
               onPress={handleWebView('SUPPORT_FORM_URL', t('tabs.account.support_button'))}
             />
+
             <SettingsOption icon='file-find' label={t('tabs.account.about_button')}
               onPress={handleDocs('about')}
+            />
+
+            <SettingsOption icon='check-circle' label={t('tabs.account.feedback_button')}
+              onPress={handleWebView('SUPPORT_FORM_URL', t('tabs.account.feedback_button'))}
             />
           </>}
 
@@ -169,7 +189,7 @@ export default function AccountScreen() {
 
         <Button
           title={t('tabs.account.logout_button')}
-          onPress={handleLogout}
+          onPress={() => logout()}
           type='primary'
           buttonStyle={styles.logoutButton}
         />
@@ -181,23 +201,30 @@ export default function AccountScreen() {
 
 const styles = StyleSheet.create({
   header: {
-    flexDirection: 'row',
     width: '100%',
-    alignItems: 'center',
     padding: 10,
     borderRadius: 15,
     overflow: 'hidden',
     marginTop: 16,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#ccc1',
+    marginBottom: 8,
   },
   profileImage: {
-    width: 50,
+    width: 40,
     aspectRatio: 1,
     borderRadius: 50,
     marginRight: 10,
     overflow: 'hidden',
+  },
+  headerButtons:{
+    borderWidth: 1,
+    borderRadius: 20,
+    borderColor: "#ccc4",
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    marginBottom: 10,
+    flexDirection: 'row',
+    gap: 4,
+    backgroundColor: "#ccc2"
   },
   options: {
     gap: 8,
@@ -206,7 +233,7 @@ const styles = StyleSheet.create({
   optionsTitle: {
     marginTop: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc4',
+    borderBottomColor: '#ccc3',
     paddingBottom: 5,
     fontWeight: 600,
   },

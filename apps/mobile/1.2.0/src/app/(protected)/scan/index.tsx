@@ -47,29 +47,8 @@ export default function ScanScreen() {
 
     return (
         <View style={styles.container}>
-            <TView style={styles.options}>
-                <TouchableOpacity 
-                    style={[styles.tabs, option === 'search' && {backgroundColor: accentColor + '70', borderRadius: 20}]}
-                    onPress={() => setOption('search')}
-                >
-                    <TIcon name='magnify' size={12} style={{ marginRight: 5 }} />
-                    <TText style={styles.tabText}>Search</TText>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                    style={[styles.tabs, option === 'qr' && {backgroundColor: accentColor + '70', borderRadius: 20}]}
-                    onPress={() => setOption('qr')}
-                >
-                    <TIcon name='qrcode' size={12} style={{ marginRight: 5 }} />
-                    <TText style={styles.tabText}>QR</TText>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                    style={[styles.tabs, option === 'translate' && {backgroundColor: accentColor + '70', borderRadius: 20}]}
-                    onPress={() => setOption('translate')}
-                >
-                    <TIcon name='translate' size={12} style={{ marginRight: 5 }} />
-                    <TText style={styles.tabText}>Translate</TText>
-                </TouchableOpacity>
-            </TView>
+            <BackButton type='floating' color={'#fff'} />
+
             <CameraView
                 style={StyleSheet.absoluteFillObject}
                 facing="back"

@@ -26,8 +26,6 @@ import {
   INITIAL_STATE,
 } from '@/components/ui/Dialog';
 import { Dialog as DialogService } from '@/services/dialog.service';
-
-import { useLoginBg } from '@/hooks/shared/useLoginBg';
 import { RouterLoadingOverlay } from '@/hooks/shared/useRouter';
 
 // Leaflet only on web
@@ -58,12 +56,8 @@ export default function RootLayout() {
   const [dialogState, setDialogState] =
     useState<DialogState>(INITIAL_STATE);
 
-  // Initialize login background image.
-  const loginBackground = useLoginBg();
 
-  const appReady =
-    loaded &&
-    !loginBackground.loading;
+  const appReady = loaded 
 
   useEffect(() => {
     if (error) {

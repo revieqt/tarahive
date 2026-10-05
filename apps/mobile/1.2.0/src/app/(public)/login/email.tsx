@@ -8,6 +8,7 @@ import CodeInputField from '@/components/ui/CodeInputField';
 import Header from '@/components/common/Header';
 import TextField from '@/components/ui/TextField';
 import { showError } from '@/services/toast.service';
+import { router } from 'expo-router';
 
 const RESEND_COOLDOWN_MS = 3 * 60 * 1000;
 
@@ -19,7 +20,6 @@ export default function EmailAuthScreen() {
   const { t } = useLanguage();
   const { sendCode, verifyCode, isSendingCode, isVerifying } = useEmailVerification();
   const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
