@@ -101,7 +101,7 @@ const ActiveRouteSidebarButton: React.FC = () => {
                 >
                     <TouchableOpacity style={styles.messageButton} onPress={() => router.push('/tara')}>
                         <TText style={styles.messageText}>
-                            {t('common.common.hello')} {session?.user?.fname}! {randomMessage}
+                            {t('common.hello')} {session?.user?.fname}! {randomMessage}
                         </TText>
                     </TouchableOpacity>
                     

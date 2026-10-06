@@ -141,7 +141,7 @@ export default function DocsScreen() {
       >
         {isLoading ? (
           <TView style={styles.centeredState}>
-            <TText style={styles.stateText}>{t('common.common.loading')}</TText>
+            <TText style={styles.stateText}>{t('common.loading')}</TText>
           </TView>
         ) : isError ? (
           <TView style={styles.centeredState}>
@@ -189,7 +189,7 @@ export default function DocsScreen() {
             disabled={activeSectionIndex <= 0}
           >
             <TIcon name="chevron-left" size={15} />
-            <TText style={{ opacity: 0.7, fontSize: 11 }}>{t('common.common.prev')}</TText>
+            <TText style={{ opacity: 0.7, fontSize: 11 }}>{t('common.prev')}</TText>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -205,7 +205,7 @@ export default function DocsScreen() {
             onPress={goToNextSection}
             disabled={activeSectionIndex < 0 || activeSectionIndex >= sections.length - 1}
           >
-            <TText style={{ opacity: 0.7, fontSize: 11 }}>{t('common.common.next')}</TText>
+            <TText style={{ opacity: 0.7, fontSize: 11 }}>{t('common.next')}</TText>
             <TIcon name="chevron-right" size={15} />
           </TouchableOpacity>
         </LinearGradient>

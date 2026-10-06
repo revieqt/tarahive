@@ -1,0 +1,336 @@
+{
+  "language": {
+    "code": "en",
+    "name": "English",
+    "nativeName": "English",
+    "flag": "🇺🇸",
+    "isRTL": false
+  },
+  "data": {
+    "common": {
+      "welcome": "Welcome to Tarahive",
+      "loading": "Loading...",
+      "cancel": "Cancel",
+      "continue": "Continue",
+      "hello": "Hello",
+      "save": "Save Changes",
+      "na": "N/A",
+      "prev": "Previous",
+      "next": "Next",
+      "offline_mode": "Offline Mode",
+      "months": {
+        "january": "January",
+        "february": "February",
+        "march": "March",
+        "april": "April",
+        "may": "May",
+        "june": "June",
+        "july": "July",
+        "august": "August",
+        "september": "September",
+        "october": "October",
+        "november": "November",
+        "december": "December"
+      },
+      "days": {
+        "sunday": "Sunday",
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday"
+      },
+      "days_short": {
+        "sun": "Sun",
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat"
+      },
+      "genders": {
+        "male": "Male",
+        "female": "Female",
+        "non_binary": "Non-binary",
+        "prefer_not_to_say": "Prefer not to say",
+        "other": "Other"
+      },
+      "no_internet": {
+        "title": "No Internet Connection",
+        "subtitle": "You are using Tarahive in offline mode. Some features may be limited until you reconnect to the internet."
+      },
+      "dev": {
+        "cache_clear_title": "Clear Cache",
+        "cache_clear_subtitle": "This will clear all cached data and log you out. Continue?"
+      },
+      "conditions": {
+        "clear_sky": "Clear sky",
+        "mainly_clear": "Mainly clear",
+        "partly_cloudy": "Partly cloudy",
+        "cloudy": "Cloudy",
+        "fog": "Fog",
+        "depositing_rime_fog": "Depositing rime fog",
+        "light_drizzle": "Light drizzle",
+        "moderate_drizzle": "Moderate drizzle",
+        "heavy_drizzle": "Heavy drizzle",
+        "light_freezing_drizzle": "Light freezing drizzle",
+        "heavy_freezing_drizzle": "Heavy freezing drizzle",
+        "slight_rain": "Slight rain",
+        "moderate_rain": "Moderate rain",
+        "heavy_rain": "Heavy rain",
+        "light_freezing_rain": "Light freezing rain",
+        "heavy_freezing_rain": "Heavy freezing rain",
+        "slight_snow_fall": "Slight snow fall",
+        "moderate_snow_fall": "Moderate snow fall",
+        "heavy_snow_fall": "Heavy snow fall",
+        "snow_grains": "Snow grains",
+        "slight_rain_showers": "Slight rain showers",
+        "moderate_rain_showers": "Moderate rain showers",
+        "violent_rain_showers": "Violent rain showers",
+        "slight_snow_showers": "Slight snow showers",
+        "heavy_snow_showers": "Heavy snow showers",
+        "thunderstorm": "Thunderstorm",
+        "thunderstorm_slight_hail": "Thunderstorm with slight hail",
+        "thunderstorm_heavy_hail": "Thunderstorm with heavy hail"
+      },
+      "login": {
+        "title1": "Your Travels,",
+        "title2": "Made Easier",
+        "google_prompt": "Continue with Google",
+        "apple_prompt": "Continue with Apple",
+        "email_prompt": "Continue with Email",
+        "terms_prompt": "By continuing, you agree to our Terms of Service and Privacy Policy."
+      },
+      "email_login": {
+        "title1": "Continue with Email",
+        "subtitle1": "Please enter your email address to enjoy Tarahive's personalized travel experience.",
+        "email_placeholder": "Email Address",
+        "title2": "Verify your Email",
+        "subtitle2": "We've sent a verification link to: ",
+        "resend_prompt": "Didn't receive the email? Resend it here.",
+        "cooldown_prompt": "Email resent. You can request another one in",
+        "verify_button": "Verify Email"
+      }
+    },
+    "itinerary": {
+      "main": {
+        "title": "Itinerary",
+        "subtitle": "Manage your travel plans",
+        "active": "Active",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      },
+      "form": {
+        "title_placeholder": "Title",
+        "details_tab": "Details",
+        "start_placeholder": "Start Date",
+        "end_placeholder": "End Date",
+        "actions_tab": "Actions",
+        "complete_button": "Mark as Completed",
+        "cancel_button": "Cancel Itinerary",
+        "repeat_button": "Repeat Itinerary",
+        "room_button": "Create Room with Itinerary",
+        "delete_button": "Delete Itinerary",
+        "copy_button": "Copy Itinerary",
+        "privacy_tab": "Privacy",
+        "sharing_enabled": "Sharing Enabled",
+        "sharing_disabled": "Sharing Disabled",
+        "allow_others_to_copy": "Allow others to copy",
+        "dont_allow_others_to_copy": "Don't allow others to copy",
+        "collaborators_button": "Collaborators",
+        "collaborators_subtitle": "Manage itinerary collaborators for",
+        "collaborator_search_placeholder": "Add new collaborator",
+        "collaborator_search_empty": "No matching users found",
+        "collaborator_search_error": "Could not search users",
+        "collaborator_list_title": "People with access",
+        "collaborator_list_empty": "No collaborators found",
+        "collaborator_list_error": "Could not load collaborators",
+        "collaborator_add_title": "Add collaborator",
+        "collaborator_edit_title": "Change permission",
+        "collaborator_permission": "Permission",
+        "collaborator_add_button": "Add collaborator",
+        "collaborator_save_button": "Save permission",
+        "collaborator_change_permission": "Change collaborator permission",
+        "collaborator_remove_title": "Remove collaborator",
+        "collaborator_remove_confirm": "Remove @{{username}} from this itinerary?",
+        "collaborator_remove": "Remove",
+        "directions": "Directions",
+        "search": "Search",
+        "focus_done": "Done",
+        "focus_delete": "Delete",
+        "header_block": "Header",
+        "text_block": "Text",
+        "checklist_block": "Checklist",
+        "location_select_prompt": "Search for a location or move the map",
+        "copy_title": "Make a copy of"
+      },
+      "type": {
+        "city": "City Trip",
+        "beach": "Weekend Trip",
+        "road": "Road Trip",
+        "business": "Business Trip",
+        "education": "Educational Trip",
+        "couple": "Couple Trip",
+        "family": "Family Trip",
+        "weekend": "Weekend Trip",
+        "vacation": "Vacation",
+        "adventure": "Adventure",
+        "backpacking": "Backpacking",
+        "event": "Event",
+        "pilgrimage": "Pilgrimage",
+        "cruise": "Cruise",
+        "staycation": "Staycation",
+        "other": "Others"
+      },
+      "privacy": {
+        "public": "Public",
+        "private": "Private",
+        "invited": "Invited Collaborators Only"
+      },
+      "viewType": {
+        "viewer": "Viewer",
+        "editor": "Editor",
+        "owner": "Owner"
+      }
+    },
+    "sos": {
+      "main": {
+        "off_title": "All Clear!",
+        "off_subtitle": "SOS: OFF",
+        "off_note": "Long-press to Activate SOS",
+        "off_hold": "Hold for Activation",
+        "on_title": "SOS in Progress",
+        "on_subtitle": "SOS: ON",
+        "on_note": "Long-press to End SOS",
+        "on_hold": "Hold for Deactivation",
+        "info": "is in a",
+        "email": "Emergency Email",
+        "number": "Emergency Contact",
+        "lang": "Alert Language"
+      },
+      "form": {
+        "title": "Enable SOS",
+        "subtitle": "Configure your emergency alert",
+        "message_placeholder": "Describe your emergency situation... (Optional)",
+        "activate_button": "Activate SOS",
+        "settings_link": "Configure where to send your emergency alerts"
+      },
+      "emergency_types": {
+        "medical": "Medical Emergency",
+        "criminal": "Criminal Activity",
+        "fire": "Fire Emergency",
+        "natural": "Natural Disaster",
+        "utility": "Utility Emergency",
+        "road": "Road Emergency",
+        "domestic": "Domestic and Personal Safety",
+        "animal": "Animal-Related Emergency",
+        "other": "Other"
+      },
+      "settings": {
+        "title": "SOS Settings",
+        "subtitle": "Configure your emergency alert preferences",
+        "email_label_enabled": "Email Alert Enabled",
+        "email_label_disabled": "Email Alert Disabled",
+        "email_description": "Send Emergency Alert via Email",
+        "email_placeholder": "Emergency Contact Email",
+        "sms_label_enabled": "SMS Alert Enabled",
+        "sms_label_disabled": "SMS Alert Disabled",
+        "sms_description": "Send Emergency Alert via SMS (Pro Users Only)",
+        "sms_placeholder": "Emergency Contact Phone",
+        "language": "Preferred Alert Language",
+        "save_button": "Save Changes"
+      }
+    },
+    "tabs": {
+      "tabs": {
+        "home_button": "Home",
+        "maps_button": "Maps",
+        "explore_button": "Explore",
+        "account_button": "Account"
+      },
+      "home": {
+        "header_title": "You're currently at",
+        "header_heat": "Heat",
+        "header_rain": "Rain",
+        "header_humid": "Humid",
+        "header_wind": "Wind",
+        "menu_itinerary": "Itineraries",
+        "menu_itinerary_desc": "Plan your Travels",
+        "menu_sos": "SOS",
+        "menu_sos_desc": "Alert others with",
+        "menu_tara": "Tara",
+        "menu_tara_desc": "Your AI Travel Buddy",
+        "calendar_new_itinerary": "New Itinerary",
+        "calendar_view_all": "View All Itineraries",
+        "calendar_no_itineraries": "No itinerary for this day"
+      },
+      "account": {
+        "pro_card_title": "Be a Certified Traveller",
+        "pro_card_subtitle": "Upgrade to Pro Now!",
+        "pro_card_description": "Get access to exclusive features and benefits by upgrading to a Pro account.",
+        "upgrade_button": "Upgrade Now!",
+        "personalization_title": "Personalization",
+        "view_profile_button": "Edit Profile",
+        "edit_profile_button": "Edit Profile",
+        "theme_button": "App Theme",
+        "language_button": "App Language",
+        "privacy_title": "Privacy",
+        "change_password_button": "Change Password",
+        "visibility_button": "Visibility Settings",
+        "logs_button": "Activity Logs",
+        "privacy_button": "Privacy Policy",
+        "terms_button": "Terms and Conditions",
+        "help_title": "Help and Support",
+        "manual_button": "User Manual",
+        "support_button": "Contact Support",
+        "feedback_button": "Give us Feedback",
+        "about_button": "About the App",
+        "developer_title": "Developer Options",
+        "cache_button": "Clear Cache",
+        "logout_button": "Logout"
+      }
+    },
+    "users": {
+      "fields": {
+        "edit_title": "Edit Profile",
+        "edit_subtitle": "Update your profile information below. You can always change it later.",
+        "username": "Username",
+        "fname": "First Name",
+        "lname": "Last Name",
+        "bio": "Bio",
+        "contact": "Contact Number",
+        "interests": "Interests"
+      },
+      "theme": {
+        "title": "App Theme",
+        "subtitle": "Use the theme you prefer. You can always change it later.",
+        "switch_prompt": "Switching to",
+        "device": "Device Default",
+        "light": "Light",
+        "dark": "Dark"
+      },
+      "language": {
+        "title": "App Language",
+        "subtitle": "Select the language you want to use in the app."
+      },
+      "visibility": {
+        "title": "Profile Visibility",
+        "subtitle": "Control who can see your profile and activity.",
+        "public": "Profile Visibility",
+        "on": "Public",
+        "off": "Private",
+        "personal": "Personal Info Visibility",
+        "travel": "Travel Info Visibility"
+      },
+      "logs": {
+        "title": "Request Activity Logs",
+        "subtitle": "Select a date range to request your activity logs.",
+        "start_date": "Start Date",
+        "end_date": "End Date",
+        "type_placeholder": "Log Type (Optional)"
+      }
+    }
+  }
+}

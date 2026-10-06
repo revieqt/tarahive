@@ -44,7 +44,7 @@ export default function LoginScreen() {
             <TText style={styles.title}>{t("common.login.title1")}</TText>
             <TText style={[styles.titleAccent, {color: accentColor}]}>{t("common.login.title2")}</TText>
           </View>
-          <TText style={styles.subtitle}>{t("common.common.welcome")}</TText>
+          <TText style={styles.subtitle}>{t("common.welcome")}</TText>
         </View>
         
         <TouchableOpacity style={styles.button} onPress={() => router.push('/home')}>

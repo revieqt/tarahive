@@ -225,11 +225,11 @@ export default function LocationPickerModal({
 
           <View style={{flexDirection: 'row', gap: 2}}>
             <TouchableOpacity style={styles.bottomButtons} onPress={onClose}>
-              <TText style={{color: "#fff"}}>{t("common.common.cancel")}</TText>
+              <TText style={{color: "#fff"}}>{t("common.cancel")}</TText>
             </TouchableOpacity>
 
             <TouchableOpacity style={[styles.bottomButtons, {backgroundColor: accentColor}]} onPress={handleConfirm}>
-              <TText style={{color: "#fff"}}>{t("common.common.continue")}</TText>
+              <TText style={{color: "#fff"}}>{t("common.continue")}</TText>
             </TouchableOpacity>
           </View>
         </LinearGradient>

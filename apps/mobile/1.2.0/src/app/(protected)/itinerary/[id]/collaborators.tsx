@@ -230,7 +230,7 @@ export default function ItineraryCollaboratorsScreen() {
               <TText type="title" style={styles.modalTitle}>
                 {t('itinerary.form.collaborator_add_title')}
               </TText>
-              <TouchableOpacity onPress={closeModal} accessibilityLabel={t('common.common.cancel')}>
+              <TouchableOpacity onPress={closeModal} accessibilityLabel={t('common.cancel')}>
                 <TIcon name="close" size={22} />
               </TouchableOpacity>
             </View>

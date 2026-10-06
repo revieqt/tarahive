@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
 import { TIcon, TText, TView } from "@/components/ui/Themed";
 import { LANGUAGES } from "@/constants/Languages";
@@ -8,10 +8,20 @@ import { showError } from "@/services/toast.service";
 import Header from "@/components/common/Header";
 
 export default function LanguageSettingsScreen() {
-  const { currentLanguage, setLanguage, loading, t } = useLanguage();
+  const { currentLanguage, downloadedLanguages, setLanguage, loading, t } = useLanguage();
   const [selectedLanguage, setSelectedLanguage] = useState(currentLanguage.code);
   const backgroundColor = useThemeColor({}, 'primary');
   const checkColor = useThemeColor({}, 'secondary');
+  const english = LANGUAGES.find((language) => language.code === "en");
+  const availableLanguages = LANGUAGES.filter(
+    (language) =>
+      language.code !== "en" &&
+      !downloadedLanguages.some((downloaded) => downloaded.code === language.code),
+  );
+
+  useEffect(() => {
+    setSelectedLanguage(currentLanguage.code);
+  }, [currentLanguage.code]);
 
   const handleLanguageSelect = async (languageCode: string) => {
     setSelectedLanguage(languageCode);
@@ -23,36 +33,51 @@ export default function LanguageSettingsScreen() {
     }
   };
 
+  function renderLanguage(language: (typeof LANGUAGES)[number]) {
+    return (
+      <TouchableOpacity
+        key={language.code}
+        style={[styles.languageItem, { backgroundColor }]}
+        onPress={() => handleLanguageSelect(language.code)}
+        disabled={loading}
+      >
+        <View style={styles.languageInfo}>
+          <TText style={styles.flag}>{language.flag}</TText>
+          <View>
+            <TText>{language.name}</TText>
+            <TText style={styles.nativeName}>{language.nativeName}</TText>
+          </View>
+        </View>
+        {selectedLanguage === language.code && !loading && (
+          <TIcon name="check" color={checkColor} size={20} />
+        )}
+        {selectedLanguage === language.code && loading && (
+          <ActivityIndicator size="small" />
+        )}
+      </TouchableOpacity>
+    );
+  }
+
   return (
     <TView style={styles.container}>
       <Header title={t("users.language.title")} subtitle={t("users.language.subtitle")} />
 
       <ScrollView style={styles.languageList}>
-        {LANGUAGES.map((language) => (
-          <TouchableOpacity
-            key={language.code}
-            style={[
-              styles.languageItem,
-              { backgroundColor },
-            ]}
-            onPress={() => handleLanguageSelect(language.code)}
-            disabled={loading}
-          >
-            <View style={styles.languageInfo}>
-              <TText style={styles.flag}>{language.flag}</TText>
-              <View>
-                <TText>{language.name}</TText>
-                <TText style={styles.nativeName}>{language.nativeName}</TText>
-              </View>
-            </View>
-            {selectedLanguage === language.code && !loading && (
-              <TIcon name="check" color={checkColor} size={20}/>
-            )}
-            {selectedLanguage === language.code && loading && (
-              <ActivityIndicator size="small" />
-            )}
-          </TouchableOpacity>
-        ))}
+        {english && renderLanguage(english)}
+
+        {downloadedLanguages.length > 0 && (
+          <>
+            <TText style={styles.sectionTitle}>Downloaded Languages</TText>
+            {downloadedLanguages.map(renderLanguage)}
+          </>
+        )}
+
+        {availableLanguages.length > 0 && (
+          <>
+            <TText style={styles.sectionTitle}>Download Languages</TText>
+            {availableLanguages.map(renderLanguage)}
+          </>
+        )}
       </ScrollView>
     </TView>
   );
@@ -65,6 +90,13 @@ const styles = StyleSheet.create({
   },
   languageList: {
     flex: 1,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    opacity: 0.65,
+    marginTop: 12,
+    marginBottom: 8,
   },
   languageItem: {
     flexDirection: "row",

@@ -113,7 +113,7 @@ export default function AccountScreen() {
             </> : 
             <View style={styles.headerButtons}>
               <TIcon name='wifi-off' size={15}/>
-              <TText>{t('common.common.offline_mode')}</TText>
+              <TText>{t('common.offline_mode')}</TText>
             </View>
           }
         </ScrollView>

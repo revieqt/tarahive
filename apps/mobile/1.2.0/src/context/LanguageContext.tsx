@@ -1,53 +1,90 @@
-import React, { createContext ,useCallback, useContext, useEffect, useRef, useState } from "react";
-import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import * as FileSystem from "expo-file-system/legacy";
 import { LANGUAGES, LanguageItem } from "@/constants/Languages";
-import { enBundle } from "@/locales/en";
 import { api, setApiLanguage } from "@/api/client";
+import englishLocale from "../../assets/locales/en.json";
 
 type TranslationMap = Record<string, unknown>;
-const DEFAULT_LANGUAGE_CODE = "en";
+type NamespaceBundle = Record<string, TranslationMap>;
 
-interface NamespaceBundle {
-  [namespace: string]: TranslationMap;
-}
-
-interface PreloadResponse {
-  version: number;
+interface LocaleBundle {
+  language: LanguageItem;
   data: NamespaceBundle;
 }
 
 interface LanguageContextValue {
   t: (key: string, params?: Record<string, string | number>) => string;
   currentLanguage: LanguageItem;
+  downloadedLanguages: LanguageItem[];
   setLanguage: (code: string) => Promise<void>;
   loadNamespace: (namespace: string) => Promise<void>;
   loading: boolean;
   error: Error | null;
 }
 
-const queryKeys = {
-  preload: (code: string) => ["localization", code, "preload"] as const,
-  namespace: (code: string, ns: string) =>
-    ["localization", code, "namespace", ns] as const,
-};
+const DEFAULT_LANGUAGE_CODE = "en";
+const defaultLocale = englishLocale as LocaleBundle;
 
-async function fetchPreload(code: string): Promise<NamespaceBundle> {
-  const response = await api.get<PreloadResponse>(`/v2/localization/${code}/preload`);
-  return response.data;
+function getLocaleDirectory(): string {
+  if (!FileSystem.documentDirectory) {
+    throw new Error("The device document directory is unavailable");
+  }
+  return `${FileSystem.documentDirectory}locales/`;
 }
 
-async function fetchNamespace(
-  code: string,
-  namespace: string
-): Promise<TranslationMap> {
-  const response = await api.get<{ version: number; data: TranslationMap }>(
-    `/v2/localization/${code}/${namespace}`
+async function ensureLocaleDirectory(): Promise<string> {
+  const directory = getLocaleDirectory();
+  const info = await FileSystem.getInfoAsync(directory);
+  if (!info.exists) {
+    await FileSystem.makeDirectoryAsync(directory, { intermediates: true });
+  }
+  return directory;
+}
+
+function parseLocaleBundle(content: string, expectedCode: string): LocaleBundle {
+  const locale = JSON.parse(content) as Partial<LocaleBundle>;
+  if (
+    !locale.language ||
+    locale.language.code !== expectedCode ||
+    typeof locale.language.name !== "string" ||
+    typeof locale.language.nativeName !== "string" ||
+    typeof locale.language.flag !== "string" ||
+    !locale.data ||
+    typeof locale.data !== "object" ||
+    Array.isArray(locale.data)
+  ) {
+    throw new Error(`The downloaded locale "${expectedCode}" is invalid`);
+  }
+  return locale as LocaleBundle;
+}
+
+async function readDownloadedLocale(code: string): Promise<LocaleBundle | null> {
+  const fileUri = `${getLocaleDirectory()}${code}.json`;
+  const info = await FileSystem.getInfoAsync(fileUri);
+  if (!info.exists) return null;
+  return parseLocaleBundle(await FileSystem.readAsStringAsync(fileUri), code);
+}
+
+async function saveDownloadedLocale(locale: LocaleBundle): Promise<void> {
+  const directory = await ensureLocaleDirectory();
+  await FileSystem.writeAsStringAsync(
+    `${directory}${locale.language.code}.json`,
+    JSON.stringify(locale),
   );
-  return response.data;
 }
 
-async function loadLocalEnBundle(): Promise<NamespaceBundle> {
-  return enBundle as NamespaceBundle;
+function getDownloadedLanguageItems(codes: string[]): LanguageItem[] {
+  return LANGUAGES.filter(
+    (language) =>
+      language.code !== DEFAULT_LANGUAGE_CODE && codes.includes(language.code),
+  );
 }
 
 function getNestedValue(obj: TranslationMap, path: string): unknown {
@@ -61,31 +98,32 @@ function getNestedValue(obj: TranslationMap, path: string): unknown {
 
 function interpolate(
   template: string,
-  params?: Record<string, string | number>
+  params?: Record<string, string | number>,
 ): string {
   if (!params) return template;
   return template.replace(/\{\{?(\w+)\}?\}/g, (_, key) =>
-    params[key] != null ? String(params[key]) : `{{${key}}}`
+    params[key] != null ? String(params[key]) : `{{${key}}}`,
   );
 }
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
 function LanguageProviderInner({ children }: { children: React.ReactNode }) {
-  const queryClient = useQueryClient();
-
   const [currentLanguage, setCurrentLanguage] = useState<LanguageItem>(
-    () => LANGUAGES.find((l) => l.code === DEFAULT_LANGUAGE_CODE)!
+    defaultLocale.language,
+  );
+  const [downloadedLanguages, setDownloadedLanguages] = useState<LanguageItem[]>(
+    [],
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const translationsRef = useRef<NamespaceBundle>({});
-  const fallbackRef = useRef<NamespaceBundle>({});
+  const translationsRef = useRef<NamespaceBundle>(defaultLocale.data);
+  const fallbackRef = useRef<NamespaceBundle>(defaultLocale.data);
   const [translationVersion, setTranslationVersion] = useState(0);
   const bumpVersion = useCallback(
-    () => setTranslationVersion((v) => v + 1),
-    []
+    () => setTranslationVersion((version) => version + 1),
+    [],
   );
 
   useEffect(() => {
@@ -96,119 +134,92 @@ function LanguageProviderInner({ children }: { children: React.ReactNode }) {
       setError(null);
 
       try {
-        const localEn = await loadLocalEnBundle();
-        fallbackRef.current = localEn;
-        let enBundle: NamespaceBundle;
-        try {
-          enBundle = await queryClient.fetchQuery({
-            queryKey: queryKeys.preload(DEFAULT_LANGUAGE_CODE),
-            queryFn: () => fetchPreload(DEFAULT_LANGUAGE_CODE),
-          });
-        } catch {
-          enBundle = localEn;
-          queryClient.setQueryData(
-            queryKeys.preload(DEFAULT_LANGUAGE_CODE),
-            enBundle
-          );
-        }
+        const directory = await ensureLocaleDirectory();
+        const filenames = await FileSystem.readDirectoryAsync(directory);
+        const downloadedCodes = filenames
+          .filter((filename) => filename.endsWith(".json"))
+          .map((filename) => filename.slice(0, -5));
 
         if (!cancelled) {
-          translationsRef.current = enBundle;
-          fallbackRef.current = { ...localEn, ...enBundle };
+          setDownloadedLanguages(getDownloadedLanguageItems(downloadedCodes));
+          translationsRef.current = defaultLocale.data;
+          fallbackRef.current = defaultLocale.data;
+          setCurrentLanguage(defaultLocale.language);
           setApiLanguage(DEFAULT_LANGUAGE_CODE);
           bumpVersion();
         }
-      } catch (err) {
+      } catch (cause) {
         if (!cancelled) {
-          setError(err instanceof Error ? err : new Error(String(err)));
+          setError(cause instanceof Error ? cause : new Error(String(cause)));
         }
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
 
-    bootstrap();
+    void bootstrap();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [bumpVersion]);
 
-  const setLanguage = useCallback(
-    async (code: string) => {
-      const lang = LANGUAGES.find((l) => l.code === code);
-      if (!lang) {
-        console.warn(`[i18n] Unknown language code: "${code}"`);
-        return;
-      }
+  const setLanguage = useCallback(async (code: string) => {
+    const availableLanguage = LANGUAGES.find((language) => language.code === code);
+    if (!availableLanguage) {
+      throw new Error(`Unknown language code: "${code}"`);
+    }
 
+    setLoading(true);
+    setError(null);
+
+    try {
+      let locale: LocaleBundle;
       if (code === DEFAULT_LANGUAGE_CODE) {
-        translationsRef.current = fallbackRef.current;
-        setCurrentLanguage(lang);
-        setApiLanguage(code);
-        bumpVersion();
-        return;
+        locale = defaultLocale;
+      } else {
+        const cachedLocale = await readDownloadedLocale(code);
+        if (cachedLocale) {
+          locale = cachedLocale;
+        } else {
+          const downloaded = await api.get<LocaleBundle>(
+            `/v2/localization/${code}`,
+          );
+          locale = parseLocaleBundle(JSON.stringify(downloaded), code);
+          await saveDownloadedLocale(locale);
+          setDownloadedLanguages((current) =>
+            getDownloadedLanguageItems([
+              ...current.map((language) => language.code),
+              code,
+            ]),
+          );
+        }
       }
 
-      setLoading(true);
-      setError(null);
-
-      try {
-        const bundle = await queryClient.fetchQuery({
-          queryKey: queryKeys.preload(code),
-          queryFn: () => fetchPreload(code),
-        });
-
-        translationsRef.current = bundle;
-        setCurrentLanguage(lang);
-        setApiLanguage(code);
-        bumpVersion();
-      } catch (err) {
-        const e = err instanceof Error ? err : new Error(String(err));
-        setError(e);
-        console.error(`[i18n] Failed to load language "${code}":`, e.message);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [queryClient, bumpVersion]
-  );
+      translationsRef.current = locale.data;
+      setCurrentLanguage(locale.language);
+      setApiLanguage(code);
+      bumpVersion();
+    } catch (cause) {
+      const languageError =
+        cause instanceof Error ? cause : new Error(String(cause));
+      setError(languageError);
+      console.error(`[i18n] Failed to load language "${code}":`, languageError);
+      throw languageError;
+    } finally {
+      setLoading(false);
+    }
+  }, [bumpVersion]);
 
   const loadNamespace = useCallback(
     async (namespace: string) => {
-      const code = currentLanguage.code;
-      if (translationsRef.current[namespace]) return;
-      const cached = queryClient.getQueryData<TranslationMap>(
-        queryKeys.namespace(code, namespace)
-      );
-      if (cached) {
-        translationsRef.current = {
-          ...translationsRef.current,
-          [namespace]: cached,
-        };
-        bumpVersion();
-        return;
-      }
-
-      try {
-        const data = await queryClient.fetchQuery({
-          queryKey: queryKeys.namespace(code, namespace),
-          queryFn: () => fetchNamespace(code, namespace),
-        });
-
-        translationsRef.current = {
-          ...translationsRef.current,
-          [namespace]: data,
-        };
-        bumpVersion();
-      } catch (err) {
-        console.error(
-          `[i18n] Failed to load namespace "${namespace}" for "${code}":`,
-          err
-        );
-        throw err;
+      if (
+        !translationsRef.current[namespace] &&
+        !fallbackRef.current[namespace]
+      ) {
+        throw new Error(`Translation namespace "${namespace}" is unavailable`);
       }
     },
-    [currentLanguage.code, queryClient, bumpVersion]
+    [],
   );
 
   const t = useCallback(
@@ -224,36 +235,30 @@ function LanguageProviderInner({ children }: { children: React.ReactNode }) {
 
       const resolve = (bundle: NamespaceBundle): string | undefined => {
         if (namespace && bundle[namespace]) {
-          const val = getNestedValue(
-            bundle[namespace] as TranslationMap,
-            subKey
-          );
-          if (typeof val === "string") return val;
+          const value = getNestedValue(bundle[namespace], subKey);
+          if (typeof value === "string") return value;
         }
 
         if (!namespace) {
           for (const ns of Object.keys(bundle)) {
-            const val = getNestedValue(bundle[ns] as TranslationMap, subKey);
-            if (typeof val === "string") return val;
+            const value = getNestedValue(bundle[ns], subKey);
+            if (typeof value === "string") return value;
           }
         }
 
         return undefined;
       };
 
-      const raw =
-        resolve(translations) ??
-        resolve(fallback) ??
-        key;
-
+      const raw = resolve(translations) ?? resolve(fallback) ?? key;
       return interpolate(raw, params);
     },
-    [translationVersion]
+    [translationVersion],
   );
 
   const value: LanguageContextValue = {
     t,
     currentLanguage,
+    downloadedLanguages,
     setLanguage,
     loadNamespace,
     loading,
@@ -268,29 +273,15 @@ function LanguageProviderInner({ children }: { children: React.ReactNode }) {
 }
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  return (
-    <QueryClientProvider client={
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            staleTime: Infinity,
-            gcTime: Infinity,
-            retry: 2,
-          },
-        },
-      })
-    }>
-      <LanguageProviderInner>{children}</LanguageProviderInner>
-    </QueryClientProvider>
-  );
+  return <LanguageProviderInner>{children}</LanguageProviderInner>;
 }
 
 export function useLanguage(): LanguageContextValue {
-  const ctx = useContext(LanguageContext);
-  if (!ctx) {
+  const context = useContext(LanguageContext);
+  if (!context) {
     throw new Error("useLanguage must be used within a <LanguageProvider>");
   }
-  return ctx;
+  return context;
 }
 
-export type { LanguageContextValue, LanguageItem, TranslationMap, NamespaceBundle };
+export type { LanguageContextValue, LocaleBundle, NamespaceBundle, TranslationMap };

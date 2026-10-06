@@ -60,7 +60,7 @@ export default function LogsRequestScreen() {
         values={GENDER_OPTIONS}
       />
       <Button
-        title={t("common.common.continue")}
+        title={t("common.continue")}
         buttonStyle={styles.requestButton}
         onPress={() => []}
         type="primary"

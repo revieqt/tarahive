@@ -16,8 +16,8 @@ export function useDev() {
       t('common.dev.cache_clear_title'),
       t('common.dev.cache_clear_subtitle'),
       {
-        confirmText: t('common.common.continue'),
-        cancelText: t('common.common.cancel'),
+        confirmText: t('common.continue'),
+        cancelText: t('common.cancel'),
         destructive: true,
         onConfirm: async () => {
           try {

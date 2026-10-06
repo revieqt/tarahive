@@ -70,7 +70,7 @@ export default function VisibilitySettingsScreen() {
       </TView>
 
       <Button
-        title={t("common.common.save")}
+        title={t("common.save")}
         type='primary'
         onPress={handleSaveSettings}
         buttonStyle={styles.button}

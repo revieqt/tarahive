@@ -135,7 +135,7 @@ export default function EditProfileSettingsScreen() {
             <TView key={field.key} style={styles.sectionContainer} color='primary'>
               <View style={styles.fieldContent}>
                 <TText style={styles.sectionChildDescription}>{field.label}</TText>
-                <TText>{displayText ? displayText : t('common.common.na')}</TText>
+                <TText>{displayText ? displayText : t('common.na')}</TText>
               </View>
               <TouchableOpacity onPress={() => openEditor(field)}>
                 <TIcon name='pencil' size={20} />
@@ -146,7 +146,7 @@ export default function EditProfileSettingsScreen() {
       </StickyScrollView>
 
       <Button
-        title={t('common.common.save')}
+        title={t('common.save')}
         type='primary'
         onPress={handleSave}
         buttonStyle={styles.button}
@@ -194,7 +194,7 @@ export default function EditProfileSettingsScreen() {
             </View>
 
             <Button
-              title={t('common.common.save')}
+              title={t('common.save')}
               type='primary'
               buttonStyle={styles.button}
               onPress={() => handleModalSubmit('')}

@@ -105,7 +105,7 @@ export default function EmailAuthScreen() {
 
         <View style={styles.buttonsContainer}>
           <Button
-            title={t("common.common.continue")}
+            title={t("common.continue")}
             onPress={handleContinue}
             type="primary"
             disabled={isEmailButtonDisabled}
