@@ -104,7 +104,7 @@ export default function DocsScreen() {
           {(block.items ?? []).map((item: string, index: number) => (
             <View key={`${item}-${index}`} style={styles.listItem}>
               <TText>•</TText>   
-              <TText style={{marginLeft: 6, lineHeight: 20}}>
+              <TText style={{marginLeft: 6}}>
                 {item}
               </TText>
             </View>
@@ -135,7 +135,6 @@ export default function DocsScreen() {
 
   return (
     <TView style={{ flex: 1 }}>
-      <HiveBg/>
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{ padding: '3%', paddingBottom: 80 }}
@@ -248,13 +247,11 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 8,
     fontWeight: '700',
-    fontSize: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc9',
+    borderBottomColor: '#ccc4',
     paddingBottom: 5,
   },
   blockText: {
-    lineHeight: 22,
     marginBottom: 10,
   },
   listContainer: {
@@ -273,7 +270,7 @@ const styles = StyleSheet.create({
     gap: 8,
     borderLeftWidth: 4,
     borderWidth: 1,
-    backgroundColor: 'rgba(255,255,255,.6)'
+    backgroundColor: '#ccc3'
   },
   imageCaption: {
     marginBottom: 12,

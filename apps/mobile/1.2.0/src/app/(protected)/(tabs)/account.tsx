@@ -13,6 +13,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useDev } from '@/hooks/shared/useDev';
 import StickyScrollView from '@/components/ui/StickyScrollView';
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
+import WebViewModal from '@/components/modals/WebViewModal';
 
 export const SettingsOption = ({ icon, label, onPress }: { icon: string; label: string; onPress: () => void }) => (
   <TouchableOpacity onPress={onPress} style={styles.optionsChild}>
@@ -35,16 +36,8 @@ export default function AccountScreen() {
   const fullName = [user?.fname, user?.lname].filter(Boolean).join(' ');
   const primaryColor = useThemeColor({}, 'primary');
   const accentColor = useThemeColor({}, 'accent');
-
-  const handleWebView = (url: string, title: string) => () => {
-    router.push({
-      pathname: "/webview" as any,
-      params: {
-        url: url,
-        title: title,
-      },
-    } as any);
-  };
+  const [webView, setWebView] = useState<{ url: string; title: string; subtitle?: string  } | null>(null);
+  const handleWebView = (url: string, title: string, subtitle?: string) => () => setWebView({ url, title, subtitle });
 
   const handleDocs = (id: string, section?: string) => () => {
     router.push({
@@ -58,6 +51,13 @@ export default function AccountScreen() {
 
   return (
     <TView style={{ flex: 1 }}>
+      <WebViewModal
+        visible={webView !== null}
+        url={webView?.url ?? ''}
+        title={webView?.title ?? ''}
+        subtitle={webView?.subtitle ?? ''}
+        onClose={() => setWebView(null)}
+      />
       <StickyScrollView
         contentContainerStyle={{ padding: '3%' }}
         title={fullName}
@@ -148,7 +148,7 @@ export default function AccountScreen() {
             <TText style={styles.optionsTitle}>{t('tabs.account.help_title')}</TText>
 
             <SettingsOption icon='headset' label={t('tabs.account.support_button')}
-              onPress={handleWebView('SUPPORT_FORM_URL', t('tabs.account.support_button'))}
+              onPress={handleWebView(SUPPORT_FORM_URL, t('tabs.account.support_button'),t('tabs.account.help_title') )}
             />
 
             <SettingsOption icon='file-find' label={t('tabs.account.about_button')}
@@ -156,7 +156,7 @@ export default function AccountScreen() {
             />
 
             <SettingsOption icon='check-circle' label={t('tabs.account.feedback_button')}
-              onPress={handleWebView('FEEDBACK_FORM_URL', t('tabs.account.feedback_button'))}
+              onPress={handleWebView(FEEDBACK_FORM_URL, t('tabs.account.feedback_button'), t('tabs.account.help_title'))}
             />
           </>}
 

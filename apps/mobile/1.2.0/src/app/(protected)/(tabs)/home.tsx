@@ -65,7 +65,7 @@ export default function HomeScreen() {
               style={[styles.qrButton, styles.shadow, { backgroundColor: primaryColor }]}
               onPress={() => router.push('/scan')}
             >
-              <TIcon name='qrcode-scan' size={25} color={textColor + '90'} />
+              <TIcon name='qrcode-scan' size={20} color={textColor + '90'} />
             </TouchableOpacity>
           </View>
 
@@ -76,7 +76,7 @@ export default function HomeScreen() {
             >
               <View style={{ padding: 10 }}>
                 <TText style={{ opacity: .5, fontSize: 10 }}>{t('tabs.home.menu_itinerary_desc')}</TText>
-                <TText style={{ opacity: .85, fontSize: 14 }}>{t('tabs.home.menu_itinerary')}</TText>
+                <TText style={{ opacity: .8, fontSize: 13, fontFamily: 'PoppinsBold' }}>{t('tabs.home.menu_itinerary')}</TText>
               </View>
               <Image source={require('../../../../assets/images/itinerary-icon.png')} style={styles.leftGridImage} />
             </TouchableOpacity>
@@ -87,7 +87,7 @@ export default function HomeScreen() {
                 style={[styles.rightGridContainer, styles.shadow, { backgroundColor: primaryColor }]}
               >
                 <TText style={{ opacity: .5, fontSize: 10 }}>{t('tabs.home.menu_sos_desc')}</TText>
-                <TText style={{ opacity: .85 }}>{t('tabs.home.menu_sos')}</TText>
+                <TText style={{ opacity: .8, fontSize: 12, fontFamily: 'PoppinsBold' }}>{t('tabs.home.menu_sos')}</TText>
                 <Image source={require('../../../../assets/images/sos-icon.png')} style={styles.rightGridImage} />
               </TouchableOpacity>
               <TouchableOpacity
@@ -95,7 +95,7 @@ export default function HomeScreen() {
                 style={[styles.rightGridContainer, styles.shadow, { backgroundColor: primaryColor }]}
               >
                 <TText style={{ opacity: .5, fontSize: 10 }}>{t('tabs.home.menu_tara_desc')}</TText>
-                <TText style={{ opacity: .85 }}>{t('tabs.home.menu_tara')}</TText>
+                <TText style={{ opacity: .8, fontSize: 12, fontFamily: 'PoppinsBold' }}>{t('tabs.home.menu_tara')}</TText>
                 <Image source={require('../../../../assets/images/icon.png')} style={styles.rightGridImage} />
               </TouchableOpacity>
             </View>
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     zIndex: 5,
-    paddingTop: 180,
+    paddingTop: 175,
   },
   menuContainer: {
     position: 'relative',

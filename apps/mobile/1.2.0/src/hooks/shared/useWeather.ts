@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { BACKEND_URL } from '../../config';
+import { BACKEND_URL } from '@/constants/Config';
 
 const API_URL = `${BACKEND_URL}/v2/weather`;
 

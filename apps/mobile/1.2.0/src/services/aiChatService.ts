@@ -1,5 +1,5 @@
 import { api } from '@/api/client';
-import { BACKEND_URL } from '@/config';
+import { BACKEND_URL } from '@/constants/Config';
 import { getAccessToken } from '@/services/token.service';
 
 const AI_API_URL = '/v2/ai';

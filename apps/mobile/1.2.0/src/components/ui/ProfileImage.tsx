@@ -1,5 +1,5 @@
 import {Image} from 'expo-image';
-import {BACKEND_URL} from '@/config';
+import {BACKEND_URL} from '@/constants/Config';
 
 interface ProfileImageProps {
   imagePath?: string;

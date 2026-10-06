@@ -49,7 +49,6 @@ const MonthlyCalendar: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState(() => toLocalDateKey(today));
 
   const { t, currentLanguage } = useLanguage();
-  const backgroundColor = useThemeColor({}, 'background');
   const secondaryColor = useThemeColor({}, 'secondary');
 
   const monthQuery = useGetUserItineraries('active', { currentMonth: true });
@@ -74,7 +73,6 @@ const MonthlyCalendar: React.FC = () => {
     const firstDayOfMonth = new Date(year, month, 1);
     const startWeekday = firstDayOfMonth.getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-
     const cells: DayCell[] = [];
 
     for (let i = 0; i < startWeekday; i++) {
@@ -144,31 +142,32 @@ const MonthlyCalendar: React.FC = () => {
       style={styles.dailyItineraryItem}
       onPress={() => router.push(`/itinerary/${item.id}`)}
     >
-      <TText>{item.title}</TText>
+      <TText style={{fontWeight: 500}}>{item.title}</TText>
       <TText style={styles.dailyItineraryDetails}>
         {formatDateToString(new Date(item.startDate), currentLanguage.code)} - {formatDateToString(new Date(item.endDate), currentLanguage.code)}
       </TText>
       <TText style={styles.dailyItineraryDetails}>{t(`itinerary.type.${item.type}`)}</TText>
+      <TIcon name='chevron-right' size={20} color={"#FF6B6B"} style={styles.dailyItineraryArrow}/>
     </TouchableOpacity>
   );
 
   return (
     <TView style={styles.container} color='primary' shadow>
       <View style={[styles.header, { backgroundColor: `${secondaryColor}20` }]}>
-        <View style={{ marginLeft: 3, marginVertical: 3 }}>
-          <TText>{monthLabel}</TText>
+        <View style={{ marginLeft: 3, marginVertical: 7 }}>
+          <TText style={{ fontWeight: 600 }}>{monthLabel}</TText>
           <TText style={{ fontSize: 10, opacity: 0.5 }}>{selectedDateLabel ? selectedDateLabel : todayLabel}</TText>
         </View>
 
-        <TouchableOpacity onPress={() => router.push('/itinerary/create')} style={[styles.newItineraryButton, { backgroundColor }]}>
+        <TouchableOpacity onPress={() => router.push('/itinerary/create')} style={styles.newItineraryButton}>
           <TIcon name='plus' size={20} />
         </TouchableOpacity>
       </View>
 
       <View style={styles.weekdayRow}>
         {WEEKDAY_LABELS.map((label) => (
-          <View key={label} style={[styles.weekdayCell, { backgroundColor }]}>
-            <TText style={{ fontSize: 10 }}>{label}</TText>
+          <View key={label} style={styles.weekdayCell}>
+            <TText style={{ fontSize: 10, fontWeight: 500, opacity: .8 }}>{label}</TText>
           </View>
         ))}
       </View>
@@ -185,15 +184,13 @@ const MonthlyCalendar: React.FC = () => {
       <View style={styles.dailyItineraryContainer}>
         {monthQuery.isLoading ? (
           <CalendarCardSkeleton/>
-        ) : activeDayItineraries.length > 0 ? (
+        ) : activeDayItineraries.length > 0 && (
           <FlatList
             data={activeDayItineraries}
             renderItem={renderDailyItinerary}
             keyExtractor={(item) => item.id}
             scrollEnabled={false}
           />
-        ) : (
-          <TText style={styles.emptyStateText}>{t('tabs.home.calendar_no_itineraries')}</TText>
         )}
       </View>
     </TView>
@@ -230,6 +227,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 5,
     borderRadius: 5,
+    borderBottomWidth: 1,
+    borderColor: "#ccc4"
   },
   cell: {
     flex: 7,
@@ -280,14 +279,11 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   dailyItineraryItem: {
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#ccc4',
-    borderLeftWidth: 3,
-    borderLeftColor: '#FF6B6B',
+    borderTopWidth: 1,
+    borderColor: '#ccc3',
     padding: 10,
+    paddingVertical: 12,
     gap: 2,
-    marginBottom: 8,
     overflow: 'hidden',
   },
   dailyItineraryDetails: {
@@ -310,6 +306,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     opacity: 0.7,
     gap: 5
+  },
+  dailyItineraryArrow:{
+    position: 'absolute',
+    right: 3,
+    top: 25
   }
 });
 

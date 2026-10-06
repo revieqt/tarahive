@@ -49,17 +49,13 @@ export default function HomeHeaderCard() {
   return (
     <LinearGradient colors={[accentColor, secondaryColor]} style={styles.locationContent}>
       <HiveBg/>
-      <View style={{ gap: 5 }}>
+      <View style={{ gap: 4, paddingTop: 17 }}>
         {showLoading ? <>
-          <Skeleton style={styles.descLoading} />
           <Skeleton style={styles.locationLoading} />
           <Skeleton style={styles.weatherTypeLoading} />
         </> :
           <>
-            <TText style={{ opacity: 0.5, fontSize: 12,color: '#fff'}}>
-              { t('tabs.home.header_title') }
-            </TText>
-            <TText type='subtitle' style={{ color: '#fff', fontSize: 17 }}>
+            <TText type='title' style={{ color: '#fff', fontSize: 17, lineHeight: 20, letterSpacing: 1 }}>
               {displayCity}
             </TText>
 
@@ -102,11 +98,11 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderWidth: 1,
     borderColor: 'transparent',
-    height: 310,
+    height: 270,
   },
   weatherImage: {
     position: 'absolute',
-    top: '-13%',
+    top: '-15%',
     right: '-15%',
     width: '40%',
     height: '75%',

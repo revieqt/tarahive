@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { sendEmailVerificationCode, verifyEmail } from '@/services/authService';
-import { showError, showInfo, showSuccess } from '@/services/toast.service';
+import { showError, showInfo } from '@/services/toast.service';
 import { useDeviceInfo } from '@/hooks/shared/useDeviceInfo';
 import { useSession } from '@/context/SessionContext';
 import { saveAccessToken, saveRefreshToken } from '@/services/token.service';
@@ -50,7 +50,6 @@ export const useEmailVerification = () => {
         ]);
         await updateSession({ user: data.user });
 
-        showSuccess('Success', data.message);
         router.replace('/(protected)');
       } catch (error: any) {
         showError(
