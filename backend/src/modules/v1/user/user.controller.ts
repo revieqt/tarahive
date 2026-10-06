@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { getUserById, getUserByIdOrUsername, updateProfile, updateVisibilitySettings } from "./user.service";
-import { detectLanguage } from "../localization/localization.service";
+import { detectLanguage } from "../../v2/localization/localization.service";
 import { AuthRequest } from "../auth/auth.types";
 
 /**

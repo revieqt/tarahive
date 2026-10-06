@@ -50,7 +50,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "build": "tsc",
+    "build": "tsc && node scripts/copyLocales.js",
     "init-subscriptions": "ts-node src/scripts/initializeSubscriptions.ts",
     "db:migrate": "ts-node scripts/migrate.ts",
     "db:clear": "ts-node scripts/clearDb.ts"

@@ -2,7 +2,7 @@ import * as nodemailer from 'nodemailer';
 import { Queue, QueueEvents, JobsOptions } from 'bullmq';
 import redis from '../../config/redis';
 import { EmailPayload } from './delivery.types';
-import { t } from '../../modules/v1/localization/localization.service';
+import { t } from '../../modules/v2/localization/localization.service';
 
 export const createDeliveryQueue = <T>(
   queueName: string,

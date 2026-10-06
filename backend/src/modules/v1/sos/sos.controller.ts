@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { disableSOS, enableSOS, updateSafetySettings } from './sos.service';
 import { LogAction } from '../../v1/audit/audit.service';
 import { AuthRequest } from '../../v1/auth/auth.types';
-import { t, detectLanguage } from '../localization/localization.service';
+import { t, detectLanguage } from '../../v2/localization/localization.service';
 
 export const enableSOSController = async (req: AuthRequest, res: Response) => {
   const lang = detectLanguage(req.headers['accept-language']);

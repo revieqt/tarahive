@@ -1,0 +1,163 @@
+{
+  "backend": {
+    "delivery": {
+      "email_header_subtitle": "Mobile Travel Companion",
+      "no_reply_notice": "Automated message from Tarahive. Please do not reply."
+    },
+    "emergency_alert": {
+      "sos_alert": "SOS Alert",
+      "sos_note": "is in an emergency. Please respond immediately if you can help!",
+      "details_title": "Emergency Details",
+      "details_type": "Emergency Type",
+      "details_loc": "Last known location",
+      "details_maps": "View Location on Google Maps",
+      "contact_title": "User Contacts",
+      "contact_email": "Email",
+      "contact_num": "Contact",
+      "contact_no_num": "Not Provided",
+      "activated_success": "SOS activated. Contacts are being notified",
+      "activated_failed": "Failed to activate SOS",
+      "deactivated_success": "SOS deactivated successfully",
+      "deactivated_failed": "Failed to deactivate SOS",
+      "update_success": "Settings updated successfully",
+      "update_failed": "Failed to update settings"
+    }
+  },
+  "auth": {
+    "onboarding": {
+      "slide1_title": "Welcome",
+      "slide1_subtitle": "to Tarahive",
+      "slide1_description": "Your ultimate travel companion app, designed to make every journey smarter, safer, and more enjoyable.",
+      "slide2_title": "Plan",
+      "slide2_subtitle": "your next adventure.",
+      "slide2_description": "Get personalized travel recommendations based on your preferences, weather conditions, and local insights.",
+      "slide3_title": "Safety",
+      "slide3_subtitle": "is our priority.",
+      "slide3_description": "Stay informed with weather updates, route safety assessments, and quick access to emergency contacts.",
+      "slide4_title": "Connect",
+      "slide4_subtitle": "with the community.",
+      "slide4_description": "Join tours, share tips, ask questions, and connect with fellow adventurers for a more social and enriching travel experience."
+    },
+    "login": {
+      "title": "Smart Plans",
+      "subtitle": "Safer Journeys. Join Tarahive!",
+      "email": "Email",
+      "password": "Password",
+      "login_button": "Login",
+      "forgot_password_prompt": "Forgot password?",
+      "google_prompt": "Continue with Google",
+      "register_prompt": "Don't have an account? Register here."
+    },
+    "register": {
+      "title": "Join our Community",
+      "subtitle": "Discover the world with Tarahive",
+      "fname": "First Name",
+      "lname": "Last Name (Optional)",
+      "bdate": "Birth Date",
+      "gender": "Gender",
+      "email": "Email",
+      "password": "Password",
+      "confirm_password": "Confirm Password",
+      "terms_prompt": "By registering, you agree to our Terms & Conditions and Privacy Policy.",
+      "register_button": "Register",
+      "required_error": "Required fields must not be empty.",
+      "age_error": "You must be at least 13 years old to register.",
+      "password_mismatch": "Passwords do not match.",
+      "invalid_email": "Invalid email format.",
+      "password_too_short": "Password must be at least 6 characters long.",
+      "registration_failed": "Registration failed.",
+      "password_invalid": "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.",
+      "email_already_registered": "Email already registered",
+      "registration_initiated": "Registration initiated. Verification code sent to your email."
+    },
+    "verify_email": {
+      "title": "Verify Your Email",
+      "subtitle": "We've sent a verification link to:",
+      "resend_prompt": "Didn't receive the email? Resend it here.",
+      "success": "Email verified successfully. Registration complete!",
+      "invalid_code": "Invalid or expired verification code",
+      "no_pending_registration": "No pending registration found. Please register again.",
+      "required_fields": "Email and code are required",
+      "code_sent": "Verification code sent to your email"
+    },
+    "forgot_password": {
+      "title": "Reset Your Password",
+      "subtitle": "Enter your email to receive reset instructions.",
+      "email": "Email",
+      "code_sent_prompt": "A reset code has been sent to your email.",
+      "new_password": "New Password",
+      "confirm_password": "Confirm New Password",
+      "reset_button": "Reset Password"
+    },
+    "change_password": {
+      "title": "Change Your Password",
+      "subtitle": "Ensure your account stays secure by updating your password regularly.",
+      "current_password": "Current Password",
+      "new_password": "New Password",
+      "confirm_password": "Confirm New Password",
+      "validation1": "must be at least 8 characters long.",
+      "validation2": "must include at least one uppercase letter.",
+      "validation3": "must include at least one lowercase letter.",
+      "validation4": "must include at least one number.",
+      "validation5": "must include at least one special character.",
+      "validation6": "passwords must match.",
+      "change_button": "Change Password"
+    },
+    "login_auth": {
+      "success": "Login successful",
+      "invalid_credentials": "Invalid email or password",
+      "user_not_found": "User account not found",
+      "user_inactive": "Your account is inactive. Please contact support.",
+      "account_suspended": "Your account has been suspended. Please contact support.",
+      "required_fields": "Email and password are required"
+    }
+  },
+  "sos": {
+    "main": {
+      "off_title": "All Clear!",
+      "off_subtitle": "SOS: OFF",
+      "off_note": "Long-press to Activate SOS",
+      "off_hold": "Hold for Activation",
+      "on_title": "SOS in Progress",
+      "on_subtitle": "SOS: ON",
+      "on_note": "Long-press to End SOS",
+      "on_hold": "Hold for Deactivation",
+      "info": "is in a",
+      "email": "Emergency Email",
+      "number": "Emergency Contact",
+      "lang": "Alert Language"
+    },
+    "form": {
+      "title": "Enable SOS",
+      "subtitle": "Configure your emergency alert",
+      "message_placeholder": "Describe your emergency situation... (Optional)",
+      "activate_button": "Activate SOS",
+      "settings_link": "Configure where to send your emergency alerts"
+    },
+    "emergency_types": {
+      "medical": "Medical Emergency",
+      "criminal": "Criminal Activity",
+      "fire": "Fire Emergency",
+      "natural": "Natural Disaster",
+      "utility": "Utility Emergency",
+      "road": "Road Emergency",
+      "domestic": "Domestic and Personal Safety",
+      "animal": "Animal-Related Emergency",
+      "other": "Other"
+    },
+    "settings": {
+      "title": "SOS Settings",
+      "subtitle": "Configure your emergency alert preferences",
+      "email_label_enabled": "Email Alert Enabled",
+      "email_label_disabled": "Email Alert Disabled",
+      "email_description": "Send Emergency Alert via Email",
+      "email_placeholder": "Emergency Contact Email",
+      "sms_label_enabled": "SMS Alert Enabled",
+      "sms_label_disabled": "SMS Alert Disabled",
+      "sms_description": "Send Emergency Alert via SMS (Pro Users Only)",
+      "sms_placeholder": "Emergency Contact Phone",
+      "language": "Preferred Alert Language",
+      "save_button": "Save Changes"
+    }
+  }
+}

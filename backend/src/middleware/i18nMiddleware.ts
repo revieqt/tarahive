@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { detectLanguage, t as translate } from '../modules/v1/localization/localization.service';
+import { detectLanguage, t as translate } from '../modules/v2/localization/localization.service';
 
 declare global {
   namespace Express {

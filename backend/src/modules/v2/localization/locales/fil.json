@@ -1,0 +1,196 @@
+{
+  "language": {
+    "code": "fil",
+    "name": "Filipino",
+    "nativeName": "Filipino",
+    "flag": "🇵🇭",
+    "isRTL": false
+  },
+  "data": {
+    "auth": {
+      "onboarding": {
+        "slide1_title": "Maligayang Pagdating",
+        "slide1_subtitle": "sa Tarahive",
+        "slide1_description": "Ang iyong pinakamahusay na travel companion app na idinisenyo upang gawing mas matalino, mas ligtas, at mas masaya ang bawat paglalakbay.",
+        "slide2_title": "Planuhin",
+        "slide2_subtitle": "ang iyong susunod na pakikipagsapalaran.",
+        "slide2_description": "Makakuha ng mga personalized na rekomendasyon sa paglalakbay batay sa iyong mga kagustuhan, kondisyon ng panahon, at lokal na kaalaman.",
+        "slide3_title": "Kaligtasan",
+        "slide3_subtitle": "ang aming prayoridad.",
+        "slide3_description": "Manatiling may alam sa mga update sa panahon, pagsusuri sa kaligtasan ng ruta, at mabilis na access sa mga emergency contact.",
+        "slide4_title": "Makipag-ugnayan",
+        "slide4_subtitle": "sa komunidad.",
+        "slide4_description": "Sumali sa mga tour, magbahagi ng mga tip, magtanong, at makipag-ugnayan sa kapwa manlalakbay para sa mas sosyal at makabuluhang karanasan sa paglalakbay."
+      },
+      "login": {
+        "title": "Matalinong Plano",
+        "subtitle": "Mas Ligtas na Paglalakbay. Sumali sa Tarahive!",
+        "email": "Email",
+        "password": "Password",
+        "login_button": "Mag-login",
+        "forgot_password_prompt": "Nakalimutan ang password?",
+        "google_prompt": "Magpatuloy gamit ang Google",
+        "register_prompt": "Wala ka pang account? Mag-register dito."
+      },
+      "register": {
+        "title": "Sumali sa aming Komunidad",
+        "subtitle": "Tuklasin ang mundo kasama ang Tarahive",
+        "fname": "Pangalan",
+        "lname": "Apelyido (Opsyonal)",
+        "bdate": "Petsa ng Kapanganakan",
+        "gender": "Kasarian",
+        "email": "Email",
+        "password": "Password",
+        "confirm_password": "Kumpirmahin ang Password",
+        "terms_prompt": "Sa pagrehistro, sumasang-ayon ka sa aming Mga Tuntunin at Kundisyon at Patakaran sa Privacy.",
+        "register_button": "Mag-register",
+        "required_error": "Hindi dapat walang laman ang mga kinakailangang field.",
+        "age_error": "Kailangan mong maging hindi bababa sa 13 taong gulang upang makapagrehistro.",
+        "password_mismatch": "Hindi magkatugma ang mga password.",
+        "invalid_email": "Hindi wastong format ng email.",
+        "password_too_short": "Ang password ay dapat may hindi bababa sa 6 na karakter.",
+        "registration_failed": "Hindi nagtagumpay ang pagrerehistro."
+      },
+      "verify_email": {
+        "title": "I-verify ang Iyong Email",
+        "subtitle": "Nagpadala kami ng verification link sa:",
+        "resend_prompt": "Hindi natanggap ang email? Ipadala muli dito."
+      },
+      "forgot_password": {
+        "title": "I-reset ang Iyong Password",
+        "subtitle": "Ilagay ang iyong email upang makatanggap ng mga tagubilin sa pag-reset.",
+        "email": "Email",
+        "code_sent_prompt": "Isang reset code ang ipinadala sa iyong email.",
+        "new_password": "Bagong Password",
+        "confirm_password": "Kumpirmahin ang Bagong Password",
+        "reset_button": "I-reset ang Password"
+      },
+      "change_password": {
+        "title": "Palitan ang Iyong Password",
+        "subtitle": "Panatilihing ligtas ang iyong account sa pamamagitan ng regular na pag-update ng iyong password.",
+        "current_password": "Kasalukuyang Password",
+        "new_password": "Bagong Password",
+        "confirm_password": "Kumpirmahin ang Bagong Password",
+        "validation1": "dapat may hindi bababa sa 8 karakter.",
+        "validation2": "dapat may hindi bababa sa isang malaking titik.",
+        "validation3": "dapat may hindi bababa sa isang maliit na titik.",
+        "validation4": "dapat may hindi bababa sa isang numero.",
+        "validation5": "dapat may hindi bababa sa isang espesyal na karakter.",
+        "validation6": "dapat magkatugma ang mga password.",
+        "change_button": "Palitan ang Password"
+      }
+    },
+    "common": {
+      "welcome": "Maligayang pagdating sa Tarahive",
+      "continue": "Magpatuloy",
+      "months": {
+        "january": "Enero",
+        "february": "Pebrero",
+        "march": "Marso",
+        "april": "Abril",
+        "may": "Mayo",
+        "june": "Hunyo",
+        "july": "Hulyo",
+        "august": "Agosto",
+        "september": "Setyembre",
+        "october": "Oktubre",
+        "november": "Nobyembre",
+        "december": "Disyembre"
+      },
+      "genders": {
+        "male": "Lalaki",
+        "female": "Babae",
+        "non_binary": "Hindi binaryo",
+        "prefer_not_to_say": "Mas gustong hindi sabihin",
+        "other": "Iba pa"
+      },
+      "no_internet": {
+        "title": "Walang Koneksyon sa Internet",
+        "description": "Ginagamit mo ang Tarahive sa offline mode. Maaaring limitado ang ilang mga feature hanggang sa muli kang makakonekta sa internet."
+      }
+    },
+    "settings": {
+      "theme": {
+        "title": "Tema ng App",
+        "subtitle": "Gamitin ang temang gusto mo. Maaari mo itong baguhin anumang oras.",
+        "switch_prompt": "Lumilipat sa",
+        "device": "Default ng Device",
+        "light": "Maliwanag",
+        "dark": "Madilim"
+      },
+      "language": {
+        "title": "Wika ng App",
+        "subtitle": "Piliin ang wikang nais mong gamitin sa app."
+      },
+      "visibility": {
+        "title": "Visibility ng Profile",
+        "subtitle": "Kontrolin kung sino ang makakakita sa iyong profile at aktibidad."
+      },
+      "logs": {
+        "title": "Humiling ng Security Logs",
+        "subtitle": "Pumili ng saklaw ng petsa upang hilingin ang iyong security logs.",
+        "start_date": "Petsa ng Pagsisimula",
+        "end_date": "Petsa ng Pagtatapos"
+      }
+    },
+    "tabs": {
+      "tabs": {
+        "home_button": "Home",
+        "maps_button": "Mapa",
+        "explore_button": "Explore",
+        "account_button": "Account"
+      },
+      "account": {
+        "personalization_title": "Pag-personalize",
+        "edit_profile_button": "I-edit ang Profile",
+        "theme_button": "Tema ng App",
+        "language_button": "Wika ng App",
+        "privacy_title": "Privacy",
+        "change_password_button": "Palitan ang Password",
+        "visibility_button": "Mga Setting ng Visibility",
+        "logs_button": "Mga Activity Log",
+        "privacy_button": "Patakaran sa Privacy",
+        "terms_button": "Mga Tuntunin at Kundisyon",
+        "help_title": "Tulong at Suporta",
+        "manual_button": "User Manual",
+        "support_button": "Makipag-ugnayan sa Suporta",
+        "about_button": "Tungkol sa App",
+        "developer_title": "Mga Opsyon para sa Developer",
+        "cache_button": "I-clear ang Cache",
+        "logout_button": "Mag-logout"
+      }
+    },
+    "weather": {
+      "conditions": {
+        "clear_sky": "Maaliwalas na kalangitan",
+        "mainly_clear": "Kadalasang maaliwalas",
+        "partly_cloudy": "Bahagyang maulap",
+        "cloudy": "Maulap",
+        "fog": "Hamog",
+        "depositing_rime_fog": "Hamog na may nagyeyelong yelo",
+        "light_drizzle": "Mahinang ambon",
+        "moderate_drizzle": "Katamtamang ambon",
+        "heavy_drizzle": "Malakas na ambon",
+        "light_freezing_drizzle": "Mahinang nagyeyelong ambon",
+        "heavy_freezing_drizzle": "Malakas na nagyeyelong ambon",
+        "slight_rain": "Mahinang ulan",
+        "moderate_rain": "Katamtamang ulan",
+        "heavy_rain": "Malakas na ulan",
+        "light_freezing_rain": "Mahinang nagyeyelong ulan",
+        "heavy_freezing_rain": "Malakas na nagyeyelong ulan",
+        "slight_snow_fall": "Mahinang pag-ulan ng niyebe",
+        "moderate_snow_fall": "Katamtamang pag-ulan ng niyebe",
+        "heavy_snow_fall": "Malakas na pag-ulan ng niyebe",
+        "snow_grains": "Pinong butil ng niyebe",
+        "slight_rain_showers": "Mahinang pagbugso ng ulan",
+        "moderate_rain_showers": "Katamtamang pagbugso ng ulan",
+        "violent_rain_showers": "Matinding pagbugso ng ulan",
+        "slight_snow_showers": "Mahinang pagbugso ng niyebe",
+        "heavy_snow_showers": "Malakas na pagbugso ng niyebe",
+        "thunderstorm": "Pagkulog at pagkidlat",
+        "thunderstorm_slight_hail": "Pagkulog at pagkidlat na may bahagyang yelong ulan",
+        "thunderstorm_heavy_hail": "Pagkulog at pagkidlat na may malakas na yelong ulan"
+      }
+    }
+  }
+}

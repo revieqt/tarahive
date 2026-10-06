@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { i18nMiddleware } from '../../middleware/i18nMiddleware';
 import authRoutes from './auth/auth.routes';
-import localizationRoutes from './localization/localization.routes';
+import localizationRoutes from '../v2/localization/localization.routes';
 import userRoutes from './user/user.routes';
 import weatherRoutes from './weather/weather.routes';
 import sosRoutes from './sos/sos.routes';
