@@ -20,6 +20,8 @@ interface SOSButtonProps {
   children?: React.ReactNode;
 }
 
+export const SOS_HOLD_DURATION_MS = 2500;
+
 const SOSButton: React.FC<SOSButtonProps> = ({
   onLongPress,
   onPressIn,
@@ -31,8 +33,31 @@ const SOSButton: React.FC<SOSButtonProps> = ({
 }) => {
   const pulse1 = useRef(new Animated.Value(0)).current;
   const pulse2 = useRef(new Animated.Value(0)).current;
+  const holdProgress = useRef(new Animated.Value(0)).current;
 
   const isActive = state === 'active';
+  const targetColor = isActive ? 'white' : 'red';
+
+  const handlePressIn = () => {
+    Animated.timing(holdProgress, {
+      toValue: 1,
+      duration: SOS_HOLD_DURATION_MS,
+      useNativeDriver: true,
+      easing: Easing.linear,
+    }).start();
+    onPressIn?.();
+  };
+
+  const handlePressOut = () => {
+    holdProgress.stopAnimation();
+    Animated.timing(holdProgress, {
+      toValue: 0,
+      duration: 150,
+      useNativeDriver: true,
+      easing: Easing.out(Easing.ease),
+    }).start();
+    onPressOut?.();
+  };
 
   useEffect(() => {
     const createPulse = (animatedValue: Animated.Value, delay: number) => {
@@ -87,11 +112,34 @@ const SOSButton: React.FC<SOSButtonProps> = ({
             { backgroundColor: isActive ? 'red' : 'white' },
           ]}
           onLongPress={onLongPress}
-          onPressIn={onPressIn}
-          onPressOut={onPressOut}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
           disabled={disabled}
         >
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              styles.fill,
+              {
+                backgroundColor: targetColor,
+                transform: [
+                  {
+                    scale: holdProgress.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0, 1.2],
+                    }),
+                  },
+                ],
+              },
+            ]}
+          />
           <TIcon name="exclamation-thick" size={70} color={isActive ? 'white' : '#ccc'}/>
+          <Animated.View
+            pointerEvents="none"
+            style={[styles.iconOverlay, { opacity: holdProgress }]}
+          >
+            <TIcon name="exclamation-thick" size={70} color={targetColor} />
+          </Animated.View>
         </Pressable>
       </View>
     </View>
@@ -132,5 +180,15 @@ const styles = StyleSheet.create({
     elevation: 4,
     borderWidth: 10,
     borderColor: '#ccc4',
+    overflow: 'hidden',
+  },
+  fill: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: BUTTON_SIZE / 2,
+  },
+  iconOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

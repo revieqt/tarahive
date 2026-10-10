@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { TText, TView } from '@/components/ui/Themed';
-import SOSButton from "@/components/common/SOSButton";
+import SOSButton, { SOS_HOLD_DURATION_MS } from "@/components/common/SOSButton";
 import { LinearGradient } from "expo-linear-gradient";
 import { useThemeColor } from "@/hooks/shared/useThemeColor";
 import { useSession } from "@/context/SessionContext";
@@ -35,7 +35,7 @@ export default function SOSSection() {
         router.push('/sos/form');
       }
       setIsLongPressing(false);
-    }, 2000);
+    }, SOS_HOLD_DURATION_MS);
   };
 
   const handleLongPressEnd = () => {

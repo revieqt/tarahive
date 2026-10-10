@@ -105,11 +105,8 @@ export default function HomeScreen() {
         <TView style={styles.content}>
           <MonthlyCalendar/>
 
-
         </TView>
-        
       </ScrollView>
-
       <SidebarAlerts />
     </TView>
   );
