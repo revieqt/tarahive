@@ -15,7 +15,10 @@ export const useSafety = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleEnableSOS = async (request: EnableSOSRequest) => {
+  const handleEnableSOS = async (
+    request: EnableSOSRequest,
+    options: { navigateBack?: boolean } = {},
+  ) => {
     setIsLoading(true);
     setError(null);
 
@@ -43,7 +46,9 @@ export const useSafety = () => {
       }
 
       showSuccess('SOS Activated', response.message || 'Emergency alert has been sent');
-      router.back();
+      if (options.navigateBack !== false) {
+        router.back();
+      }
 
       return response;
     } catch (err) {

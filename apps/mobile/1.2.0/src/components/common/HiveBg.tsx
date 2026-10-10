@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, ViewStyle } from 'react-native';
 import Svg, { G, Path } from 'react-native-svg';
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -95,6 +95,8 @@ interface HiveBgProps {
   blur?: boolean;
   blurAmount?: number;
   fade?: boolean;
+  color?: string;
+  style?: ViewStyle;
 }
 
 const HiveBg: React.FC<HiveBgProps> = ({
@@ -103,6 +105,8 @@ const HiveBg: React.FC<HiveBgProps> = ({
   blur = true,
   blurAmount = 2,
   fade = true,
+  color,
+  style
 }) => {
   const HEX_COLOR = useThemeColor({}, 'accent');
   const primaryColor = useThemeColor({}, 'primary');
@@ -118,6 +122,7 @@ const HiveBg: React.FC<HiveBgProps> = ({
           ],
         },
         blur && { filter: `blur(${blurAmount}px)` } as any,
+        style && style
       ]}
       pointerEvents="none"
     >
@@ -134,7 +139,7 @@ const HiveBg: React.FC<HiveBgProps> = ({
               <Path
                 key={`${col}-${row}`}
                 d={flatHexPath(cx, cy, R)}
-                fill={HEX_COLOR}
+                fill={color ? color : HEX_COLOR}
                 fillOpacity={hexOpacity(col, row)}
               />
             );

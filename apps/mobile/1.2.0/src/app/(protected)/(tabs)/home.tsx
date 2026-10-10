@@ -75,7 +75,7 @@ export default function HomeScreen() {
               style={[styles.gridChildContainer, styles.leftGridContainer, styles.shadow, { backgroundColor: primaryColor }]}
             >
               <View style={{ padding: 10 }}>
-                <TText style={{ opacity: .8, fontSize: 13, fontFamily: 'PoppinsBold', color: accentColor }}>{t('tabs.home.menu_itinerary')}</TText>
+                <TText style={{ opacity: .8, fontSize: 12, fontFamily: 'PoppinsBold', color: accentColor }}>{t('tabs.home.menu_itinerary')}</TText>
                 <TText style={{ opacity: .5, fontSize: 10 }}>{t('tabs.home.menu_itinerary_desc')}</TText>
               </View>
               <Image source={require('../../../../assets/images/itinerary-icon.png')} style={styles.leftGridImage} />
@@ -86,7 +86,7 @@ export default function HomeScreen() {
                 onPress={() => router.push('/sos')}
                 style={[styles.rightGridContainer, styles.shadow, { backgroundColor: primaryColor }]}
               >
-                <TText style={{ opacity: .8, fontSize: 12, fontFamily: 'PoppinsBold', color: accentColor }}>{t('tabs.home.menu_sos')}</TText>
+                <TText style={{ opacity: .8, fontSize: 11, fontFamily: 'PoppinsBold', color: accentColor }}>{t('tabs.home.menu_sos')}</TText>
                 <TText style={{ opacity: .5, fontSize: 10 }}>{t('tabs.home.menu_sos_desc')}</TText>
                 <Image source={require('../../../../assets/images/sos-icon.png')} style={styles.rightGridImage} />
               </TouchableOpacity>
@@ -94,7 +94,7 @@ export default function HomeScreen() {
                 onPress={() => router.push('/tara')}
                 style={[styles.rightGridContainer, styles.shadow, { backgroundColor: primaryColor }]}
               >
-                <TText style={{ opacity: .8, fontSize: 12, fontFamily: 'PoppinsBold', color: accentColor }}>{t('tabs.home.menu_tara')}</TText>
+                <TText style={{ opacity: .8, fontSize: 11, fontFamily: 'PoppinsBold', color: accentColor }}>{t('tabs.home.menu_tara')}</TText>
                 <TText style={{ opacity: .5, fontSize: 10 }}>{t('tabs.home.menu_tara_desc')}</TText>
                 <Image source={require('../../../../assets/images/icon.png')} style={styles.rightGridImage} />
               </TouchableOpacity>

@@ -7,13 +7,16 @@ import {
   Easing,
   StyleProp,
   ViewStyle,
+  GestureResponderEvent,
+  PanResponder,
 } from 'react-native';
 import {TIcon} from '../ui/Themed';
 
 interface SOSButtonProps {
   onLongPress?: () => void;
   onPressIn?: () => void;
-  onPressOut?: () => void;
+  onPressMove?: (event: GestureResponderEvent) => void;
+  onPressOut?: (event: GestureResponderEvent) => void;
   style?: StyleProp<ViewStyle>;
   state?: 'active' | 'notActive';
   disabled?: boolean;
@@ -25,6 +28,7 @@ export const SOS_HOLD_DURATION_MS = 2500;
 const SOSButton: React.FC<SOSButtonProps> = ({
   onLongPress,
   onPressIn,
+  onPressMove,
   onPressOut,
   style,
   state = 'notActive',
@@ -34,6 +38,14 @@ const SOSButton: React.FC<SOSButtonProps> = ({
   const pulse1 = useRef(new Animated.Value(0)).current;
   const pulse2 = useRef(new Animated.Value(0)).current;
   const holdProgress = useRef(new Animated.Value(0)).current;
+  const callbacks = useRef({
+    onPressIn,
+    onPressMove,
+    onPressOut,
+  });
+  const disabledRef = useRef(disabled);
+  callbacks.current = { onPressIn, onPressMove, onPressOut };
+  disabledRef.current = disabled;
 
   const isActive = state === 'active';
   const targetColor = isActive ? 'white' : 'red';
@@ -45,10 +57,10 @@ const SOSButton: React.FC<SOSButtonProps> = ({
       useNativeDriver: true,
       easing: Easing.linear,
     }).start();
-    onPressIn?.();
+    callbacks.current.onPressIn?.();
   };
 
-  const handlePressOut = () => {
+  const handlePressOut = (event: GestureResponderEvent) => {
     holdProgress.stopAnimation();
     Animated.timing(holdProgress, {
       toValue: 0,
@@ -56,8 +68,19 @@ const SOSButton: React.FC<SOSButtonProps> = ({
       useNativeDriver: true,
       easing: Easing.out(Easing.ease),
     }).start();
-    onPressOut?.();
+    callbacks.current.onPressOut?.(event);
   };
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponderCapture: () => !disabledRef.current,
+      onStartShouldSetPanResponder: () => !disabledRef.current,
+      onMoveShouldSetPanResponder: () => !disabledRef.current,
+      onPanResponderGrant: handlePressIn,
+      onPanResponderMove: (event) => callbacks.current.onPressMove?.(event),
+      onPanResponderRelease: handlePressOut,
+      onPanResponderTerminate: handlePressOut,
+    }),
+  ).current;
 
   useEffect(() => {
     const createPulse = (animatedValue: Animated.Value, delay: number) => {
@@ -103,17 +126,16 @@ const SOSButton: React.FC<SOSButtonProps> = ({
 
   return (
     <View style={[styles.container, style]}>
-      <View style={styles.wrapper}>
+      <View style={styles.wrapper} {...panResponder.panHandlers}>
         <Animated.View style={getAnimatedStyle(pulse1)} />
         <Animated.View style={getAnimatedStyle(pulse2)} />
         <Pressable
+          pointerEvents="none"
           style={[
             styles.button,
             { backgroundColor: isActive ? 'red' : 'white' },
           ]}
           onLongPress={onLongPress}
-          onPressIn={handlePressIn}
-          onPressOut={handlePressOut}
           disabled={disabled}
         >
           <Animated.View
