@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { View,  StyleSheet, Animated, Easing } from "react-native";
+import { View,  StyleSheet, Animated, Easing, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
 import { TText } from "../ui/Themed";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -45,18 +45,24 @@ const getBadgeColor = (level: number) => {
 // ----------------------------------------------------
 // BADGE COMPONENT (NO GLOW)
 // ----------------------------------------------------
-export const ExpBadge = ({ expPoints }: { expPoints: number }) => {
+interface ExpBadgeProps {
+  expPoints: number;
+  size?: number;
+  style?: ViewStyle;
+}
+
+export const ExpBadge = ({ expPoints, size = 50, style }: ExpBadgeProps) => {
   const levelInfo = getLevelInfo(expPoints);
   const badgeColor = getBadgeColor(levelInfo.level);
 
   return (
-    <View style={styles.badgeWrapper}>
-      <MaterialCommunityIcons name="shield" size={50} color={badgeColor} />
+    <View style={[styles.badgeWrapper, { width: size * 1.4, height: size * 1.4 }, style]}>
+      <MaterialCommunityIcons name="shield" size={size} color={badgeColor} />
 
       <View style={styles.innerIcon}>
         <MaterialCommunityIcons
           name={levelInfo.icon as any}
-          size={23}
+          size={size * 0.46}
           color="#fff"
         />
       </View>
@@ -115,11 +121,16 @@ export const ExpProgress = ({ expPoints }: { expPoints: number }) => {
 // ----------------------------------------------------
 // LEVEL TITLE TEXT
 // ----------------------------------------------------
-export const ExpLevel = ({ expPoints }: { expPoints: number }) => {
+interface ExpLevelProps {
+  expPoints: number;
+  style?: StyleProp<TextStyle>;
+}
+
+export const ExpLevel = ({ expPoints, style }: ExpLevelProps) => {
   const levelInfo = getLevelInfo(expPoints);
 
   return (
-    <TText style={styles.levelText}>
+    <TText style={[styles.levelText, style]}>
       {levelInfo.title}
     </TText>
   );
@@ -130,8 +141,6 @@ export const ExpLevel = ({ expPoints }: { expPoints: number }) => {
 // ----------------------------------------------------
 const styles = StyleSheet.create({
   badgeWrapper: {
-    width: 70,
-    height: 70,
     justifyContent: "center",
     alignItems: "center",
   },

@@ -18,11 +18,13 @@ import { useLanguage } from "@/context/LanguageContext";
 import HiveBg from "@/components/common/HiveBg";
 import { useLocation } from "@/context/LocationContext";
 import { EMERGENCY_TYPES } from "@/types/sosTypes";
+import { router } from "expo-router";
+import Button from "@/components/ui/Button";
 
 const ACTIVATION_COUNTDOWN_SECONDS = 7;
 const PICKER_RADIUS = 112;
 const PICKER_TARGET_RADIUS = 44;
-const PICKER_BUTTON_SIZE = 62;
+const PICKER_BUTTON_SIZE = 55;
 const CANCEL_ZONE_HEIGHT = 90;
 const PICKER_TYPES = EMERGENCY_TYPES.filter((type) => type.id !== 'other');
 
@@ -70,7 +72,6 @@ export default function SOSSection() {
       };
     });
   };
-  const pickerTargets = getPickerTargets();
 
   const getEmergencyTypeAtPoint = (x: number, y: number) => {
     if (y >= height - CANCEL_ZONE_HEIGHT) {
@@ -158,7 +159,19 @@ export default function SOSSection() {
 
   return (
     <TView style={{ flex: 1 }}>
-      <BackButton type='floating' color='#fff' />
+      <View style={styles.header}>
+        <BackButton color='#fff' style={styles.headerButtons}/>
+
+        <View style={styles.headerTitle}>
+          <TText style={{color: '#fff', fontWeight: 700}}>SOS</TText>
+          <TText style={{color: '#fff4', fontSize: 12}}>dsds</TText>
+        </View>
+
+        <TouchableOpacity style={styles.headerButtons}>
+          <TIcon name='help-circle' size={18} color="#fff"/>
+        </TouchableOpacity>
+      </View>
+      
       <LinearGradient colors={gradientColors} style={styles.background}/>
 
       <View style={styles.container}>
@@ -191,7 +204,7 @@ export default function SOSSection() {
           <TText style={styles.pickerInstruction}>
             {t('sos.main.picker_instruction')}
           </TText>
-          {pickerTargets.map((type) => (
+          {getPickerTargets().map((type) => (
             <View
               key={type.id}
               style={[
@@ -242,38 +255,37 @@ export default function SOSSection() {
         </View>
       )}
 
-      {countdown !== null && (
-        <TouchableOpacity
-          accessibilityRole="button"
-          style={styles.cancelCountdown}
+      {countdown !== null ? (
+        <Button
+          title={t('sos.main.cancel_countdown', { seconds: countdown })}
+          buttonStyle={styles.cancelCountdown}
+          textStyle={{color: 'red'}}
           onPress={cancelActivationCountdown}
-        >
-          <TText style={styles.cancelCountdownText}>
-            {t('sos.main.cancel_countdown', { seconds: countdown })}
-          </TText>
-        </TouchableOpacity>
+        />
+      ) : (
+        <TView style={styles.bottomSheetContainer}>
+          { isSOSActive ? 
+              <SOSInfoCard userData={session?.user}/>
+            : 
+            <View style={styles.offNote}>
+              <TText>{t('sos.main.email')}: {user?.safetyState.emergencyContact?.email}</TText>
+              <TText>{t('sos.main.number')}: {user?.safetyState.emergencyContact?.phone || "N/A"}</TText>
+
+              <View style={styles.messageButtons}>
+                <TouchableOpacity style={[styles.openSettings, { backgroundColor: accentColor }]} onPress={() => router.push('/sos/settings')}>
+                  <TText style={{ color: '#fff' }}>Settings</TText>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.openSettings}>
+                  <TText style={{ opacity: 0.5 }}>How SOS Works</TText>
+                </TouchableOpacity>
+              </View>
+            </View>
+          }
+        </TView>
       )}
 
-      {/* <TView style={styles.messageContainer}>
-        { isSOSActive ? 
-            <SOSInfoCard userData={session?.user}/>
-          : 
-          <View style={styles.offNote}>
-            <TText>{t('sos.main.email')}: {user?.safetyState.emergencyContact?.email}</TText>
-            <TText>{t('sos.main.number')}: {user?.safetyState.emergencyContact?.phone || "N/A"}</TText>
-
-            <View style={styles.messageButtons}>
-              <TouchableOpacity style={[styles.openSettings, { backgroundColor: accentColor }]} onPress={() => router.push('/sos/settings')}>
-                <TText style={{ color: '#fff' }}>Settings</TText>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.openSettings}>
-                <TText style={{ opacity: 0.5 }}>How SOS Works</TText>
-              </TouchableOpacity>
-            </View>
-          </View>
-        }
-      </TView> */}
+      
 
       <HiveBg fade={false} flipHorizontal flipVertical blur/>
       <HiveBg fade={false} blur color={secondaryColor}/>
@@ -291,17 +303,38 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
   },
+  header:{
+    position: 'absolute',
+    top: 0,
+    right: 0, 
+    left: 0,
+    zIndex: 1000,
+    flexDirection: 'row'
+  },
+  headerTitle:{
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  headerButtons:{
+    width: 40,
+    justifyContent: 'center',
+    alignItems: 'center'
+  }, 
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     gap: 40,
   },
-  messageContainer: {
-    marginHorizontal: '3%',
-    borderRadius: 15,
-    marginBottom: '3%',
-    gap: 5,
+  bottomSheetContainer: {
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
+    position: 'absolute',
+    bottom: 0,
+    left: 2,
+    right: 2,
+    zIndex: 10
   },
   openSettings: {
     alignSelf: 'flex-start',
@@ -355,8 +388,6 @@ const styles = StyleSheet.create({
     borderRadius: PICKER_BUTTON_SIZE / 2,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
   },
   otherOption: {
     position: 'absolute',
@@ -411,12 +442,9 @@ const styles = StyleSheet.create({
   cancelCountdown: {
     position: 'absolute',
     zIndex: 1200,
-    bottom: 36,
-    alignSelf: 'center',
-    backgroundColor: '#D53E0F',
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-    borderRadius: 28,
+    bottom: 16,
+    left: '3%',
+    right: '3%',
   },
   cancelCountdownText: {
     color: '#fff',

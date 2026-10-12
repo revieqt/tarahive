@@ -12,9 +12,10 @@ import BackButton from '@/components/common/BackButton';
 import ProfileImage from '@/components/ui/ProfileImage';
 import { ExpBadge, ExpLevel, ExpProgress } from '@/components/common/ExpFeature';
 import { useInternetConnection } from '@/utils/checkInternetConnection';
-import { ProBadge } from '@/components/ui/ProBadge';
+import ProBadge from '@/components/ui/ProBadge';
 import HiveBg from '@/components/common/HiveBg';
 import StickyScrollView from '@/components/ui/StickyScrollView';
+import ShareModal from '@/components/modals/ShareModal';
 // import SOSInfoCard from '@/components/cards/SOSInfoCard';
 
 export default function ProfileScreen() {
@@ -78,61 +79,54 @@ export default function ProfileScreen() {
     <StickyScrollView
       style={{ flex: 1 }}
       contentContainerStyle={{ height: 2000 }}
-      headerAppearOn={120}
+      headerAppearOn={80}
       title={displayUser?.fname ? `${displayUser.fname} ${displayUser.lname}` : 'Profile'}
       subtitle={displayUser?.username ? `@${displayUser.username}` : 'Profile'}
     >
-      <LinearGradient style={styles.headerBackground} colors={[accentColor, secondaryColor]}>
-        <BackButton type='floating' color='white' />
-        <HiveBg fade={false} />
-        <HiveBg fade={false} flipHorizontal />
-
-        <View style={styles.userOptionContainer}>
-          {isCurrentUser &&
-            <TouchableOpacity
-              onPress={() => router.push('/settings/edit-profile')}
-              style={styles.userOptionButton}>
-              <TIcon name='pencil' size={20} color='white' />
-            </TouchableOpacity>
-          }
-
-          <TouchableOpacity
-            onPress={() => router.push({
-              pathname: '/share',
-              params: { path: `user/${displayUser?.username}` },
-            } as any)}
-            style={styles.userOptionButton}>
-            <TIcon name='share' size={20} color='white' />
-          </TouchableOpacity>
-        </View>
-      </LinearGradient>
+      <BackButton type='floating' color='white' />
+      <LinearGradient style={styles.headerBackground} colors={[accentColor, secondaryColor]}/>
 
       <View style={[styles.profileImage, { borderColor: backgroundColor }]}>
-        <ProfileImage imagePath={displayUser?.profileImage} />
+        <View style={{flex: 1, overflow: 'hidden', borderRadius: 100}}>
+          <ProfileImage imagePath={displayUser?.profileImage} />
+        </View>
+        
+        <ExpBadge expPoints={displayUser?.expPoints || 0} size={30} style={styles.profileBadge}/>
       </View>
 
       <View style={styles.nameContainer}>
         <View style={styles.row}>
-          <TText type='title' style={{ fontSize: 15 }}>{displayUser?.fname} {displayUser?.lname}</TText>
+          <TText type='title' style={{ fontSize: 13 }}>{displayUser?.fname} {displayUser?.lname}</TText>
           <ProBadge isProUser size={15} />
         </View>
-
-        <TText style={{ opacity: .5, marginTop: -5, fontSize: 12 }}>@{displayUser?.username}</TText>
+        <TText style={{ opacity: .8, marginTop: -8, fontSize: 11 }}>@{displayUser?.username}</TText>
+        <ExpLevel expPoints={displayUser?.expPoints || 0} style={styles.level}/>
       </View>
 
       <View style={styles.userInfoContainer}>
         { displayUser?.bio && <TText style={{ opacity: .5, marginBottom: 10 }}>{displayUser.bio}</TText> }
         
-        <TView style={styles.badgeContainer} color='primary'>
-          <ExpBadge expPoints={displayUser?.expPoints || 0} />
-          <View style={styles.progressContainer}>
-            <ExpLevel expPoints={displayUser?.expPoints || 0} />
-            <ExpProgress expPoints={displayUser?.expPoints || 0} />
-          </View>
-        </TView>
+        <View style={styles.userOptionContainer}>
+          {isCurrentUser &&
+            <TouchableOpacity
+              onPress={() => router.push('/user/edit')}
+              style={[styles.userOptionButton, {backgroundColor: primaryColor}]}>
+              <TText>Edit Profile</TText>
+            </TouchableOpacity>
+          }
 
-        {/* <SOSInfoCard userData={displayUser ? displayUser : undefined}/> */}
+          <TouchableOpacity
+            style={[styles.userOptionButton, {backgroundColor: primaryColor}]}
+            onPress={() => setShowShare(true)}>
+            <TText>Share Profile</TText>
+          </TouchableOpacity>
+        </View>
       </View>
+      <ShareModal
+        visible={showShare}
+        onClose={() => setShowShare(false)}
+        path={`/user/${displayUser?.username || displayUser?.id || id}`}
+      />
     </StickyScrollView>
   );
 }
@@ -158,17 +152,27 @@ const styles = StyleSheet.create({
     width: 85,
     height: 85,
     borderRadius: 60,
-    overflow: 'hidden',
     marginTop: -20,
     marginLeft: '3%',
-    borderWidth: 5,
+    borderWidth: 3,
+  },
+  profileBadge:{
+    position: 'absolute',
+    right: -10,
+    bottom: 0
+  },
+  level:{
+    fontSize: 11,
+    fontWeight: 500,
+    marginTop: 3,
+    opacity: .5,
   },
   nameContainer: {
     width: '100%',
     paddingRight: '3%',
     marginLeft: '3%',
     paddingLeft: 95,
-    marginTop: -60,
+    marginTop: -62,
   },
   headerBottom: {
     position: 'absolute',
@@ -181,19 +185,16 @@ const styles = StyleSheet.create({
     zIndex: 200,
   },
   userOptionContainer:{
-    position: 'absolute',
-    top: 16,
-    right: '3%',
     flexDirection: 'row',
-    gap: 5,
-    zIndex: 200,
+    gap: 3,
   },
   userOptionButton: {
     padding: 5,
-    borderRadius: 50,
+    borderRadius: 10,
+    flex: 1,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#fff'
+    borderColor: '#ccc3'
   },
   badgeContainer: {
     width: '100%',

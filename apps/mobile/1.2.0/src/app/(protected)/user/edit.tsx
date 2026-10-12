@@ -3,11 +3,13 @@ import React, { useMemo, useState } from 'react';
 import { Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useSession } from '@/context/SessionContext';
 import Button from '@/components/ui/Button';
-import Header from '@/components/common/Header';
 import StickyScrollView from '@/components/ui/StickyScrollView';
 import { useLanguage } from '@/context/LanguageContext';
 import InputModal from '@/components/modals/InputModal';
 import { useUpdateProfile } from '@/hooks/user/useUpdateProfile';
+import BackButton from '@/components/common/BackButton';
+import ProfileImage from '@/components/ui/ProfileImage';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function EditProfileSettingsScreen() {
   const { session } = useSession();
@@ -123,16 +125,33 @@ export default function EditProfileSettingsScreen() {
         title={t('users.fields.edit_title')}
         subtitle={t('users.fields.edit_subtitle')}
       >
-        <Header title={t('users.fields.edit_title')} subtitle={t('users.fields.edit_subtitle')} />
+        <BackButton/>
 
-        {fields.map(field => {
+        <TouchableOpacity style={styles.profileImageContainer}>
+          <ProfileImage imagePath={user?.profileImage} />
+
+          <LinearGradient
+            colors={['transparent', '#000']}
+            style={styles.profileImageGradient}
+          >
+            <TIcon name='pencil' size={20} color='#fff'/>
+          </LinearGradient>
+        </TouchableOpacity>
+
+        {fields.map((field, index) => {
           const displayValue = draftValues[field.key] ?? field.value ?? '';
           const displayText = Array.isArray(displayValue)
             ? displayValue.map((item) => interestOptions.find((interest) => interest.id === item)?.label || item).join(', ')
             : displayValue;
 
           return (
-            <TView key={field.key} style={styles.sectionContainer} color='primary'>
+            <TView
+              key={field.key}
+              style={[
+                styles.sectionContainer,
+                index < fields.length - 1 && styles.sectionDivider,
+              ]}
+            >
               <View style={styles.fieldContent}>
                 <TText style={styles.sectionChildDescription}>{field.label}</TText>
                 <TText>{displayText ? displayText : t('common.na')}</TText>
@@ -221,21 +240,31 @@ export default function EditProfileSettingsScreen() {
 
 const styles = StyleSheet.create({
   sectionContainer: {
-    borderRadius: 15,
-    padding: 10,
-    marginBottom: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 5,
     justifyContent: 'space-between',
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  sectionDivider: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#ccc4',
   },
   profileImageContainer: {
     width: 120,
     aspectRatio: 1,
     alignSelf: 'center',
     borderRadius: 1000,
-    marginVertical: 16,
+    marginBottom: 16,
     overflow: 'hidden',
-    marginTop: -85,
+  },
+  profileImageGradient:{
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 10,
+    alignItems: 'center'
   },
   sectionChildDescription: {
     fontSize: 10,

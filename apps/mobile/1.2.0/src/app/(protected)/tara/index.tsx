@@ -1,18 +1,21 @@
 import React, { useEffect, useRef } from 'react';
 import { View, ScrollView, KeyboardAvoidingView, Platform, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import * as Speech from 'expo-speech';
 import { ChatArea, ChatHeader, ChatField, ChatBubble } from '@/components/ui/Chat';
 import { useAiChat } from '@/hooks/tara/useAiChat';
 import { TText, TView, TIcon } from '@/components/ui/Themed';
 import { Markdown } from '@/components/ui/Markdown';
 import BackButton from '@/components/common/BackButton';
-import { AutoScrollView } from '@/components/ui/AutoScrollView';
-import { TARA_AI_SUGGESTIONS_EN } from '@/constants/TaraSuggestions';
 import { formatDateToString } from '@/utils/formatDateToString';
 
 export default function AiChatScreen() {
   const scrollViewRef = useRef<ScrollView>(null);
+  const autoSentPromptRef = useRef<string | null>(null);
+  const { prompt, triggerSearch } = useLocalSearchParams<{
+    prompt?: string | string[];
+    triggerSearch?: string | string[];
+  }>();
   const {
     messages,
     isSending,
@@ -24,6 +27,18 @@ export default function AiChatScreen() {
     handleSendMessage,
     clearChat,
   } = useAiChat();
+
+  useEffect(() => {
+    const incomingPrompt = Array.isArray(prompt) ? prompt[0] : prompt;
+    const shouldTrigger = Array.isArray(triggerSearch) ? triggerSearch[0] : triggerSearch;
+
+    if (shouldTrigger !== 'true' || !incomingPrompt?.trim() || autoSentPromptRef.current === incomingPrompt) {
+      return;
+    }
+
+    autoSentPromptRef.current = incomingPrompt;
+    void handleSendMessage(incomingPrompt);
+  }, [handleSendMessage, prompt, triggerSearch]);
 
   const [isTtsEnabled, setIsTtsEnabled] = React.useState(false);
   const [dotCount, setDotCount] = React.useState(1);
@@ -106,18 +121,6 @@ export default function AiChatScreen() {
             <TText style={{ textAlign: 'center', opacity: 0.7, marginTop: 10, paddingHorizontal: 16 }}>
               Your personal travel assistant! What would you like to explore today?
             </TText>
-
-            <AutoScrollView horizontal speed={10000} style={styles.suggestionContainer}>
-              {TARA_AI_SUGGESTIONS_EN.map((suggestion, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.suggestionButton}
-                  onPress={() => handleSuggestionPress(suggestion)}
-                >
-                  <TText style={styles.suggestionText}>{suggestion}</TText>
-                </TouchableOpacity>
-              ))}
-            </AutoScrollView>
           </View>
 
           <ChatField
@@ -244,21 +247,6 @@ export default function AiChatScreen() {
 }
 
 const styles = StyleSheet.create({
-  suggestionContainer: {
-    maxHeight: 100,
-  },
-  suggestionButton: {
-    backgroundColor: '#00CAFF',
-    borderRadius: 50,
-    paddingVertical: 7,
-    paddingHorizontal: 14,
-    opacity: 0.8,
-  },
-  suggestionText: {
-    color: '#fff',
-    textAlign: 'center',
-    fontSize: 13,
-  },
   viewItineraryButton: {
     alignItems: 'center',
     width: '100%',

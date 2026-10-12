@@ -34,6 +34,18 @@ export default function HomeScreen() {
 
     return () => clearInterval(typingInterval);
   }, [suggestion]);
+
+  const handleSearchSend = () => {
+    const prompt = searchAi.trim() || suggestion.trim();
+    if (!prompt) return;
+
+    router.push({
+      pathname: '/tara',
+      params: { prompt, triggerSearch: 'true' },
+    } as any);
+  };
+  const searchPrompt = searchAi.trim() || suggestion.trim();
+
   return (
     <TView style={{ flex: 1 }}>
       <HomeHeaderCard />
@@ -50,13 +62,8 @@ export default function HomeScreen() {
                 style={[styles.searchField, { color: textColor }]}
               />
 
-              <TouchableOpacity
-               onPress={() => router.push({
-                  pathname: '/tara',
-                  params: { prompt: searchAi, triggerSearch: true },
-                } as any)}
-              >
-                <TIcon name='send' size={18} color={searchAi ? secondaryColor : '#ccc4'} />
+              <TouchableOpacity onPress={handleSearchSend} disabled={!searchPrompt}>
+                <TIcon name='send' size={18} color={searchPrompt ? secondaryColor : '#ccc4'} />
               </TouchableOpacity>
             </View>
 
@@ -129,7 +136,7 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     flexDirection: 'row',
-    gap: 6,
+    gap: 3,
     paddingHorizontal: '3%',
     marginBottom: '2%',
     zIndex: 1000,
@@ -137,7 +144,7 @@ const styles = StyleSheet.create({
   searchFieldContainer: {
     flex: 1,
     height: 40,
-    borderRadius: 10,
+    borderRadius: 50,
     flexDirection: 'row',
     alignItems: 'center',
     paddingRight: 10,
@@ -152,7 +159,7 @@ const styles = StyleSheet.create({
   qrButton: {
     height: 40,
     aspectRatio: 1,
-    borderRadius: 10,
+    borderRadius: 50,
     backgroundColor: '#ccc7',
     justifyContent: 'center',
     alignItems: 'center',
