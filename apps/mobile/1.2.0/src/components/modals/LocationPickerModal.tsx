@@ -104,7 +104,11 @@ export default function LocationPickerModal({
     let initLat: number;
     let initLng: number;
 
-    if (isEditingLocation && initialLocation?.latitude && initialLocation?.longitude) {
+    if (
+      isEditingLocation &&
+      initialLocation?.latitude != null &&
+      initialLocation.longitude != null
+    ) {
       initLat = initialLocation.latitude;
       initLng = initialLocation.longitude;
       setLocationName(initialLocation.locationName ?? '');
@@ -155,8 +159,8 @@ export default function LocationPickerModal({
   const handleConfirm = () => {
     if (
       locationData.locationName &&
-      locationData.latitude &&
-      locationData.longitude &&
+      locationData.latitude != null &&
+      locationData.longitude != null &&
       locationData.address
     ) {
       onAddLocation({

@@ -18,7 +18,7 @@ import RoundButton from "@/components/ui/RoundButton";
 import { ITINERARY_TYPES } from "@/constants/Itinerary";
 import { newItinerayId } from "@/services/itineraryService";
 import { useLanguage } from "@/context/LanguageContext";
-import { CreateItineraryForm, Itinerary, ItineraryGeneralPermissions, ItineraryPrivacy, ItineraryStatus, ItineraryUpdateValues, ItineraryViewType, HeaderType, ItineraryBlock, TextBlock } from "@/types/itineraryTypes";
+import { CreateItineraryForm, Itinerary, ItineraryGeneralPermissions, ItineraryPrivacy, ItineraryStatus, ItineraryUpdateValues, ItineraryViewType, HeaderType, ItineraryBlock, LocationBlockData, TextBlock } from "@/types/itineraryTypes";
 import { useUpdateItinerary } from "@/hooks/itinerary/useUpdateItinerary";
 import { useItineraryStatus } from "@/hooks/itinerary/useItineraryStatus";
 
@@ -64,6 +64,7 @@ export default function ItineraryForm({
   const [content, setContent] = useState<ItineraryBlock[]>((initialValues?.content as ItineraryBlock[] | undefined) ?? [],);
   const [focusedId, setFocusedId] = useState<string | null>(null);
   const [locationVisible, setLocationVisible] = useState(false);
+  const [locationEditBlockId, setLocationEditBlockId] = useState<string | null>(null);
   const [composerId, setComposerId] = useState<string | null>(null);
   const [blockHeights, setBlockHeights] = useState<Record<string, number>>({});
   const { t } = useLanguage();
@@ -130,6 +131,31 @@ export default function ItineraryForm({
     };
     setContent((current) => [...current, block]);
     setFocusedId(block.id);
+  };
+
+  const saveLocation = (location: LocationItemWithAddress) => {
+    if (!canEdit || location.latitude == null || location.longitude == null)
+      return;
+    if (locationEditBlockId) {
+      updateBlock(locationEditBlockId, {
+        latitude: location.latitude,
+        longitude: location.longitude,
+        locationName: location.locationName,
+        address: location.address,
+      });
+      return;
+    }
+    addLocation(location);
+  };
+
+  const closeLocationPicker = () => {
+    setLocationVisible(false);
+    setLocationEditBlockId(null);
+  };
+
+  const editLocation = (block: LocationBlockData) => {
+    setLocationEditBlockId(block.id);
+    setLocationVisible(true);
   };
 
   const deleteFocused = () => {
@@ -266,8 +292,10 @@ export default function ItineraryForm({
                   },
                 })
               }
+              onEditPress={() => editLocation(block)}
               onLongPress={beginDrag}
               editable={canEdit}
+              themeColor={themeColor}
             />
           )}
           {block.type === "toggle" && (
@@ -300,6 +328,10 @@ export default function ItineraryForm({
   const lastBlock = content[content.length - 1];
   const showComposer = canEdit && (!lastBlock || lastBlock.type !== "text" || Boolean(composerId));
   const visibleContent = composerId ? content.filter((block) => block.id !== composerId) : content;
+  const editingLocation = content.find(
+    (block): block is LocationBlockData =>
+      block.id === locationEditBlockId && block.type === "location",
+  );
   const submit = () => {
     if (!createMode) {
       itineraryUpdate.save();
@@ -445,7 +477,10 @@ export default function ItineraryForm({
                 primaryColor={primaryColor}
                 onText={addText}
                 onHeading={addHeading}
-                onLocation={() => setLocationVisible(true)}
+                onLocation={() => {
+                  setLocationEditBlockId(null);
+                  setLocationVisible(true);
+                }}
                 onChecklist={addChecklist}
                 onDivider={addDivider}
               />
@@ -463,8 +498,10 @@ export default function ItineraryForm({
       {canEdit && (
         <LocationPickerModal
           visible={locationVisible}
-          onClose={() => setLocationVisible(false)}
-          onAddLocation={addLocation}
+          onClose={closeLocationPicker}
+          onAddLocation={saveLocation}
+          isEditingLocation={locationEditBlockId !== null}
+          initialLocation={editingLocation ? { ...editingLocation, note: "" } : undefined}
         />
       )}
     </KeyboardAvoidingView>

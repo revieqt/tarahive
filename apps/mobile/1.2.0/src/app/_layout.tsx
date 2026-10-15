@@ -49,8 +49,7 @@ const queryClient = new QueryClient({
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    Inter: require('../../assets/fonts/Inter-VariableFont_opsz,wght.ttf'),
-    PoppinsBold: require('../../assets/fonts/Poppins-Bold.ttf'),
+    PlusJakartaSans: require('../../assets/fonts/PlusJakartaSans-VariableFont_wght.ttf')
   });
 
   const [dialogState, setDialogState] =
