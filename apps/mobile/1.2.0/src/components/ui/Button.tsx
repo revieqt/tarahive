@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     fontSize: 13,
     textAlign: 'center',
-    fontFamily: 'Inter',
+    fontFamily: 'PlusJakartaSans',
     letterSpacing: 1,
   },
   primaryText: {
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     textAlign: 'center',
     fontWeight: 800,
-    fontFamily: 'Inter',
+    fontFamily: 'PlusJakartaSans',
     letterSpacing: 1,
   },
 });

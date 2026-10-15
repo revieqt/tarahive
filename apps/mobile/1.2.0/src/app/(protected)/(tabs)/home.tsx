@@ -53,7 +53,7 @@ export default function HomeScreen() {
         <View style={styles.menuContainer}>
           <LinearGradient colors={['transparent', backgroundColor, backgroundColor]} style={styles.menuGradient} />
           <View style={styles.searchContainer}>
-            <View style={[styles.searchFieldContainer, styles.shadow, { backgroundColor: primaryColor }]}>
+            <View style={[styles.searchFieldContainer, { backgroundColor: primaryColor }]}>
               <TextInput
                 value={searchAi}
                 onChangeText={setSearchAi}
@@ -69,7 +69,7 @@ export default function HomeScreen() {
 
 
             <TouchableOpacity
-              style={[styles.qrButton, styles.shadow, { backgroundColor: primaryColor }]}
+              style={[styles.qrButton, { backgroundColor: primaryColor }]}
               onPress={() => router.push('/scan')}
             >
               <TIcon name='qrcode-scan' size={20} color={textColor + '90'} />
@@ -79,10 +79,10 @@ export default function HomeScreen() {
           <View style={styles.gridContainer}>
             <TouchableOpacity
               onPress={() => router.push('/itinerary')}
-              style={[styles.gridChildContainer, styles.leftGridContainer, styles.shadow, { backgroundColor: primaryColor }]}
+              style={[styles.gridChildContainer, styles.leftGridContainer, { backgroundColor: primaryColor, borderWidth: 1, borderColor: "#ccc2" }]}
             >
               <View style={{ padding: 10 }}>
-                <TText style={{ opacity: .8, fontSize: 12, fontFamily: 'PoppinsBold', color: accentColor }}>{t('tabs.home.menu_itinerary')}</TText>
+                <TText style={{ opacity: .8, fontSize: 12, fontFamily: 'PlusJakartaSans', color: accentColor, fontWeight: 800 }}>{t('tabs.home.menu_itinerary')}</TText>
                 <TText style={{ opacity: .5, fontSize: 10 }}>{t('tabs.home.menu_itinerary_desc')}</TText>
               </View>
               <Image source={require('../../../../assets/images/itinerary-icon.png')} style={styles.leftGridImage} />
@@ -91,17 +91,17 @@ export default function HomeScreen() {
               style={[styles.gridChildContainer, styles.leftGridContainer]}>
               <TouchableOpacity
                 onPress={() => router.push('/sos')}
-                style={[styles.rightGridContainer, styles.shadow, { backgroundColor: primaryColor }]}
+                style={[styles.rightGridContainer, { backgroundColor: primaryColor }]}
               >
-                <TText style={{ opacity: .8, fontSize: 11, fontFamily: 'PoppinsBold', color: accentColor }}>{t('tabs.home.menu_sos')}</TText>
+                <TText style={{ opacity: .8, fontSize: 11, fontFamily: 'PlusJakartaSans', color: accentColor, fontWeight: 800 }}>{t('tabs.home.menu_sos')}</TText>
                 <TText style={{ opacity: .5, fontSize: 10 }}>{t('tabs.home.menu_sos_desc')}</TText>
                 <Image source={require('../../../../assets/images/sos-icon.png')} style={styles.rightGridImage} />
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => router.push('/tara')}
-                style={[styles.rightGridContainer, styles.shadow, { backgroundColor: primaryColor }]}
+                style={[styles.rightGridContainer, { backgroundColor: primaryColor }]}
               >
-                <TText style={{ opacity: .8, fontSize: 11, fontFamily: 'PoppinsBold', color: accentColor }}>{t('tabs.home.menu_tara')}</TText>
+                <TText style={{ opacity: .8, fontSize: 11, fontFamily: 'PlusJakartaSans', color: accentColor, fontWeight: 800 }}>{t('tabs.home.menu_tara')}</TText>
                 <TText style={{ opacity: .5, fontSize: 10 }}>{t('tabs.home.menu_tara_desc')}</TText>
                 <Image source={require('../../../../assets/images/icon.png')} style={styles.rightGridImage} />
               </TouchableOpacity>
@@ -128,6 +128,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     zIndex: 5,
     paddingTop: 175,
+    paddingBottom: 60,
   },
   menuContainer: {
     position: 'relative',
@@ -148,10 +149,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingRight: 10,
-    overflow: 'hidden'
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: "#ccc2"
   },
   searchField: {
-    fontFamily: 'Inter',
+    fontFamily: 'PlusJakartaSans',
     fontSize: 11,
     paddingHorizontal: 12,
     flex: 1,
@@ -160,10 +163,11 @@ const styles = StyleSheet.create({
     height: 40,
     aspectRatio: 1,
     borderRadius: 50,
-    backgroundColor: '#ccc7',
     justifyContent: 'center',
     alignItems: 'center',
-    overflow: 'hidden',
+    overflow: 'hidden', 
+    borderWidth: 1, 
+    borderColor: "#ccc2"
   },
   menuGradient: {
     height: '105%',
@@ -208,7 +212,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#ccc0',
+    borderColor: '#ccc2',
     padding: 8,
   },
   leftGridImage: {

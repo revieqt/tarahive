@@ -174,7 +174,7 @@ const SidebarAlerts: React.FC = () => {
                     transform: [{ scale: containerScale }],
                 }
             ]}
-            pointerEvents={hideAlert ? 'none' : 'auto'}
+            pointerEvents={hideAlert ? 'none' : 'box-none'}
         >
 
             <Animated.View
@@ -211,9 +211,8 @@ const SidebarAlerts: React.FC = () => {
 
 const styles = StyleSheet.create({
     container: {
-        pointerEvents: 'box-none',
         position: 'absolute',
-        bottom: 5,
+        bottom: 70,
         right: 7,
         zIndex: 1000,
         width: 55,
@@ -223,7 +222,7 @@ const styles = StyleSheet.create({
     },
     openContainer: {
         position: 'absolute',
-        bottom: 5,
+        bottom: 60,
         right: 8,
         zIndex: 1000,
         padding: 10,
@@ -236,6 +235,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 30,
+        borderWidth: 1, 
+        borderColor: "#ccc2"
     },
     hideButton: {
         width: '100%',

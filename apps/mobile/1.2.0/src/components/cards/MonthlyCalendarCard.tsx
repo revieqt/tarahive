@@ -152,7 +152,7 @@ const MonthlyCalendar: React.FC = () => {
   );
 
   return (
-    <TView style={styles.container} color='primary' shadow>
+    <TView style={styles.container} color='primary'>
       <View style={[styles.header, { backgroundColor: `${secondaryColor}20` }]}>
         <View style={{ marginLeft: 3, marginVertical: 7 }}>
           <TText style={{ fontWeight: 600 }}>{monthLabel}</TText>
@@ -201,7 +201,9 @@ const styles = StyleSheet.create({
   container: {
     marginHorizontal: '3%',
     borderRadius: 12,
-    overflow: 'hidden'
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: "#ccc2"
   },
   header: {
     padding: '2%',
