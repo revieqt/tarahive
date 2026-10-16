@@ -101,9 +101,9 @@ export default function HomeScreen() {
                 onPress={() => router.push('/tara')}
                 style={[styles.rightGridContainer, { backgroundColor: primaryColor }]}
               >
-                <TText style={{ opacity: .8, fontSize: 11, fontFamily: 'PlusJakartaSans', color: accentColor, fontWeight: 800 }}>{t('tabs.home.menu_tara')}</TText>
-                <TText style={{ opacity: .5, fontSize: 10 }}>{t('tabs.home.menu_tara_desc')}</TText>
-                <Image source={require('../../../../assets/images/icon.png')} style={styles.rightGridImage} />
+                <TText style={{ opacity: .8, fontSize: 11, fontFamily: 'PlusJakartaSans', color: accentColor, fontWeight: 800 }}>My Budget</TText>
+                <TText style={{ opacity: .5, fontSize: 10 }}>Expences Tracker</TText>
+                <Image source={require('../../../../assets/images/budget-icon.png')} style={styles.rightGridImage} />
               </TouchableOpacity>
             </View>
           </View>
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: '-30%',
     right: '-13%',
-    opacity: .8,
+    opacity: .9,
   },
   content:{
     marginBottom: 20

@@ -64,7 +64,7 @@ export default function AccountScreen() {
         subtitle={'@'+user?.username}
         showBackButton={false}
       >
-        <TView style={styles.header} color='primary' shadow>
+        <TView style={styles.header} color='primary'>
           <TouchableOpacity
             style={{ flexDirection: 'row' }}
             disabled={!isConnected}
@@ -88,37 +88,8 @@ export default function AccountScreen() {
           </TouchableOpacity>
         </TView>
 
-        <ScrollView horizontal contentContainerStyle={{gap: 3}} showsHorizontalScrollIndicator={false}>
-          { isConnected ? <>
-              <TouchableOpacity 
-                style={[styles.headerButtons, {backgroundColor: primaryColor}]}
-                onPress={() =>
-                  router.push({
-                    pathname: '/user/[id]',
-                    params: { id: user?.username },
-                  } as any)
-                }
-              >
-                <TIcon name='account' size={15} color={accentColor}/>
-                <TText>{t('tabs.account.view_profile_button')}</TText>
-              </TouchableOpacity>
-
-              <TouchableOpacity 
-                style={[styles.headerButtons, {backgroundColor: primaryColor}]}
-                onPress={() => router.push('/settings/edit-profile')}
-              >
-                <TIcon name='pencil' size={15} color={accentColor}/>
-                <TText>{t('tabs.account.edit_profile_button')}</TText>
-              </TouchableOpacity>
-            </> : 
-            <View style={styles.headerButtons}>
-              <TIcon name='wifi-off' size={15}/>
-              <TText>{t('common.offline_mode')}</TText>
-            </View>
-          }
-        </ScrollView>
-
         <View style={styles.options}>
+
           <TText style={styles.optionsTitle}>{t('tabs.account.personalization_title')}</TText>
 
           <SettingsOption icon='palette' label={t('tabs.account.theme_button')}
@@ -203,10 +174,12 @@ const styles = StyleSheet.create({
   header: {
     width: '100%',
     padding: 10,
-    borderRadius: 15,
+    borderRadius: 30,
     overflow: 'hidden',
     marginTop: 16,
     marginBottom: 8,
+    borderWidth: 1,
+    borderColor: "#ccc2"
   },
   profileImage: {
     width: 40,
