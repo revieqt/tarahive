@@ -12,6 +12,7 @@ import { useTara } from '@/hooks/shared/useTara';
 import SidebarAlerts from '@/components/common/Sidebar';
 import MonthlyCalendar from '@/components/cards/MonthlyCalendarCard';
 import { StickyScrollViewHeader } from '@/components/ui/StickyScrollView';
+import BetaTesterCard from '@/components/cards/BetaTesterCard';
 
 export default function HomeScreen() {
   const isConnected = useInternetConnection();
@@ -70,7 +71,7 @@ export default function HomeScreen() {
         <View style={styles.menuContainer}>
           <LinearGradient colors={['transparent', backgroundColor, backgroundColor]} style={styles.menuGradient} />
           <View style={styles.searchContainer}>
-            <View style={[styles.searchFieldContainer, { backgroundColor: primaryColor }]}>
+            <View style={[styles.searchFieldContainer, { borderColor: primaryColor }]}>
               <TextInput
                 value={searchAi}
                 onChangeText={setSearchAi}
@@ -80,16 +81,18 @@ export default function HomeScreen() {
               />
 
               <TouchableOpacity onPress={handleSearchSend} disabled={!searchPrompt}>
-                <TIcon name='send' size={18} color={searchPrompt ? secondaryColor : '#ccc4'} />
+                <TIcon name='send' size={15} color={searchPrompt ? accentColor + '95' : '#ccc4'} />
               </TouchableOpacity>
+              <View style={[styles.translucentBg, { backgroundColor: primaryColor }]}/>
             </View>
 
 
             <TouchableOpacity
-              style={[styles.qrButton, { backgroundColor: primaryColor }]}
+              style={[styles.qrButton, { borderColor: primaryColor }]}
               onPress={() => router.push('/scan')}
             >
-              <TIcon name='qrcode-scan' size={20} color={textColor + '90'} />
+              <TIcon name='qrcode-scan' size={17}/>
+              <View style={[styles.translucentBg, { backgroundColor: primaryColor }]}/>
             </TouchableOpacity>
           </View>
 
@@ -98,9 +101,9 @@ export default function HomeScreen() {
               onPress={() => router.push('/itinerary')}
               style={[styles.gridChildContainer, styles.leftGridContainer, { backgroundColor: primaryColor, borderWidth: 1, borderColor: "#ccc2" }]}
             >
-              <View style={{ padding: 10 }}>
+              <View style={{ padding: 12 }}>
                 <TText style={{ opacity: .8, fontSize: 12, fontFamily: 'PlusJakartaSans', color: accentColor, fontWeight: 800 }}>{t('tabs.home.menu_itinerary')}</TText>
-                <TText style={{ opacity: .5, fontSize: 10 }}>{t('tabs.home.menu_itinerary_desc')}</TText>
+                <TText style={{ opacity: .5, fontSize: 10 }}>Travel Planner</TText>
               </View>
               <Image source={require('../../../../assets/images/itinerary-icon.png')} style={styles.leftGridImage} />
             </TouchableOpacity>
@@ -111,15 +114,15 @@ export default function HomeScreen() {
                 style={[styles.rightGridContainer, { backgroundColor: primaryColor }]}
               >
                 <TText style={{ opacity: .8, fontSize: 11, fontFamily: 'PlusJakartaSans', color: accentColor, fontWeight: 800 }}>{t('tabs.home.menu_sos')}</TText>
-                <TText style={{ opacity: .5, fontSize: 10 }}>{t('tabs.home.menu_sos_desc')}</TText>
+                <TText style={{ opacity: .5, fontSize: 10 }}>Emergency Alert</TText>
                 <Image source={require('../../../../assets/images/sos-icon.png')} style={styles.rightGridImage} />
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => router.push('/tara')}
+                onPress={() => router.push('/expenses')}
                 style={[styles.rightGridContainer, { backgroundColor: primaryColor }]}
               >
-                <TText style={{ opacity: .8, fontSize: 11, fontFamily: 'PlusJakartaSans', color: accentColor, fontWeight: 800 }}>My Budget</TText>
-                <TText style={{ opacity: .5, fontSize: 10 }}>Expences Tracker</TText>
+                <TText style={{ opacity: .8, fontSize: 11, fontFamily: 'PlusJakartaSans', color: accentColor, fontWeight: 800 }}>Expenses</TText>
+                <TText style={{ opacity: .5, fontSize: 10 }}>Tracker</TText>
                 <Image source={require('../../../../assets/images/budget-icon.png')} style={styles.rightGridImage} />
               </TouchableOpacity>
             </View>
@@ -128,7 +131,6 @@ export default function HomeScreen() {
 
         <TView style={styles.content}>
           <MonthlyCalendar/>
-
         </TView>
       </Animated.ScrollView>
       <StickyScrollViewHeader
@@ -176,13 +178,13 @@ const styles = StyleSheet.create({
     paddingRight: 10,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: "#ccc2"
   },
   searchField: {
     fontFamily: 'PlusJakartaSans',
     fontSize: 11,
     paddingHorizontal: 12,
     flex: 1,
+    opacity: .8
   },
   qrButton: {
     height: 40,
@@ -192,26 +194,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     overflow: 'hidden', 
     borderWidth: 1, 
-    borderColor: "#ccc2"
+  },
+  translucentBg:{
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: -1,
+    opacity: .4
   },
   menuGradient: {
-    height: '105%',
+    height: '120%',
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
     zIndex: 100,
     pointerEvents: 'none',
-  },
-  shadow: {
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
-    elevation: 3,
   },
   gridContainer: {
     flexDirection: 'row',
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   leftGridContainer: {
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#ccc0'
+    borderColor: '#ccc0',
   },
   rightGridContainer: {
     flex: 1,
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#ccc2',
-    padding: 8,
+    padding: 10,
   },
   leftGridImage: {
     width: '85%',

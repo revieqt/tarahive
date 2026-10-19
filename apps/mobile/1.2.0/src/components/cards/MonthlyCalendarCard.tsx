@@ -155,7 +155,7 @@ const MonthlyCalendar: React.FC = () => {
     <TView style={styles.container} color='primary'>
       <View style={[styles.header, { backgroundColor: `${secondaryColor}20` }]}>
         <View style={{ marginLeft: 3, marginVertical: 7 }}>
-          <TText style={{ fontWeight: 600 }}>{monthLabel}</TText>
+          <TText style={{ fontWeight: 700 }}>{monthLabel}</TText>
           <TText style={{ fontSize: 10, opacity: 0.5 }}>{selectedDateLabel ? selectedDateLabel : todayLabel}</TText>
         </View>
 

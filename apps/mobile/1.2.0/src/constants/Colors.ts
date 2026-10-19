@@ -22,7 +22,8 @@
 export const Colors = {
   light: {
     text: '#2C3333',
-    background: '#FAFAFA',
+    // background: '#FAFAFA',
+    background: '#F5F5F5',
     icon: '#687076', 
 
     primary: '#fff',

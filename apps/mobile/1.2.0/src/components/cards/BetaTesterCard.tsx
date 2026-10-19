@@ -1,37 +1,30 @@
 import React, {useState} from 'react';
-import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { TText, TIcon, TView } from '@/components/ui/Themed';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { TText, TIcon } from '@/components/ui/Themed';
 import { useLocation } from '@/context/LocationContext';
-import { useCurrentWeather, type WeatherData } from '@/hooks/shared/useWeather';
-import Skeleton from '@/components/ui/Skeleton';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
-import WeatherDisplay from '../common/WeatherDisplay';
 import { useLanguage } from '@/context/LanguageContext';
 import HiveBg from '../common/HiveBg';
 import { SUPPORT_FORM_URL, FEEDBACK_FORM_URL } from '@/constants/Config';
 import WebViewModal from '../modals/WebViewModal';
 
-
 export default function BetaTesterCard() {
   const { t } = useLanguage();
-  const locationData = useLocation();
   const secondaryColor = useThemeColor({}, 'secondary');
   const accentColor = useThemeColor({}, 'accent');
   const [webView, setWebView] = useState<{ url: string; title: string; subtitle?: string  } | null>(null);
   const handleWebView = (url: string, title: string, subtitle?: string) => () => setWebView({ url, title, subtitle });
 
   return (
-    <TView style={styles.container} color='primary'>
-      <HiveBg style={styles.hiveBg}/>
-      <TText style={styles.title}>You are a Beta Tester!</TText>
+    <View style={[styles.container, {backgroundColor: secondaryColor + '20'}]}>
+      <TText style={[styles.title, {color: accentColor}]}>You are a Beta Tester!</TText>
       <TText style={styles.subtitle}>Share your feedback, and help shape the future of travel planning.</TText>
 
       <View style={styles.optionsContainer}>
         <TouchableOpacity style={styles.options}
           onPress={handleWebView(SUPPORT_FORM_URL, t('tabs.account.feedback_button'), t('tabs.account.help_title'))}
         >
-          <TIcon name='ticket-confirmation' size={20}/>
+          <TIcon name='ticket-confirmation' size={20} color={secondaryColor}/>
           <TText style={styles.optionsText}>Contact Support</TText>
         </TouchableOpacity>
 
@@ -40,8 +33,8 @@ export default function BetaTesterCard() {
         <TouchableOpacity style={styles.options}
           onPress={handleWebView(FEEDBACK_FORM_URL, t('tabs.account.feedback_button'), t('tabs.account.help_title'))}
         >
-          <TIcon name='bug' size={20}/>
-          <TText style={styles.optionsText}>Report a Bug</TText>
+          <TIcon name='bug' size={20} color={secondaryColor}/>
+          <TText style={styles.optionsText}>Report Bug</TText>
         </TouchableOpacity>
 
         <View style={styles.optionsDivider}/>
@@ -49,7 +42,7 @@ export default function BetaTesterCard() {
         <TouchableOpacity style={styles.options}
           onPress={handleWebView(FEEDBACK_FORM_URL, t('tabs.account.feedback_button'), t('tabs.account.help_title'))}
         >
-          <TIcon name='chat-alert' size={20}/>
+          <TIcon name='chat-alert' size={20} color={secondaryColor}/>
           <TText style={styles.optionsText}>Give Feedback</TText>
         </TouchableOpacity>
       </View>
@@ -61,22 +54,20 @@ export default function BetaTesterCard() {
         subtitle={webView?.subtitle ?? ''}
         onClose={() => setWebView(null)}
       />
-    </TView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    padding: 10,
+    padding: 14,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#ccc2',
     borderRadius: 15,
     gap: 4,
-  },
-  hiveBg:{
-    marginRight: '-15%'
+    marginVertical: 4
   },
   title:{
     fontWeight: 700
@@ -87,19 +78,21 @@ const styles = StyleSheet.create({
   },
   optionsContainer:{
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
     height: 50,
-    marginTop: 4
+    marginTop: 8,
+    paddingHorizontal: '7%'
   },
   options:{
-    flex: 1,
+    width: '20%',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 4
+    gap: 4,
   },
   optionsText:{
-    fontSize: 10
+    fontSize: 10,
+    textAlign: 'center'
   },
   optionsDivider:{
     width: 1,
