@@ -1,97 +1,148 @@
-import { router, Stack } from 'expo-router';
-import { StyleSheet, TouchableOpacity, View, } from 'react-native';
+import { router, Tabs, useLocalSearchParams, usePathname } from 'expo-router';
+import { StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
 import { TIcon, TText, TView } from '@/components/ui/Themed';
-import HiveBg from '@/components/common/HiveBg';
-import Button from '@/components/ui/Button';
-import EmptyMessage from '@/components/common/EmptyMessage';
-import { useState } from 'react';
-import { useThemeColor } from '@/hooks/shared/useThemeColor';
-import { formatDateToString } from '@/utils/formatDateToString';
 import { useLanguage } from '@/context/LanguageContext';
-import ItineraryPickerModal from '@/components/modals/ItineraryPickerModal';
-import { useLocalSearchParams } from 'expo-router';
-import { Itinerary } from '@/types/itineraryTypes';
+import { useState } from 'react';
+import BackButton from '@/components/common/BackButton';
+import ShareModal from '@/components/modals/ShareModal';
+import StickyScrollView from '@/components/ui/StickyScrollView';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useThemeColor } from '@/hooks/shared/useThemeColor';
 
-const firstParam = (value?: string | string[]) =>
-  Array.isArray(value) ? value[0] : value;
+export default function RoomLayout() {
+  const { t } = useLanguage();
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const pathname = usePathname();
+  const [shareModalVisible, setShareModalVisible] = useState(false);
+  const name = 'Test';
+  const description = 'This is a test description for the room.';
+  const themeColor = '#4A90E2';
+  const backgroundColor = useThemeColor({}, 'background');
+  const primaryColor = useThemeColor({}, 'primary');
+  const [tab, setTab] = useState('feed');
 
-export default function MainRoomScreen() {
-  const params = useLocalSearchParams<{
-    id?: string | string[];
-    title?: string | string[];
-    startDate?: string | string[];
-    endDate?: string | string[];
-  }>();
-  const secondaryColor = useThemeColor({}, 'secondary');
-  const [roomName, setRoomName] = useState('');
-  const [description, setDescription] = useState('');
-  const [isPickerVisible, setIsPickerVisible] = useState(false);
-  const [itineraryId, setItineraryId] = useState(() => firstParam(params.id));
-  const [itineraryTitle, setItineraryTitle] = useState(() => firstParam(params.title));
-  const [itineraryStartDate, setItineraryStartDate] = useState(() => firstParam(params.startDate));
-  const [itineraryEndDate, setItineraryEndDate] = useState(() => firstParam(params.endDate));
-  const { currentLanguage } = useLanguage();
-
-  const handleItinerarySelect = (itinerary: Itinerary) => {
-    setItineraryId(itinerary.id);
-    setItineraryTitle(itinerary.title);
-    setItineraryStartDate(itinerary.startDate);
-    setItineraryEndDate(itinerary.endDate);
+  const navigateToTab = (tab: 'details' | 'members' | 'chat' | 'map' | 'settings') => {
+    const pathname = tab === 'details' ? '/room/[id]' : `/room/[id]/${tab}`;
+    router.navigate({ pathname, params: { id } });
   };
 
-
   return (
-    <TView style={styles.container}>
-      <TouchableOpacity
-        style={[styles.itineraryButton, itineraryId && { borderColor: secondaryColor, backgroundColor: secondaryColor + '22' }]}
-        onPress={() => setIsPickerVisible(true)}
-        accessibilityRole="button"
+    <TView style={{flex: 1}}>
+      <StickyScrollView
+        style={{ flex: 1 }} 
+        contentContainerStyle={{ height: 2000 }}
+        headerAppearOn={150}
+        title={"Room Title here"}
+        subtitle={"2 members"}
       >
-        {
-          itineraryId ? (
-            <View style={{width: '100%', gap: 3}}>
-              <TText style={styles.itineraryDetails}>Attached Itinerary</TText>
-              <TText>{itineraryTitle}</TText>
-              <TText style={styles.itineraryDetails}>
-                {itineraryStartDate ? formatDateToString(itineraryStartDate, currentLanguage.code) : 'Date'} - {itineraryEndDate ? formatDateToString(itineraryEndDate, currentLanguage.code) : 'Date'}
-              </TText>
-            </View>
-          ) : (<>
-            <TIcon name='plus' size={20}/>
-            <TText>Select Itinerary</TText>
-            <TText style={styles.itineraryDetails}>Attach an itinerary to this room (optional)</TText>
-          </>
-          )
-        }
-      </TouchableOpacity>
+        <TView 
+          color='secondary'
+          style={styles.header}
+        >
+          <BackButton type='floating' color='#fff'/>
+          <LinearGradient
+            colors={['transparent', backgroundColor]}
+            style={styles.headerGradient}
+          >
+            <TText type='title' numberOfLines={1}>Room Title Here</TText>
+            <TText numberOfLines={2} style={styles.description}>Loren Ipsum Loren Ipsum Loren Ipsum Loren Ipsum Loren Ipsum Loren Ipsum</TText>
+          </LinearGradient>
+        </TView>
 
-      <ItineraryPickerModal
-        visible={isPickerVisible}
-        onClose={() => setIsPickerVisible(false)}
-        onSelect={handleItinerarySelect}
-      />
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.tabsContainer}
+          style={styles.tabsScroll}
+        >
+          <TouchableOpacity
+            style={[
+              styles.tabs,
+              { backgroundColor: primaryColor }
+            ]}
+            onPress={() => setTab('feed')}
+          >
+            <TText>Feed</TText>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.tabs, { backgroundColor: primaryColor }]}
+            onPress={() => setTab('members')}
+          >
+            <TText>Members</TText>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.tabs, { backgroundColor: primaryColor }]}
+            onPress={() => router.push('/room/[id]/chat')}
+          >
+            <TText>Chat</TText>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.tabs, { backgroundColor: primaryColor }]}
+            onPress={() => router.push('/room/[id]/map')}
+          >
+            <TText>Map</TText>
+          </TouchableOpacity>
+        </ScrollView>
+
+      </StickyScrollView>
     </TView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  header:{
+    height: 170
+  },
+  headerGradient:{
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    left: 0,
+    paddingHorizontal: '3%',
+    paddingBottom: 8,
+    paddingTop: 20
+  },
+  description: {
+    opacity: 0.7,
+    fontSize: 12,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
     padding: '3%',
   },
-  itineraryButton: {
-    padding: 12,
+  tabs: {
+    paddingHorizontal: 8,
     borderWidth: 1,
-    borderColor: '#ccc4',
-    borderRadius: 15,
-    backgroundColor: '#ccc1',
-    borderStyle: 'dashed',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 3,
+    borderColor: '#ccc2',
+    borderRadius: 20,
+    opacity: 0.5,
+    height: 30,
+    justifyContent: 'center'
   },
-  itineraryDetails: {
-    fontSize: 10,
-    color: '#888',
+  navigationRow: {
+    flexDirection: 'row',
+  },
+  tabsContainer: {
+    flexDirection: 'row',
+    gap: 4,
+    paddingLeft: '3%'
+  },
+  tabsScroll: {
+    // flex: 1,
+  },
+  moreOptionsContainer: {
+    flexDirection: 'row',
+    borderTopLeftRadius: 20,
+    backgroundColor: '#fff4',
+    alignItems: 'center',
+    paddingHorizontal: 7,
+    paddingVertical: 4,
+    gap: 8,
+    marginRight: '-3%',
   },
 });

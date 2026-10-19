@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   boxContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 8,
+    gap: 4,
   },
 
   box: {
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
 
   character: {
     fontSize: 20,
-    fontFamily: 'Inter',
+    fontFamily: 'PlusJakartaSans',
     textAlign: 'center',
     padding: 0,
     margin: 0,

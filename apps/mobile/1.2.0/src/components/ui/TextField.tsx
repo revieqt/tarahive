@@ -161,13 +161,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 16,
     right: 16,
-    fontFamily: 'Inter',
+    fontFamily: 'PlusJakartaSans',
   },
   input: {
     flex: 1,
     fontSize: 13,
     backgroundColor: 'transparent',
-    fontFamily: 'Inter',
+    fontFamily: 'PlusJakartaSans',
   },
 });
 

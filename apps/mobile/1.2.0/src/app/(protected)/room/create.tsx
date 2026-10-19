@@ -40,7 +40,7 @@ export default function CreateRoomScreen() {
 
   return (
     <TView style={styles.container}>
-      <Header title='Create Room' subtitle='Fill-out details'/>
+      <Header title='Create Room'/>
 
       <TextField
         value={roomName}

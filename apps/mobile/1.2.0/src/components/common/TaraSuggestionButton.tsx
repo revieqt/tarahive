@@ -135,6 +135,7 @@ const ActiveRouteSidebarButton: React.FC = () => {
                         },
                     ]}
                 />
+                <TText style={styles.aiBadge}>AI</TText>
             </TouchableOpacity>
         </View>
     );
@@ -203,4 +204,18 @@ const styles = StyleSheet.create({
         opacity: 1,
         alignSelf: 'flex-end',
     },
+    aiBadge:{
+        backgroundColor: "#fff",
+        color: "#000",
+        fontWeight: 800,
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        paddingRight: 10,
+        paddingBottom: 4,
+        fontSize: 10,
+        paddingLeft: 5,
+        borderTopLeftRadius: 20,
+        opacity: .7
+    }
 });

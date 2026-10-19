@@ -27,14 +27,16 @@ export default function RoomsScreen() {
         style={{ flex: 1 }} 
         contentContainerStyle={{ height: 2000 }} 
         showBackButton={false}
+        headerAppearOn={60}
         title={"Rooms"}
         subtitle={'@'+session?.user?.username}
       >
+
         <View style={styles.header}>
-          <View style={{flex: 1}}>
-            <TText type='title'>Rooms</TText>
-            <TText>Rooms dasdasdasda sdasdasdas dasd asdasdasd</TText>
-          </View>
+          <TText type='title'>Rooms</TText>
+          <TouchableOpacity>
+            <TIcon name='help-circle' size={15}/>
+          </TouchableOpacity>
         </View>
 
         
@@ -73,9 +75,13 @@ export default function RoomsScreen() {
 
 const styles = StyleSheet.create({
   header:{
-    height: 100,
-    paddingHorizontal: '3%',
+    marginTop: 20,
+    justifyContent: 'space-between',
+    marginHorizontal: '3%',
+    borderBottomWidth: 2,
+    borderColor: "#ccc2",
     flexDirection: 'row',
+    alignItems: 'center'
   },
   dialButton:{
     position: 'absolute',

@@ -2,14 +2,16 @@ import { TText, TView, TIcon } from '@/components/ui/Themed';
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { ScrollView, StyleSheet, TouchableOpacity, View, Image, TextInput } from 'react-native';
+import { Animated, ScrollView, StyleSheet, TouchableOpacity, View, Image, TextInput } from 'react-native';
 import { useInternetConnection } from '@/utils/checkInternetConnection';
 import HomeHeaderCard from '@/components/cards/HomeHeaderCard';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
+import { useLocation } from '@/context/LocationContext';
 import { useTara } from '@/hooks/shared/useTara';
 import SidebarAlerts from '@/components/common/Sidebar';
 import MonthlyCalendar from '@/components/cards/MonthlyCalendarCard';
+import { StickyScrollViewHeader } from '@/components/ui/StickyScrollView';
 
 export default function HomeScreen() {
   const isConnected = useInternetConnection();
@@ -20,8 +22,17 @@ export default function HomeScreen() {
   const secondaryColor = useThemeColor({}, 'secondary');
   const [searchAi, setSearchAi] = useState('');
   const [animatedSuggestion, setAnimatedSuggestion] = useState('');
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const scrollRef = useRef<ScrollView>(null);
   const suggestion = useTara('suggestions');
   const { t } = useLanguage();
+  const locationData = useLocation();
+  const currentCity = locationData.city || locationData.suburb || locationData.region || locationData.state || 'Your Location';
+
+  const handleScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+    { useNativeDriver: true },
+  );
 
   useEffect(() => {
     setAnimatedSuggestion('');
@@ -49,7 +60,13 @@ export default function HomeScreen() {
   return (
     <TView style={{ flex: 1 }}>
       <HomeHeaderCard />
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <Animated.ScrollView
+        ref={scrollRef}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.menuContainer}>
           <LinearGradient colors={['transparent', backgroundColor, backgroundColor]} style={styles.menuGradient} />
           <View style={styles.searchContainer}>
@@ -113,7 +130,15 @@ export default function HomeScreen() {
           <MonthlyCalendar/>
 
         </TView>
-      </ScrollView>
+      </Animated.ScrollView>
+      <StickyScrollViewHeader
+        title={currentCity}
+        subtitle='Your current location'
+        showBackButton={false}
+        onTitlePress={() => scrollRef.current?.scrollTo({ y: 0, animated: true })}
+        headerAppearOn={180}
+        scrollY={scrollY}
+      />
       <SidebarAlerts />
     </TView>
   );
