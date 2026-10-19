@@ -14,6 +14,7 @@ import { useDev } from '@/hooks/shared/useDev';
 import StickyScrollView from '@/components/ui/StickyScrollView';
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
 import WebViewModal from '@/components/modals/WebViewModal';
+import BetaTesterCard from '@/components/cards/BetaTesterCard';
 
 export const SettingsOption = ({ icon, label, onPress }: { icon: string; label: string; onPress: () => void }) => (
   <TouchableOpacity onPress={onPress} style={styles.optionsChild}>
@@ -87,6 +88,8 @@ export default function AccountScreen() {
             </View>
           </TouchableOpacity>
         </TView>
+
+        <BetaTesterCard/>
 
         <View style={styles.options}>
 
