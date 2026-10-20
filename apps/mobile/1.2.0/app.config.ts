@@ -18,6 +18,7 @@ const config: ExpoConfig = {
 
   plugins: [
     'expo-router',
+    'expo-sqlite',
     [
       'react-native-google-mobile-ads',
       {

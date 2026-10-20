@@ -12,7 +12,7 @@ import { useTara } from '@/hooks/shared/useTara';
 import SidebarAlerts from '@/components/common/Sidebar';
 import MonthlyCalendar from '@/components/cards/MonthlyCalendarCard';
 import { StickyScrollViewHeader } from '@/components/ui/StickyScrollView';
-import BetaTesterCard from '@/components/cards/BetaTesterCard';
+import { useAiChat } from '@/hooks/tara/useAiChat';
 
 export default function HomeScreen() {
   const isConnected = useInternetConnection();
@@ -20,7 +20,6 @@ export default function HomeScreen() {
   const primaryColor = useThemeColor({}, 'primary');
   const textColor = useThemeColor({}, 'text');
   const accentColor = useThemeColor({}, 'accent');
-  const secondaryColor = useThemeColor({}, 'secondary');
   const [searchAi, setSearchAi] = useState('');
   const [animatedSuggestion, setAnimatedSuggestion] = useState('');
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -29,6 +28,7 @@ export default function HomeScreen() {
   const { t } = useLanguage();
   const locationData = useLocation();
   const currentCity = locationData.city || locationData.suburb || locationData.region || locationData.state || 'Your Location';
+  const { clearChat } = useAiChat();
 
   const handleScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
@@ -50,7 +50,7 @@ export default function HomeScreen() {
   const handleSearchSend = () => {
     const prompt = searchAi.trim() || suggestion.trim();
     if (!prompt) return;
-
+    clearChat();
     router.push({
       pathname: '/tara',
       params: { prompt, triggerSearch: 'true' },

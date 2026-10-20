@@ -27,25 +27,25 @@ export default function AiChatScreen() {
     handleSendMessage,
     clearChat,
   } = useAiChat();
+  const [isTtsEnabled, setIsTtsEnabled] = React.useState(false);
+  const [dotCount, setDotCount] = React.useState(1);
+
 
   useEffect(() => {
     const incomingPrompt = Array.isArray(prompt) ? prompt[0] : prompt;
     const shouldTrigger = Array.isArray(triggerSearch) ? triggerSearch[0] : triggerSearch;
 
-    if (shouldTrigger !== 'true' || !incomingPrompt?.trim() || autoSentPromptRef.current === incomingPrompt) {
-      return;
-    }
+    if (shouldTrigger !== 'true' || !incomingPrompt?.trim() || autoSentPromptRef.current === incomingPrompt) return;
 
     autoSentPromptRef.current = incomingPrompt;
     void handleSendMessage(incomingPrompt);
   }, [handleSendMessage, prompt, triggerSearch]);
 
-  const [isTtsEnabled, setIsTtsEnabled] = React.useState(false);
-  const [dotCount, setDotCount] = React.useState(1);
 
   useEffect(() => {
     scrollViewRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
+
 
   useEffect(() => {
     if (!isSending) return;
@@ -71,36 +71,14 @@ export default function AiChatScreen() {
   const hasUserMessages = messages.some((msg) => msg.isUser);
 
   const handleSend = async () => {
-    if (!inputText.trim()) {
-      return;
-    }
-
+    if (!inputText.trim()) return;
     await handleSendMessage(inputText);
-  };
-
-  const handleSuggestionPress = (suggestion: string) => {
-    setInputText(suggestion);
   };
 
   const handleClearChat = async () => {
     Speech.stop();
     await clearChat();
   };
-
-  const headerOptions = [
-    {
-      label: 'Clear Chat',
-      iconName: 'trash-can',
-      iconColor: '#ef4444',
-      onPress: handleClearChat,
-    },
-    {
-      label: isTtsEnabled ? 'Disable Speech' : 'Enable Speech',
-      iconName: isTtsEnabled ? 'volume-high' : 'volume-off',
-      iconColor: '#fff',
-      onPress: () => setIsTtsEnabled(!isTtsEnabled),
-    },
-  ];
 
   return (
     <TView style={{ height: '100%', width: '100%' }}>
@@ -148,7 +126,20 @@ export default function AiChatScreen() {
             description="Your travel assistant"
             hasBackButton
             onBackPress={() => router.back()}
-            optionsValue={headerOptions}
+            optionsValue={[
+              {
+                label: 'Clear Chat',
+                iconName: 'trash-can',
+                iconColor: '#ef4444',
+                onPress: handleClearChat,
+              },
+              {
+                label: isTtsEnabled ? 'Disable Speech' : 'Enable Speech',
+                iconName: isTtsEnabled ? 'volume-high' : 'volume-off',
+                iconColor: '#fff',
+                onPress: () => setIsTtsEnabled(!isTtsEnabled),
+              },
+            ]}
           />
 
           <ChatArea>

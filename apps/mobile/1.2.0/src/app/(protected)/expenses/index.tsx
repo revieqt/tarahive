@@ -12,6 +12,7 @@ import { useSession } from '@/context/SessionContext';
 import SpeedDial from '@/components/ui/SpeedDial';
 import BackButton from '@/components/common/BackButton';
 import HiveBg from '@/components/common/HiveBg';
+import RadialGauge from '@/components/ui/RadialGauge';
 
 export default function BudgetScreen() {
   const isConnected = useInternetConnection();
@@ -34,15 +35,28 @@ export default function BudgetScreen() {
       >
         <BackButton/>
 
-        <View style={[styles.header, {backgroundColor: secondaryColor + '40'}]}>
-          <View style={styles.headerText}>
-            <TText type='title'>0.00</TText>
+        
+
+        <View style={styles.header}>
+          <RadialGauge 
+            maximum={3000} 
+            value={1000}
+            radius={110}
+            width={10}
+            style={styles.gauge}
+          />
+
+          <View style={styles.centerText}>
+            <TText type='title'>1000000.00</TText>
             <TText>My Monthly Expenses Limit</TText>
-            
-            
           </View>
+
+          {/* <View style={styles.headerTabContainer}>
+            <TouchableOpacity style={styles.headerTab}>
+
+            </TouchableOpacity>
+          </View> */}
           
-          <HiveBg/>
         </View>
 
         <TView color='primary' style={styles.content}>
@@ -58,15 +72,16 @@ export default function BudgetScreen() {
 
 const styles = StyleSheet.create({
   header:{
-    marginHorizontal: '3%',
-    borderColor: '#ccc2',
-    borderWidth: 1,
-    borderRadius: 10,
-    height: 150,
-    flexDirection: 'column-reverse',
-    overflow: 'hidden'
   },
-  headerText:{
+  gauge:{
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%'
+  },
+  centerText:{
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: -50
   },
   editLimit:{
     flexDirection: 'row',
