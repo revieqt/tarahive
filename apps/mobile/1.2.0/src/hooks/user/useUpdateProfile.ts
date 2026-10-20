@@ -1,58 +1,132 @@
 import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
+import * as ImagePicker from 'expo-image-picker';
 import { useSession } from '@/context/SessionContext';
 import { updateProfile } from '@/services/userService';
 import { showError, showInfo } from '@/services/toast.service';
-import { UpdateProfilePayload } from '@/types/userTypes';
+import { EditableProfileFields, ProfileImageUpload } from '@/types/userTypes';
+
+interface UpdateProfileVariables {
+  fields: EditableProfileFields;
+  profileImage: ProfileImageUpload | null;
+}
 
 export const useUpdateProfile = () => {
   const { session, updateSession } = useSession();
+  const [profileImage, setProfileImage] = useState<ProfileImageUpload | null>(null);
 
   const mutation = useMutation({
-    mutationFn: async (payload: UpdateProfilePayload) => {
+    mutationFn: async ({ fields, profileImage: selectedImage }: UpdateProfileVariables) => {
       const currentUser = session?.user;
-      const hasChanges = Object.entries(payload).some(([key, value]) => {
-        const currentValue = currentUser?.[key as keyof typeof currentUser];
-        return JSON.stringify(currentValue) !== JSON.stringify(value);
-      });
+      if (!currentUser) {
+        throw new Error('Your profile session is no longer available');
+      }
 
-      if (!hasChanges) {
+      const changedFields = Object.entries(fields).reduce<EditableProfileFields>(
+        (changed, [key, value]) => {
+          if (value === undefined) return changed;
+
+          const field = key as keyof EditableProfileFields;
+          const currentValue = currentUser[field];
+          if (JSON.stringify(currentValue) !== JSON.stringify(value)) {
+            Object.assign(changed, { [field]: value });
+          }
+          return changed;
+        },
+        {},
+      );
+
+      if (Object.keys(changedFields).length === 0 && !selectedImage) {
         return {
-          success: true,
-          message: 'No changes detected. Profile already up to date.',
+          response: null,
+          changedFields,
         };
       }
 
-      const response = await updateProfile(payload);
+      const response = await updateProfile({
+        ...changedFields,
+        ...(selectedImage ? { profileImage: selectedImage } : {}),
+      });
 
       if (!response.success) {
         throw new Error(response.message || 'Failed to update profile');
       }
 
-      return response;
+      return { response, changedFields };
     },
-    onSuccess: async (_response, payload) => {
+    onSuccess: async ({ response, changedFields }) => {
+      if (!response) {
+        showInfo('No changes', 'Your profile is already up to date.');
+        return;
+      }
+
       try {
+        if (!session?.user) {
+          throw new Error('Your profile session is no longer available');
+        }
+
         await updateSession({
           user: {
-            ...(session?.user || {}),
-            ...payload,
-          } as any,
+            ...session.user,
+            ...changedFields,
+            ...(response.data.profileImage
+              ? { profileImage: response.data.profileImage }
+              : {}),
+          },
         });
 
-        showInfo('Success', _response.message || 'Profile updated successfully');
-      } catch (error: any) {
-        showError('Error', error.message || 'Failed to update local session');
+        setProfileImage(null);
+        showInfo('Success', response.message || 'Profile updated successfully');
+      } catch (error) {
+        showError(
+          'Error',
+          error instanceof Error ? error.message : 'Failed to update local session',
+        );
       }
     },
-    onError: (error: any) => {
-      const errorMsg = error.message || 'Failed to update profile';
+    onError: (error) => {
+      const errorMsg = error instanceof Error ? error.message : 'Failed to update profile';
       showError('Error', errorMsg);
     },
   });
 
+  const chooseProfileImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.9,
+        base64: true,
+      });
+
+      if (!result.canceled) {
+        const image = result.assets[0];
+        if (!image.base64) {
+          showError('Error', 'Could not read the selected profile image');
+          return;
+        }
+
+        setProfileImage({
+          uri: image.uri,
+          base64: image.base64,
+        });
+      }
+    } catch (error) {
+      showError(
+        'Error',
+        error instanceof Error ? error.message : 'Failed to choose a profile image',
+      );
+    }
+  };
+
   return {
-    updateProfile: mutation.mutate,
-    updateProfileAsync: mutation.mutateAsync,
+    updateProfile: (fields: EditableProfileFields) =>
+      mutation.mutate({ fields, profileImage }),
+    updateProfileAsync: (fields: EditableProfileFields) =>
+      mutation.mutateAsync({ fields, profileImage }),
+    chooseProfileImage,
+    profileImageUri: profileImage?.uri,
     isPending: mutation.isPending,
     isError: mutation.isError,
     error: mutation.error,

@@ -9,7 +9,7 @@ router.get("/me", rateLimiter('MODERATE'), authMiddleware, getMe);
 router.get("/search", rateLimiter('MODERATE'), authMiddleware, searchUsersController);
 router.get("/:id", rateLimiter('MODERATE'), authMiddleware, getUser);
 router.patch("/update-visibility", rateLimiter('MODERATE'), authMiddleware, updateVisibilityController);
-router.patch("/update-profile", rateLimiter('MODERATE'), authMiddleware, updateProfileController);
+router.patch("/profile", rateLimiter('MODERATE'), authMiddleware, updateProfileController);
 router.patch("/setup", rateLimiter('MODERATE'), authMiddleware, setupUserAccount);
 
 export default router;

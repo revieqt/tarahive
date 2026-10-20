@@ -4,22 +4,21 @@ import { Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useSession } from '@/context/SessionContext';
 import Button from '@/components/ui/Button';
 import StickyScrollView from '@/components/ui/StickyScrollView';
-import { useLanguage } from '@/context/LanguageContext';
 import InputModal from '@/components/modals/InputModal';
 import { useUpdateProfile } from '@/hooks/user/useUpdateProfile';
 import BackButton from '@/components/common/BackButton';
 import ProfileImage from '@/components/ui/ProfileImage';
 import { LinearGradient } from 'expo-linear-gradient';
+import { EditableProfileFields } from '@/types/userTypes';
 
 export default function EditProfileSettingsScreen() {
   const { session } = useSession();
-  const { t } = useLanguage();
-  const { updateProfile, isPending } = useUpdateProfile();
+  const { updateProfile, chooseProfileImage, profileImageUri, isPending } = useUpdateProfile();
   const user = session?.user;
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [editingField, setEditingField] = useState<null | { key: string; label: string; type: 'text' | 'contactNumber'; initialValue?: string; placeholder?: string }>(null);
-  const [draftValues, setDraftValues] = useState<Record<string, string | string[] | undefined>>({});
+  const [editingField, setEditingField] = useState<null | { key: keyof EditableProfileFields; label: string; type: 'text' | 'contactNumber'; initialValue?: string; placeholder?: string }>(null);
+  const [draftValues, setDraftValues] = useState<EditableProfileFields>({});
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
 
   const interestOptions = useMemo(() => [
@@ -38,13 +37,18 @@ export default function EditProfileSettingsScreen() {
   ], []);
 
   const fields = useMemo(() => [
-    { key: 'username', label: t('users.fields.username'), value: user?.username, type: 'text' as const, placeholder: t('users.fields.username') },
-    { key: 'fname', label: t('users.fields.fname'), value: user?.fname, type: 'text' as const, placeholder: t('users.fields.fname') },
-    { key: 'lname', label: t('users.fields.lname'), value: user?.lname, type: 'text' as const, placeholder: t('users.fields.lname') },
-    { key: 'bio', label: t('users.fields.bio'), value: user?.bio, type: 'text' as const, placeholder: t('users.fields.bio') },
-    { key: 'contactNumber', label: t('users.fields.contact'), value: user?.contactNumber, type: 'contactNumber' as const, placeholder: t('users.fields.contact') },
-    { key: 'interests', label: t('users.fields.interests'), value: Array.isArray(user?.interests) ? user.interests : [], type: 'text' as const, placeholder: t('users.fields.interests') },
-  ], [user?.username, user?.fname, user?.lname, user?.bio, user?.contactNumber, user?.interests, t]);
+    { key: 'username', label: 'Username', value: user?.username, type: 'text' as const, placeholder: 'Username' },
+    { key: 'fname', label: 'First name', value: user?.fname, type: 'text' as const, placeholder: 'First name' },
+    { key: 'lname', label: 'Last name', value: user?.lname, type: 'text' as const, placeholder: 'Last name' },
+    { key: 'bio', label: 'Bio', value: user?.bio, type: 'text' as const, placeholder: 'Bio' },
+    { key: 'interests', label: 'Interests', value: Array.isArray(user?.interests) ? user.interests : [], type: 'text' as const, placeholder: 'Interests' },
+  ] satisfies Array<{
+    key: keyof EditableProfileFields;
+    label: string;
+    value: string | string[] | undefined;
+    type: 'text';
+    placeholder: string;
+  }>, [user?.username, user?.fname, user?.lname, user?.bio, user?.interests]);
 
   const openEditor = (field: typeof fields[number]) => {
     if (field.key === 'interests') {
@@ -96,25 +100,7 @@ export default function EditProfileSettingsScreen() {
   };
 
   const handleSave = () => {
-    const payload = Object.entries(draftValues).reduce((acc, [key, value]) => {
-      if (key === 'interests') {
-        if (Array.isArray(value) && value.length > 0) {
-          acc[key as keyof typeof acc] = value;
-        }
-        return acc;
-      }
-
-      if (typeof value === 'string' && value.trim() !== '') {
-        acc[key as keyof typeof acc] = value;
-      }
-      return acc;
-    }, {} as Record<string, string | string[]>);
-
-    if (Object.keys(payload).length === 0) {
-      return;
-    }
-
-    updateProfile(payload);
+    updateProfile(draftValues);
   };
 
   return (
@@ -122,13 +108,13 @@ export default function EditProfileSettingsScreen() {
       <StickyScrollView
         style={{ flex: 1, padding: '3%' }}
         contentContainerStyle={{ paddingBottom: 100 }}
-        title={t('users.fields.edit_title')}
-        subtitle={t('users.fields.edit_subtitle')}
+        title="Edit Profile"
+        subtitle="Update your personal information"
       >
         <BackButton/>
 
-        <TouchableOpacity style={styles.profileImageContainer}>
-          <ProfileImage imagePath={user?.profileImage} />
+        <TouchableOpacity style={styles.profileImageContainer} onPress={chooseProfileImage}>
+          <ProfileImage imagePath={profileImageUri || user?.profileImage} />
 
           <LinearGradient
             colors={['transparent', '#000']}
@@ -154,7 +140,7 @@ export default function EditProfileSettingsScreen() {
             >
               <View style={styles.fieldContent}>
                 <TText style={styles.sectionChildDescription}>{field.label}</TText>
-                <TText>{displayText ? displayText : t('common.na')}</TText>
+                <TText>{displayText ? displayText : 'N/A'}</TText>
               </View>
               <TouchableOpacity onPress={() => openEditor(field)}>
                 <TIcon name='pencil' size={20} />
@@ -165,7 +151,7 @@ export default function EditProfileSettingsScreen() {
       </StickyScrollView>
 
       <Button
-        title={t('common.save')}
+        title="Save Changes"
         type='primary'
         onPress={handleSave}
         buttonStyle={styles.button}
@@ -213,7 +199,7 @@ export default function EditProfileSettingsScreen() {
             </View>
 
             <Button
-              title={t('common.save')}
+              title="Save"
               type='primary'
               buttonStyle={styles.button}
               onPress={() => handleModalSubmit('')}

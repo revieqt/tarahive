@@ -1,4 +1,4 @@
-import dotenv from 'dotenv';
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import path from "path";
@@ -12,17 +12,18 @@ import { initializeFirebase } from './config/firebase';
 import v2Router from './modules/v2/v2.routes';
 import docsRouter from './modules/docs/docs.routes';
 import { initializeEmailDeliveryWorker } from './workers/delivery/email.worker';
-dotenv.config();
+import { storagePath } from './infrastructure/storage';
 
 const app = express();
 const server = createServer(app);
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "8mb" }));
 app.use(ipMiddleware);
 app.use('/public', express.static(path.join(__dirname, "../public")));
 app.use('/uploads', express.static(path.join(__dirname, "../uploads")));
+app.use('/storage', express.static(storagePath));
 app.use("/queues", serverAdapter.getRouter());
 // app.use('/v1', v1Router);
 app.use('/v2', v2Router);
@@ -52,4 +53,3 @@ async function bootstrap() {
 }
 
 bootstrap();
-

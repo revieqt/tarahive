@@ -7,7 +7,7 @@ interface ProfileImageProps {
 
 export default function ProfileImage({ imagePath }: ProfileImageProps) {
   const imageSource = imagePath
-    ? { uri: `${BACKEND_URL}${imagePath}` }
+    ? { uri: /^[a-z][a-z0-9+.-]*:/i.test(imagePath) ? imagePath : `${BACKEND_URL}${imagePath}` }
     : require('../../../assets/images/defaultProfile.png');
 
   return (

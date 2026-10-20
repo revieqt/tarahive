@@ -8,7 +8,8 @@ import {
 } from '@/types/userTypes';
 
 const API_URL = `/v1/user`;
-const SETUP_API_URL = `/v2/user`;
+const V2_USER_API_URL = `/v2/user`;
+const SETUP_API_URL = V2_USER_API_URL;
 const USER_SEARCH_API_URL = `/v2/user/search`;
 
 export const searchUsers = async (search: string): Promise<UserSearchResult[]> => {
@@ -74,9 +75,13 @@ export const updateVisibilitySettings = async (
 
 export const updateProfile = async (
   payload: UpdateProfilePayload
-): Promise<{ success: boolean; data: User; message: string }> => {
-  return await api.patch<{ success: boolean; data: User; message: string }>(
-    `${API_URL}/update-profile`,
-    payload
+): Promise<{ success: boolean; data: { profileImage?: string }; message: string }> => {
+  const { profileImage, ...fields } = payload;
+  return await api.patch<{ success: boolean; data: { profileImage?: string }; message: string }>(
+    `${V2_USER_API_URL}/profile`,
+    {
+      ...fields,
+      ...(profileImage ? { profileImage: profileImage.base64 } : {}),
+    },
   );
 };

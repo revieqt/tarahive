@@ -22,7 +22,6 @@ export interface ProfileUpdatePayload {
   fname?: string;
   lname?: string;
   bio?: string;
-  contactNumber?: string;
   interests?: string[];
 }
 

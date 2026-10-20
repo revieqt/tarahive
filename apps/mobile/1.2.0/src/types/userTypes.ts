@@ -11,8 +11,18 @@ export interface UpdateProfilePayload {
   fname?: string;
   lname?: string;
   bio?: string;
-  contactNumber?: string;
   interests?: string[];
+  profileImage?: ProfileImageUpload;
+}
+
+export type EditableProfileFields = Pick<
+  UpdateProfilePayload,
+  'username' | 'fname' | 'lname' | 'bio' | 'interests'
+>;
+
+export interface ProfileImageUpload {
+  uri: string;
+  base64: string;
 }
 
 export interface SetupAccountPayload {

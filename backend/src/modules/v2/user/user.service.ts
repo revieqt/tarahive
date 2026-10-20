@@ -1,4 +1,5 @@
 import { userRepo } from "../../../config/postgres";
+import { storageService } from "../../../infrastructure/storage";
 import { User } from "./user.entity";
 import { ProfileUpdatePayload, SetupUserPayload, UserSearchResult, UserStatus } from "./user.types";
 
@@ -122,8 +123,9 @@ export const updateVisibilitySettings = async (
 
 export const updateProfile = async (
   userId: string,
-  updates: ProfileUpdatePayload
-): Promise<void> => {
+  updates: ProfileUpdatePayload,
+  profileImage?: Buffer,
+): Promise<User> => {
   const user = await userRepo.findOne({ where: { id: userId } });
 
   if (!user) throw new Error("User not found");
@@ -133,8 +135,40 @@ export const updateProfile = async (
   if (typeof updates.bio !== "undefined") user.bio = updates.bio;
   if (typeof updates.interests !== "undefined") user.interests = updates.interests;
 
-  await userRepo.save(user);
-  return;
+  const oldImageKey = user.profileImage?.startsWith("/storage/")
+    ? user.profileImage.slice("/storage/".length)
+    : undefined;
+  const storedImage = profileImage
+    ? await storageService.uploadImage(profileImage, "profileImages")
+    : undefined;
+
+  if (storedImage) {
+    user.profileImage = `/storage/${storedImage.key}`;
+  }
+
+  let savedUser: User;
+  try {
+    savedUser = await userRepo.save(user);
+  } catch (error) {
+    if (storedImage) {
+      try {
+        await storageService.deleteImage(storedImage.key);
+      } catch (cleanupError) {
+        console.error("Failed to remove profile image after profile update failed", cleanupError);
+      }
+    }
+    throw error;
+  }
+
+  if (storedImage && oldImageKey) {
+    try {
+      await storageService.deleteImage(oldImageKey);
+    } catch (error) {
+      console.error("Failed to remove replaced profile image", error);
+    }
+  }
+
+  return savedUser;
 };
 
 export const setupUser = async (
