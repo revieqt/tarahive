@@ -314,12 +314,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 16,
     right: 16,
-    fontFamily: 'Inter',
+    fontFamily: 'PlusJakartaSans',
   },
   pickerText: {
     flex: 1,
     fontSize: 13,
-    fontFamily: 'Inter',
+    fontFamily: 'PlusJakartaSans',
   },
   modalOverlay: {
     flex: 1,
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 13,
-    fontFamily: 'Inter',
+    fontFamily: 'PlusJakartaSans',
     opacity: 0.7,
   },
   optionTextSelected: {

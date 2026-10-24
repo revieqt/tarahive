@@ -4,7 +4,6 @@ import { router } from "@/hooks/shared/useRouter";
 import { LinearGradient } from "expo-linear-gradient";
 import DraggableFlatList from "react-native-draggable-flatlist";
 import { TIcon, TView } from "@/components/ui/Themed";
-import BackButton from "@/components/common/BackButton";
 import LocationPickerModal, { LocationItemWithAddress } from "@/components/modals/LocationPickerModal";
 import HeadingBlock from "@/components/itinerary/HeadingBlock";
 import LocationBlock from "@/components/itinerary/LocationBlock";
@@ -163,6 +162,7 @@ export default function ItineraryForm({
   const deleteFocused = () => {
     if (!canEdit || !focusedId) return;
     setContent((current) => current.filter((block) => block.id !== focusedId));
+    if (composerId === focusedId) setComposerId(null);
     setFocusedId(null);
   };
 
@@ -354,102 +354,106 @@ export default function ItineraryForm({
     <KeyboardAvoidingView
       style={{ backgroundColor, flex: 1 }}
       behavior="padding"
-      onStartShouldSetResponderCapture={() => {
-        if (canEdit && focusedId) setFocusedId(null);
-        return false;
-      }}
     >
-      <StickyScrollView
-        title={title ? title : "Unnamed Itinerary"}
-        subtitle={(!startDate || !endDate) ? "No Date Yet" : formatDateToString(startDate) + " - " + formatDateToString(endDate)}
+      <View
+        style={{ flex: 1 }}
+        onStartShouldSetResponderCapture={() => {
+          if (canEdit && focusedId) setFocusedId(null);
+          return false;
+        }}
       >
-        <DraggableFlatList
-          data={visibleContent}
-          keyExtractor={(item) => item.id}
-          renderItem={renderBlock}
-          onDragEnd={({ data }) =>
-            canEdit &&
-            setContent(
-              composerId
-                ? [...data, content.find((block) => block.id === composerId)!]
-                : data,
-            )
-          }
-          ListHeaderComponent={
-            <ItineraryHeader
-              itineraryId={itineraryId}
-              ownerUsername={ownerUsername}
-              title={title}
-              onTitleChange={setTitle}
-              type={type}
-              onTypeChange={setType}
-              startDate={startDate}
-              onStartDateChange={setStartDate}
-              endDate={endDate}
-              onEndDateChange={setEndDate}
-              privacy={privacy}
-              onPrivacyChange={setPrivacy}
-              generalPermissions={generalPermissions}
-              onGeneralPermissionsChange={(key, value) =>
-                setGeneralPermissions((current) => ({ ...current, [key]: value }))
-              }
-              status={status}
-              onStatusChange={itineraryStatus.updateStatus}
-              onRepeatItinerary={onRepeatItinerary}
-              isUpdatingStatus={itineraryStatus.isPending}
-              themeColor={themeColor}
-              onThemeColorPress={
-                canEdit ? () => setColorBarVisible(true) : undefined
-              }
-              editable={canEdit}
-              createMode={createMode}
-              viewType={viewType}
-              style={{marginBottom: 10}}
-            />
-          }
-          ListFooterComponent={
-            showComposer ? (
-              <View
-                style={styles.footer}
-                onTouchStart={() => setFocusedId(null)}
-              >
-                <TextInput
-                  value={
-                    composerId
-                      ? content.find(
-                          (block): block is TextBlock => block.id === composerId && block.type === "text")?.value
-                      : ""
-                  }
-                  multiline
-                  autoFocus={!content.length}
-                  editable={canEdit}
-                  style={[
-                    styles.textBlock,
-                    {
-                      height: composerId ? blockHeights[composerId] || 30 : 30,
-                      color: textColor,
-                      marginHorizontal: '3%'
-                    },
-                  ]}
-                  onFocus={startComposer}
-                  onChangeText={updateComposer}
-                  onContentSizeChange={(event) =>
-                    composerId &&
-                    updateBlockHeight(
-                      composerId,
-                      event.nativeEvent.contentSize.height,
-                    )
-                  }
-                  onBlur={finishComposer}
-                />
-              </View>
-            ) : null
-          }
-          contentContainerStyle={styles.listContent}
-          keyboardShouldPersistTaps="handled"
-          activationDistance={canEdit ? 8 : 100000}
-        />
-      </StickyScrollView>
+        <StickyScrollView
+          title={title ? title : "Unnamed Itinerary"}
+          subtitle={(!startDate || !endDate) ? "No Date Yet" : formatDateToString(startDate) + " - " + formatDateToString(endDate)}
+        >
+          <DraggableFlatList
+            data={visibleContent}
+            keyExtractor={(item) => item.id}
+            renderItem={renderBlock}
+            onDragEnd={({ data }) =>
+              canEdit &&
+              setContent(
+                composerId
+                  ? [...data, content.find((block) => block.id === composerId)!]
+                  : data,
+              )
+            }
+            ListHeaderComponent={
+              <ItineraryHeader
+                itineraryId={itineraryId}
+                ownerUsername={ownerUsername}
+                title={title}
+                onTitleChange={setTitle}
+                type={type}
+                onTypeChange={setType}
+                startDate={startDate}
+                onStartDateChange={setStartDate}
+                endDate={endDate}
+                onEndDateChange={setEndDate}
+                privacy={privacy}
+                onPrivacyChange={setPrivacy}
+                generalPermissions={generalPermissions}
+                onGeneralPermissionsChange={(key, value) =>
+                  setGeneralPermissions((current) => ({ ...current, [key]: value }))
+                }
+                status={status}
+                onStatusChange={itineraryStatus.updateStatus}
+                onRepeatItinerary={onRepeatItinerary}
+                isUpdatingStatus={itineraryStatus.isPending}
+                themeColor={themeColor}
+                onThemeColorPress={
+                  canEdit ? () => setColorBarVisible(true) : undefined
+                }
+                editable={canEdit}
+                createMode={createMode}
+                viewType={viewType}
+                style={{marginBottom: 10}}
+              />
+            }
+            ListFooterComponent={
+              showComposer ? (
+                <View
+                  style={styles.footer}
+                  onTouchStart={() => setFocusedId(null)}
+                >
+                  <TextInput
+                    value={
+                      composerId
+                        ? content.find(
+                            (block): block is TextBlock => block.id === composerId && block.type === "text")?.value
+                        : ""
+                    }
+                    multiline
+                    autoFocus={!content.length}
+                    editable={canEdit}
+                    style={[
+                      styles.textBlock,
+                      {
+                        height: composerId ? blockHeights[composerId] || 30 : 30,
+                        color: textColor,
+                        marginHorizontal: '3%'
+                      },
+                    ]}
+                    onFocus={startComposer}
+                    onChangeText={updateComposer}
+                    onContentSizeChange={(event) =>
+                      composerId &&
+                      updateBlockHeight(
+                        composerId,
+                        event.nativeEvent.contentSize.height,
+                      )
+                    }
+                    onBlur={finishComposer}
+                  />
+                </View>
+              ) : null
+            }
+            contentContainerStyle={styles.listContent}
+            keyboardShouldPersistTaps="handled"
+            activationDistance={canEdit ? 8 : 100000}
+          />
+        </StickyScrollView>
+      </View>
       {canEdit && colorBarVisible && (
         <Pressable
           style={styles.colorBarDismissArea}

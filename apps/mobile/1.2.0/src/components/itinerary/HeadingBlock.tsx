@@ -21,7 +21,7 @@ export default function HeadingBlock({
   onContentSizeChange,
   editable = true,
 }: HeadingBlockProps) {
-  const sizes = { header1: 22, header2: 18, header3: 15 };
+  const sizes = { header1: 18, header2: 15, header3: 13 };
   const [height, setHeight] = useState(30);
   const textColor = useThemeColor({}, "text");
   const { t } = useLanguage();

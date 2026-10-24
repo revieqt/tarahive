@@ -77,6 +77,7 @@ export default function ItineraryHeader({
   const [shareModalVisible, setShareModalVisible] = useState(false);
   const { t } = useLanguage();
   const iconColor = useThemeColor({}, "icon");
+  const textColor = useThemeColor({}, "text");
   const privacyLabel = privacy === "collaborators"
     ? "itinerary.privacy.invited"
     : `itinerary.privacy.${privacy}`;
@@ -101,8 +102,8 @@ export default function ItineraryHeader({
           value={title}
           onChangeText={onTitleChange}
           editable={editable}
-          style={styles.titleInput}
-          placeholderTextColor="#ccc"
+          style={[styles.titleInput, {color: textColor}]}
+          placeholderTextColor="#ccc4"
         />
 
         {!createMode && ownerUsername ? (
@@ -121,7 +122,7 @@ export default function ItineraryHeader({
               <TText style={styles.metaText}>{ownerUsername}</TText>
             </TouchableOpacity>
             <TText style={styles.metaText}> · {t(statusLabel)}</TText>
-            <TIcon name={privacyIcon} size={11} color="white" style={{marginLeft: 4}}/>
+            <TIcon name={privacyIcon} size={11} style={{marginLeft: 4}}/>
           </View>
         ) : null}
 
@@ -138,24 +139,24 @@ export default function ItineraryHeader({
               style={[styles.tabs, tab === 1 && {borderColor: themeColor}]}
               onPress={() => setTab(1)}
             >
-              <TText style={[styles.tabsText, tab === 1 && {color: themeColor}]}>{t('itinerary.form.details_tab')}</TText>
+              <TText style={[styles.tabsText, tab === 1 && {color: themeColor, opacity: 1}]}>{t('itinerary.form.details_tab')}</TText>
             </TouchableOpacity>
 
             { !createMode  &&
               <TouchableOpacity 
-                style={[styles.tabs, tab === 2 && {borderColor: '#fff', opacity: 1}]}
+                style={[styles.tabs, tab === 2 && {borderColor: themeColor}]}
                 onPress={() => setTab(2)}
               >
-                <TText style={styles.tabsText}>{t('itinerary.form.actions_tab')}</TText>
+                <TText style={[styles.tabsText, tab === 2 && {color: themeColor, opacity: 1}]}>{t('itinerary.form.actions_tab')}</TText>
               </TouchableOpacity>
             }
 
             { canEdit && !createMode &&
               <TouchableOpacity 
-                style={[styles.tabs, tab === 3 && {borderColor: '#fff', opacity: 1}]}
+                style={[styles.tabs, tab === 3 && {borderColor: themeColor}]}
                 onPress={() => setTab(3)}
               >
-                <TText style={styles.tabsText}>{t('itinerary.form.privacy_tab')}</TText>
+                <TText style={[styles.tabsText, tab === 3 && {color: themeColor, opacity: 1}]}>{t('itinerary.form.privacy_tab')}</TText>
               </TouchableOpacity>
             }
           </ScrollView>
@@ -378,13 +379,12 @@ const styles = StyleSheet.create({
     width: "92%",
   },
   metaText: {
-    opacity: 0.7,
-    color: "white",
     fontSize: 10,
   },
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    opacity: 0.7,
   },
   closeButton:{
     position: 'absolute',
@@ -393,7 +393,8 @@ const styles = StyleSheet.create({
     padding: 5
   },
   headerButton: {
-    backgroundColor: "#ccc2",
+    borderWidth: 1,
+    borderColor: "#ccc2",
     paddingVertical: 6,
     paddingHorizontal: 8,
     justifyContent: "center",
@@ -416,9 +417,9 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   tabsText:{
-    color: '#fff',
     fontSize: 12,
-    marginBottom: 4
+    marginBottom: 4,
+    opacity: .5
   },
   moreOptionsContainer:{
     flexDirection: 'row',

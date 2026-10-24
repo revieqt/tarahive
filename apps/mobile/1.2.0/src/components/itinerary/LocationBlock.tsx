@@ -29,7 +29,7 @@ export default function LocationBlock({
         activeOpacity={0.8}
         onPress={editable ? onPress : undefined}
         onLongPress={editable ? onLongPress : undefined}
-        style={[styles.copy, {backgroundColor: themeColor + '20'}]}
+        style={styles.copy}
       >
           <TText style={styles.name}>{block.locationName}</TText>
           <TText numberOfLines={1} style={styles.address}>
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 8
   },
-  name: { fontSize: 13, fontWeight: "600" },
+  name: { fontSize: 13, fontWeight: "500" },
   address: { fontSize: 11, opacity: 0.5 },
   actions: {
     flexDirection: "row",
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 5,
     borderWidth: 1,
-    borderColor: "#9994",
+    borderColor: "#ccc2",
     borderRadius: 20,
     opacity: .75
   },
