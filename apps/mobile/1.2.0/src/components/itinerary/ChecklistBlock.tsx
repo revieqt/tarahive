@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     paddingVertical: 5,
-    fontFamily: "Inter",
+    fontFamily: "PlusJakartaSans",
     fontSize: 14,
   },
   completed: { textDecorationLine: "line-through", opacity: 0.55 },

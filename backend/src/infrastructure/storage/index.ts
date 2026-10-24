@@ -7,7 +7,7 @@ import { StorageService } from "./storage.service";
 
 export const storagePath =
   process.env.STORAGE_PATH ??
-  path.resolve(process.cwd(), "../storage");
+  path.resolve(__dirname, "../../../../storage");
 
 const providerName = process.env.STORAGE_PROVIDER ?? "local";
 

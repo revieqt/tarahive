@@ -16,7 +16,8 @@ import ShareModal from "@/components/modals/ShareModal";
 import { ITINERARY_TYPES } from "@/constants/Itinerary";
 import { ItineraryGeneralPermissions, ItineraryPrivacy, ItineraryStatus, ItineraryViewType } from "@/types/itineraryTypes"
 import BackButton from "../common/BackButton";
-import { useLanguage } from "@/context/LanguageContext"
+import { useLanguage } from "@/context/LanguageContext";
+import { useThemeColor } from '@/hooks/shared/useThemeColor';
 
 type ItineraryHeaderProps = {
   itineraryId?: string;
@@ -75,6 +76,7 @@ export default function ItineraryHeader({
   const [tab, setTab] = useState(1);
   const [shareModalVisible, setShareModalVisible] = useState(false);
   const { t } = useLanguage();
+  const iconColor = useThemeColor({}, "icon");
   const privacyLabel = privacy === "collaborators"
     ? "itinerary.privacy.invited"
     : `itinerary.privacy.${privacy}`;
@@ -90,9 +92,9 @@ export default function ItineraryHeader({
       : "itinerary.main.active";
 
   return (
-    <TView style={style}>
+    <TView style={style} color='primary'>
       <View
-        style={[styles.titleContainer, {backgroundColor: themeColor}]}
+        style={[styles.titleContainer, {backgroundColor: themeColor + '10'}]}
       >
         <TextInput
           placeholder={t('itinerary.form.title_placeholder')}
@@ -100,7 +102,7 @@ export default function ItineraryHeader({
           onChangeText={onTitleChange}
           editable={editable}
           style={styles.titleInput}
-          placeholderTextColor="#fff7"
+          placeholderTextColor="#ccc"
         />
 
         {!createMode && ownerUsername ? (
@@ -123,7 +125,7 @@ export default function ItineraryHeader({
           </View>
         ) : null}
 
-        <BackButton type="close" color="white" style={styles.closeButton}/>
+        <BackButton type="close" style={styles.closeButton}/>
       
         <View style={{flexDirection: 'row'}}>
           <ScrollView 
@@ -133,10 +135,10 @@ export default function ItineraryHeader({
             style={{flex: 1}}
           >
             <TouchableOpacity 
-              style={[styles.tabs, tab === 1 && {borderColor: '#fff', opacity: 1}]}
+              style={[styles.tabs, tab === 1 && {borderColor: themeColor}]}
               onPress={() => setTab(1)}
             >
-              <TText style={styles.tabsText}>{t('itinerary.form.details_tab')}</TText>
+              <TText style={[styles.tabsText, tab === 1 && {color: themeColor}]}>{t('itinerary.form.details_tab')}</TText>
             </TouchableOpacity>
 
             { !createMode  &&
@@ -158,13 +160,13 @@ export default function ItineraryHeader({
             }
           </ScrollView>
 
-          <View style={styles.moreOptionsContainer}>
+          <View style={[styles.moreOptionsContainer, {backgroundColor: themeColor + '20'}]}>
             <TouchableOpacity
               onPress={() => setShareModalVisible(true)}
               disabled={!itineraryId}
               accessibilityLabel="Share itinerary"
             >
-              <TIcon name='share' size={20} color='white'/>
+              <TIcon name='share' size={20}/>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -172,10 +174,10 @@ export default function ItineraryHeader({
               disabled={!onRepeatItinerary}
               accessibilityLabel={t("itinerary.form.copy_button")}
             >
-              <TIcon name='content-copy' size={17} color='white'/>
+              <TIcon name='content-copy' size={17}/>
             </TouchableOpacity>
 
-            { canEdit && <TouchableOpacity style={[styles.colorView, {backgroundColor: themeColor}]} onPress={editable ? onThemeColorPress : undefined}/> }
+            { canEdit && <TouchableOpacity style={[styles.colorView, {backgroundColor: themeColor, borderColor: iconColor}]} onPress={editable ? onThemeColorPress : undefined}/> }
           </View>
         </View>
       </View>
@@ -366,14 +368,13 @@ export default function ItineraryHeader({
 const styles = StyleSheet.create({
   titleContainer: {
     paddingHorizontal: '3%',
-    paddingTop: 8
+    paddingTop: 16,
   },
   titleInput: {
-    fontFamily: "Inter",
+    fontFamily: "PlusJakartaSans",
     fontSize: 20,
     fontWeight: "bold",
     height: 30,
-    color: "#fff",
     width: "92%",
   },
   metaText: {
@@ -387,13 +388,13 @@ const styles = StyleSheet.create({
   },
   closeButton:{
     position: 'absolute',
-    top: 0,
-    right: 0,
-    padding: '3%'
+    top: 12,
+    right: 2,
+    padding: 5
   },
   headerButton: {
     backgroundColor: "#ccc2",
-    paddingVertical: 4,
+    paddingVertical: 6,
     paddingHorizontal: 8,
     justifyContent: "center",
     alignItems: "center",
@@ -413,7 +414,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 3,
     paddingTop: 9,
     borderColor: 'transparent',
-    opacity: .5
   },
   tabsText:{
     color: '#fff',
@@ -426,20 +426,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff4',
     alignItems: 'center',
     paddingHorizontal: 7,
-    paddingVertical: 4,
-    gap: 8,
+    paddingVertical: 6,
+    gap: 9,
     marginRight: '-3%'
   },
   colorView:{
     width: 20,
     height: 20,
     borderRadius: 30,
-    borderColor: '#fff',
-    borderWidth: 3,
+    borderWidth: 2,
   },
   bottomOptions:{
     gap: 2,
-    paddingVertical: 8,
+    paddingVertical: 6,
     paddingHorizontal: '3%',
   }
 });

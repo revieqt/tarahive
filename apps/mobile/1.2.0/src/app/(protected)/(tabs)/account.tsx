@@ -60,7 +60,7 @@ export default function AccountScreen() {
         onClose={() => setWebView(null)}
       />
       <StickyScrollView
-        contentContainerStyle={{ padding: '3%', paddingBottom: 60 }}
+        contentContainerStyle={{ padding: '3%', paddingBottom: 80 }}
         title={fullName}
         subtitle={'@'+user?.username}
         showBackButton={false}

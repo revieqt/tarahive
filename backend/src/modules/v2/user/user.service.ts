@@ -161,11 +161,7 @@ export const updateProfile = async (
   }
 
   if (storedImage && oldImageKey) {
-    try {
-      await storageService.deleteImage(oldImageKey);
-    } catch (error) {
-      console.error("Failed to remove replaced profile image", error);
-    }
+    await storageService.deleteImage(oldImageKey);
   }
 
   return savedUser;

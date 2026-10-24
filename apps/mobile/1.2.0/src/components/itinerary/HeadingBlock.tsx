@@ -55,5 +55,5 @@ export default function HeadingBlock({
 }
 
 const styles = StyleSheet.create({
-  input: { padding: 0, fontFamily: "Inter", fontWeight: "800" },
+  input: { padding: 0, fontFamily: "PlusJakartaSans", fontWeight: "800" },
 });

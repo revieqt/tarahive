@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     borderRadius: 50,
-    padding: 8,
+    padding: 6,
     gap: 5,
     flexDirection: "row",
     shadowColor: '#000',
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
   },
   option: {
     flex: 1,
-    padding: 5,
+    padding: 8,
     borderRadius: 15,
     flexDirection: "row",
     justifyContent: "center",

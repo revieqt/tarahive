@@ -112,7 +112,6 @@ export default function EditProfileSettingsScreen() {
         subtitle="Update your personal information"
       >
         <BackButton/>
-
         <TouchableOpacity style={styles.profileImageContainer} onPress={chooseProfileImage}>
           <ProfileImage imagePath={profileImageUri || user?.profileImage} />
 

@@ -21,6 +21,8 @@ import { useLanguage } from "@/context/LanguageContext";
 import { CreateItineraryForm, Itinerary, ItineraryGeneralPermissions, ItineraryPrivacy, ItineraryStatus, ItineraryUpdateValues, ItineraryViewType, HeaderType, ItineraryBlock, LocationBlockData, TextBlock } from "@/types/itineraryTypes";
 import { useUpdateItinerary } from "@/hooks/itinerary/useUpdateItinerary";
 import { useItineraryStatus } from "@/hooks/itinerary/useItineraryStatus";
+import StickyScrollView from "../ui/StickyScrollView";
+import { formatDateToString } from "@/utils/formatDateToString";
 
 type ItineraryFormProps = {
   ownerUsername?: string;
@@ -357,39 +359,10 @@ export default function ItineraryForm({
         return false;
       }}
     >
-      <TView color='primary' style={styles.header}>
-        <ItineraryHeader
-          itineraryId={itineraryId}
-          ownerUsername={ownerUsername}
-          title={title}
-          onTitleChange={setTitle}
-          type={type}
-          onTypeChange={setType}
-          startDate={startDate}
-          onStartDateChange={setStartDate}
-          endDate={endDate}
-          onEndDateChange={setEndDate}
-          privacy={privacy}
-          onPrivacyChange={setPrivacy}
-          generalPermissions={generalPermissions}
-          onGeneralPermissionsChange={(key, value) =>
-            setGeneralPermissions((current) => ({ ...current, [key]: value }))
-          }
-          status={status}
-          onStatusChange={itineraryStatus.updateStatus}
-          onRepeatItinerary={onRepeatItinerary}
-          isUpdatingStatus={itineraryStatus.isPending}
-          themeColor={themeColor}
-          onThemeColorPress={
-            canEdit ? () => setColorBarVisible(true) : undefined
-          }
-          editable={canEdit}
-          createMode={createMode}
-          viewType={viewType}
-        />
-      </TView>
-
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <StickyScrollView
+        title={title ? title : "Unnamed Itinerary"}
+        subtitle={(!startDate || !endDate) ? "No Date Yet" : formatDateToString(startDate) + " - " + formatDateToString(endDate)}
+      >
         <DraggableFlatList
           data={visibleContent}
           keyExtractor={(item) => item.id}
@@ -402,7 +375,38 @@ export default function ItineraryForm({
                 : data,
             )
           }
-          style={ createMode ? {marginTop: 113} : {marginTop: 125}}
+          ListHeaderComponent={
+            <ItineraryHeader
+              itineraryId={itineraryId}
+              ownerUsername={ownerUsername}
+              title={title}
+              onTitleChange={setTitle}
+              type={type}
+              onTypeChange={setType}
+              startDate={startDate}
+              onStartDateChange={setStartDate}
+              endDate={endDate}
+              onEndDateChange={setEndDate}
+              privacy={privacy}
+              onPrivacyChange={setPrivacy}
+              generalPermissions={generalPermissions}
+              onGeneralPermissionsChange={(key, value) =>
+                setGeneralPermissions((current) => ({ ...current, [key]: value }))
+              }
+              status={status}
+              onStatusChange={itineraryStatus.updateStatus}
+              onRepeatItinerary={onRepeatItinerary}
+              isUpdatingStatus={itineraryStatus.isPending}
+              themeColor={themeColor}
+              onThemeColorPress={
+                canEdit ? () => setColorBarVisible(true) : undefined
+              }
+              editable={canEdit}
+              createMode={createMode}
+              viewType={viewType}
+              style={{marginBottom: 10}}
+            />
+          }
           ListFooterComponent={
             showComposer ? (
               <View
@@ -424,6 +428,7 @@ export default function ItineraryForm({
                     {
                       height: composerId ? blockHeights[composerId] || 30 : 30,
                       color: textColor,
+                      marginHorizontal: '3%'
                     },
                   ]}
                   onFocus={startComposer}
@@ -444,7 +449,7 @@ export default function ItineraryForm({
           keyboardShouldPersistTaps="handled"
           activationDistance={canEdit ? 8 : 100000}
         />
-      </ScrollView>
+      </StickyScrollView>
       {canEdit && colorBarVisible && (
         <Pressable
           style={styles.colorBarDismissArea}
@@ -509,29 +514,8 @@ export default function ItineraryForm({
 }
 
 const styles = StyleSheet.create({
-  header: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    left: 0,
-    zIndex: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
-    elevation: 3,
-  },
-  backButton: { 
-    borderRadius: 20, 
-    padding: 3, 
-    marginTop: 7 
-  },
   listContent: { 
     paddingBottom: 140, 
-    paddingHorizontal: "3%" 
   },
   blockRow: {
     flexDirection: "row-reverse",
@@ -539,7 +523,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   block: { 
-    flex: 1 
+    flex: 1,
+    marginHorizontal: '3%'
   },
   dragHandle: {
     width: 10,
@@ -563,15 +548,8 @@ const styles = StyleSheet.create({
   textBlock: { 
     minHeight: 30, 
     padding: 0, 
-    fontFamily: "Inter", 
+    fontFamily: "PlusJakartaSans", 
     fontSize: 13 
-  },
-  shadow: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
-    elevation: 3,
   },
   dividerRow: { 
     marginBottom: 4 
@@ -601,11 +579,5 @@ const styles = StyleSheet.create({
   ,
   colorBarLayer: { 
     zIndex: 30 
-  },
-  optionsButton: {
-    borderColor: '#ccc4',
-    borderWidth: 1,
-    padding: 4,
-    borderRadius: 20
   },
 });
