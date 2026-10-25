@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { showError, showSuccess } from '@/services/toast.service';
+import { ApiError } from '@/api/errors';
+import { showError, showWarning } from '@/services/toast.service';
 import { updateItinerary } from '@/services/itineraryService';
 import {
   Itinerary,
@@ -81,10 +82,13 @@ const validateChanges = (itinerary: Itinerary, changes: ItineraryChanges) => {
 };
 
 const toPayload = (
-  itineraryId: string,
+  itinerary: Itinerary,
   changes: ItineraryChanges
 ): UpdateItineraryPayload => {
-  const payload: UpdateItineraryPayload = { itineraryId };
+  const payload: UpdateItineraryPayload = {
+    itineraryId: itinerary.id,
+    expectedVersion: itinerary.v,
+  };
 
   if (changes.title !== undefined) payload.title = changes.title;
   if (changes.type !== undefined) payload.type = changes.type;
@@ -105,7 +109,8 @@ const toPayload = (
 
 export const useUpdateItinerary = (
   itinerary: Itinerary | undefined,
-  values: ItineraryUpdateValues
+  values: ItineraryUpdateValues,
+  onSaved?: (itinerary: Itinerary) => void
 ) => {
   const queryClient = useQueryClient();
   const changes = itinerary ? getChanges(itinerary, values) : {};
@@ -120,13 +125,40 @@ export const useUpdateItinerary = (
       return response;
     },
     onSuccess: async (response, payload) => {
+      queryClient.setQueryData<Itinerary>(
+        ['itinerary', payload.itineraryId],
+        (current) => ({
+          ...current,
+          ...response.data,
+          user: response.data.user ?? current?.user,
+        })
+      );
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['itinerary', payload.itineraryId] }),
         queryClient.invalidateQueries({ queryKey: ['user-itineraries'] }),
       ]);
-      showSuccess('Success', response.message || 'Itinerary updated successfully');
+      onSaved?.(response.data);
     },
-    onError: (error: Error) => {
+    onError: async (error: Error, payload) => {
+      if (error instanceof ApiError && error.status === 409) {
+        const conflictData = (error.data as { data?: Itinerary } | undefined)?.data;
+        if (conflictData?.id === payload.itineraryId) {
+          queryClient.setQueryData<Itinerary>(
+            ['itinerary', payload.itineraryId],
+            (current) => ({
+              ...current,
+              ...conflictData,
+              user: conflictData.user ?? current?.user,
+            })
+          );
+        }
+        await queryClient.invalidateQueries({ queryKey: ['itinerary', payload.itineraryId] });
+        showWarning(
+          'Itinerary changed',
+          'The latest version was loaded. Your unsaved edits were kept where possible; review and save again.'
+        );
+        return;
+      }
       showError('Update Error', error.message || 'Failed to update itinerary');
     },
   });
@@ -136,7 +168,7 @@ export const useUpdateItinerary = (
 
     try {
       validateChanges(itinerary, changes);
-      mutation.mutate(toPayload(itinerary.id, changes));
+      mutation.mutate(toPayload(itinerary, changes));
     } catch (error) {
       showError('Update Error', error instanceof Error ? error.message : 'Invalid itinerary changes');
     }

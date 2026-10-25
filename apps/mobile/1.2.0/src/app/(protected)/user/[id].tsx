@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity, View, ScrollView, Dimensions, Image, Alert } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, ScrollView, Dimensions, Alert } from 'react-native';
 import { TText, TView, TIcon } from '@/components/ui/Themed';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSession } from '@/context/SessionContext';
@@ -16,6 +16,8 @@ import ProBadge from '@/components/ui/ProBadge';
 import HiveBg from '@/components/common/HiveBg';
 import StickyScrollView from '@/components/ui/StickyScrollView';
 import ShareModal from '@/components/modals/ShareModal';
+import { Image } from 'expo-image';
+import OptionsPopup from '@/components/ui/OptionsPopup';
 // import SOSInfoCard from '@/components/cards/SOSInfoCard';
 
 export default function ProfileScreen() {
@@ -122,6 +124,76 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
       </View>
+
+      <TView style={styles.journalContainer} color='primary'>
+        <View style={styles.journalTitle}>
+          <TText style={{fontWeight: 700, flex: 1}}>{isCurrentUser ? 'My' : user?.fname} Journal</TText>
+
+          <OptionsPopup
+            options={[
+              { label: "Itinerary Archives", iconName: "archive", onPress: () => router.push('itinerary/archives')},
+              { label: "Help", iconName: "help-circle" },
+            ]}
+          >
+            <TIcon name="dots-vertical" size={18}/>
+          </OptionsPopup>
+        </View>
+        
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.journalItemContainer}>
+          { isCurrentUser &&
+            <TouchableOpacity style={[styles.journalItem, styles.newJournalItem]} onPress={() => router.push('/journal')}>
+              <TIcon name='plus' size={30}/>
+              <TText style={styles.journalItemTitle}>Create New Journal</TText>
+            </TouchableOpacity>
+          }
+          {/* SAMPLE JOURNAL ITEM */}
+          <TouchableOpacity style={styles.journalItem} onPress={() => router.push('/journal')}>
+            <Image
+              source={require('../../../../assets/images/default-bg-1.2.0.jpg')}
+              style={{ flex: 1, width: '100%', height: '100%' }}
+              contentFit="cover"
+            />
+
+            <LinearGradient
+              colors={['transparent', '#000']}
+              style={styles.journalItemGradient}
+            >
+              <TText style={[styles.journalItemTitle, {color: 'white'}]}>Sample Journal Title</TText>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.journalItem} onPress={() => router.push('/journal')}>
+            <Image
+              source={require('../../../../assets/images/default-bg-1.2.0.jpg')}
+              style={{ flex: 1, width: '100%', height: '100%' }}
+              contentFit="cover"
+            />
+
+            <LinearGradient
+              colors={['transparent', '#000']}
+              style={styles.journalItemGradient}
+            >
+              <TText style={[styles.journalItemTitle, {color: 'white'}]}>Sample Journal Title</TText>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.journalItem} onPress={() => router.push('/journal')}>
+            <Image
+              source={require('../../../../assets/images/default-bg-1.2.0.jpg')}
+              style={{ flex: 1, width: '100%', height: '100%' }}
+              contentFit="cover"
+            />
+
+            <LinearGradient
+              colors={['transparent', '#000']}
+              style={styles.journalItemGradient}
+            >
+              <TText style={[styles.journalItemTitle, {color: 'white'}]}>Sample Journal Title</TText>
+            </LinearGradient>
+          </TouchableOpacity>
+        </ScrollView>
+      </TView>
+      
       <ShareModal
         visible={showShare}
         onClose={() => setShowShare(false)}
@@ -174,16 +246,6 @@ const styles = StyleSheet.create({
     paddingLeft: 95,
     marginTop: -62,
   },
-  headerBottom: {
-    position: 'absolute',
-    bottom: -1,
-    left: 0,
-    right: 0,
-    height: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    zIndex: 200,
-  },
   userOptionContainer:{
     flexDirection: 'row',
     gap: 3,
@@ -196,20 +258,45 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc3'
   },
-  badgeContainer: {
-    width: '100%',
-    padding: 5,
-    overflow: 'hidden',
-    borderRadius: 12,
-    justifyContent: 'center',
+  journalContainer:{
+    marginTop: 10,
+    paddingVertical: 10
   },
-  progressContainer: {
+  journalTitle:{
+    flexDirection: 'row',
+    marginHorizontal: '3%',
+    marginBottom: 7,
+  },
+  journalItemContainer:{
+    paddingHorizontal: '3%',
+    gap: 4
+  },
+  journalItem:{
+    borderWidth: 1,
+    height: 150,
+    width: 100,
+    borderColor: "#ccc4",
+    borderRadius: 10,
+    backgroundColor: "#0001",
+    overflow: 'hidden'
+  },
+  newJournalItem:{
+    justifyContent: 'center',
+    alignItems: 'center',
+    opacity: .5,
+    borderWidth: 2,
+    borderStyle: 'dashed'
+  },
+  journalItemGradient:{
     position: 'absolute',
-    top: 0,
     bottom: 0,
-    left: 70,
+    left: 0,
     right: 0,
-    justifyContent: 'center',
-    paddingHorizontal: 16,
+    padding: 10
   },
+  journalItemTitle:{
+    textAlign: 'center', 
+    fontSize: 11, 
+    fontWeight: 600
+  }
 });

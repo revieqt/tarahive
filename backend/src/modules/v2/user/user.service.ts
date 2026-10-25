@@ -7,9 +7,14 @@ export const searchUsers = async (
   search: string,
   currentUserId: string
 ): Promise<UserSearchResult[]> => {
-  const escapedSearch = search.replace(/[\\%_]/g, "\\$&");
-  const pattern = `%${escapedSearch}%`;
-  const normalizedSearch = search.toLowerCase();
+  const trimmedSearch = search.trim();
+  if (!trimmedSearch) {
+    return [];
+  }
+
+  const escapedSearch = trimmedSearch.replace(/[\\%_]/g, "\\$&");
+  const normalizedSearch = trimmedSearch.toLowerCase();
+  const searchPattern = `%${escapedSearch.toLowerCase()}%`;
   const prefixPattern = `${escapedSearch.toLowerCase()}%`;
 
   const users = await userRepo
@@ -20,43 +25,41 @@ export const searchUsers = async (
       "user.fname",
       "user.lname",
       "user.username",
+      "user.email",
     ])
     .where(
-      "(user.fname ILIKE :pattern ESCAPE E'\\\\' OR user.lname ILIKE :pattern ESCAPE E'\\\\' OR user.username ILIKE :pattern ESCAPE E'\\\\')",
-      { pattern, normalizedSearch, prefixPattern }
+      "(LOWER(COALESCE(user.fname, '')) LIKE :searchPattern ESCAPE E'\\\\' OR LOWER(COALESCE(user.lname, '')) LIKE :searchPattern ESCAPE E'\\\\' OR LOWER(COALESCE(user.username, '')) LIKE :searchPattern ESCAPE E'\\\\' OR LOWER(COALESCE(user.email, '')) LIKE :searchPattern ESCAPE E'\\\\')",
+      { searchPattern, normalizedSearch, prefixPattern }
     )
     .andWhere("user.id <> :currentUserId", { currentUserId })
     .andWhere("user.status = :status", { status: UserStatus.ACTIVE })
-    .andWhere("user.username IS NOT NULL")
     .orderBy(
       `CASE
-        WHEN LOWER(user.username) = :normalizedSearch THEN 0
-        WHEN LOWER(COALESCE(user.fname, '')) = :normalizedSearch OR LOWER(COALESCE(user.lname, '')) = :normalizedSearch THEN 1
-        WHEN LOWER(user.username) LIKE :prefixPattern ESCAPE E'\\\\' THEN 2
-        WHEN LOWER(COALESCE(user.fname, '')) LIKE :prefixPattern ESCAPE E'\\\\' OR LOWER(COALESCE(user.lname, '')) LIKE :prefixPattern ESCAPE E'\\\\' THEN 3
-        ELSE 4
+        WHEN LOWER(COALESCE(user.username, '')) = :normalizedSearch THEN 0
+        WHEN LOWER(COALESCE(user.email, '')) = :normalizedSearch THEN 1
+        WHEN LOWER(COALESCE(user.fname, '')) = :normalizedSearch OR LOWER(COALESCE(user.lname, '')) = :normalizedSearch THEN 2
+        WHEN LOWER(COALESCE(user.username, '')) LIKE :prefixPattern ESCAPE E'\\\\' THEN 3
+        WHEN LOWER(COALESCE(user.email, '')) LIKE :prefixPattern ESCAPE E'\\\\' THEN 4
+        WHEN LOWER(COALESCE(user.fname, '')) LIKE :prefixPattern ESCAPE E'\\\\' OR LOWER(COALESCE(user.lname, '')) LIKE :prefixPattern ESCAPE E'\\\\' THEN 5
+        ELSE 6
       END`,
       "ASC"
-    )
-    .addOrderBy(
-      `GREATEST(
-        similarity(LOWER(COALESCE(user.username, '')), :normalizedSearch),
-        similarity(LOWER(COALESCE(user.fname, '')), :normalizedSearch),
-        similarity(LOWER(COALESCE(user.lname, '')), :normalizedSearch)
-      )`,
-      "DESC"
     )
     .addOrderBy("user.username", "ASC")
     .take(7)
     .getMany();
 
-  return users.map((user) => ({
-    id: user.id,
-    profileImage: user.profileImage ?? "",
-    fname: user.fname ?? "",
-    lname: user.lname ?? "",
-    username: user.username!,
-  }));
+  return users.map((user) => {
+    const username = user.username ?? user.email?.split("@")[0] ?? "";
+
+    return {
+      id: user.id,
+      profileImage: user.profileImage ?? "",
+      fname: user.fname ?? "",
+      lname: user.lname ?? "",
+      username,
+    };
+  });
 };
 
 export const getUserById = async (userId: string): Promise<Partial<User>> => {

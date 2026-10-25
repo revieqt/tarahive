@@ -87,7 +87,6 @@ const ActiveRouteSidebarButton: React.FC = () => {
                         {
                             opacity: fadeAnimation,
                             backgroundColor: primaryColor,
-                            borderColor: accentColor,
                             transform: [
                                 {
                                     translateX: slideAnimation.interpolate({
@@ -108,7 +107,7 @@ const ActiveRouteSidebarButton: React.FC = () => {
                 </Animated.View>
             ) : null}
             <TouchableOpacity
-                style={styles.wrapper}
+                style={[styles.wrapper,{backgroundColor: accentColor}]}
                 onPress={() => router.push('/tara')}
             >
                 <Animated.Image
@@ -116,7 +115,6 @@ const ActiveRouteSidebarButton: React.FC = () => {
                     style={[
                         styles.taraImage,
                         {
-                            backgroundColor: accentColor,
                             transform: [
                                 {
                                     translateY: floatAnimation.interpolate({
@@ -167,7 +165,6 @@ const styles = StyleSheet.create({
         shadowRadius: 24,
         elevation: 10,
         borderRadius: 30,
-        borderWidth: 3,
     },
     messageText: {
         textAlign: 'center',

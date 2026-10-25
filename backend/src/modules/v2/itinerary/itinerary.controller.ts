@@ -9,7 +9,9 @@ import {
   deleteItineraryCollaboratorService,
   getItineraryService,
   getAllUserItinerariesService,
+  ItineraryVersionConflictError,
 } from './itinerary.service';
+import { notifyItineraryUpdated } from '../../../infrastructure/socket';
 import {
   CollaboratorPermissions,
   CreateItineraryCollaboratorRequest,
@@ -96,7 +98,7 @@ export const updateItinerary = async (req: AuthRequest, res: Response) => {
 
     const body = req.body as Partial<UpdateItineraryRequest>;
     const allowedFields = new Set([
-      'itineraryId', 'title', 'type', 'startDate', 'endDate', 'content',
+      'itineraryId', 'expectedVersion', 'title', 'type', 'startDate', 'endDate', 'content',
       'privacy', 'themeColor', 'allowSharing', 'allowCopying',
     ]);
     const unexpectedField = Object.keys(body).find((field) => !allowedFields.has(field));
@@ -108,8 +110,16 @@ export const updateItinerary = async (req: AuthRequest, res: Response) => {
     if (typeof body.itineraryId !== 'string' || !body.itineraryId.trim()) {
       return res.status(400).json({ success: false, message: 'itineraryId is required' });
     }
+    if (
+      body.expectedVersion !== undefined &&
+      (!Number.isInteger(body.expectedVersion) || body.expectedVersion < 1)
+    ) {
+      return res.status(400).json({ success: false, message: 'expectedVersion must be a positive integer' });
+    }
 
-    const updateFields = [...allowedFields].filter((field) => field !== 'itineraryId');
+    const updateFields = [...allowedFields].filter(
+      (field) => field !== 'itineraryId' && field !== 'expectedVersion'
+    );
     if (!updateFields.some((field) => Object.prototype.hasOwnProperty.call(body, field))) {
       return res.status(400).json({ success: false, message: 'At least one itinerary field must be provided' });
     }
@@ -157,10 +167,22 @@ export const updateItinerary = async (req: AuthRequest, res: Response) => {
       }
     }
 
-    const itinerary = await updateItineraryService(userId, body.itineraryId, updates);
+    const itinerary = await updateItineraryService(
+      userId,
+      body.itineraryId,
+      updates,
+      body.expectedVersion
+    );
     if (!itinerary) {
       return res.status(404).json({ success: false, message: 'Itinerary not found or not editable' });
     }
+
+    notifyItineraryUpdated(
+      itinerary.id,
+      itinerary.v,
+      itinerary.updatedOn.toISOString(),
+      userId
+    );
 
     return res.status(200).json({
       success: true,
@@ -168,6 +190,14 @@ export const updateItinerary = async (req: AuthRequest, res: Response) => {
       data: itinerary,
     });
   } catch (error) {
+    if (error instanceof ItineraryVersionConflictError) {
+      return res.status(409).json({
+        success: false,
+        code: 'ITINERARY_VERSION_CONFLICT',
+        message: error.message,
+        data: error.latestItinerary,
+      });
+    }
     if (error instanceof RangeError) {
       return res.status(400).json({ success: false, message: error.message });
     }
@@ -209,6 +239,13 @@ export const updateItineraryStatus = async (req: AuthRequest, res: Response) => 
     if (!itinerary) {
       return res.status(404).json({ success: false, message: 'Itinerary not found or not owned by user' });
     }
+
+    notifyItineraryUpdated(
+      itinerary.id,
+      itinerary.v,
+      itinerary.updatedOn.toISOString(),
+      userId
+    );
 
     return res.status(200).json({
       success: true,

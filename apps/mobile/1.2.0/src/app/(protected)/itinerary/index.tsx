@@ -33,7 +33,7 @@ export default function ItineraryScreen() {
             ]}
             style={styles.moreButton}
           >
-            <TIcon name="dots-vertical" size={20}/>
+            <TIcon name="menu" size={20}/>
           </OptionsPopup>
         </View>
         {isLoading ? (

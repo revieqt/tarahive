@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { useGetItinerary } from '@/hooks/itinerary/useGetItinerary';
+import { useItineraryRealtime } from '@/hooks/itinerary/useItineraryRealtime';
 import ItineraryForm from '@/components/itinerary/Form';
 import { useRouter } from '@/hooks/shared/useRouter';
 import { CreateItineraryForm } from '@/types/itineraryTypes';
@@ -13,10 +14,10 @@ export default function ItineraryScreen() {
 	const {
 		itinerary,
 		isLoading,
-		isFetching,
 		isError,
 		refetch,
 	} = useGetItinerary(itineraryId ?? null);
+	const remoteUpdateNotice = useItineraryRealtime(itineraryId ?? null);
 	const retryItinerary = useCallback(() => {
 		void refetch();
 	}, [refetch]);
@@ -36,7 +37,7 @@ export default function ItineraryScreen() {
 		router.replace('/itinerary/create');
 	}, [itinerary, queryClient]);
 	useRouter({
-		isLoading: isLoading || isFetching,
+		isLoading,
 		hasError: Boolean(isError || (itinerary === null && !isLoading)),
 		onRetry: retryItinerary,
 		errorMessage: 'The itinerary could not be fetched. Try again or go back.',
@@ -48,6 +49,7 @@ export default function ItineraryScreen() {
 			viewType="owner"
 			itineraryId={itineraryId}
 			ownerUsername={itinerary?.user?.username}
+			remoteUpdateNotice={remoteUpdateNotice}
 			initialItinerary={itinerary ?? undefined}
 			onRepeatItinerary={repeatItinerary}
 			initialValues={{

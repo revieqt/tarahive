@@ -103,7 +103,7 @@ export default function ItineraryHeader({
           onChangeText={onTitleChange}
           editable={editable}
           style={[styles.titleInput, {color: textColor}]}
-          placeholderTextColor="#ccc4"
+          placeholderTextColor="#ccc8"
         />
 
         {!createMode && ownerUsername ? (
@@ -271,7 +271,7 @@ export default function ItineraryHeader({
               },
             })}
           >
-            <TIcon name="account-group" size={12} color="white"/>
+            <TIcon name="account-group" size={12}/>
             <TText style={styles.detailsText}>{t('itinerary.form.room_button')}</TText>
           </TouchableOpacity>
 

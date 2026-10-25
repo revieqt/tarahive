@@ -13,9 +13,11 @@ import v2Router from './modules/v2/v2.routes';
 import docsRouter from './modules/docs/docs.routes';
 import { initializeEmailDeliveryWorker } from './workers/delivery/email.worker';
 import { storagePath } from './infrastructure/storage';
+import { initializeSocketServer } from './infrastructure/socket';
 
 const app = express();
 const server = createServer(app);
+initializeSocketServer(server);
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());

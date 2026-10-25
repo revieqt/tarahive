@@ -65,10 +65,18 @@ export const createItineraryService = async (
   }
 };
 
+export class ItineraryVersionConflictError extends Error {
+  constructor(public readonly latestItinerary: Itinerary) {
+    super('This itinerary was updated by someone else. Review the latest changes before saving again.');
+    this.name = 'ItineraryVersionConflictError';
+  }
+}
+
 export const updateItineraryService = async (
   userId: string,
   itineraryId: string,
-  updates: UpdateItineraryData
+  updates: UpdateItineraryData,
+  expectedVersion?: number
 ): Promise<Itinerary | null> => {
   return AppDataSource.transaction(async (manager) => {
     const collaborator = await manager.findOne(ItineraryCollaborator, {
@@ -91,6 +99,10 @@ export const updateItineraryService = async (
 
     if (!itinerary) {
       return null;
+    }
+
+    if (expectedVersion !== undefined && itinerary.v !== expectedVersion) {
+      throw new ItineraryVersionConflictError(itinerary);
     }
 
     if (updates.title !== undefined) itinerary.title = updates.title;

@@ -53,6 +53,7 @@ export interface Itinerary {
   content?: unknown;
   themeColor?: string;
   status: ItineraryStatus;
+  v?: number;
   createdOn: string;
   updatedOn: string;
   privacy?: ItineraryPrivacy;
@@ -83,6 +84,7 @@ export interface ItineraryUpdateValues {
 
 export interface UpdateItineraryPayload {
   itineraryId: string;
+  expectedVersion?: number;
   title?: string;
   type?: string;
   startDate?: string;

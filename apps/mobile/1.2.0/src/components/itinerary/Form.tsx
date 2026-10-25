@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { Animated, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 import { router } from "@/hooks/shared/useRouter";
 import { LinearGradient } from "expo-linear-gradient";
 import DraggableFlatList from "react-native-draggable-flatlist";
-import { TIcon, TView } from "@/components/ui/Themed";
+import { TIcon, TText, TView } from "@/components/ui/Themed";
 import LocationPickerModal, { LocationItemWithAddress } from "@/components/modals/LocationPickerModal";
 import HeadingBlock from "@/components/itinerary/HeadingBlock";
 import LocationBlock from "@/components/itinerary/LocationBlock";
@@ -18,10 +18,31 @@ import { ITINERARY_TYPES } from "@/constants/Itinerary";
 import { newItinerayId } from "@/services/itineraryService";
 import { useLanguage } from "@/context/LanguageContext";
 import { CreateItineraryForm, Itinerary, ItineraryGeneralPermissions, ItineraryPrivacy, ItineraryStatus, ItineraryUpdateValues, ItineraryViewType, HeaderType, ItineraryBlock, LocationBlockData, TextBlock } from "@/types/itineraryTypes";
+import { ItineraryRemoteUpdateNotice } from "@/hooks/itinerary/useItineraryRealtime";
 import { useUpdateItinerary } from "@/hooks/itinerary/useUpdateItinerary";
 import { useItineraryStatus } from "@/hooks/itinerary/useItineraryStatus";
+import { showWarning } from "@/services/toast.service";
 import StickyScrollView from "../ui/StickyScrollView";
 import { formatDateToString } from "@/utils/formatDateToString";
+
+const itineraryToUpdateValues = (itinerary: Itinerary): ItineraryUpdateValues => ({
+  title: itinerary.title,
+  type: itinerary.type,
+  startDate: new Date(itinerary.startDate),
+  endDate: new Date(itinerary.endDate),
+  content: itinerary.content ?? [],
+  privacy: itinerary.privacy ?? "private",
+  themeColor: itinerary.themeColor ?? "",
+  allowSharing: itinerary.generalPermissions?.allowSharing ?? true,
+  allowCopying: itinerary.generalPermissions?.allowCopying ?? true,
+});
+
+const valuesMatch = (left: unknown, right: unknown): boolean => {
+  if (left instanceof Date && right instanceof Date) {
+    return left.getTime() === right.getTime();
+  }
+  return JSON.stringify(left ?? null) === JSON.stringify(right ?? null);
+};
 
 type ItineraryFormProps = {
   ownerUsername?: string;
@@ -33,6 +54,7 @@ type ItineraryFormProps = {
   onRepeatItinerary?: () => void;
   createMode?: boolean;
   itineraryId?: string;
+  remoteUpdateNotice?: ItineraryRemoteUpdateNotice | null;
 };
 
 export default function ItineraryForm({
@@ -44,7 +66,8 @@ export default function ItineraryForm({
   isSubmitting = false,
   onSubmit,
   onRepeatItinerary,
-  itineraryId
+  itineraryId,
+  remoteUpdateNotice,
 }: ItineraryFormProps) {
   const status = initialItinerary?.status ?? ItineraryStatus.ACTIVE;
   const canEdit = viewType !== "viewer" && status === ItineraryStatus.ACTIVE;
@@ -63,11 +86,15 @@ export default function ItineraryForm({
   const [themeColor, setThemeColor] = useState(initialValues?.themeColor ?? accentColor);
   const [colorBarVisible, setColorBarVisible] = useState(false);
   const [content, setContent] = useState<ItineraryBlock[]>((initialValues?.content as ItineraryBlock[] | undefined) ?? [],);
+  const previousItinerary = useRef(initialItinerary);
+  const [updateNotice, setUpdateNotice] = useState<ItineraryRemoteUpdateNotice | null>(null);
   const [focusedId, setFocusedId] = useState<string | null>(null);
   const [locationVisible, setLocationVisible] = useState(false);
   const [locationEditBlockId, setLocationEditBlockId] = useState<string | null>(null);
   const [composerId, setComposerId] = useState<string | null>(null);
   const [blockHeights, setBlockHeights] = useState<Record<string, number>>({});
+  const [isRemoteUpdateNoticeVisible, setIsRemoteUpdateNoticeVisible] = useState(false);
+  const noticeOpacity = useRef(new Animated.Value(0)).current;
   const { t } = useLanguage();
   const updateValues: ItineraryUpdateValues = {
     title,
@@ -80,8 +107,130 @@ export default function ItineraryForm({
     allowSharing: generalPermissions.allowSharing,
     allowCopying: generalPermissions.allowCopying,
   };
-  const itineraryUpdate = useUpdateItinerary(initialItinerary, updateValues);
+  const itineraryUpdate = useUpdateItinerary(initialItinerary, updateValues, (savedItinerary) => {
+    setUpdateNotice({
+      actorName: "You",
+      version: savedItinerary.v ?? Date.now(),
+    });
+  });
   const itineraryStatus = useItineraryStatus(initialItinerary?.id, initialItinerary?.status);
+
+  useEffect(() => {
+    if (!remoteUpdateNotice) {
+      return;
+    }
+
+    setUpdateNotice(remoteUpdateNotice);
+  }, [remoteUpdateNotice]);
+
+  useEffect(() => {
+    if (!updateNotice) {
+      noticeOpacity.stopAnimation();
+      noticeOpacity.setValue(0);
+      setIsRemoteUpdateNoticeVisible(false);
+      return undefined;
+    }
+
+    setIsRemoteUpdateNoticeVisible(true);
+    noticeOpacity.stopAnimation();
+    Animated.timing(noticeOpacity, {
+      toValue: 1,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+
+    const timeout = setTimeout(() => {
+      Animated.timing(noticeOpacity, {
+        toValue: 0,
+        duration: 250,
+        useNativeDriver: true,
+      }).start(({ finished }) => {
+        if (finished) setIsRemoteUpdateNoticeVisible(false);
+      });
+    }, 3000);
+
+    return () => {
+      clearTimeout(timeout);
+      noticeOpacity.stopAnimation();
+    };
+  }, [updateNotice, noticeOpacity]);
+
+  useEffect(() => {
+    if (!initialItinerary) return;
+
+    const previous = previousItinerary.current;
+    if (!previous || previous.id !== initialItinerary.id) {
+      previousItinerary.current = initialItinerary;
+      const values = itineraryToUpdateValues(initialItinerary);
+      setTitle(values.title);
+      setType(values.type);
+      setStartDate(values.startDate);
+      setEndDate(values.endDate);
+      setContent(values.content as ItineraryBlock[]);
+      setPrivacy(values.privacy);
+      setThemeColor(values.themeColor || accentColor);
+      setGeneralPermissions({
+        allowSharing: values.allowSharing,
+        allowCopying: values.allowCopying,
+      });
+      return;
+    }
+
+    const isNewer = previous.v !== undefined && initialItinerary.v !== undefined
+      ? initialItinerary.v > previous.v
+      : new Date(initialItinerary.updatedOn).getTime() > new Date(previous.updatedOn).getTime();
+    if (!isNewer) return;
+
+    const baseline = itineraryToUpdateValues(previous);
+    const incoming = itineraryToUpdateValues(initialItinerary);
+    const local = updateValues;
+    const conflicts: string[] = [];
+    const mergeField = <K extends keyof ItineraryUpdateValues>(
+      field: K,
+      setValue: (value: ItineraryUpdateValues[K]) => void
+    ) => {
+      const editedLocally = !valuesMatch(local[field], baseline[field]);
+      const changedRemotely = !valuesMatch(incoming[field], baseline[field]);
+      if (!editedLocally) {
+        setValue(incoming[field]);
+      } else if (changedRemotely && !valuesMatch(local[field], incoming[field])) {
+        conflicts.push(field);
+      }
+    };
+
+    mergeField("title", setTitle);
+    mergeField("type", setType);
+    mergeField("startDate", setStartDate);
+    mergeField("endDate", setEndDate);
+    mergeField("content", (value) => setContent(value as ItineraryBlock[]));
+    mergeField("privacy", setPrivacy);
+    mergeField("themeColor", setThemeColor);
+    mergeField("allowSharing", (value) =>
+      setGeneralPermissions((current) => ({ ...current, allowSharing: value }))
+    );
+    mergeField("allowCopying", (value) =>
+      setGeneralPermissions((current) => ({ ...current, allowCopying: value }))
+    );
+    previousItinerary.current = initialItinerary;
+
+    if (conflicts.length) {
+      showWarning(
+        "Itinerary updated",
+        "Remote changes were loaded. Your edits were kept for fields changed on both devices."
+      );
+    }
+  }, [
+    initialItinerary,
+    accentColor,
+    title,
+    type,
+    startDate,
+    endDate,
+    content,
+    privacy,
+    themeColor,
+    generalPermissions,
+  ]);
 
   const updateBlock = (id: string, changes: Partial<ItineraryBlock>) => {
     if (!canEdit) return;
@@ -468,6 +617,22 @@ export default function ItineraryForm({
           ]}
           colors={["transparent", backgroundColor]}
         >
+          {isRemoteUpdateNoticeVisible && updateNotice && (
+            <Animated.View
+              accessibilityLiveRegion="polite"
+              pointerEvents="none"
+              style={[styles.remoteUpdateNoticeContainer, { opacity: noticeOpacity }]}
+            >
+              <TView color="primary" borderRadius={18} style={styles.remoteUpdateNotice}>
+                <TIcon name="account-sync-outline" size={16} color="#FFFFFF" />
+                <TText style={styles.remoteUpdateNoticeText} numberOfLines={1}>
+                  {updateNotice.actorName === "You"
+                    ? "You updated this itinerary"
+                    : `${updateNotice.actorName} updated this itinerary`}
+                </TText>
+              </TView>
+            </Animated.View>
+          )}
           <View style={styles.bottomBarRow}>
             {colorBarVisible ? (
               <ColorBar
@@ -577,6 +742,25 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
+  },
+  remoteUpdateNoticeContainer: {
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  remoteUpdateNotice: {
+    maxWidth: "90%",
+    minHeight: 36,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    elevation: 6,
+  },
+  remoteUpdateNoticeText: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    flexShrink: 1,
   },
   colorBarDismissArea: { 
     ...StyleSheet.absoluteFillObject, zIndex: 20 }

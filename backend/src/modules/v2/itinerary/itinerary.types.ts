@@ -27,6 +27,7 @@ export interface CreateItineraryRequest {
 
 export interface UpdateItineraryRequest {
   itineraryId: string;
+  expectedVersion?: number;
   title?: string;
   type?: string;
   startDate?: string;
@@ -38,7 +39,10 @@ export interface UpdateItineraryRequest {
   allowCopying?: boolean;
 }
 
-export type UpdateItineraryData = Omit<UpdateItineraryRequest, 'itineraryId' | 'startDate' | 'endDate'> & {
+export type UpdateItineraryData = Omit<
+  UpdateItineraryRequest,
+  'itineraryId' | 'expectedVersion' | 'startDate' | 'endDate'
+> & {
   startDate?: Date;
   endDate?: Date;
 };
