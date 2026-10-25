@@ -1,97 +1,20 @@
-import React, { useState } from "react";
-import { View, StyleSheet, TouchableOpacity, FlatList, Image} from "react-native";
-import { TIcon, TText, TView } from "@/components/ui/Themed";
+import React from "react";
+import { View, StyleSheet, FlatList} from "react-native";
+import { TIcon, TView } from "@/components/ui/Themed";
 import { useLanguage } from "@/context/LanguageContext";
-import { useThemeColor } from "@/hooks/shared/useThemeColor";
 import Header from "@/components/common/Header";
 import RoundButton from "@/components/ui/RoundButton";
 import { router } from "expo-router";
 import { useGetUserItineraries } from "@/hooks/itinerary/useGetUserItineraries";
-import { Itinerary, getStatusColor } from "@/types/itineraryTypes";
-import { formatDateToString } from "@/utils/formatDateToString";
 import EmptyMessage from "@/components/common/EmptyMessage";
 import ItineraryCardSkeleton from "@/components/feedback/CalendarCardSkeleton";
 import StickyScrollView from "@/components/ui/StickyScrollView";
 import OptionsPopup from "@/components/ui/OptionsPopup";
-import { useSession } from "@/context/SessionContext";
-
-const ItineraryOptions = [
-  { value: 'active', icon: 'cards-heart', label: 'itinerary.main.active' },
-  { value: 'done', icon: 'check-circle', label: 'itinerary.main.completed' },
-  { value: 'cancelled', icon: 'close-circle', label: 'itinerary.main.cancelled' },
-];
+import ItineraryCard from "@/components/itinerary/ItineraryCard";
 
 export default function ItineraryScreen() {
-  const { t , currentLanguage } = useLanguage();
-  const { session } = useSession();
-  const primaryColor = useThemeColor({}, 'primary');
-  const accentColor = useThemeColor({}, 'accent');
-  const [selectedStatus, setSelectedStatus] = useState<'active' | 'done' | 'cancelled'>('active');
-  const { itineraries, isLoading, isError } = useGetUserItineraries(selectedStatus);
-
-  const handleItineraryPress = (id: string) => {
-    router.push(`/itinerary/${id}`);
-  };
-
-  const renderItineraryCard = ({ item }: { item: Itinerary }) => {
-    const isSharedWithUser = Boolean(
-      session?.user?.id && item.user?.id && session.user.id !== item.user.id
-    );
-
-    return (
-    <TouchableOpacity
-      onPress={() => handleItineraryPress(item.id)}
-      style={[styles.itineraryCard, { backgroundColor: primaryColor, borderColor: getStatusColor(item.status) }]}
-    >
-        <TText style={styles.cardTitle} numberOfLines={1}>{item.title}</TText>
-        <TText style={styles.dateText}>
-          {formatDateToString(new Date(item.startDate), currentLanguage.code)} - {formatDateToString(new Date(item.endDate), currentLanguage.code)}
-        </TText>
-
-        <View style={styles.cardTabs}>
-          <TView style={[styles.cardBubble, {backgroundColor: accentColor + '80'}]}>
-            <TText style={styles.cardBubbleText}>{t(`itinerary.type.${item.type}`)}</TText>
-          </TView>
-
-          {isSharedWithUser && (
-            <TView style={[styles.cardBubble, {backgroundColor: "#ccc"}]}>
-              <TText style={styles.cardBubbleText}>Shared with you</TText>
-            </TView>
-          )}
-
-        </View>
-
-      <OptionsPopup
-        options={[
-          {
-            label: t('itinerary.form.room_button'),
-            iconName: "tooltip-account",
-            onPress: () => router.push({ pathname: "/share"})
-          },
-          {
-            label: t('itinerary.form.complete_button'),
-            iconName: "check-circle",
-            onPress: () => router.push({ pathname: "/share"})
-          },
-          {
-            label: t('itinerary.form.cancel_button'),
-            iconName: "close-circle",
-            onPress: () => router.push({ pathname: "/share"})
-          },
-          {
-            label: t('itinerary.form.delete_button'),
-            iconName: "trash-can",
-            onPress: () => router.push({ pathname: "/share"})
-          },
-        ]}
-        style={styles.optionsButton}
-      >
-        <TIcon name="dots-vertical" size={20}/>
-      </OptionsPopup>
-      
-    </TouchableOpacity>
-    );
-  };
+  const { t } = useLanguage();
+  const { itineraries, isLoading, isError } = useGetUserItineraries('active');
 
   return (
     <TView style={{ flex: 1 }}>
@@ -101,19 +24,18 @@ export default function ItineraryScreen() {
         title="Itinerary"
         subtitle="Manage your travel plans"
       >
-        <Header title={t('itinerary.main.title')} subtitle={t('itinerary.main.subtitle')}/>
-        <View style={styles.tabsContainer}>
-          {ItineraryOptions.map((option, index) => (
-            <TouchableOpacity
-              style={[styles.tabs, selectedStatus === option.value && { borderBottomColor: accentColor, borderBottomWidth: 2 }]}
-              onPress={() => setSelectedStatus(option.value as 'active' | 'done' | 'cancelled')}
-            >
-              <TIcon name={option.icon} size={13} color={selectedStatus === option.value ? accentColor : 'gray'} />
-              <TText style={{ color: selectedStatus === option.value ? accentColor : 'gray', fontSize: 11 }}>{t(option.label)}</TText>
-            </TouchableOpacity>
-          ))}
+        <Header title={t('itinerary.main.title')} subtitle={t('itinerary.main.subtitle')} style={{zIndex: 10}}/>
+        <View style={styles.moreButtonContainer}>
+          <OptionsPopup
+            options={[
+              { label: "Itinerary Archives", iconName: "archive", onPress: () => router.push('itinerary/archives')},
+              { label: "Help", iconName: "help-circle" },
+            ]}
+            style={styles.moreButton}
+          >
+            <TIcon name="dots-vertical" size={20}/>
+          </OptionsPopup>
         </View>
-
         {isLoading ? (
           <>
             <ItineraryCardSkeleton />
@@ -130,7 +52,7 @@ export default function ItineraryScreen() {
         ) : (
           <FlatList
             data={itineraries}
-            renderItem={renderItineraryCard}
+            renderItem={({ item }) => <ItineraryCard itinerary={item} />}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.listContent}
             scrollEnabled={false}
@@ -141,7 +63,7 @@ export default function ItineraryScreen() {
       <RoundButton
         iconName='plus'
         onPress={() => router.push('/itinerary/create')}
-        style={[styles.addButton, styles.shadow]}
+        style={styles.addButton}
       />
     </TView>
   );
@@ -154,70 +76,23 @@ const styles = StyleSheet.create({
   listContent: {
     gap: 8,
   },
-  itineraryCard: {
-    borderRadius: 15,
-    padding: '3%',
-    gap: 3,
-    overflow: 'hidden',
+  moreButtonContainer: {
+    position: 'absolute',
+    top: 10,
+    right: 0,
+    zIndex: 1000,
   },
-  shadow:{
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
-    elevation: 3,
-  },
-  cardTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    flex: 1,
-  },
-  dateText: {
-    fontSize: 11,
-    opacity: 0.7,
-  },
-  cardTabs: {
-    flexDirection: 'row',
-    gap: 4,
-  },
-  cardBubble: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 10,
-  },
-  cardBubbleText: {
-    fontSize: 11,
-    color: '#fff'
-  },
-  tabsContainer: {
-    flexDirection: 'row',
-    marginBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc3',
-  },
-  tabs: {
-    justifyContent: 'center',
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    height: 20,
-    paddingBottom: 12,
-    gap: 5,
+  moreButton:{
+    padding: 10,
   },
   addButton: {
     position: 'absolute',
     bottom: 16,
     right: '3%',
-  },
-  optionsButton: {
-    borderColor: '#ccc1',
-    borderLeftWidth: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
-    right: -10,
-    bottom: -10,
-    top: -78,
-    width: 30
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+    elevation: 3,
   },
 });

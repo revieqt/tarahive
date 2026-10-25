@@ -96,7 +96,7 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, style, type = 'default
 
   return (
     <View style={[{ marginBottom: 16 }, style]}>
-      <BackButton />
+      <BackButton style={{ width: '50%' }}/>
       {title && <TText type="title">{title}</TText>}
       {subtitle && <TText style={{ opacity: 0.75 }}>{subtitle}</TText>}
     </View>

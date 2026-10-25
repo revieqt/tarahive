@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     borderRadius: 20,
-    gap: 2,
+    gap: 3,
     opacity: .8
   },
   disabledAction: {
