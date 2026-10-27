@@ -89,48 +89,54 @@ export default function AccountScreen() {
           </TouchableOpacity>
         </TView>
 
-        <BetaTesterCard/>
-
         <View style={styles.options}>
 
-          <TText style={styles.optionsTitle}>{t('tabs.account.personalization_title')}</TText>
+          <TText style={styles.optionsTitle}>{t('account.personalization_title')}</TText>
 
-          <SettingsOption icon='palette' label={t('tabs.account.theme_button')}
+          <SettingsOption icon='palette' label={t('account.theme_button')}
             onPress={() => router.push('/settings/theme')}
           />
 
           {isConnected && <>
-            <SettingsOption icon='translate' label={t('tabs.account.language_button')}
+            <SettingsOption icon='translate' label={t('account.language_button')}
               onPress={() => router.push('/settings/language')}
             />
 
-            <TText style={styles.optionsTitle}>{t('tabs.account.privacy_title')}</TText>
+            <TText style={styles.optionsTitle}>{t('account.privacy_title')}</TText>
 
-            <SettingsOption icon='eye' label={t('tabs.account.visibility_button')}
+            <SettingsOption icon='eye' label={t('account.visibility_button')}
               onPress={() => router.push('/settings/visibility')}
             />
-            <SettingsOption icon='key' label={t('tabs.account.logs_button')}
+            <SettingsOption icon='key' label={t('account.logs_button')}
               onPress={() => router.push('/settings/logs-request')}
             />
-            <SettingsOption icon='file-eye' label={t('tabs.account.privacy_button')}
+            <SettingsOption icon='file-eye' label={t('account.privacy_button')}
               onPress={handleDocs('policies-terms', 'privacy-policy')}
             />
-            <SettingsOption icon='file-alert' label={t('tabs.account.terms_button')}
+            <SettingsOption icon='file-alert' label={t('account.terms_button')}
               onPress={handleDocs('policies-terms', 'terms-and-conditions')}
             />
 
-            <TText style={styles.optionsTitle}>{t('tabs.account.help_title')}</TText>
+            <TText style={styles.optionsTitle}>{t('account.help_title')}</TText>
 
-            <SettingsOption icon='headset' label={t('tabs.account.support_button')}
-              onPress={handleWebView(SUPPORT_FORM_URL, t('tabs.account.support_button'),t('tabs.account.help_title') )}
+            <SettingsOption icon='file-find' label={t('account.manual_button')}
+              onPress={handleDocs('about')}
             />
-
-            <SettingsOption icon='file-find' label={t('tabs.account.about_button')}
+            
+            <SettingsOption icon='help-circle' label={t('account.about_button')}
               onPress={handleDocs('about')}
             />
 
-            <SettingsOption icon='check-circle' label={t('tabs.account.feedback_button')}
-              onPress={handleWebView(FEEDBACK_FORM_URL, t('tabs.account.feedback_button'), t('tabs.account.help_title'))}
+            <SettingsOption icon='headset' label={t('account.support_button')}
+              onPress={handleWebView(SUPPORT_FORM_URL, t('account.support_button'),t('account.help_title') )}
+            />
+
+            <SettingsOption icon='bug' label={t('account.bug_button')}
+              onPress={handleWebView(FEEDBACK_FORM_URL, t('account.feedback_button'), t('account.help_title'))}
+            />
+
+            <SettingsOption icon='check-circle' label={t('account.feedback_button')}
+              onPress={handleWebView(FEEDBACK_FORM_URL, t('account.feedback_button'), t('account.help_title'))}
             />
           </>}
 
@@ -153,8 +159,8 @@ export default function AccountScreen() {
           </Pressable>
 
           {devMode && <>
-            <TText style={styles.optionsTitle}> {t('tabs.account.developer_title')} </TText>
-            <SettingsOption icon='layers-remove' label={t('tabs.account.cache_button')}
+            <TText style={styles.optionsTitle}> {t('account.developer_title')} </TText>
+            <SettingsOption icon='layers-remove' label={t('account.cache_button')}
               onPress={clearCache}
             />
           </>}
@@ -162,7 +168,7 @@ export default function AccountScreen() {
         </View>
 
         <Button
-          title={t('tabs.account.logout_button')}
+          title={t('account.logout_button')}
           onPress={() => logout()}
           type='primary'
           buttonStyle={styles.logoutButton}

@@ -118,6 +118,8 @@
         "verify_button": "Verify Email"
       }
     },
+
+
     "home": {
       "menu_itinerary": "Itineraries",
       "menu_itinerary_desc": "Travel Planner",
@@ -126,31 +128,29 @@
       "menu_expenses": "Expenses",
       "menu_expenses_desc": "Tracker"
     },
+
+
     "account": {
-      "pro_card_title": "Be a Certified Traveller",
-      "pro_card_subtitle": "Upgrade to Pro Now!",
-      "pro_card_description": "Get access to exclusive features and benefits by upgrading to a Pro account.",
-      "upgrade_button": "Upgrade Now!",
       "personalization_title": "Personalization",
-      "view_profile_button": "Edit Profile",
-      "edit_profile_button": "Edit Profile",
       "theme_button": "App Theme",
       "language_button": "App Language",
       "privacy_title": "Privacy",
-      "change_password_button": "Change Password",
       "visibility_button": "Visibility Settings",
       "logs_button": "Activity Logs",
       "privacy_button": "Privacy Policy",
       "terms_button": "Terms and Conditions",
       "help_title": "Help and Support",
       "manual_button": "User Manual",
-      "support_button": "Contact Support",
-      "feedback_button": "Give us Feedback",
       "about_button": "About the App",
+      "support_button": "Contact Support",
+      "bug_button": "Report a Bug",
+      "feedback_button": "Give us Feedback",
       "developer_title": "Developer Options",
       "cache_button": "Clear Cache",
       "logout_button": "Logout"
     },
+
+
     "itinerary": {
       "main": {
         "title": "Itinerary",
@@ -232,6 +232,8 @@
         "owner": "Owner"
       }
     },
+
+
     "sos": {
       "main": {
         "off_title": "All Clear!",
@@ -276,6 +278,8 @@
         "nearby_help": "Nearby Help"
       }
     },
+
+    
     "users": {
       "fields": {
         "edit_title": "Edit Profile",
