@@ -70,6 +70,24 @@ export function detectLanguage(acceptLanguageHeader?: string): string {
   return DEFAULT_LANG;
 }
 
+export function detectBackendLanguage(languageHeader?: string): string {
+  if (!languageHeader) return DEFAULT_LANG;
+
+  const language = languageHeader
+    .split(',')[0]
+    .trim()
+    .split(';')[0]
+    .trim()
+    .replace('-', '_')
+    .toLowerCase()
+    .split(/[-_]/)[0];
+
+  if (!/^[a-z]{2,3}$/.test(language)) return DEFAULT_LANG;
+
+  const filePath = path.join(backendLocalesPath, `${language}.json`);
+  return fs.existsSync(filePath) ? language : DEFAULT_LANG;
+}
+
 const backendLocaleCache: Record<string, Record<string, unknown>> = {};
 
 function loadBackendLocale(lang: string): Record<string, unknown> {

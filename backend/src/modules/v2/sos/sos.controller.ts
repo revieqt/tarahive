@@ -2,7 +2,38 @@ import { Request, Response } from 'express';
 import { disableSOS, enableSOS, updateSafetySettings } from './sos.service';
 import { LogAction } from '../../v1/audit/audit.service';
 import { AuthRequest } from '../../v1/auth/auth.types';
-import { t, detectLanguage } from '../localization/localization.service';
+import { t, detectBackendLanguage, detectLanguage } from '../localization/localization.service';
+
+const SOS_ADVICE_TYPES = new Set([
+  'medical',
+  'criminal',
+  'fire',
+  'natural',
+  'utility',
+  'road',
+  'domestic',
+  'animal',
+  'other',
+]);
+
+export const getSOSAdviceController = (req: AuthRequest, res: Response) => {
+  const lang = detectBackendLanguage(
+    req.get('language') || req.get('accept-language'),
+  );
+  const type = req.query.type;
+
+  if (typeof type !== 'string' || !SOS_ADVICE_TYPES.has(type)) {
+    return res.status(400).json({
+      success: false,
+      message: 'A valid emergency type is required',
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    advice: t(`sos.sos_advice.${type}`, lang)
+  });
+};
 
 export const enableSOSController = async (req: AuthRequest, res: Response) => {
   const lang = detectLanguage(req.headers['accept-language']);

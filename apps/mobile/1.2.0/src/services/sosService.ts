@@ -17,6 +17,21 @@ export interface SafetyResponse {
   message: string;
 }
 
+export interface SOSAdviceResponse {
+  success: boolean;
+  advice: string;
+}
+
+export const getSOSAdvice = async (
+  emergencyType: string,
+  language: string,
+): Promise<SOSAdviceResponse> => {
+  return api.get<SOSAdviceResponse>(`${API_URL}/advice`, {
+    params: { type: emergencyType },
+    headers: { language },
+  });
+};
+
 export interface UpdateSafetySettingsPayload {
   delivery: {
     isEmailEnabled: boolean;

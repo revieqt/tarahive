@@ -20,13 +20,13 @@ import { useLocation } from "@/context/LocationContext";
 import { EMERGENCY_TYPES } from "@/types/sosTypes";
 import { router } from "expo-router";
 import Button from "@/components/ui/Button";
+import EmergencyResourcesModal from "@/components/sos/EmergencyResourcesModal";
+import EmergencyPicker, {
+  EMERGENCY_PICKER_CANCEL_ZONE_HEIGHT,
+  getEmergencyTypeAtPoint,
+} from "@/components/sos/EmergencyPicker";
 
 const ACTIVATION_COUNTDOWN_SECONDS = 7;
-const PICKER_RADIUS = 112;
-const PICKER_TARGET_RADIUS = 44;
-const PICKER_BUTTON_SIZE = 55;
-const CANCEL_ZONE_HEIGHT = 90;
-const PICKER_TYPES = EMERGENCY_TYPES.filter((type) => type.id !== 'other');
 
 export default function SOSSection() {
   const secondaryColor = useThemeColor({}, 'secondary');
@@ -45,10 +45,17 @@ export default function SOSSection() {
   const [selectedEmergencyType, setSelectedEmergencyType] = useState<string | null>(null);
   const [isOverCancelZone, setIsOverCancelZone] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
+  const [isAdviceOpen, setIsAdviceOpen] = useState(false);
+  const [adviceEmergencyType, setAdviceEmergencyType] = useState<string | null>(null);
 
   const gradientColors = isSOSActive
     ? (['#D53E0F', secondaryColor] as const)
     : ([accentColor, secondaryColor] as const);
+
+  const showAdvice = (emergencyType: string) => {
+    setAdviceEmergencyType(emergencyType);
+    setIsAdviceOpen(true);
+  };
 
   useEffect(() => () => {
     if (longPressTimer.current) {
@@ -59,40 +66,20 @@ export default function SOSSection() {
     }
   }, []);
 
-  const getPickerTargets = () => {
-    const centerX = width / 2;
-    const centerY = height / 2;
-
-    return PICKER_TYPES.map((type, index) => {
-      const angle = -Math.PI / 2 + (index * 2 * Math.PI) / PICKER_TYPES.length;
-      return {
-        ...type,
-        x: centerX + Math.cos(angle) * PICKER_RADIUS,
-        y: centerY + Math.sin(angle) * PICKER_RADIUS,
-      };
-    });
-  };
-
-  const getEmergencyTypeAtPoint = (x: number, y: number) => {
-    if (y >= height - CANCEL_ZONE_HEIGHT) {
-      return null;
+  const activateSOS = async (emergencyType: string) => {
+    const response = await handleEnableSOS(
+      { emergencyType, latitude, longitude },
+      { navigateBack: false },
+    );
+    if (response?.success) {
+      showAdvice(emergencyType);
     }
-
-    const centerX = width / 2;
-    const centerY = height / 2;
-    if (Math.hypot(x - centerX, y - centerY) <= PICKER_TARGET_RADIUS) {
-      return 'other';
-    }
-
-    return getPickerTargets().find(
-      (target) => Math.hypot(x - target.x, y - target.y) <= PICKER_TARGET_RADIUS,
-    )?.id ?? null;
   };
 
   const updateSelection = (event: GestureResponderEvent) => {
     const { pageX, pageY } = event.nativeEvent;
-    setIsOverCancelZone(pageY >= height - CANCEL_ZONE_HEIGHT);
-    setSelectedEmergencyType(getEmergencyTypeAtPoint(pageX, pageY));
+    setIsOverCancelZone(pageY >= height - EMERGENCY_PICKER_CANCEL_ZONE_HEIGHT);
+    setSelectedEmergencyType(getEmergencyTypeAtPoint(pageX, pageY, width, height));
   };
 
   const beginActivationCountdown = (emergencyType: string) => {
@@ -107,10 +94,7 @@ export default function SOSSection() {
           countdownTimer.current = null;
         }
         setCountdown(null);
-        void handleEnableSOS(
-          { emergencyType, latitude, longitude },
-          { navigateBack: false },
-        );
+        void activateSOS(emergencyType);
         return;
       }
       setCountdown(secondsRemaining);
@@ -150,7 +134,7 @@ export default function SOSSection() {
     setIsPickingEmergency(false);
     setIsOverCancelZone(false);
     const { pageX, pageY } = event.nativeEvent;
-    const emergencyType = getEmergencyTypeAtPoint(pageX, pageY);
+    const emergencyType = getEmergencyTypeAtPoint(pageX, pageY, width, height);
     setSelectedEmergencyType(null);
     if (emergencyType) {
       beginActivationCountdown(emergencyType);
@@ -159,35 +143,27 @@ export default function SOSSection() {
 
   return (
     <TView style={{ flex: 1 }}>
-      <View style={styles.header}>
-        <BackButton color='#fff' style={styles.headerButtons}/>
-
-        <View style={styles.headerTitle}>
-          <TText style={{color: '#fff', fontWeight: 700}}>SOS</TText>
-          <TText style={{color: '#fff4', fontSize: 12}}>dsds</TText>
-        </View>
-
-        <TouchableOpacity style={styles.headerButtons}>
-          <TIcon name='help-circle' size={18} color="#fff"/>
-        </TouchableOpacity>
-      </View>
-      
       <LinearGradient colors={gradientColors} style={styles.background}/>
+      <BackButton color="white" type='floating'/>
 
       <View style={styles.container}>
-        {/* <View style={styles.titleContainer}>
+        <View style={styles.titleContainer}>
           {isSOSActive ? (
             <>
               <TText type='title' style={{ color: '#fff' }}>{t('sos.main.on_title')}</TText>
-              <TText type='subtitle' style={{ color: '#fff' }}>{t('sos.main.on_subtitle')}</TText>
+              <TText style={{ color: '#fff' }}>
+                {t(EMERGENCY_TYPES.find(
+                  (type) => type.id === user?.safetyState?.emergencyType,
+                )?.labelKey ?? "sos.emergency_types.other")}
+                </TText>
             </>
           ) : (
             <>
               <TText type='title' style={{ color: '#fff' }}>{t('sos.main.off_title')}</TText>
-              <TText type='subtitle' style={{ color: '#fff' }}>{t('sos.main.off_subtitle')}</TText>
+              <TText style={{ color: '#fff' }}>{t('sos.main.off_subtitle')}</TText>
             </>
           )}
-        </View> */}
+        </View>
 
         <SOSButton
           state={isSOSActive ? 'active' : 'notActive'}
@@ -196,101 +172,64 @@ export default function SOSSection() {
           onPressOut={handleLongPressEnd}
           disabled={isLoading || countdown !== null}
         />
+
+        <View style={styles.titleContainer}>
+          {isSOSActive ? (
+            <>
+              <View style={styles.messageButtons}>
+                <TouchableOpacity
+                  style={[styles.openSettings, { backgroundColor: accentColor }]}
+                  onPress={() => showAdvice(user?.safetyState?.emergencyType || "other")}
+                >
+                  <TText style={{ color: '#fff' }}>View Resources</TText>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.openSettings}>
+                  <TIcon name='help-circle' size={16} color='white'/>
+                </TouchableOpacity>
+              </View>
+            </>
+          ) : (
+            <>
+              <View style={styles.messageButtons}>
+                <TouchableOpacity style={[styles.openSettings, { backgroundColor: accentColor}]} onPress={() => router.push('/sos/settings')}>
+                  <TText style={{ color: '#fff' }}>Settings</TText>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.openSettings}>
+                  <TIcon name='help-circle' size={16} color='white'/>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
+        </View>
       </View>
 
       {isPickingEmergency && (
-        <View pointerEvents="none" style={styles.pickerOverlay}>
-          <View style={styles.pickerScrim} />
-          <TText style={styles.pickerInstruction}>
-            {t('sos.main.picker_instruction')}
-          </TText>
-          {getPickerTargets().map((type) => (
-            <View
-              key={type.id}
-              style={[
-                styles.pickerOption,
-                {
-                  left: type.x - 50,
-                  top: type.y - PICKER_BUTTON_SIZE / 2,
-                },
-              ]}
-            >
-              <View
-                style={[
-                  styles.pickerCircle,
-                  {
-                    backgroundColor: type.color,
-                    transform: [{ scale: selectedEmergencyType === type.id ? 1.12 : 1 }],
-                  },
-                ]}
-              >
-                <TIcon name={type.icon} size={28} color="#fff" />
-              </View>
-              {selectedEmergencyType === type.id && (
-                <TText numberOfLines={1} style={styles.pickerLabel}>
-                  {t(type.labelKey)}
-                </TText>
-              )}
-            </View>
-          ))}
-          <View
-            style={[styles.otherOption, selectedEmergencyType === 'other' && styles.selectedOtherOption]}
-          >
-            <TText style={styles.otherText}>{t('sos.emergency_types.other')}</TText>
-          </View>
-          {isOverCancelZone && (
-            <LinearGradient
-              pointerEvents="none"
-              colors={['rgba(213, 62, 15, 0)', '#D53E0F']}
-              start={{ x: 0.5, y: 0 }}
-              end={{ x: 0.5, y: 1 }}
-              style={styles.cancelZoneGradient}
-            />
-          )}
-          <View pointerEvents="none" style={styles.cancelZoneLabel}>
-            <TText style={styles.cancelZoneText}>
-              {t('sos.main.release_to_cancel')}
-            </TText>
-          </View>
-        </View>
+        <EmergencyPicker
+          selectedEmergencyType={selectedEmergencyType}
+          isOverCancelZone={isOverCancelZone}
+        />
       )}
 
-      {countdown !== null ? (
+      {countdown !== null &&
         <Button
           title={t('sos.main.cancel_countdown', { seconds: countdown })}
           buttonStyle={styles.cancelCountdown}
           textStyle={{color: 'red'}}
           onPress={cancelActivationCountdown}
         />
-      ) : (
-        <TView style={styles.bottomSheetContainer}>
-          { isSOSActive ? 
-              <SOSInfoCard userData={session?.user}/>
-            : 
-            <View style={styles.offNote}>
-              <TText>{t('sos.main.email')}: {user?.safetyState.emergencyContact?.email}</TText>
-              <TText>{t('sos.main.number')}: {user?.safetyState.emergencyContact?.phone || "N/A"}</TText>
+      }
 
-              <View style={styles.messageButtons}>
-                <TouchableOpacity style={[styles.openSettings, { backgroundColor: accentColor }]} onPress={() => router.push('/sos/settings')}>
-                  <TText style={{ color: '#fff' }}>Settings</TText>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.openSettings}>
-                  <TText style={{ opacity: 0.5 }}>How SOS Works</TText>
-                </TouchableOpacity>
-              </View>
-            </View>
-          }
-        </TView>
-      )}
-
-      
+      <EmergencyResourcesModal
+        visible={isAdviceOpen}
+        emergencyType={adviceEmergencyType}
+        onClose={() => setIsAdviceOpen(false)}
+      />
 
       <HiveBg fade={false} flipHorizontal flipVertical blur/>
       <HiveBg fade={false} blur color={secondaryColor}/>
     </TView>
-
   );
 };
 
@@ -326,6 +265,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 40,
+    zIndex: 20
   },
   bottomSheetContainer: {
     borderTopLeftRadius: 15,
@@ -351,93 +291,13 @@ const styles = StyleSheet.create({
   },
   messageButtons: {
     flexDirection: 'row',
-    gap: 5,
+    gap: 2,
     marginTop: 5,
-  },
-  offNote:{
-    padding: 10,
-    gap: 5
-  },
-  pickerOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    zIndex: 1100,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  pickerScrim: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#0009',
-  },
-  pickerInstruction: {
-    position: 'absolute',
-    top: '12%',
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  pickerOption: {
-    position: 'absolute',
-    width: 100,
-    height: 88,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-  },
-  pickerCircle: {
-    width: PICKER_BUTTON_SIZE,
-    height: PICKER_BUTTON_SIZE,
-    borderRadius: PICKER_BUTTON_SIZE / 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  otherOption: {
-    position: 'absolute',
-    left: '50%',
-    top: '50%',
-    width: 80,
-    marginLeft: -40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    transform: [{ translateY: -10 }],
-  },
-  selectedOtherOption: {
-    transform: [{ translateY: -10 }, { scale: 1.08 }],
-  },
-  otherText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-  pickerLabel: {
-    color: '#fff',
-    fontSize: 10,
-    fontWeight: '700',
-    textAlign: 'center',
-    marginTop: 4,
-  },
-  cancelZoneGradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: CANCEL_ZONE_HEIGHT * 1.5,
-  },
-  cancelZoneLabel: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: CANCEL_ZONE_HEIGHT,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cancelZoneText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
-    textShadowColor: '#8B0000',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
+    padding: 5,
+    backgroundColor: '#fff5',
+    borderColor: "#fff6",
+    borderWidth: 1,
+    borderRadius: 20
   },
   cancelCountdown: {
     position: 'absolute',
@@ -445,10 +305,7 @@ const styles = StyleSheet.create({
     bottom: 16,
     left: '3%',
     right: '3%',
-  },
-  cancelCountdownText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
+    backgroundColor: '#fff5',
+    borderColor: "#fff6"
   },
 });

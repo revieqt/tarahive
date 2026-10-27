@@ -1,9 +1,27 @@
 {
-  "backend": {
-    "delivery": {
-      "email_header_subtitle": "Mobile Travel Companion",
-      "no_reply_notice": "Automated message from Tarahive. Please do not reply."
-    },
+  "delivery": {
+    "email_header_subtitle": "Mobile Travel Companion",
+    "no_reply_notice": "Automated message from Tarahive. Please do not reply."
+  },
+  "emergency_alert": {
+    "sos_alert": "SOS Alert",
+    "sos_note": "is in an emergency. Please respond immediately if you can help!",
+    "details_title": "Emergency Details",
+    "details_type": "Emergency Type",
+    "details_loc": "Last known location",
+    "details_maps": "View Location on Google Maps",
+    "contact_title": "User Contacts",
+    "contact_email": "Email",
+    "contact_num": "Contact",
+    "contact_no_num": "Not Provided",
+    "activated_success": "SOS activated. Contacts are being notified",
+    "activated_failed": "Failed to activate SOS",
+    "deactivated_success": "SOS deactivated successfully",
+    "deactivated_failed": "Failed to deactivate SOS",
+    "update_success": "Settings updated successfully",
+    "update_failed": "Failed to update settings"
+  },
+  "sos":{
     "emergency_alert": {
       "sos_alert": "SOS Alert",
       "sos_note": "is in an emergency. Please respond immediately if you can help!",
@@ -21,143 +39,17 @@
       "deactivated_failed": "Failed to deactivate SOS",
       "update_success": "Settings updated successfully",
       "update_failed": "Failed to update settings"
-    }
-  },
-  "auth": {
-    "onboarding": {
-      "slide1_title": "Welcome",
-      "slide1_subtitle": "to Tarahive",
-      "slide1_description": "Your ultimate travel companion app, designed to make every journey smarter, safer, and more enjoyable.",
-      "slide2_title": "Plan",
-      "slide2_subtitle": "your next adventure.",
-      "slide2_description": "Get personalized travel recommendations based on your preferences, weather conditions, and local insights.",
-      "slide3_title": "Safety",
-      "slide3_subtitle": "is our priority.",
-      "slide3_description": "Stay informed with weather updates, route safety assessments, and quick access to emergency contacts.",
-      "slide4_title": "Connect",
-      "slide4_subtitle": "with the community.",
-      "slide4_description": "Join tours, share tips, ask questions, and connect with fellow adventurers for a more social and enriching travel experience."
     },
-    "login": {
-      "title": "Smart Plans",
-      "subtitle": "Safer Journeys. Join Tarahive!",
-      "email": "Email",
-      "password": "Password",
-      "login_button": "Login",
-      "forgot_password_prompt": "Forgot password?",
-      "google_prompt": "Continue with Google",
-      "register_prompt": "Don't have an account? Register here."
-    },
-    "register": {
-      "title": "Join our Community",
-      "subtitle": "Discover the world with Tarahive",
-      "fname": "First Name",
-      "lname": "Last Name (Optional)",
-      "bdate": "Birth Date",
-      "gender": "Gender",
-      "email": "Email",
-      "password": "Password",
-      "confirm_password": "Confirm Password",
-      "terms_prompt": "By registering, you agree to our Terms & Conditions and Privacy Policy.",
-      "register_button": "Register",
-      "required_error": "Required fields must not be empty.",
-      "age_error": "You must be at least 13 years old to register.",
-      "password_mismatch": "Passwords do not match.",
-      "invalid_email": "Invalid email format.",
-      "password_too_short": "Password must be at least 6 characters long.",
-      "registration_failed": "Registration failed.",
-      "password_invalid": "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.",
-      "email_already_registered": "Email already registered",
-      "registration_initiated": "Registration initiated. Verification code sent to your email."
-    },
-    "verify_email": {
-      "title": "Verify Your Email",
-      "subtitle": "We've sent a verification link to:",
-      "resend_prompt": "Didn't receive the email? Resend it here.",
-      "success": "Email verified successfully. Registration complete!",
-      "invalid_code": "Invalid or expired verification code",
-      "no_pending_registration": "No pending registration found. Please register again.",
-      "required_fields": "Email and code are required",
-      "code_sent": "Verification code sent to your email"
-    },
-    "forgot_password": {
-      "title": "Reset Your Password",
-      "subtitle": "Enter your email to receive reset instructions.",
-      "email": "Email",
-      "code_sent_prompt": "A reset code has been sent to your email.",
-      "new_password": "New Password",
-      "confirm_password": "Confirm New Password",
-      "reset_button": "Reset Password"
-    },
-    "change_password": {
-      "title": "Change Your Password",
-      "subtitle": "Ensure your account stays secure by updating your password regularly.",
-      "current_password": "Current Password",
-      "new_password": "New Password",
-      "confirm_password": "Confirm New Password",
-      "validation1": "must be at least 8 characters long.",
-      "validation2": "must include at least one uppercase letter.",
-      "validation3": "must include at least one lowercase letter.",
-      "validation4": "must include at least one number.",
-      "validation5": "must include at least one special character.",
-      "validation6": "passwords must match.",
-      "change_button": "Change Password"
-    },
-    "login_auth": {
-      "success": "Login successful",
-      "invalid_credentials": "Invalid email or password",
-      "user_not_found": "User account not found",
-      "user_inactive": "Your account is inactive. Please contact support.",
-      "account_suspended": "Your account has been suspended. Please contact support.",
-      "required_fields": "Email and password are required"
-    }
-  },
-  "sos": {
-    "main": {
-      "off_title": "All Clear!",
-      "off_subtitle": "SOS: OFF",
-      "off_note": "Long-press to Activate SOS",
-      "off_hold": "Hold for Activation",
-      "on_title": "SOS in Progress",
-      "on_subtitle": "SOS: ON",
-      "on_note": "Long-press to End SOS",
-      "on_hold": "Hold for Deactivation",
-      "info": "is in a",
-      "email": "Emergency Email",
-      "number": "Emergency Contact",
-      "lang": "Alert Language"
-    },
-    "form": {
-      "title": "Enable SOS",
-      "subtitle": "Configure your emergency alert",
-      "message_placeholder": "Describe your emergency situation... (Optional)",
-      "activate_button": "Activate SOS",
-      "settings_link": "Configure where to send your emergency alerts"
-    },
-    "emergency_types": {
-      "medical": "Medical Emergency",
-      "criminal": "Criminal Activity",
-      "fire": "Fire Emergency",
-      "natural": "Natural Disaster",
-      "utility": "Utility Emergency",
-      "road": "Road Emergency",
-      "domestic": "Domestic and Personal Safety",
-      "animal": "Animal-Related Emergency",
-      "other": "Other"
-    },
-    "settings": {
-      "title": "SOS Settings",
-      "subtitle": "Configure your emergency alert preferences",
-      "email_label_enabled": "Email Alert Enabled",
-      "email_label_disabled": "Email Alert Disabled",
-      "email_description": "Send Emergency Alert via Email",
-      "email_placeholder": "Emergency Contact Email",
-      "sms_label_enabled": "SMS Alert Enabled",
-      "sms_label_disabled": "SMS Alert Disabled",
-      "sms_description": "Send Emergency Alert via SMS (Pro Users Only)",
-      "sms_placeholder": "Emergency Contact Phone",
-      "language": "Preferred Alert Language",
-      "save_button": "Save Changes"
+    "sos_advice":{
+      "medical": "# 🏥 Medical Emergency Safety Advice\n\n## 1. Assess the Situation and Stay Calm\nCheck whether the person is responsive and breathing normally. Make sure the surrounding area is safe before approaching. Do not put yourself or others in danger.\n\n## 2. Call Emergency Services Immediately\nCall **911 in the Philippines** or your local emergency number if the person is unconscious, having difficulty breathing, experiencing severe chest pain, bleeding heavily, or showing signs of a stroke. Provide your exact location and describe the emergency clearly.\n\n## 3. Check Breathing and Responsiveness\nSpeak loudly to the person and gently tap their shoulder. If they are unresponsive and are not breathing normally or are only gasping, begin CPR if you are able and follow the emergency dispatcher's instructions. Ask someone nearby to get an AED if available.\n\n## 4. Provide Appropriate First Aid\n- **Severe bleeding:** Apply firm, direct pressure to the wound with a clean cloth or dressing.\n- **Burns:** Cool the burn under cool running water for 20 minutes. Do not apply ice, butter, or creams.\n- **Choking:** If the person cannot speak, breathe, or cough effectively, provide age-appropriate choking first aid and follow the emergency dispatcher's instructions.\n- **Seizures:** Clear nearby hazards, protect the person's head, and time the seizure. Do not restrain them or put anything in their mouth.\n- **Suspected stroke:** Look for facial drooping, arm weakness, or slurred speech. Call emergency services immediately and note when symptoms began.\n\n## 5. Avoid Further Harm\nDo not move a seriously injured person unless they are in immediate danger. Do not give food, drinks, or medication to an unconscious person. Stay with the person and monitor their condition until help arrives.\n\n## 6. Prepare Information for Responders\nIf possible, provide the person's age, symptoms, known allergies, existing medical conditions, medications, and the time the symptoms began. Do not delay emergency care to gather this information.\n\n## Important Safety Reminders\n- Follow the emergency dispatcher's instructions.\n- Do not attempt medical procedures beyond your training.\n- If the person becomes unresponsive or their condition worsens, inform the dispatcher immediately.\n- Keep the area clear so emergency responders can reach the person quickly.\n\n**⚠️ If someone is experiencing a life-threatening medical emergency, call 911 immediately. Do not delay seeking professional medical help.**",
+      "criminal": "# 🚨 Criminal Emergency Safety Advice\n\n## 1. Prioritize Your Safety\nIf you witness or experience a crime, stay calm and move to a safe location if possible. Avoid confronting, threatening, or attempting to apprehend the suspect. Do not put yourself or others at greater risk.\n\n## 2. Contact Emergency Services\nCall **911 in the Philippines** if you are in immediate danger, witness a violent crime, or need urgent police assistance. Clearly provide your exact location, describe what is happening, and report whether anyone is injured or in danger.\n\n## 3. Move Away from the Threat\n- If threatened by an armed person, avoid sudden movements and do not attempt to grab their weapon.\n- If someone is following you, move toward a well-lit, populated place or a secure establishment.\n- If an intruder enters your home, avoid confronting them. Leave safely if possible or secure yourself in a room and contact the police.\n- If you are witnessing violence, keep a safe distance and avoid intervening physically unless necessary to protect yourself from immediate danger.\n\n## 4. Protect Yourself and Others\nWarn nearby people only if it is safe to do so. Follow instructions from police officers and emergency responders. If you are in a secure location, remain there until authorities confirm that it is safe to leave.\n\n## 5. Observe Details Safely\nIf you can do so without putting yourself at risk, remember relevant details such as the suspect's appearance, clothing, direction of travel, vehicle description, and the time and location of the incident. Do not pursue the suspect or risk your safety to take photos or videos.\n\n## 6. Preserve Evidence and Report the Incident\nOnce you are safe, avoid disturbing the scene or handling potential evidence. Save relevant messages, call records, photos, or videos that you already have, if it is safe and appropriate to do so. Cooperate with responding officers and provide an accurate account of what happened.\n\n## Important Safety Reminders\n- Do not confront or chase a suspect.\n- Do not share your live location or sensitive personal information publicly if doing so could put you at risk.\n- If you are being threatened, avoid escalating the situation and prioritize escape when safe.\n- If anyone is injured, request medical assistance immediately.\n- Follow instructions from police and emergency responders.\n\n**⚠️ If a crime is happening now and someone is in immediate danger, move to safety and call 911 in the Philippines. Do not risk your life to intervene or collect evidence.**",
+      "fire": "# 🔥 Fire Emergency Safety Advice\n\n## 1. Stay Calm and Evacuate Immediately\nIf you see a fire or smell heavy smoke, alert people nearby and leave the building using the nearest safe exit. Do not waste time collecting personal belongings.\n\n## 2. Stay Low if There Is Smoke\nSmoke rises and can make breathing difficult. Stay close to the floor while moving toward a safe exit. Cover your nose and mouth with a cloth if available, but do not delay your escape.\n\n## 3. Never Use Elevators\nUse the stairs or designated emergency exits. Check whether a door feels hot before opening it. If it is hot or smoke is coming through, do not open it. Find another safe escape route.\n\n## 4. Contact Emergency Services\nOnce you are in a safe location, call **911 in the Philippines** or your local fire department. Provide your exact location, describe the fire, and report anyone who may be trapped inside.\n\n## 5. Stay Outside and Wait for Help\nMove away from the burning building and proceed to a safe meeting point. Never re-enter the building to retrieve belongings or rescue pets. Inform firefighters if someone is still inside.\n\n## Important Safety Reminders\n- Never use water on grease fires or electrical fires.\n- Only attempt to extinguish a small, contained fire if you are trained, have the correct fire extinguisher, and have a clear escape route.\n- If your clothes catch fire, remember: **Stop, Drop, and Roll.**\n- If trapped, close doors between yourself and the fire, block smoke from entering if possible, and call emergency services to report your location.\n- Follow instructions from firefighters and emergency responders.\n\n**⚠️ If there is a fire right now, evacuate immediately and call 911. Do not delay your escape to read these instructions.**",
+      "natural": "# 🌪️ Natural Disaster Emergency Safety Advice\n\n## 1. Stay Calm and Monitor Official Updates\nRemain calm and monitor announcements from local authorities, the Philippine Atmospheric, Geophysical and Astronomical Services Administration (PAGASA), and the National Disaster Risk Reduction and Management Council (NDRRMC). Follow official warnings, evacuation orders, and safety instructions.\n\n## 2. Identify the Type of Disaster\n- **Typhoon or Strong Winds:** Stay indoors, away from windows and glass doors. Secure loose objects only if it is safe to do so.\n- **Earthquake:** Drop, Cover, and Hold On. Protect your head and neck, stay away from windows, and do not use elevators.\n- **Flood:** Move to higher ground when instructed or when flooding threatens. Avoid walking or driving through floodwater.\n- **Landslide:** Move away from slopes, cliffs, and areas showing signs of ground movement. Report unusual ground cracks or sudden water changes to authorities.\n- **Tsunami:** After a strong or prolonged earthquake near the coast, move immediately to higher ground or inland if safe. Do not wait for an official warning if natural warning signs are present.\n- **Volcanic Eruption:** Follow evacuation orders, stay away from danger zones, and protect your eyes and respiratory system from ash using suitable protection.\n\n## 3. Evacuate When Necessary\nIf authorities issue an evacuation order, leave promptly and use designated evacuation routes. Bring essential supplies only if they are readily accessible. Avoid dangerous roads, bridges, floodwaters, and damaged structures.\n\n## 4. Prepare an Emergency Kit\nKeep essential supplies ready, including:\n- Drinking water and ready-to-eat food.\n- First-aid kit and necessary medications.\n- Flashlight, batteries, and a power bank.\n- Whistle and battery-powered radio, if available.\n- Identification documents and emergency contact information in a waterproof bag.\n- Extra clothing, hygiene supplies, and face masks.\n\n## 5. Protect Yourself and Your Family\nKeep family members together whenever possible and establish a meeting point in case you become separated. Help children, older adults, persons with disabilities, and others who may need assistance, provided it is safe to do so.\n\n## 6. Communicate Your Situation\nInform a trusted contact of your location and safety status when communication is available. Keep phone calls brief to conserve battery life. Use emergency hotlines when immediate assistance is needed, and provide your location and the type of emergency clearly.\n\n## 7. Stay Safe After the Disaster\nAvoid fallen power lines, damaged buildings, unstable slopes, contaminated water, and debris. Do not return to evacuated areas until authorities declare them safe. Report injuries, missing persons, and urgent hazards to emergency responders.\n\n## Important Safety Reminders\n- Follow official evacuation orders and disaster warnings.\n- Never cross floodwaters on foot or by vehicle.\n- Stay away from damaged electrical equipment and downed power lines.\n- Keep emergency supplies accessible and your phone charged whenever possible.\n- Do not spread unverified information or rumors about the disaster.\n- Call **911 in the Philippines** for immediate, life-threatening emergencies.\n\n**⚠️ If a disaster is happening now, prioritize your immediate safety, follow official instructions, and evacuate when necessary. Do not delay escaping danger to collect belongings or read these instructions.**",
+      "utility": "# 🛠️ Utility Emergency Safety Advice\n\n## 1. Identify the Hazard and Stay Calm\nIf you experience a power outage, gas leak, water supply problem, or damaged utility line, remain calm and assess the situation from a safe distance. Do not touch damaged equipment, exposed wires, or leaking pipes.\n\n## 2. Electrical Emergency\n- If you notice sparks, burning smells, exposed wires, or electrical fires, keep your distance and warn others to stay away.\n- Switch off the main power supply only if it is safe to reach and there is no risk of electric shock, fire, or contact with water.\n- Never touch fallen power lines or electrical equipment exposed to floodwater.\n- Contact your local electric utility provider to report outages, damaged lines, or other electrical hazards.\n\n## 3. Gas Leak or Suspected Gas Leak\n- If you smell gas or hear hissing near a gas appliance or cylinder, leave the area immediately.\n- Do not light matches, smoke, operate electrical switches, or use devices inside the affected area.\n- Do not attempt to repair the leak or turn off the supply if doing so would expose you to danger.\n- Once safely away, contact emergency services or your gas supplier for assistance.\n\n## 4. Water Leak or Burst Pipe\n- Avoid contact with water near electrical outlets, appliances, or exposed wiring.\n- Shut off the main water valve only if it is safe and accessible.\n- Keep away from contaminated water and flooded areas that may conceal hazards.\n- Contact your water service provider or a qualified plumber to report the problem and arrange repairs.\n\n## 5. Power Outage\n- Use a flashlight instead of candles whenever possible.\n- Unplug sensitive electrical equipment to protect it from possible power surges when electricity returns.\n- Keep refrigerator and freezer doors closed to preserve food for as long as possible.\n- Use generators outdoors, far from doors and windows, and never operate them indoors or in enclosed spaces because of carbon monoxide poisoning.\n- Report prolonged outages to your electricity provider.\n\n## 6. Report the Emergency\nWhen contacting emergency services or your utility provider, provide your exact location, the type of hazard, any visible damage, and whether anyone is injured or in immediate danger. Do not approach the hazard to obtain additional information.\n\n## Important Safety Reminders\n- Never attempt repairs involving live electrical systems, gas lines, or damaged utility infrastructure unless you are qualified and authorized.\n- Keep children and pets away from affected areas.\n- Follow instructions from emergency responders and utility personnel.\n- If you suspect a gas leak, prioritize evacuation before making calls.\n- Call **911 in the Philippines** if there is an immediate threat to life, fire, explosion risk, or serious injury.\n\n**⚠️ If a utility hazard presents an immediate danger, move to a safe location and contact the appropriate emergency service or utility provider. Do not risk injury by attempting repairs yourself.**",
+      "road": "# 🚗 Road Emergency Safety Advice\n\n## 1. Stay Calm and Assess the Situation\nIf your vehicle breaks down, you witness a road accident, or you encounter a hazard while traveling, remain calm and prioritize the safety of yourself, your passengers, and other road users.\n\n## 2. Move to a Safe Location\n- If your vehicle is still operational, move to the roadside or another safe location away from moving traffic.\n- Turn on your hazard lights to warn approaching drivers.\n- If you cannot move your vehicle safely, remain alert and contact roadside assistance or emergency services.\n- Exit the vehicle only when it is safe to do so. If traffic makes exiting dangerous, stay inside with your seat belt fastened until help arrives, unless there is an immediate danger such as fire.\n- Never stand behind or directly in front of a disabled vehicle on a busy road.\n\n## 3. Respond to a Road Accident\n- Call **911 in the Philippines** if anyone is seriously injured, trapped, or in immediate danger.\n- Do not move injured people unless they face an immediate threat, such as fire or approaching traffic.\n- Do not remove a motorcycle helmet from an injured rider unless necessary to manage an immediate life-threatening airway emergency and you are trained to do so.\n- Provide basic first aid only within your level of training and follow the emergency dispatcher's instructions.\n- Warn approaching traffic only if you can do so without putting yourself at risk.\n\n## 4. Handle Vehicle Breakdowns Safely\n- Turn on your hazard lights and park as far from moving traffic as possible.\n- Apply the parking brake and switch off the engine when safe.\n- If available, use a warning triangle or other approved warning device only when you can place it without entering dangerous traffic.\n- Contact roadside assistance, a towing service, or a qualified mechanic.\n- Never attempt repairs in an active traffic lane or beneath a vehicle supported only by a jack.\n\n## 5. Report Road Hazards\nIf you encounter fallen trees, damaged roads, flooding, landslides, debris, or dangerous obstructions, keep a safe distance and report the hazard to local authorities or the appropriate road agency.\n\nDo not drive through floodwater, around fallen power lines, or across roads that authorities have closed. Find a safer route when possible.\n\n## 6. Provide Accurate Information\nWhen requesting assistance, provide:\n- Your exact location or the nearest landmark.\n- The direction of travel and road name, if known.\n- The type of incident, such as a collision, breakdown, or road obstruction.\n- The number of people involved and any visible injuries.\n- Any immediate hazards, such as fire, fuel leakage, or blocked traffic.\n\nDo not put yourself in danger to collect additional information or take photographs.\n\n## Important Safety Reminders\n- Keep your seat belt fastened while traveling in a vehicle.\n- Wear an approved helmet when riding a motorcycle.\n- Never stop in an active traffic lane unless unavoidable.\n- Do not confront aggressive drivers or attempt to manage dangerous traffic yourself.\n- Keep an emergency kit, flashlight, first-aid supplies, and emergency contact numbers in your vehicle when possible.\n- Call **911 in the Philippines** for serious accidents, life-threatening injuries, fires, or immediate danger.\n\n**⚠️ If you are involved in a road emergency right now, move to safety if possible, warn others only when safe, and contact emergency services if anyone is injured or in immediate danger.**",
+      "domestic": "# 🏠 Domestic Emergency Safety Advice\n\n## 1. Stay Calm and Assess the Situation\nIf an emergency occurs at home, such as a break-in, domestic violence, a household accident, or a dangerous confrontation, remain calm and prioritize your safety. Avoid confronting anyone who may pose a threat.\n\n## 2. Move to a Safe Location\n- If someone is threatening or harming you, move away from the person if it is safe to do so.\n- If possible, go to a trusted neighbor's home, a nearby public place, or another secure location.\n- If you cannot leave safely, move to a room with an exit and a way to contact emergency services. Avoid rooms containing potential weapons or rooms where you could become trapped.\n- If children or other vulnerable household members are at risk, help them reach safety when possible without increasing the danger.\n\n## 3. Contact Emergency Services\nCall **911 in the Philippines** if someone is being assaulted, threatened with serious harm, unlawfully confined, or is in immediate danger.\n\nClearly provide your location, describe the emergency, and inform the operator if anyone is injured, children are present, or weapons are involved.\n\n## 4. Respond to Household Accidents\n- **Cuts or severe bleeding:** Apply firm, direct pressure with a clean cloth or dressing and seek urgent medical assistance if needed.\n- **Burns:** Cool the affected area under cool running water for 20 minutes. Do not apply ice, butter, or creams.\n- **Gas leaks:** Leave immediately, avoid flames and electrical switches, and contact emergency services or your gas supplier from a safe location.\n- **Electrical hazards:** Keep away from exposed wires, sparks, and wet electrical equipment. Do not touch anyone who may still be in contact with an electrical source until the power has been safely disconnected.\n- **Poisoning:** Contact emergency medical services or a poison specialist. Do not induce vomiting unless instructed by a qualified professional.\n\n## 5. Protect Your Privacy and Personal Safety\nIf you are experiencing domestic abuse or coercive behavior, use a safe device to contact someone you trust or seek assistance. Avoid announcing your plans to leave if doing so could increase the danger. Do not put yourself at further risk to collect belongings or evidence.\n\n## 6. Seek Help and Report the Incident\nWhen you are safe, contact the appropriate authorities or a trusted support organization. If you have injuries, seek medical care. Preserve relevant messages or other evidence only if it is safe to do so.\n\n## 7. Prepare for Future Emergencies\n- Keep emergency contact numbers accessible.\n- Identify safe exits and a trusted nearby contact.\n- Keep essential medication, identification, keys, and emergency supplies accessible when possible.\n- Establish a family emergency plan, including a safe meeting point.\n- Teach household members how to contact emergency services and report their location.\n\n## Important Safety Reminders\n- Your safety is more important than protecting property or belongings.\n- Do not physically intervene in a violent confrontation if doing so could put you in danger.\n- If a child, older adult, or person with a disability is at risk, inform emergency responders.\n- Follow instructions from police officers, firefighters, and medical professionals.\n- Call **911 in the Philippines** for immediate threats to life, serious violence, fire, or medical emergencies.\n\n**⚠️ If you are in immediate danger at home, move to safety if possible and call 911. Do not delay seeking help to read these instructions.**",
+      "animal": "# 🐾 Animal Emergency Safety Advice\n\n## 1. Stay Calm and Assess the Situation\nIf an animal is injured, trapped, missing, behaving aggressively, or in immediate danger, remain calm and assess the situation from a safe distance. Avoid sudden movements, loud noises, or actions that may frighten the animal.\n\n## 2. Protect Yourself and Others\n- Do not approach an unfamiliar, aggressive, or severely injured animal.\n- Keep children and other pets away from the affected area.\n- Avoid touching an animal that is in pain, as it may bite or scratch out of fear.\n- Do not attempt to handle wildlife, venomous animals, or potentially rabid animals yourself.\n\n## 3. Contact the Appropriate Emergency Service\n- **Injured or seriously ill pet:** Contact the nearest veterinarian or emergency veterinary clinic immediately.\n- **Animal trapped or in immediate danger:** Contact local animal rescue services, the local government unit (LGU), or the Bureau of Fire Protection if rescue assistance is needed.\n- **Stray or injured animal:** Contact your local veterinary office, animal welfare organization, or animal control service, if available.\n- **Animal bite or scratch:** Wash the wound immediately with soap and running water for at least 15 minutes and seek urgent medical evaluation for rabies prevention.\n- **Dangerous animal threatening people:** Move to safety and contact local authorities or emergency services.\n\n## 4. Provide Basic First Aid if Safe\n- **Bleeding:** Apply gentle, direct pressure with clean gauze or a clean cloth if the animal can be handled safely.\n- **Suspected fracture:** Minimize movement and avoid attempting to straighten the injured limb.\n- **Heatstroke:** Move the animal to a cooler, shaded area, begin gentle cooling with cool water, and contact a veterinarian immediately. Avoid ice baths.\n- **Poisoning:** Contact a veterinarian immediately. Do not induce vomiting or give home remedies unless instructed by a veterinary professional.\n- **Breathing difficulties or unconsciousness:** Seek emergency veterinary care immediately and follow the veterinarian's instructions.\n\n## 5. Assist a Trapped or Missing Animal\n- If an animal is trapped, assess the surroundings before attempting a rescue. Do not enter burning buildings, floodwaters, unstable structures, or other hazardous areas.\n- If your pet is missing, notify local animal shelters, veterinary clinics, and animal welfare groups. Share a recent photo and contact information when appropriate.\n- If an animal is trapped in a vehicle during hot weather, contact local authorities for urgent assistance rather than putting yourself in danger.\n\n## 6. Prepare Information for Responders\nIf possible, provide the animal's species, size, location, visible injuries, behavior, and any known exposure to toxins or hazards. For pets, share their medical history and medications if known. Do not delay urgent treatment to gather this information.\n\n## Important Safety Reminders\n- Never give human medication to an animal unless specifically directed by a veterinarian.\n- Do not force food or water into an unconscious animal.\n- Avoid direct contact with blood, saliva, or other bodily fluids from an animal suspected of having rabies.\n- Use a carrier or leash only if the animal can be handled safely.\n- Follow instructions from veterinarians, animal rescuers, and emergency responders.\n- Call **911 in the Philippines** if a dangerous animal poses an immediate threat to human life.\n\n**⚠️ If an animal is seriously injured or struggling to breathe, contact a veterinarian immediately. If the situation threatens human safety, move away from the danger and contact the appropriate emergency service.**",
+      "other": "# ⚠️ General Emergency Safety Advice\n\n## 1. Stay Calm and Assess the Situation\nRemain calm and identify the immediate danger. Check whether you or anyone nearby is injured or at risk. Avoid actions that could worsen the situation, and do not approach unknown hazards.\n\n## 2. Move to a Safe Location\nIf your surroundings are dangerous, move away from the threat if it is safe to do so. Look for a secure, well-lit, or populated location. Avoid entering restricted areas, unstable structures, or places where you could become trapped.\n\n## 3. Contact Emergency Services\nCall **911 in the Philippines** if someone is in immediate danger, seriously injured, missing under urgent circumstances, or requires urgent assistance. Clearly explain what happened, provide your exact location or nearest landmark, and follow the operator's instructions.\n\n## 4. Inform Someone You Trust\nContact a trusted family member, friend, or emergency contact when it is safe to do so. Share your location, describe your situation, and let them know whether you need assistance. Avoid sharing sensitive information publicly.\n\n## 5. Avoid Unnecessary Risks\n- Do not attempt dangerous rescues or repairs beyond your training.\n- Stay away from unfamiliar substances, suspicious objects, exposed wires, and unstable structures.\n- Do not accept help from strangers if the situation makes you feel unsafe; seek assistance from identifiable emergency personnel or trusted establishments when possible.\n- Follow instructions from authorized emergency responders.\n\n## 6. Provide Accurate Information\nWhen requesting assistance, explain the nature of the emergency, your location, the number of people affected, any visible injuries, and any immediate hazards. Stay available for follow-up instructions if it is safe to do so.\n\n## 7. Stay Safe Until Help Arrives\nRemain in a safe location and monitor your surroundings. Keep your phone available, conserve its battery, and avoid moving to a more dangerous area. If your situation changes, update emergency responders when possible.\n\n## Important Safety Reminders\n- Your safety and the safety of others come first.\n- Do not delay contacting emergency services when there is an immediate threat to life.\n- Follow official warnings and instructions.\n- Do not spread unverified information during an emergency.\n- If you cannot make a call, try sending a text message to a trusted contact or use another available means of requesting help.\n\n**⚠️ If you are facing an immediate threat, move to safety if possible and call 911 in the Philippines. Explain your situation clearly and follow the emergency operator's instructions.**"
     }
   }
 }
