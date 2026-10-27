@@ -69,7 +69,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({
               ? `${Math.round(heatValue)}°C`
               : 'N/A'}
           </TText>
-          <TText style={[styles.weatherLabel, { color }]}>{ t('tabs.home.header_heat') }</TText>
+          <TText style={[styles.weatherLabel, { color }]}>{ t('common.weather.temperature') }</TText>
         </View>
         <View style={[styles.weather, { backgroundColor: backgroundColor }]}>
           <TIcon name='cloud' size={20} color="#E0F3FF" />
@@ -78,7 +78,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({
               ? `${rainValue}mm`
               : 'N/A'}
           </TText>
-          <TText style={[styles.weatherLabel, { color }]}>{ t('tabs.home.header_rain') }</TText>
+          <TText style={[styles.weatherLabel, { color }]}>{ t('common.weather.precipitation') }</TText>
         </View>
         <View style={[styles.weather, { backgroundColor: backgroundColor }]}>
           <TIcon name='water' size={20} color="#E0F3FF" />
@@ -87,7 +87,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({
               ? `${humidValue.toFixed(0)}%`
               : 'N/A'}
           </TText>
-          <TText style={[styles.weatherLabel, { color }]}>{ t('tabs.home.header_humid') }</TText>
+          <TText style={[styles.weatherLabel, { color }]}>{ t('common.weather.humidity') }</TText>
         </View>
         <View style={[styles.weather, { backgroundColor: backgroundColor }]}>
           <TIcon name='fan' size={20} color="#E0F3FF" />
@@ -96,7 +96,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({
               ? `${Math.round(windValue)}km/h`
               : 'N/A'}
           </TText>
-          <TText style={[styles.weatherLabel, { color }]}>{ t('tabs.home.header_wind') }</TText>
+          <TText style={[styles.weatherLabel, { color }]}>{ t('common.weather.wind') }</TText>
         </View>
       </View>
     </View>

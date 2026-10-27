@@ -102,8 +102,8 @@ export default function HomeScreen() {
               style={[styles.gridChildContainer, styles.leftGridContainer, { backgroundColor: primaryColor, borderWidth: 1, borderColor: "#ccc2" }]}
             >
               <View style={{ padding: 12 }}>
-                <TText style={{ opacity: .8, fontSize: 12, fontFamily: 'PlusJakartaSans', color: accentColor, fontWeight: 800 }}>{t('tabs.home.menu_itinerary')}</TText>
-                <TText style={{ opacity: .5, fontSize: 10 }}>Travel Planner</TText>
+                <TText style={{ opacity: .8, fontSize: 12, fontFamily: 'PlusJakartaSans', color: accentColor, fontWeight: 800 }}>{t('home.menu_itinerary')}</TText>
+                <TText style={{ opacity: .5, fontSize: 10 }}>{t('home.menu_itinerary_desc')}</TText>
               </View>
               <Image source={require('../../../../assets/images/itinerary-icon.png')} style={styles.leftGridImage} />
             </TouchableOpacity>
@@ -113,16 +113,16 @@ export default function HomeScreen() {
                 onPress={() => router.push('/sos')}
                 style={[styles.rightGridContainer, { backgroundColor: primaryColor }]}
               >
-                <TText style={{ opacity: .8, fontSize: 11, fontFamily: 'PlusJakartaSans', color: accentColor, fontWeight: 800 }}>{t('tabs.home.menu_sos')}</TText>
-                <TText style={{ opacity: .5, fontSize: 10 }}>Emergency Alert</TText>
+                <TText style={{ opacity: .8, fontSize: 11, fontFamily: 'PlusJakartaSans', color: accentColor, fontWeight: 800 }}>{t('home.menu_sos')}</TText>
+                <TText style={{ opacity: .5, fontSize: 10 }}>{t('home.menu_sos_desc')}</TText>
                 <Image source={require('../../../../assets/images/sos-icon.png')} style={styles.rightGridImage} />
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => router.push('/expenses')}
                 style={[styles.rightGridContainer, { backgroundColor: primaryColor }]}
               >
-                <TText style={{ opacity: .8, fontSize: 11, fontFamily: 'PlusJakartaSans', color: accentColor, fontWeight: 800 }}>Expenses</TText>
-                <TText style={{ opacity: .5, fontSize: 10 }}>Tracker</TText>
+                <TText style={{ opacity: .8, fontSize: 11, fontFamily: 'PlusJakartaSans', color: accentColor, fontWeight: 800 }}>{t('home.menu_expenses')}</TText>
+                <TText style={{ opacity: .5, fontSize: 10 }}>{t('home.menu_expenses_desc')}</TText>
                 <Image source={require('../../../../assets/images/budget-icon.png')} style={styles.rightGridImage} />
               </TouchableOpacity>
             </View>

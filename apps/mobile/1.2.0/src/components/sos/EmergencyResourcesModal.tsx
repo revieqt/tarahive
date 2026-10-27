@@ -12,8 +12,8 @@ import { TIcon, TText, TView } from "@/components/ui/Themed";
 import { Markdown } from "@/components/ui/Markdown";
 import { useThemeColor } from "@/hooks/shared/useThemeColor";
 import { EMERGENCY_TYPES } from "@/types/sosTypes";
-import { useLanguage } from "@/context/LanguageContext";
 import { useAdvice } from "@/hooks/sos/useAdvice";
+import { useLanguage } from "@/context/LanguageContext";
 
 type EmergencyResourcesModalProps = {
   visible: boolean;
@@ -80,7 +80,7 @@ export default function EmergencyResourcesModal({
 
                 <View style={{flex: 1}}>
                     <TText type="title" style={styles.title}>{emergencyLabel}</TText>
-                    <TText style={{fontSize: 12, opacity: .7, marginTop: -5}}>Here are some resources that might help.</TText>
+                    <TText style={{fontSize: 12, opacity: .7, marginTop: -5}}>{t('sos.resources.subtitle')}</TText>
                 </View>
                 
             </View>
@@ -100,7 +100,7 @@ export default function EmergencyResourcesModal({
                 onPress={() => setCurrentTab(1)}
                 style={[styles.tabs, currentTab === 1 && {backgroundColor: emergencyTypeDefinition.color + '30'}]}
                 >
-                <TText style={currentTab === 1 && styles.activeTabText}>Advice</TText>
+                <TText style={currentTab === 1 && styles.activeTabText}>{t('sos.resources.advisory')}</TText>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -109,13 +109,10 @@ export default function EmergencyResourcesModal({
                 onPress={() => setCurrentTab(2)}
                 style={[styles.tabs, currentTab === 2 && {backgroundColor: emergencyTypeDefinition.color + '30'}]}
                 >
-                <TText style={currentTab === 2 && styles.activeTabText}>Nearby Help</TText>
+                <TText style={currentTab === 2 && styles.activeTabText}>{t('sos.resources.nearby_help')}</TText>
                 </TouchableOpacity>
             </ScrollView>
           </View>
-
-          
-
 
           <ScrollView
             style={[styles.scrollView, {backgroundColor}]}

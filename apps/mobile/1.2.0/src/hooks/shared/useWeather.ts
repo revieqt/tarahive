@@ -3,35 +3,35 @@ import { BACKEND_URL } from '@/constants/Config';
 
 const API_URL = `${BACKEND_URL}/v2/weather`;
 
-const weatherCodeKeyMap: Record<number, string> = {  // 2. rename map + swap values to keys
-  0:  'common.conditions.clear_sky',
-  1:  'common.conditions.mainly_clear',
-  2:  'common.conditions.partly_cloudy',
-  3:  'common.conditions.cloudy',
-  45: 'common.conditions.fog',
-  48: 'common.conditions.depositing_rime_fog',
-  51: 'common.conditions.light_drizzle',
-  53: 'common.conditions.moderate_drizzle',
-  55: 'common.conditions.heavy_drizzle',
-  56: 'common.conditions.light_freezing_drizzle',
-  57: 'common.conditions.heavy_freezing_drizzle',
-  61: 'common.conditions.slight_rain',
-  63: 'common.conditions.moderate_rain',
-  65: 'common.conditions.heavy_rain',
-  66: 'common.conditions.light_freezing_rain',
-  67: 'common.conditions.heavy_freezing_rain',
-  71: 'common.conditions.slight_snow_fall',
-  73: 'common.conditions.moderate_snow_fall',
-  75: 'common.conditions.heavy_snow_fall',
-  77: 'common.conditions.snow_grains',
-  80: 'common.conditions.slight_rain_showers',
-  81: 'common.conditions.moderate_rain_showers',
-  82: 'common.conditions.violent_rain_showers',
-  85: 'common.conditions.slight_snow_showers',
-  86: 'common.conditions.heavy_snow_showers',
-  95: 'common.conditions.thunderstorm',
-  96: 'common.conditions.thunderstorm_slight_hail',
-  99: 'common.conditions.thunderstorm_heavy_hail',
+const weatherCodeKeyMap: Record<number, string> = {
+  0:  'common.weather.clear_sky',
+  1:  'common.weather.mainly_clear',
+  2:  'common.weather.partly_cloudy',
+  3:  'common.weather.cloudy',
+  45: 'common.weather.fog',
+  48: 'common.weather.depositing_rime_fog',
+  51: 'common.weather.light_drizzle',
+  53: 'common.weather.moderate_drizzle',
+  55: 'common.weather.heavy_drizzle',
+  56: 'common.weather.light_freezing_drizzle',
+  57: 'common.weather.heavy_freezing_drizzle',
+  61: 'common.weather.slight_rain',
+  63: 'common.weather.moderate_rain',
+  65: 'common.weather.heavy_rain',
+  66: 'common.weather.light_freezing_rain',
+  67: 'common.weather.heavy_freezing_rain',
+  71: 'common.weather.slight_snow_fall',
+  73: 'common.weather.moderate_snow_fall',
+  75: 'common.weather.heavy_snow_fall',
+  77: 'common.weather.snow_grains',
+  80: 'common.weather.slight_rain_showers',
+  81: 'common.weather.moderate_rain_showers',
+  82: 'common.weather.violent_rain_showers',
+  85: 'common.weather.slight_snow_showers',
+  86: 'common.weather.heavy_snow_showers',
+  95: 'common.weather.thunderstorm',
+  96: 'common.weather.thunderstorm_slight_hail',
+  99: 'common.weather.thunderstorm_heavy_hail',
 };
 
 export interface WeatherData {
@@ -66,7 +66,7 @@ const normalizeWeatherData = (responseData: any): WeatherData => {
     weatherType:
       weatherPayload?.weatherType && typeof weatherPayload.weatherType === 'string'
         ? weatherPayload.weatherType
-        : getWeatherTypeFromCode(weatherCode) ?? 'weather.conditions.clear_sky',
+        : getWeatherTypeFromCode(weatherCode) ?? 'common.weather.clear_sky',
   };
 };
 

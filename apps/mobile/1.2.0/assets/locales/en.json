@@ -65,7 +65,11 @@
         "cache_clear_title": "Clear Cache",
         "cache_clear_subtitle": "This will clear all cached data and log you out. Continue?"
       },
-      "conditions": {
+      "weather": {
+        "temperature": "Heat",
+        "precipitation": "Rain",
+        "humidity": "Humid",
+        "wind": "Wind",
         "clear_sky": "Clear sky",
         "mainly_clear": "Mainly clear",
         "partly_cloudy": "Partly cloudy",
@@ -113,6 +117,39 @@
         "cooldown_prompt": "Email resent. You can request another one in",
         "verify_button": "Verify Email"
       }
+    },
+    "home": {
+      "menu_itinerary": "Itineraries",
+      "menu_itinerary_desc": "Travel Planner",
+      "menu_sos": "SOS",
+      "menu_sos_desc": "Emergency Alert",
+      "menu_expenses": "Expenses",
+      "menu_expenses_desc": "Tracker"
+    },
+    "account": {
+      "pro_card_title": "Be a Certified Traveller",
+      "pro_card_subtitle": "Upgrade to Pro Now!",
+      "pro_card_description": "Get access to exclusive features and benefits by upgrading to a Pro account.",
+      "upgrade_button": "Upgrade Now!",
+      "personalization_title": "Personalization",
+      "view_profile_button": "Edit Profile",
+      "edit_profile_button": "Edit Profile",
+      "theme_button": "App Theme",
+      "language_button": "App Language",
+      "privacy_title": "Privacy",
+      "change_password_button": "Change Password",
+      "visibility_button": "Visibility Settings",
+      "logs_button": "Activity Logs",
+      "privacy_button": "Privacy Policy",
+      "terms_button": "Terms and Conditions",
+      "help_title": "Help and Support",
+      "manual_button": "User Manual",
+      "support_button": "Contact Support",
+      "feedback_button": "Give us Feedback",
+      "about_button": "About the App",
+      "developer_title": "Developer Options",
+      "cache_button": "Clear Cache",
+      "logout_button": "Logout"
     },
     "itinerary": {
       "main": {
@@ -198,27 +235,15 @@
     "sos": {
       "main": {
         "off_title": "All Clear!",
-        "off_subtitle": "SOS: OFF",
-        "off_note": "Long-press to Activate SOS",
-        "off_hold": "Hold for Activation",
+        "off_subtitle": "You're marked as safe",
+        "off_note": "Hold SOS button to activate. This will notify your emergency contacts which you can configure in settings.",
+        "off_button": "Configure Settings",
         "on_title": "SOS in Progress",
-        "on_subtitle": "SOS: ON",
-        "on_note": "Long-press to End SOS",
-        "on_hold": "Hold for Deactivation",
+        "on_note": "Your Emergency Contacts has been notified and your emergency status can be seen by others. View resources that might help you.",
+        "on_button": "View Resources",
         "picker_instruction": "Keep holding and release on an emergency type",
         "release_to_cancel": "Release here to cancel",
-        "cancel_countdown": "Cancel SOS ({seconds})",
-        "info": "is in a",
-        "email": "Emergency Email",
-        "number": "Emergency Contact",
-        "lang": "Alert Language"
-      },
-      "form": {
-        "title": "Enable SOS",
-        "subtitle": "Configure your emergency alert",
-        "message_placeholder": "Describe your emergency situation... (Optional)",
-        "activate_button": "Activate SOS",
-        "settings_link": "Configure where to send your emergency alerts"
+        "cancel_countdown": "Cancel SOS ({seconds})"
       },
       "emergency_types": {
         "medical": "Medical Emergency",
@@ -244,55 +269,11 @@
         "sms_placeholder": "Emergency Contact Phone",
         "language": "Preferred Alert Language",
         "save_button": "Save Changes"
-      }
-    },
-    "tabs": {
-      "tabs": {
-        "home_button": "Home",
-        "maps_button": "Maps",
-        "explore_button": "Explore",
-        "account_button": "Account"
       },
-      "home": {
-        "header_title": "You're currently at",
-        "header_heat": "Heat",
-        "header_rain": "Rain",
-        "header_humid": "Humid",
-        "header_wind": "Wind",
-        "menu_itinerary": "Itineraries",
-        "menu_itinerary_desc": "Plan your Travels",
-        "menu_sos": "SOS",
-        "menu_sos_desc": "Alert others with",
-        "menu_tara": "Tara",
-        "menu_tara_desc": "Your AI Travel Buddy",
-        "calendar_new_itinerary": "New Itinerary",
-        "calendar_view_all": "View All Itineraries",
-        "calendar_no_itineraries": "No itinerary for this day"
-      },
-      "account": {
-        "pro_card_title": "Be a Certified Traveller",
-        "pro_card_subtitle": "Upgrade to Pro Now!",
-        "pro_card_description": "Get access to exclusive features and benefits by upgrading to a Pro account.",
-        "upgrade_button": "Upgrade Now!",
-        "personalization_title": "Personalization",
-        "view_profile_button": "Edit Profile",
-        "edit_profile_button": "Edit Profile",
-        "theme_button": "App Theme",
-        "language_button": "App Language",
-        "privacy_title": "Privacy",
-        "change_password_button": "Change Password",
-        "visibility_button": "Visibility Settings",
-        "logs_button": "Activity Logs",
-        "privacy_button": "Privacy Policy",
-        "terms_button": "Terms and Conditions",
-        "help_title": "Help and Support",
-        "manual_button": "User Manual",
-        "support_button": "Contact Support",
-        "feedback_button": "Give us Feedback",
-        "about_button": "About the App",
-        "developer_title": "Developer Options",
-        "cache_button": "Clear Cache",
-        "logout_button": "Logout"
+      "resources":{
+        "subtitle": "Here are some resources that might help.",
+        "advisory": "Advisory",
+        "nearby_help": "Nearby Help"
       }
     },
     "users": {

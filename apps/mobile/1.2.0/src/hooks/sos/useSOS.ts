@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import { enableSOS, disableSOS, type EnableSOSRequest } from '@/services/sosService';
 import { useSession } from '@/context/SessionContext';
 import { useDeviceInfo, type DeviceInfo } from '@/hooks/shared/useDeviceInfo';
-import { showError, showSuccess } from '@/services/toast.service';
+import { showError } from '@/services/toast.service';
 
 /**
  * Custom hook for SOS operations
@@ -45,7 +45,6 @@ export const useSafety = () => {
         });
       }
 
-      showSuccess('SOS Activated', response.message || 'Emergency alert has been sent');
       if (options.navigateBack !== false) {
         router.back();
       }

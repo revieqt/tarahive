@@ -176,12 +176,13 @@ export default function SOSSection() {
         <View style={styles.titleContainer}>
           {isSOSActive ? (
             <>
+              <TText style={{ color: '#fff9', textAlign: 'center', marginBottom: 10 }}>{t('sos.main.on_note')}</TText>
               <View style={styles.messageButtons}>
                 <TouchableOpacity
                   style={[styles.openSettings, { backgroundColor: accentColor }]}
                   onPress={() => showAdvice(user?.safetyState?.emergencyType || "other")}
                 >
-                  <TText style={{ color: '#fff' }}>View Resources</TText>
+                  <TText style={{ color: '#fff' }}>{t('sos.main.on_button')}</TText>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.openSettings}>
@@ -191,9 +192,10 @@ export default function SOSSection() {
             </>
           ) : (
             <>
+              <TText style={{ color: '#fff9', textAlign: 'center', marginBottom: 10 }}>{t('sos.main.off_note')}</TText>
               <View style={styles.messageButtons}>
                 <TouchableOpacity style={[styles.openSettings, { backgroundColor: accentColor}]} onPress={() => router.push('/sos/settings')}>
-                  <TText style={{ color: '#fff' }}>Settings</TText>
+                  <TText style={{ color: '#fff' }}>{t('sos.main.off_button')}</TText>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.openSettings}>
@@ -288,6 +290,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 3,
+    paddingHorizontal: '3%'
   },
   messageButtons: {
     flexDirection: 'row',
