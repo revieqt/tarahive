@@ -1,9 +1,16 @@
-import { ActivityIndicator, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { TText, TView } from '@/components/ui/Themed';
 import BackButton from '@/components/common/BackButton';
 import { BACKEND_URL } from '@/constants/Config';
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
 import { useUpdateRoom } from '@/hooks/room/useUpdateRoom';
+import ColorBar from '@/components/itinerary/ColorBar';
+import TextField from '@/components/ui/TextField';
+import DropDownField from '@/components/ui/DropDownField';
+import Header from '@/components/common/Header';
+import StickyScrollView from '@/components/ui/StickyScrollView';
+import { LinearGradient } from 'expo-linear-gradient';
+import Button from '@/components/ui/Button';
 
 export default function UpdateRoomScreen() {
   const textColor = useThemeColor({}, 'text');
@@ -57,15 +64,16 @@ export default function UpdateRoomScreen() {
   const imageUri = roomImageUri ?? savedImageUri;
 
   return (
-    <TView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.header}>
-          <BackButton />
-          <TText type="title">Edit room</TText>
-        </View>
+    <TView style={{flex: 1}}>
+      <StickyScrollView 
+        contentContainerStyle={styles.content}
+        title="Update Room"
+        subtitle="Edit your room details"
+      >
+        <Header title="Update Room" subtitle="Edit your room details" />
 
         <TouchableOpacity
-          style={[styles.imagePicker, { backgroundColor: primaryColor }]}
+          style={[styles.imagePicker, { backgroundColor: themeColor }]}
           onPress={chooseRoomImage}
           accessibilityRole="button"
         >
@@ -79,97 +87,71 @@ export default function UpdateRoomScreen() {
           <TText style={styles.imageAction}>{imageUri ? 'Change image' : 'Choose image'}</TText>
         </TouchableOpacity>
 
-        <TText style={styles.label}>Name</TText>
-        <TextInput
+        <View style={styles.colorBarContainer}>
+          <ColorBar
+            primaryColor={primaryColor}
+            selectedColor={themeColor}
+            onSelect={setThemeColor}
+          />
+        </View>
+
+        <TextField
+          placeholder="Name"
           value={name}
           onChangeText={setName}
-          placeholder="Room name"
-          placeholderTextColor={`${textColor}80`}
-          style={[styles.input, { color: textColor, borderColor: `${textColor}30` }]}
           maxLength={255}
           accessibilityLabel="Room name"
         />
 
-        <TText style={styles.label}>Description</TText>
-        <TextInput
+        <TextField
+          placeholder="Description"
           value={description}
           onChangeText={setDescription}
-          placeholder="Describe this room"
-          placeholderTextColor={`${textColor}80`}
-          style={[styles.input, styles.descriptionInput, { color: textColor, borderColor: `${textColor}30` }]}
           multiline
-          textAlignVertical="top"
+          numberOfLines={4}
+          style={styles.descriptionField}
           accessibilityLabel="Room description"
         />
 
-        <TText style={styles.label}>Privacy</TText>
-        <View style={styles.privacyOptions}>
-          {(['PRIVATE', 'PUBLIC'] as const).map((value) => (
-            <TouchableOpacity
-              key={value}
-              onPress={() => setPrivacy(value)}
-              style={[
-                styles.privacyOption,
-                { borderColor: privacy === value ? primaryColor : `${textColor}30` },
-                privacy === value && { backgroundColor: `${primaryColor}20` },
-              ]}
-              accessibilityRole="radio"
-              accessibilityState={{ selected: privacy === value }}
-            >
-              <TText>{value === 'PRIVATE' ? 'Private' : 'Public'}</TText>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        <TText style={styles.label}>Theme color</TText>
-        <TextInput
-          value={themeColor}
-          onChangeText={setThemeColor}
-          placeholder="#FF6B6B"
-          placeholderTextColor={`${textColor}80`}
-          style={[styles.input, { color: textColor, borderColor: `${textColor}30` }]}
-          autoCapitalize="characters"
-          maxLength={7}
-          accessibilityLabel="Theme color hex value"
-        />
-
-        <TouchableOpacity
-          onPress={save}
-          disabled={!hasChanges || isPending}
-          style={[
-            styles.saveButton,
-            { backgroundColor: primaryColor },
-            (!hasChanges || isPending) && styles.disabledButton,
+        <DropDownField
+          placeholder="Privacy"
+          value={privacy}
+          onValueChange={(value) => {
+            if (value === 'PRIVATE' || value === 'PUBLIC') setPrivacy(value);
+          }}
+          values={[
+            { label: 'Private', value: 'PRIVATE' },
+            { label: 'Public', value: 'PUBLIC' },
           ]}
-          accessibilityRole="button"
-        >
-          {isPending ? <ActivityIndicator color={textColor} /> : <TText>Save changes</TText>}
-        </TouchableOpacity>
-      </ScrollView>
+        />
+      </StickyScrollView>
+
+      <LinearGradient
+        colors={['transparent', primaryColor, primaryColor]}
+        style={styles.buttonContainer}
+      >
+        <Button
+          title="Save Changes"
+          type='primary'
+          loading={isPending}
+          disabled={!hasChanges || isPending}
+          onPress={save}
+        />
+      </LinearGradient>
     </TView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   content: {
-    padding: 18,
-    paddingBottom: 36,
-    gap: 10,
+    padding: '3%',
+    paddingBottom: 100,
   },
   stateContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     gap: 12,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-    marginBottom: 8,
   },
   imagePicker: {
     height: 190,
@@ -199,29 +181,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#0009',
     color: '#fff',
   },
-  label: {
-    marginTop: 6,
-    fontWeight: '600',
+  descriptionField: {
+    height: 110,
+    borderRadius: 16,
   },
-  input: {
+  colorBarContainer: {
+    height: 48,
     borderWidth: 1,
-    borderRadius: 10,
-    minHeight: 46,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-  },
-  descriptionInput: {
-    minHeight: 110,
-  },
-  privacyOptions: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  privacyOption: {
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingVertical: 11,
-    paddingHorizontal: 16,
+    borderColor: '#ccc4',
+    borderRadius: 30,
+    marginBottom: 8
   },
   saveButton: {
     minHeight: 48,
@@ -236,4 +205,12 @@ const styles = StyleSheet.create({
   retry: {
     textDecorationLine: 'underline',
   },
+  buttonContainer:{
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingVertical:16,
+    paddingHorizontal: '3%'
+  }
 });

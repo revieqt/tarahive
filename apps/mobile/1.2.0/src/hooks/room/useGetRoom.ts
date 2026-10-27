@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
 import { getRoomById } from '@/services/roomService';
 import { showError } from '@/services/toast.service';
-import { Room } from '@/types/roomTypes';
 
 export const useGetRoom = () => {
   const { id } = useLocalSearchParams<{ id?: string | string[] }>();
@@ -40,7 +39,8 @@ export const useGetRoom = () => {
   };
 
   return {
-    room: query.data as Room | null | undefined,
+    room: query.data?.room,
+    member: query.data?.member,
     isLoading: query.isLoading,
     isFetching: query.isFetching,
     isError: query.isError,

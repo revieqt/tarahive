@@ -1,6 +1,18 @@
 import { Response } from 'express';
 import { AuthRequest } from '../auth/auth.types';
-import { createRoom, getRoomById, getRoomMembers, getUserRooms, updateRoom } from './room.service';
+import {
+  createRoom,
+  getRoomById,
+  getRoomMembers,
+  getUserRooms,
+  acceptRoomInvite,
+  approveRoomMembershipRequest,
+  cancelRoomMembershipRequest,
+  inviteRoomMember,
+  requestRoomMembership,
+  removeRoomInvite,
+  updateRoom,
+} from './room.service';
 import { CreateRoomRequest, UpdateRoomRequest } from './room.types';
 import { ImageValidationError } from '../../../infrastructure/storage/validators/image-validator.service';
 import { RoomPrivacy } from './room.entity';
@@ -69,11 +81,7 @@ export const createRoomController = async (req: AuthRequest, res: Response): Pro
 };
 
 export const getRoomController = async (req: AuthRequest, res: Response): Promise<void> => {
-  if (!req.user?.sub) {
-    res.status(401).json({ success: false, message: 'User not authenticated' });
-    return;
-  }
-
+  const userId = req.user?.sub;
   const { id } = req.params;
   if (!isUuid(id)) {
     res.status(400).json({ success: false, message: 'Room ID must be a valid UUID' });
@@ -81,27 +89,21 @@ export const getRoomController = async (req: AuthRequest, res: Response): Promis
   }
 
   try {
-    const room = await getRoomById(id);
-    if (!room) {
+    const result = await getRoomById(id, userId);
+    if (result.kind === 'NOT_FOUND') {
       res.status(404).json({ success: false, message: 'Room not found' });
+      return;
+    }
+    if (result.kind === 'FORBIDDEN') {
+      res.status(403).json({ success: false, message: 'You must be a room member to access this private room' });
       return;
     }
 
     res.status(200).json({
       success: true,
       message: 'Room retrieved successfully',
-      data: {
-        ...room,
-        itinerary: room.itinerary
-          ? {
-              id: room.itinerary.id,
-              title: room.itinerary.title,
-              startDate: room.itinerary.startDate,
-              endDate: room.itinerary.endDate,
-              type: room.itinerary.type,
-            }
-          : null,
-      },
+      room: result.room,
+      ...(result.member ? { member: result.member } : {}),
     });
   } catch (error) {
     console.error('Error retrieving room:', error);
@@ -134,12 +136,223 @@ export const getRoomMembersController = async (req: AuthRequest, res: Response):
       data: members,
     });
   } catch (error) {
-    if (error instanceof Error && error.message === 'Active room membership required') {
+    if (error instanceof Error && error.message === 'Room membership required') {
       res.status(403).json({ success: false, message: 'Only room members can view room members' });
       return;
     }
     console.error('Error retrieving room members:', error);
     res.status(500).json({ success: false, message: 'Failed to retrieve room members' });
+  }
+};
+
+const validateInviteBody = (
+  body: unknown,
+): { userId: string; roomId: string } | null => {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return null;
+  const { userId, roomId } = body as Record<string, unknown>;
+  if (!isUuid(userId) || !isUuid(roomId)) return null;
+  return { userId, roomId };
+};
+
+const validateRoomIdBody = (body: unknown): string | null => {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return null;
+  const { roomId } = body as Record<string, unknown>;
+  return isUuid(roomId) ? roomId : null;
+};
+
+export const requestRoomMembershipController = async (
+  req: AuthRequest,
+  res: Response,
+): Promise<void> => {
+  const userId = req.user?.sub;
+  if (!userId) {
+    res.status(401).json({ success: false, message: 'User not authenticated' });
+    return;
+  }
+  const roomId = validateRoomIdBody(req.body);
+  if (!roomId) {
+    res.status(400).json({ success: false, message: 'A valid roomId is required' });
+    return;
+  }
+
+  try {
+    const outcome = await requestRoomMembership(roomId, userId);
+    if (outcome === 'NOT_PUBLIC') {
+      res.status(400).json({ success: false, message: 'Join requests are only allowed for public rooms' });
+      return;
+    }
+    if (outcome === 'ALREADY_MEMBER') {
+      res.status(409).json({ success: false, message: 'You already have a membership or pending request for this room' });
+      return;
+    }
+    res.status(201).json({ success: true, message: 'Room join request submitted successfully' });
+  } catch (error) {
+    console.error('Error requesting room membership:', error);
+    res.status(500).json({ success: false, message: 'Failed to submit room join request' });
+  }
+};
+
+export const cancelRoomMembershipRequestController = async (
+  req: AuthRequest,
+  res: Response,
+): Promise<void> => {
+  const userId = req.user?.sub;
+  if (!userId) {
+    res.status(401).json({ success: false, message: 'User not authenticated' });
+    return;
+  }
+  const roomId = validateRoomIdBody(req.body);
+  if (!roomId) {
+    res.status(400).json({ success: false, message: 'A valid roomId is required' });
+    return;
+  }
+
+  try {
+    const outcome = await cancelRoomMembershipRequest(roomId, userId);
+    if (outcome === 'NOT_FOUND') {
+      res.status(404).json({ success: false, message: 'Pending join request not found' });
+      return;
+    }
+    res.status(200).json({ success: true, message: 'Room join request cancelled successfully' });
+  } catch (error) {
+    console.error('Error cancelling room membership request:', error);
+    res.status(500).json({ success: false, message: 'Failed to cancel room join request' });
+  }
+};
+
+export const approveRoomMembershipRequestController = async (
+  req: AuthRequest,
+  res: Response,
+): Promise<void> => {
+  const adminUserId = req.user?.sub;
+  if (!adminUserId) {
+    res.status(401).json({ success: false, message: 'User not authenticated' });
+    return;
+  }
+  const approval = validateInviteBody(req.body);
+  if (!approval) {
+    res.status(400).json({ success: false, message: 'Valid roomId and userId are required' });
+    return;
+  }
+
+  try {
+    const outcome = await approveRoomMembershipRequest(
+      approval.roomId,
+      adminUserId,
+      approval.userId,
+    );
+    if (outcome === 'FORBIDDEN') {
+      res.status(403).json({ success: false, message: 'Only active room admins can approve requests' });
+      return;
+    }
+    if (outcome === 'NOT_REQUESTED') {
+      res.status(404).json({ success: false, message: 'Pending room join request not found' });
+      return;
+    }
+    res.status(200).json({ success: true, message: 'Room join request approved successfully' });
+  } catch (error) {
+    console.error('Error approving room membership request:', error);
+    res.status(500).json({ success: false, message: 'Failed to approve room join request' });
+  }
+};
+
+export const acceptRoomInviteController = async (
+  req: AuthRequest,
+  res: Response,
+): Promise<void> => {
+  const userId = req.user?.sub;
+  if (!userId) {
+    res.status(401).json({ success: false, message: 'User not authenticated' });
+    return;
+  }
+  const invite = validateInviteBody(req.body);
+  if (!invite) {
+    res.status(400).json({ success: false, message: 'Valid roomId and userId are required' });
+    return;
+  }
+  if (invite.userId !== userId) {
+    res.status(403).json({ success: false, message: 'You can only accept an invitation addressed to you' });
+    return;
+  }
+
+  try {
+    const outcome = await acceptRoomInvite(invite.roomId, userId);
+    if (outcome === 'NOT_INVITED') {
+      res.status(404).json({ success: false, message: 'Pending room invitation not found' });
+      return;
+    }
+    res.status(200).json({ success: true, message: 'Room invitation accepted successfully' });
+  } catch (error) {
+    console.error('Error accepting room invitation:', error);
+    res.status(500).json({ success: false, message: 'Failed to accept room invitation' });
+  }
+};
+
+export const inviteRoomMemberController = async (
+  req: AuthRequest,
+  res: Response,
+): Promise<void> => {
+  const adminUserId = req.user?.sub;
+  if (!adminUserId) {
+    res.status(401).json({ success: false, message: 'User not authenticated' });
+    return;
+  }
+  const invite = validateInviteBody(req.body);
+  if (!invite) {
+    res.status(400).json({ success: false, message: 'Valid userId and roomId are required' });
+    return;
+  }
+
+  try {
+    const outcome = await inviteRoomMember(invite.roomId, adminUserId, invite.userId);
+    if (outcome === 'FORBIDDEN') {
+      res.status(403).json({ success: false, message: 'Only active room admins can invite members' });
+      return;
+    }
+    if (outcome === 'USER_NOT_FOUND') {
+      res.status(404).json({ success: false, message: 'User not found' });
+      return;
+    }
+    if (outcome === 'ALREADY_MEMBER') {
+      res.status(409).json({ success: false, message: 'User already has a room membership' });
+      return;
+    }
+    res.status(201).json({ success: true, message: 'Room invitation created successfully' });
+  } catch (error) {
+    console.error('Error inviting room member:', error);
+    res.status(500).json({ success: false, message: 'Failed to invite room member' });
+  }
+};
+
+export const removeRoomInviteController = async (
+  req: AuthRequest,
+  res: Response,
+): Promise<void> => {
+  const adminUserId = req.user?.sub;
+  if (!adminUserId) {
+    res.status(401).json({ success: false, message: 'User not authenticated' });
+    return;
+  }
+  const invite = validateInviteBody(req.body);
+  if (!invite) {
+    res.status(400).json({ success: false, message: 'Valid userId and roomId are required' });
+    return;
+  }
+
+  try {
+    const outcome = await removeRoomInvite(invite.roomId, adminUserId, invite.userId);
+    if (outcome === 'FORBIDDEN') {
+      res.status(403).json({ success: false, message: 'Only active room admins can remove invitations' });
+      return;
+    }
+    if (outcome === 'NOT_INVITED') {
+      res.status(404).json({ success: false, message: 'Pending room invitation not found' });
+      return;
+    }
+    res.status(200).json({ success: true, message: 'Room invitation removed successfully' });
+  } catch (error) {
+    console.error('Error removing room invitation:', error);
+    res.status(500).json({ success: false, message: 'Failed to remove room invitation' });
   }
 };
 

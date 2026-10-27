@@ -1,5 +1,5 @@
-import { ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { TText, TView } from '@/components/ui/Themed';
+import { ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView, View } from 'react-native';
+import { TIcon, TText, TView } from '@/components/ui/Themed';
 import BackButton from '@/components/common/BackButton';
 import StickyScrollView from '@/components/ui/StickyScrollView';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -7,16 +7,20 @@ import { Image } from 'expo-image';
 import { BACKEND_URL } from '@/constants/Config';
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
 import { useGetRoom } from '@/hooks/room/useGetRoom';
-import { router } from 'expo-router';
 import ItineraryCard from '@/components/itinerary/ItineraryCard';
+import ShareModal from '@/components/modals/ShareModal';
+import { useState } from 'react';
+import { useRoomMembershipActions } from '@/hooks/room/useRoomMembershipActions';
 
 const formatDateTime = (value: string) => new Date(value).toLocaleString();
 
 export default function RoomLayout() {
   const backgroundColor = useThemeColor({}, 'background');
   const primaryColor = useThemeColor({}, 'primary');
+  const [ shareModalVisible, setShareModalVisible ] = useState(false);
   const {
     room,
+    member,
     isLoading,
     isError,
     selectedTab,
@@ -25,6 +29,14 @@ export default function RoomLayout() {
     navigateToMembers,
     navigateToUpdate,
   } = useGetRoom();
+  const {
+    requestJoin,
+    cancelJoinRequest,
+    acceptInvite,
+    isRequesting,
+    isCancellingRequest,
+    isAcceptingInvite,
+  } = useRoomMembershipActions();
 
   if (isLoading) {
     return (
@@ -61,36 +73,106 @@ export default function RoomLayout() {
           {roomImageUri ? (
             <Image
               source={{ uri: roomImageUri }}
-              style={styles.headerImage}
+              style={{...StyleSheet.absoluteFillObject,}}
               contentFit="cover"
               transition={200}
               accessibilityLabel={`${room.name} room image`}
             />
           ) : null}
+
           <BackButton type='floating' color='#fff'/>
+
+          <View style={styles.headerButtonsContainer}>
+            <TouchableOpacity
+              style={styles.headerButtons}
+              onPress={navigateToUpdate}
+            >
+              <TIcon name="pencil" size={20} color='white'/>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.headerButtons}
+              onPress={() => setShareModalVisible(true)}
+            >
+              <TIcon name="share" size={20} color='white'/>
+            </TouchableOpacity>
+          </View>
+
           <LinearGradient
-            colors={['transparent', backgroundColor]}
+            colors={['transparent', primaryColor]}
             style={styles.headerGradient}
           >
-            <TText type='title' numberOfLines={1}>{room.name}</TText>
-            {room.description ? (
-              <TText numberOfLines={2} style={styles.description}>{room.description}</TText>
-            ) : null}
+            <TText type='title' numberOfLines={1} style={{textAlign: 'center'}}>{room.name}</TText>
+            <View style={styles.privacy}>
+              <TIcon
+                name={room.privacy === 'PRIVATE' ? 'lock' : 'earth'}
+                size={14}
+              />
+              <TText style={styles.privacyText}>
+                {room.privacy === 'PRIVATE' ? 'Private Room' : 'Public Room'}
+              </TText>
+            </View>
           </LinearGradient>
         </TView>
 
-        <TView style={styles.roomDetails}>
-          <TText type="title">Room details</TText>
-          <TText>Room ID: {room.id}</TText>
-          <TText>Itinerary ID: {room.itineraryId || 'None'}</TText>
-          <TText>Description: {room.description || 'None'}</TText>
-          <TText>Privacy: {room.privacy}</TText>
-          <TText>Theme color: {room.themeColor}</TText>
-          <TText>Room image: {room.roomImage || 'None'}</TText>
-          <TText>Created: {formatDateTime(room.createdOn)}</TText>
-          <TText>Updated: {formatDateTime(room.updatedOn)}</TText>
+        <TView color='primary' style={styles.roomDetails}>
+          {room.description ? (
+            <TText numberOfLines={2} style={styles.description}>{room.description}</TText>
+          ) : null}
+          {room.privacy === 'PUBLIC' && !member ? (
+            <TouchableOpacity
+              style={[styles.membershipButton, { backgroundColor: primaryColor }]}
+              onPress={requestJoin}
+              disabled={isRequesting}
+              accessibilityRole="button"
+            >
+              {isRequesting ? <ActivityIndicator /> : <TText>Request to join</TText>}
+            </TouchableOpacity>
+          ) : null}
+          {member?.status === 'REQUESTED' ? (
+            <TouchableOpacity
+              style={[styles.membershipButton, { backgroundColor: primaryColor }]}
+              onPress={cancelJoinRequest}
+              disabled={isCancellingRequest}
+              accessibilityRole="button"
+            >
+              {isCancellingRequest ? <ActivityIndicator /> : <TText>Cancel join request</TText>}
+            </TouchableOpacity>
+          ) : null}
+          {member?.status === 'INVITED' ? (
+            <TouchableOpacity
+              style={[styles.membershipButton, { backgroundColor: primaryColor }]}
+              onPress={acceptInvite}
+              disabled={isAcceptingInvite}
+              accessibilityRole="button"
+            >
+              {isAcceptingInvite ? <ActivityIndicator /> : <TText>Accept invitation</TText>}
+            </TouchableOpacity>
+          ) : null}
 
-          <TText type="title" style={styles.itineraryHeading}>Itinerary</TText>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.tabsContainer}
+            style={styles.tabsScroll}
+          >
+            <TouchableOpacity
+              style={[styles.tabs, { backgroundColor: primaryColor }]}
+              onPress={navigateToMembers}
+            >
+              <TText>Members</TText>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.tabs, { backgroundColor: primaryColor }]}
+              onPress={navigateToChat}
+            >
+              <TText>Chat</TText>
+            </TouchableOpacity>
+          </ScrollView>
+        </TView>
+
+        <TView color='primary' style={styles.itineraryInfo}>
           {room.itinerary ? (
             <ItineraryCard
               id={room.itinerary.id}
@@ -103,48 +185,13 @@ export default function RoomLayout() {
             <TText>No itinerary attached</TText>
           )}
         </TView>
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.tabsContainer}
-          style={styles.tabsScroll}
-        >
-          <TouchableOpacity
-            style={[
-              styles.tabs,
-              { backgroundColor: primaryColor }
-            ]}
-            onPress={() => setSelectedTab('feed')}
-            accessibilityState={{ selected: selectedTab === 'feed' }}
-          >
-            <TText>Feed</TText>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.tabs, { backgroundColor: primaryColor }]}
-            onPress={navigateToMembers}
-            accessibilityState={{ selected: selectedTab === 'members' }}
-          >
-            <TText>Members</TText>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.tabs, { backgroundColor: primaryColor }]}
-            onPress={navigateToChat}
-          >
-            <TText>Chat</TText>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.tabs, { backgroundColor: primaryColor }]}
-            onPress={navigateToUpdate}
-          >
-            <TText>Edit Room</TText>
-          </TouchableOpacity>
-        </ScrollView>
-
       </StickyScrollView>
+
+      <ShareModal
+        visible={shareModalVisible}
+        onClose={() => setShareModalVisible(false)}
+        path={`/room/${room.id ?? ''}`}
+      />
     </TView>
   );
 }
@@ -156,11 +203,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header:{
-    height: 170,
+    height: 200,
     overflow: 'hidden',
-  },
-  headerImage: {
-    ...StyleSheet.absoluteFillObject,
   },
   headerGradient:{
     position: 'absolute',
@@ -169,18 +213,52 @@ const styles = StyleSheet.create({
     left: 0,
     paddingHorizontal: '3%',
     paddingBottom: 8,
-    paddingTop: 20
+    paddingTop: 70,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  headerButtonsContainer:{
+    position: 'absolute',
+    right: '3%',
+    top: 16,
+    flexDirection: 'row',
+    gap: 4
+  },
+  headerButtons:{
+    backgroundColor: '#fff5',
+    borderWidth: 1,
+    borderColor: "#fff6",
+    padding: 4,
+    borderRadius: 20
   },
   description: {
-    opacity: 0.7,
     fontSize: 12,
+    textAlign: 'center'
+  },
+  membershipButton: {
+    minHeight: 42,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 14,
+    marginVertical: 8,
+  },
+  privacy: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  privacyText: {
+    fontSize: 11,
+    opacity: .7
   },
   roomDetails: {
     padding: '3%',
-    gap: 6,
+    marginBottom: 10
   },
-  itineraryHeading: {
+  itineraryInfo: {
     marginTop: 12,
+    marginHorizontal: '3%'
   },
   tabs: {
     paddingHorizontal: 8,

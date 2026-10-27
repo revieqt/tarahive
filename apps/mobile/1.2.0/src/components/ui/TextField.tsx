@@ -25,6 +25,8 @@ interface TextFieldProps {
   multiline?: boolean;
   numberOfLines?: number;
   onContentSizeChange?: (e: NativeSyntheticEvent<TextInputContentSizeChangeEventData>) => void;
+  maxLength?: number;
+  accessibilityLabel?: string;
 }
 
 const TextField: React.FC<TextFieldProps> = ({
@@ -41,6 +43,8 @@ const TextField: React.FC<TextFieldProps> = ({
   multiline,
   numberOfLines,
   onContentSizeChange,
+  maxLength,
+  accessibilityLabel,
 }) => {
   const backgroundColor = useThemeColor({}, 'primary');
   const textColor = useThemeColor({}, 'text');
@@ -139,6 +143,9 @@ const TextField: React.FC<TextFieldProps> = ({
         multiline={multiline}
         numberOfLines={numberOfLines}
         onContentSizeChange={onContentSizeChange}
+        maxLength={maxLength}
+        accessibilityLabel={accessibilityLabel}
+        textAlignVertical={multiline ? 'top' : 'center'}
       />
     </View>
   );

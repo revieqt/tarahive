@@ -21,7 +21,9 @@ export interface RoomItinerary {
 
 export interface UserRoom {
   id: string;
+  name: string;
   privacy: string;
+  themeColor: string;
   roomImage: string | null;
   description: string | null;
   members: number;
@@ -47,6 +49,21 @@ export interface RoomMembersResponse {
   data?: RoomMember[];
 }
 
+export interface RoomInvitePayload {
+  userId: string;
+  roomId: string;
+}
+
+export interface RoomInviteResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface RoomMembershipPayload {
+  roomId: string;
+  userId?: string;
+}
+
 export interface UserRoomsResponse {
   success: boolean;
   rooms?: UserRoom[];
@@ -61,7 +78,13 @@ export interface CreateRoomRequest {
 export interface RoomResponse {
   success: boolean;
   message: string;
-  data?: Room;
+  room?: Room;
+  member?: Pick<RoomMember, 'id' | 'role' | 'status'>;
+}
+
+export interface RoomAccessData {
+  room: Room;
+  member?: Pick<RoomMember, 'id' | 'role' | 'status'>;
 }
 
 export interface CreateRoomResponse {

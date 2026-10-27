@@ -24,7 +24,7 @@ export default function RoomsScreen() {
     <TView style={{flex: 1}}>
       <StickyScrollView 
         style={{ flex: 1 }} 
-        contentContainerStyle={{ height: 2000 }} 
+        contentContainerStyle={{  }} 
         showBackButton={false}
         headerAppearOn={60}
         title={"Rooms"}
@@ -58,8 +58,10 @@ export default function RoomsScreen() {
           <FlatList
             data={rooms}
             keyExtractor={(room) => room.id}
+            numColumns={2}
             scrollEnabled={false}
             contentContainerStyle={styles.roomList}
+            columnWrapperStyle={styles.roomRow}
             renderItem={({ item: room }) => (
               <RoomCard
                 {...room}
@@ -106,8 +108,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     justifyContent: 'space-between',
     marginHorizontal: '3%',
-    borderBottomWidth: 2,
-    borderColor: "#ccc2",
     flexDirection: 'row',
     alignItems: 'center'
   },
@@ -115,6 +115,9 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingHorizontal: '3%',
     paddingTop: 12,
+  },
+  roomRow: {
+    justifyContent: 'space-between',
   },
   dialButton:{
     position: 'absolute',

@@ -23,7 +23,7 @@ export const useUpdateRoom = () => {
     enabled: Boolean(roomId),
     staleTime: 5 * 60 * 1000,
   });
-  const room = roomQuery.data;
+  const room = roomQuery.data?.room;
 
   useEffect(() => {
     if (!room || initializedRoomId.current === room.id) return;

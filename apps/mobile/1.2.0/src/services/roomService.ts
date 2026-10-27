@@ -11,6 +11,10 @@ import {
   UpdateRoomResponse,
   RoomMember,
   RoomMembersResponse,
+  RoomInvitePayload,
+  RoomInviteResponse,
+  RoomAccessData,
+  RoomMembershipPayload,
 } from '@/types/roomTypes';
 
 const API_URL = '/v2/room';
@@ -26,13 +30,16 @@ export const getUserRooms = async (): Promise<UserRoom[]> => {
 /**
  * Get a specific room by ID
  */
-export const getRoomById = async (id: string): Promise<Room | null> => {
+export const getRoomById = async (id: string): Promise<RoomAccessData | null> => {
   try {
     const response = await api.get<RoomResponse>(`${API_URL}/${id}`);
-    if (!response.data) {
+    if (!response.room) {
       throw new Error(response.message || 'Room response did not include room data');
     }
-    return response.data;
+    return {
+      room: response.room,
+      ...(response.member ? { member: response.member } : {}),
+    };
   } catch (error) {
     if (error instanceof ApiError && error.status === 404) {
       return null;
@@ -64,3 +71,37 @@ export const getRoomMembers = async (roomId: string): Promise<RoomMember[]> => {
   }
   return response.data;
 };
+
+export const inviteRoomMember = async (
+  payload: RoomInvitePayload
+): Promise<RoomInviteResponse> =>
+  api.post<RoomInviteResponse>(`${API_URL}/invite`, payload);
+
+export const removeRoomInvite = async (
+  payload: RoomInvitePayload
+): Promise<RoomInviteResponse> =>
+  api.delete<RoomInviteResponse>(`${API_URL}/invite`, {
+    body: JSON.stringify(payload),
+  });
+
+export const requestRoomMembership = async (
+  payload: Pick<RoomMembershipPayload, 'roomId'>
+): Promise<RoomInviteResponse> =>
+  api.post<RoomInviteResponse>(`${API_URL}/request`, payload);
+
+export const cancelRoomMembershipRequest = async (
+  payload: Pick<RoomMembershipPayload, 'roomId'>
+): Promise<RoomInviteResponse> =>
+  api.delete<RoomInviteResponse>(`${API_URL}/request`, {
+    body: JSON.stringify(payload),
+  });
+
+export const approveRoomMembershipRequest = async (
+  payload: RoomMembershipPayload & { userId: string }
+): Promise<RoomInviteResponse> =>
+  api.post<RoomInviteResponse>(`${API_URL}/request/approve`, payload);
+
+export const acceptRoomInvite = async (
+  payload: RoomMembershipPayload & { userId: string }
+): Promise<RoomInviteResponse> =>
+  api.post<RoomInviteResponse>(`${API_URL}/invite/accept`, payload);

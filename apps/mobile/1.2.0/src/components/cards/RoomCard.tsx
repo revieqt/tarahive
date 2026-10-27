@@ -1,16 +1,16 @@
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View, ViewStyle, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import { TIcon, TText, TView } from '@/components/ui/Themed';
 import { BACKEND_URL } from '@/constants/Config';
-import { useThemeColor } from '@/hooks/shared/useThemeColor';
 import type { UserRoom } from '@/types/roomTypes';
+import { router } from 'expo-router';
 
 interface RoomCardProps extends UserRoom {
-  name?: string;
   pressable?: boolean;
   onPress?: () => void;
   options?: ReactNode;
+  style?: ViewStyle;
 }
 
 export default function RoomCard({
@@ -18,100 +18,87 @@ export default function RoomCard({
   name,
   description,
   privacy,
+  themeColor,
   roomImage,
   members,
   pressable = true,
-  onPress,
-  options,
+  style
 }: RoomCardProps) {
-  const primaryColor = useThemeColor({}, 'primary');
   const imageUri = roomImage
     ? /^[a-z][a-z0-9+.-]*:/i.test(roomImage)
       ? roomImage
       : `${BACKEND_URL}${roomImage}`
     : null;
 
-  const content = (
-    <View style={styles.content}>
-      {imageUri ? (
-        <Image source={{ uri: imageUri }} style={styles.image} contentFit="cover" />
-      ) : (
-        <TView style={styles.imagePlaceholder}>
-          <TIcon name="account-group" size={24} />
-        </TView>
-      )}
-      <View style={styles.info}>
+  return (
+    <TouchableOpacity 
+      style={[styles.card, style]}
+      disabled={!pressable}
+      onPress={() => router.push(`/room/${id}`)}
+    >
+      <TView style={[styles.imageContainer, { backgroundColor: themeColor }]}>
+        {imageUri ? (
+          <Image source={{ uri: imageUri }} style={styles.imageContainer} contentFit="cover" />
+        ) : <TIcon name="account-group" size={30} color='white'/>
+        }
+      </TView>
+
+      <View style={styles.content}>
         <TText numberOfLines={1} style={styles.title}>{name || description || 'Room'}</TText>
+
         {name && description ? (
           <TText numberOfLines={1} style={styles.description}>{description}</TText>
         ) : null}
-        <TText style={styles.meta}>
-          {privacy} · {members} {members === 1 ? 'member' : 'members'}
-        </TText>
-      </View>
-    </View>
-  );
 
-  return (
-    <View style={[styles.card, { backgroundColor: primaryColor }]}>
-      {pressable ? (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={name ? `Open ${name}` : `Open room ${id}`}
-          onPress={onPress}
-          style={styles.pressable}
-        >
-          {content}
-        </Pressable>
-      ) : content}
-      {options ? <View style={styles.options}>{options}</View> : null}
-    </View>
+        <View style={styles.metaRow}>
+          <TText style={styles.meta}>
+            {privacy.charAt(0).toUpperCase() + privacy.slice(1).toLowerCase()} ·
+          </TText>
+          <TText style={styles.meta}>{members}</TText>
+          <TIcon name="account" size={12} />
+        </View>
+      </View>
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 15,
+    width: '48%',
     overflow: 'hidden',
   },
-  pressable: {
-    flex: 1,
+  imageContainer: {
+    width: '100%',
+    borderRadius: 15,
+    aspectRatio: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#8883',
   },
   content: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    padding: 12,
+    paddingVertical: 10,
+    gap: 3
   },
   image: {
     width: 52,
     height: 52,
     borderRadius: 12,
   },
-  imagePlaceholder: {
-    width: 52,
-    height: 52,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#8883',
-  },
-  info: {
-    flex: 1,
-    gap: 4,
-  },
   title: {
     fontWeight: '700',
   },
   description: {
-    fontSize: 12,
+    fontSize: 11,
     opacity: 0.8,
   },
   meta: {
     fontSize: 11,
     opacity: 0.7,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
   },
   options: {
     paddingHorizontal: 10,
