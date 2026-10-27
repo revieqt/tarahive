@@ -93,12 +93,12 @@ export default function EmailAuthScreen() {
   if (steps === 'email') {
     return (
       <TView style={{flex: 1, padding: '3%'}}>
-        <Header title={t("common.email_login.title1")} subtitle={t("common.email_login.subtitle1")}/>
+        <Header title={t("login.email.title1")} subtitle={t("login.email.subtitle1")}/>
       
         <TextField
           value={email}
           onChangeText={setEmail}
-          placeholder={t("common.email_login.email_placeholder")}
+          placeholder={t("login.email.email_placeholder")}
           keyboardType="email-address"
           autoCapitalize="none"
         />
@@ -120,7 +120,7 @@ export default function EmailAuthScreen() {
 
   return (
     <TView style={{flex: 1, padding: '3%'}}>
-      <Header title={t("common.email_login.title2")} subtitle={t("common.email_login.subtitle2") + email}/>
+      <Header title={t("login.email.title2")} subtitle={t("login.email.subtitle2") + email}/>
       
       <CodeInputField
         value={verificationCode}
@@ -137,14 +137,14 @@ export default function EmailAuthScreen() {
           <TText style={{ opacity: isResendDisabled ? 0.5 : 1, textAlign: 'center' }}>
             {
               isResendDisabled && cooldownTime > 0
-                ? `${t("common.email_login.cooldown_prompt")} ${formatCooldownTime(cooldownTime)}`
-                : t("common.email_login.resend_prompt")
+                ? `${t("login.email.cooldown_prompt")} ${formatCooldownTime(cooldownTime)}`
+                : t("login.email.resend_prompt")
             }
           </TText>
         </TouchableOpacity>
 
         <Button
-          title={t("common.email_login.verify_button")}
+          title={t("login.email.verify_button")}
           onPress={handleVerify}
           type="primary"
           disabled={isVerifyDisabled}

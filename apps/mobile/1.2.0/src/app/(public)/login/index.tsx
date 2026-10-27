@@ -41,29 +41,29 @@ export default function LoginScreen() {
       >
         <View style={styles.titleContainer}>
           <View style={styles.titleRow}>
-            <TText style={styles.title}>{t("common.login.title1")}</TText>
-            <TText style={[styles.titleAccent, {color: accentColor}]}>{t("common.login.title2")}</TText>
+            <TText style={styles.title}>{t("login.main.title1")}</TText>
+            <TText style={[styles.titleAccent, {color: accentColor}]}>{t("login.main.title2")}</TText>
           </View>
-          <TText style={styles.subtitle}>{t("common.welcome")}</TText>
+          <TText style={styles.subtitle}>{t("welcome")}</TText>
         </View>
         
         <TouchableOpacity style={styles.button} onPress={() => router.push('/home')}>
           <TIcon name="google" size={20} style={{color: accentColor}} />
-          <TText style={{color: '#fff'}}>{t("common.login.google_prompt")}</TText>
+          <TText style={{color: '#fff'}}>{t("login.main.google_prompt")}</TText>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.button}>
           <TIcon name="apple" size={20} style={{color: accentColor}} />
-          <TText style={{color: '#fff'}}>{t("common.login.apple_prompt")}</TText>
+          <TText style={{color: '#fff'}}>{t("login.main.apple_prompt")}</TText>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => router.push('/login/email')}>
-          <TText style={styles.emailOption}>{t("common.login.email_prompt")}</TText>
+          <TText style={styles.emailOption}>{t("login.main.email_prompt")}</TText>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={handleDocs('policies-terms')}>
           <TText style={styles.termsText}>
-            {t("common.login.terms_prompt")}
+            {t("login.main.terms_prompt")}
           </TText>
         </TouchableOpacity>
 
