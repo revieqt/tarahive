@@ -1,25 +1,24 @@
 import { TText, TView, TIcon } from '@/components/ui/Themed';
-import { useThemeColor } from '@/hooks/shared/useThemeColor';
-import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
-import { ScrollView, StyleSheet, TouchableOpacity, View, Image, TextInput } from 'react-native';
-import { useInternetConnection } from '@/utils/checkInternetConnection';
-import HomeHeaderCard from '@/components/cards/HomeHeaderCard';
-import { useState, useEffect } from 'react';
-import { useLanguage } from '@/context/LanguageContext';
+import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 import StickyScrollView from '@/components/ui/StickyScrollView';
 import { useSession } from '@/context/SessionContext';
 import SpeedDial from '@/components/ui/SpeedDial';
+import EmptyMessage from '@/components/common/EmptyMessage';
+import { useGetUserRooms } from '@/hooks/room/useGetUserRooms';
+import RoomCard from '@/components/cards/RoomCard';
 
 export default function RoomsScreen() {
-  const isConnected = useInternetConnection();
-  const backgroundColor = useThemeColor({}, 'background');
-  const primaryColor = useThemeColor({}, 'primary');
-  const textColor = useThemeColor({}, 'text');
-  const accentColor = useThemeColor({}, 'accent');
-  const secondaryColor = useThemeColor({}, 'secondary');
-  const { t } = useLanguage();
   const { session } = useSession();
+  const {
+    rooms,
+    isLoading,
+    isError,
+    refetch,
+    openRoom,
+    navigateToCreateRoom,
+    navigateToSearchRooms,
+    navigateToJoinRoom,
+  } = useGetUserRooms();
 
   return (
     <TView style={{flex: 1}}>
@@ -39,7 +38,36 @@ export default function RoomsScreen() {
           </TouchableOpacity>
         </View>
 
-        
+        {isLoading ? (
+          <EmptyMessage title="Loading rooms" description="" loading />
+        ) : isError ? (
+          <EmptyMessage
+            title="Failed to load rooms"
+            description="Please try again"
+            iconName="alert-circle"
+            buttonLabel="Retry"
+            buttonAction={() => { void refetch(); }}
+          />
+        ) : rooms.length === 0 ? (
+          <EmptyMessage
+            title="No rooms yet"
+            description="Create or join a room to get started"
+            iconName="account-group"
+          />
+        ) : (
+          <FlatList
+            data={rooms}
+            keyExtractor={(room) => room.id}
+            scrollEnabled={false}
+            contentContainerStyle={styles.roomList}
+            renderItem={({ item: room }) => (
+              <RoomCard
+                {...room}
+                onPress={() => openRoom(room.id)}
+              />
+            )}
+          />
+        )}
       </StickyScrollView>
 
       <SpeedDial
@@ -52,19 +80,19 @@ export default function RoomsScreen() {
             key: 'search',
             label: 'Search Rooms',
             icon: 'account-supervisor-circle-outline',
-            onPress: () => router.push('/room/create'),
+            onPress: navigateToSearchRooms,
           },
           {
             key: 'join',
             label: 'Join Room',
             icon: 'account-star',
-            onPress: () => router.push('/room/join'),
+            onPress: navigateToJoinRoom,
           },
           {
             key: 'create',
             label: 'Create New Room',
             icon: 'account-multiple-plus',
-            onPress: () => router.push('/room/create'),
+            onPress: navigateToCreateRoom,
           },
         ]}
       />
@@ -82,6 +110,11 @@ const styles = StyleSheet.create({
     borderColor: "#ccc2",
     flexDirection: 'row',
     alignItems: 'center'
+  },
+  roomList: {
+    gap: 8,
+    paddingHorizontal: '3%',
+    paddingTop: 12,
   },
   dialButton:{
     position: 'absolute',

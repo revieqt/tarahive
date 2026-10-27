@@ -31,8 +31,12 @@ export const useGetRoom = () => {
     if (roomId) router.push({ pathname: '/room/[id]/chat', params: { id: roomId } });
   };
 
-  const navigateToMap = () => {
-    if (roomId) router.push({ pathname: '/room/[id]/map', params: { id: roomId } });
+  const navigateToMembers = () => {
+    if (roomId) router.push({ pathname: '/room/[id]/members', params: { id: roomId } });
+  };
+
+  const navigateToUpdate = () => {
+    if (roomId) router.push({ pathname: '/room/[id]/update', params: { id: roomId } });
   };
 
   return {
@@ -45,6 +49,7 @@ export const useGetRoom = () => {
     selectedTab,
     setSelectedTab,
     navigateToChat,
-    navigateToMap,
+    navigateToMembers,
+    navigateToUpdate,
   };
 };

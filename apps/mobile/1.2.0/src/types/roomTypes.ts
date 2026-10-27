@@ -3,7 +3,7 @@ export interface Room {
   itineraryId: string | null;
   name: string;
   description: string | null;
-  privacy: string;
+  privacy: RoomPrivacy;
   themeColor: string;
   roomImage: string | null;
   createdOn: string;
@@ -17,6 +17,40 @@ export interface RoomItinerary {
   startDate: string;
   endDate: string;
   type: string;
+}
+
+export interface UserRoom {
+  id: string;
+  privacy: string;
+  roomImage: string | null;
+  description: string | null;
+  members: number;
+}
+
+export interface RoomMember {
+  id: string;
+  userId: string;
+  nickname: string;
+  role: 'ADMIN' | 'MEMBER';
+  status: 'ACTIVE' | 'INVITED' | 'REQUESTED';
+  user: {
+    username: string | null;
+    fname: string | null;
+    lname: string | null;
+    profileImage: string | null;
+  };
+}
+
+export interface RoomMembersResponse {
+  success: boolean;
+  message: string;
+  data?: RoomMember[];
+}
+
+export interface UserRoomsResponse {
+  success: boolean;
+  rooms?: UserRoom[];
+  message?: string;
 }
 
 export interface CreateRoomRequest {
@@ -34,4 +68,25 @@ export interface CreateRoomResponse {
   success: boolean;
   message: string;
   roomId: string;
+}
+
+export type RoomPrivacy = 'PRIVATE' | 'PUBLIC';
+
+export interface UpdateRoomPayload {
+  roomImage?: string;
+  name?: string;
+  description?: string | null;
+  privacy?: RoomPrivacy;
+  themeColor?: string;
+}
+
+export interface UpdateRoomResponse {
+  success: boolean;
+  message: string;
+  data?: Room;
+}
+
+export interface RoomImageUpload {
+  uri: string;
+  base64: string;
 }

@@ -8,6 +8,7 @@ import { StorageService } from "./storage.service";
 export const storagePath =
   process.env.STORAGE_PATH ??
   path.resolve(__dirname, "../../../../storage");
+export const uploadsPath = path.resolve(__dirname, "../../../uploads");
 
 const providerName = process.env.STORAGE_PROVIDER ?? "local";
 
@@ -23,6 +24,12 @@ const processor = new ImageProcessorService();
 
 export const storageService = new StorageService(
   provider,
+  validator,
+  processor,
+);
+
+export const uploadsStorageService = new StorageService(
+  new LocalStorageProvider(uploadsPath),
   validator,
   processor,
 );

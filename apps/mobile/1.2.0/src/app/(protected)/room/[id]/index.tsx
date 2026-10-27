@@ -3,6 +3,8 @@ import { TText, TView } from '@/components/ui/Themed';
 import BackButton from '@/components/common/BackButton';
 import StickyScrollView from '@/components/ui/StickyScrollView';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Image } from 'expo-image';
+import { BACKEND_URL } from '@/constants/Config';
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
 import { useGetRoom } from '@/hooks/room/useGetRoom';
 import { router } from 'expo-router';
@@ -20,7 +22,8 @@ export default function RoomLayout() {
     selectedTab,
     setSelectedTab,
     navigateToChat,
-    navigateToMap,
+    navigateToMembers,
+    navigateToUpdate,
   } = useGetRoom();
 
   if (isLoading) {
@@ -39,6 +42,12 @@ export default function RoomLayout() {
     );
   }
 
+  const roomImageUri = room.roomImage
+    ? /^[a-z][a-z0-9+.-]*:/i.test(room.roomImage)
+      ? room.roomImage
+      : `${BACKEND_URL}${room.roomImage}`
+    : null;
+
   return (
     <TView style={{flex: 1}}>
       <StickyScrollView
@@ -49,6 +58,15 @@ export default function RoomLayout() {
         subtitle="Room"
       >
         <TView style={[styles.header, { backgroundColor: room.themeColor || primaryColor }]}>
+          {roomImageUri ? (
+            <Image
+              source={{ uri: roomImageUri }}
+              style={styles.headerImage}
+              contentFit="cover"
+              transition={200}
+              accessibilityLabel={`${room.name} room image`}
+            />
+          ) : null}
           <BackButton type='floating' color='#fff'/>
           <LinearGradient
             colors={['transparent', backgroundColor]}
@@ -105,7 +123,7 @@ export default function RoomLayout() {
 
           <TouchableOpacity
             style={[styles.tabs, { backgroundColor: primaryColor }]}
-            onPress={() => setSelectedTab('members')}
+            onPress={navigateToMembers}
             accessibilityState={{ selected: selectedTab === 'members' }}
           >
             <TText>Members</TText>
@@ -120,9 +138,9 @@ export default function RoomLayout() {
 
           <TouchableOpacity
             style={[styles.tabs, { backgroundColor: primaryColor }]}
-            onPress={navigateToMap}
+            onPress={navigateToUpdate}
           >
-            <TText>Map</TText>
+            <TText>Edit Room</TText>
           </TouchableOpacity>
         </ScrollView>
 
@@ -138,7 +156,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header:{
-    height: 170
+    height: 170,
+    overflow: 'hidden',
+  },
+  headerImage: {
+    ...StyleSheet.absoluteFillObject,
   },
   headerGradient:{
     position: 'absolute',

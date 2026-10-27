@@ -1,6 +1,7 @@
 
 export const STORAGE_CATEGORIES = [
-  "profileImages"
+  "profileImages",
+  "roomImage",
 ] as const;
 
 export type StorageCategory =

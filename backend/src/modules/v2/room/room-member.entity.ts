@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  Index,
   ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
@@ -25,6 +26,8 @@ export enum RoomMemberStatus {
 
 @Entity('room_members')
 @Unique(['roomId', 'userId'])
+@Index(['userId', 'roomId'])
+@Index(['roomId', 'status'])
 export class RoomMember {
   @PrimaryGeneratedColumn('uuid')
   id!: string;

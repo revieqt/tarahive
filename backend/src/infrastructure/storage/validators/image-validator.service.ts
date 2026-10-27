@@ -13,6 +13,16 @@ const PROFILES: Record<StorageCategory, ImageProfile> = {
     width: 512,
     height: 512,
   },
+  roomImage: {
+    maxBytes: 5 * 1024 * 1024,
+    maxWidth: 6000,
+    maxHeight: 6000,
+    outputFormat: "webp",
+    quality: 85,
+    fit: "cover",
+    width: 1600,
+    height: 900,
+  },
 };
 
 const ALLOWED_FORMATS = new Set([

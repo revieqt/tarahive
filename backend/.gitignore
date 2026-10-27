@@ -32,8 +32,10 @@ yarn-error.log*
 
 # User uploaded files and temporary files
 uploads/profileImages/*
+uploads/roomImage/*
 uploads/temp/*
 !uploads/profileImages/.gitkeep
+!uploads/roomImage/.gitkeep
 !uploads/temp/.gitkeep
 
 # Node-specific
