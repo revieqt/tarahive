@@ -1,4 +1,4 @@
-import { userRepo } from "../../../config/postgres";
+import { userRepo } from "../../../infrastructure/postgres/postgres";
 import { User } from "./user.entity";
 import { ProfileUpdatePayload } from "./user.types";
 

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const postgres_1 = require("../src/config/postgres");
+const postgres_1 = require("../src/infrastructure/postgres/postgres");
 async function runMigrations() {
     try {
         console.log("🔌 Initializing database connection...");

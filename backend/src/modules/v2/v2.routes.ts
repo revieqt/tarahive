@@ -7,6 +7,7 @@ import weatherRoutes from './weather/weather.routes';
 import itineraryRoutes from './itinerary/itinerary.routes';
 import sosRoutes from './sos/sos.routes';
 import aiRoutes from './ai/ai.routes';
+import roomRoutes from './room/room.routes';
 
 const v2Router = Router();
 
@@ -18,5 +19,6 @@ v2Router.use('/weather', weatherRoutes);
 v2Router.use('/itinerary', itineraryRoutes);
 v2Router.use('/sos', sosRoutes);
 v2Router.use('/ai', aiRoutes);
+v2Router.use('/room', roomRoutes);
 
 export default v2Router;

@@ -17,6 +17,12 @@ export enum RoomMemberRole {
   MEMBER = 'MEMBER',
 }
 
+export enum RoomMemberStatus {
+  ACTIVE = 'ACTIVE',
+  INVITED = 'INVITED',
+  REQUESTED = 'REQUESTED',
+}
+
 @Entity('room_members')
 @Unique(['roomId', 'userId'])
 export class RoomMember {
@@ -44,12 +50,19 @@ export class RoomMember {
   })
   role!: RoomMemberRole;
 
+  @Column({
+    type: 'enum',
+    enum: RoomMemberStatus,
+    default: RoomMemberStatus.INVITED,
+  })
+  status!: RoomMemberStatus;
+
   @Column({ type: 'varchar', length: 100 })
   nickname!: string;
 
   @CreateDateColumn()
-  createdAt!: Date;
+  createdOn!: Date;
 
   @UpdateDateColumn()
-  updatedAt!: Date;
+  updatedOn!: Date;
 }

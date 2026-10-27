@@ -7,16 +7,18 @@ import { DataSource } from "typeorm";
 // import { Itinerary } from "../modules/v1/itinerary/itinerary.entity";
 // import { ItineraryCollaborator } from "../modules/v1/itinerary/itinerary-collaborator.entity";
 
-import { Log } from "../modules/v2/audit/audit.entity";
-import { User } from "../modules/v2/user/user.entity";
-import { Auth } from "../modules/v2/auth/auth.entity";
-import { Itinerary } from "../modules/v2/itinerary/itinerary.entity";
-import { ItineraryCollaborator } from "../modules/v2/itinerary/itinerary-collaborator.entity";
-import { AiConversation } from "../modules/v2/ai/ai-conversations.entity";
-import { AiMessage } from "../modules/v2/ai/ai-messages.entity";
-import { AddUserSearchTrigramIndexes1790976000000 } from "../migrations/1790976000000-AddUserSearchTrigramIndexes";
-import { AddOwnerCollaboratorPermission1790977000000 } from "../migrations/1790977000000-AddOwnerCollaboratorPermission";
-import { RemoveCollaboratorStatusAndAssignOwners1790978000000 } from "../migrations/1790978000000-RemoveCollaboratorStatusAndAssignOwners";
+import { Log } from "../../modules/v2/audit/audit.entity";
+import { User } from "../../modules/v2/user/user.entity";
+import { Auth } from "../../modules/v2/auth/auth.entity";
+import { Itinerary } from "../../modules/v2/itinerary/itinerary.entity";
+import { ItineraryCollaborator } from "../../modules/v2/itinerary/itinerary-collaborator.entity";
+import { AiConversation } from "../../modules/v2/ai/ai-conversations.entity";
+import { AiMessage } from "../../modules/v2/ai/ai-messages.entity";
+import { Room } from "../../modules/v2/room/room.entity";
+import { RoomMember } from "../../modules/v2/room/room-member.entity";
+import { AddUserSearchTrigramIndexes1790976000000 } from "../../migrations/1790976000000-AddUserSearchTrigramIndexes";
+import { AddOwnerCollaboratorPermission1790977000000 } from "../../migrations/1790977000000-AddOwnerCollaboratorPermission";
+import { RemoveCollaboratorStatusAndAssignOwners1790978000000 } from "../../migrations/1790978000000-RemoveCollaboratorStatusAndAssignOwners";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -36,7 +38,7 @@ export const AppDataSource = new DataSource({
   migrationsTransactionMode: 'each',
   
   // entities: [User, Log, Itinerary, ItineraryCollaborator],
-  entities: [User, Auth, Log, Itinerary, ItineraryCollaborator, AiConversation, AiMessage ],
+  entities: [User, Auth, Log, Itinerary, ItineraryCollaborator, AiConversation, AiMessage, Room, RoomMember ],
   
 });
 

@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
-const postgres_1 = require("../src/config/postgres");
+const postgres_1 = require("../src/infrastructure/postgres/postgres");
 const clearDatabase = async () => {
     try {
         console.log("⚠️ Initializing database connection...");

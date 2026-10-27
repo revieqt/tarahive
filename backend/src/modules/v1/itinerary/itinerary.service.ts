@@ -1,4 +1,4 @@
-import { AppDataSource } from '../../../config/postgres';
+import { AppDataSource } from '../../../infrastructure/postgres/postgres';
 import { Itinerary } from './itinerary.entity';
 import {
   CreateItineraryRequest,

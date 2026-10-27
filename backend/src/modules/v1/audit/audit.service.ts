@@ -1,4 +1,4 @@
-import { AppDataSource } from "../../../config/postgres";
+import { AppDataSource } from "../../../infrastructure/postgres/postgres";
 import { Log } from "./audit.entity";
 import { LogSeverity, AuditLogPayload } from "./audit.types";
 import { maskIP } from "../../../utils/maskIP";

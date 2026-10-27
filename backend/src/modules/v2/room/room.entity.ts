@@ -50,9 +50,15 @@ export class Room {
   })
   themeColor!: string;
 
+  @Column({
+    type: 'text',
+    nullable: true,
+  })
+  roomImage!: string | null;
+
   @CreateDateColumn()
-  createdAt!: Date;
+  createdOn!: Date;
 
   @UpdateDateColumn()
-  updatedAt!: Date;
+  updatedOn!: Date;
 }

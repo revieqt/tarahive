@@ -52,7 +52,15 @@ export default function ItineraryScreen() {
         ) : (
           <FlatList
             data={itineraries}
-            renderItem={({ item }) => <ItineraryCard itinerary={item} />}
+            renderItem={({ item }) => (
+              <ItineraryCard
+                id={item.id}
+                title={item.title}
+                type={item.type}
+                startDate={item.startDate}
+                endDate={item.endDate}
+              />
+            )}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.listContent}
             scrollEnabled={false}

@@ -1,4 +1,4 @@
-import { AppDataSource } from "../src/config/postgres";
+import { AppDataSource } from "../src/infrastructure/postgres/postgres";
 
 async function runMigrations() {
   try {

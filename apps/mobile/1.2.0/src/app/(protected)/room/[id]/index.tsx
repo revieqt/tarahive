@@ -1,30 +1,43 @@
-import { router, Tabs, useLocalSearchParams, usePathname } from 'expo-router';
-import { StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
-import { TIcon, TText, TView } from '@/components/ui/Themed';
-import { useLanguage } from '@/context/LanguageContext';
-import { useState } from 'react';
+import { ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { TText, TView } from '@/components/ui/Themed';
 import BackButton from '@/components/common/BackButton';
-import ShareModal from '@/components/modals/ShareModal';
 import StickyScrollView from '@/components/ui/StickyScrollView';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
+import { useGetRoom } from '@/hooks/room/useGetRoom';
+import { router } from 'expo-router';
+import ItineraryCard from '@/components/itinerary/ItineraryCard';
+
+const formatDateTime = (value: string) => new Date(value).toLocaleString();
 
 export default function RoomLayout() {
-  const { t } = useLanguage();
-  const { id } = useLocalSearchParams<{ id: string }>();
-  const pathname = usePathname();
-  const [shareModalVisible, setShareModalVisible] = useState(false);
-  const name = 'Test';
-  const description = 'This is a test description for the room.';
-  const themeColor = '#4A90E2';
   const backgroundColor = useThemeColor({}, 'background');
   const primaryColor = useThemeColor({}, 'primary');
-  const [tab, setTab] = useState('feed');
+  const {
+    room,
+    isLoading,
+    isError,
+    selectedTab,
+    setSelectedTab,
+    navigateToChat,
+    navigateToMap,
+  } = useGetRoom();
 
-  const navigateToTab = (tab: 'details' | 'members' | 'chat' | 'map' | 'settings') => {
-    const pathname = tab === 'details' ? '/room/[id]' : `/room/[id]/${tab}`;
-    router.navigate({ pathname, params: { id } });
-  };
+  if (isLoading) {
+    return (
+      <TView style={styles.stateContainer}>
+        <ActivityIndicator />
+      </TView>
+    );
+  }
+
+  if (isError || !room) {
+    return (
+      <TView style={styles.stateContainer}>
+        <TText>{isError ? 'Failed to load room' : 'Room not found'}</TText>
+      </TView>
+    );
+  }
 
   return (
     <TView style={{flex: 1}}>
@@ -32,21 +45,45 @@ export default function RoomLayout() {
         style={{ flex: 1 }} 
         contentContainerStyle={{ height: 2000 }}
         headerAppearOn={150}
-        title={"Room Title here"}
-        subtitle={"2 members"}
+        title={room.name}
+        subtitle="Room"
       >
-        <TView 
-          color='secondary'
-          style={styles.header}
-        >
+        <TView style={[styles.header, { backgroundColor: room.themeColor || primaryColor }]}>
           <BackButton type='floating' color='#fff'/>
           <LinearGradient
             colors={['transparent', backgroundColor]}
             style={styles.headerGradient}
           >
-            <TText type='title' numberOfLines={1}>Room Title Here</TText>
-            <TText numberOfLines={2} style={styles.description}>Loren Ipsum Loren Ipsum Loren Ipsum Loren Ipsum Loren Ipsum Loren Ipsum</TText>
+            <TText type='title' numberOfLines={1}>{room.name}</TText>
+            {room.description ? (
+              <TText numberOfLines={2} style={styles.description}>{room.description}</TText>
+            ) : null}
           </LinearGradient>
+        </TView>
+
+        <TView style={styles.roomDetails}>
+          <TText type="title">Room details</TText>
+          <TText>Room ID: {room.id}</TText>
+          <TText>Itinerary ID: {room.itineraryId || 'None'}</TText>
+          <TText>Description: {room.description || 'None'}</TText>
+          <TText>Privacy: {room.privacy}</TText>
+          <TText>Theme color: {room.themeColor}</TText>
+          <TText>Room image: {room.roomImage || 'None'}</TText>
+          <TText>Created: {formatDateTime(room.createdOn)}</TText>
+          <TText>Updated: {formatDateTime(room.updatedOn)}</TText>
+
+          <TText type="title" style={styles.itineraryHeading}>Itinerary</TText>
+          {room.itinerary ? (
+            <ItineraryCard
+              id={room.itinerary.id}
+              title={room.itinerary.title}
+              type={room.itinerary.type}
+              startDate={room.itinerary.startDate}
+              endDate={room.itinerary.endDate}
+            />
+          ) : (
+            <TText>No itinerary attached</TText>
+          )}
         </TView>
 
         <ScrollView
@@ -60,28 +97,30 @@ export default function RoomLayout() {
               styles.tabs,
               { backgroundColor: primaryColor }
             ]}
-            onPress={() => setTab('feed')}
+            onPress={() => setSelectedTab('feed')}
+            accessibilityState={{ selected: selectedTab === 'feed' }}
           >
             <TText>Feed</TText>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.tabs, { backgroundColor: primaryColor }]}
-            onPress={() => setTab('members')}
+            onPress={() => setSelectedTab('members')}
+            accessibilityState={{ selected: selectedTab === 'members' }}
           >
             <TText>Members</TText>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.tabs, { backgroundColor: primaryColor }]}
-            onPress={() => router.push('/room/[id]/chat')}
+            onPress={navigateToChat}
           >
             <TText>Chat</TText>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.tabs, { backgroundColor: primaryColor }]}
-            onPress={() => router.push('/room/[id]/map')}
+            onPress={navigateToMap}
           >
             <TText>Map</TText>
           </TouchableOpacity>
@@ -93,6 +132,11 @@ export default function RoomLayout() {
 }
 
 const styles = StyleSheet.create({
+  stateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   header:{
     height: 170
   },
@@ -109,11 +153,12 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     fontSize: 12,
   },
-  closeButton: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
+  roomDetails: {
     padding: '3%',
+    gap: 6,
+  },
+  itineraryHeading: {
+    marginTop: 12,
   },
   tabs: {
     paddingHorizontal: 8,
@@ -124,9 +169,6 @@ const styles = StyleSheet.create({
     height: 30,
     justifyContent: 'center'
   },
-  navigationRow: {
-    flexDirection: 'row',
-  },
   tabsContainer: {
     flexDirection: 'row',
     gap: 4,
@@ -134,15 +176,5 @@ const styles = StyleSheet.create({
   },
   tabsScroll: {
     // flex: 1,
-  },
-  moreOptionsContainer: {
-    flexDirection: 'row',
-    borderTopLeftRadius: 20,
-    backgroundColor: '#fff4',
-    alignItems: 'center',
-    paddingHorizontal: 7,
-    paddingVertical: 4,
-    gap: 8,
-    marginRight: '-3%',
   },
 });

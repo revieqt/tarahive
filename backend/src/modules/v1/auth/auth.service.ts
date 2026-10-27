@@ -1,4 +1,4 @@
-import { AppDataSource } from "../../../config/postgres";
+import { AppDataSource } from "../../../infrastructure/postgres/postgres";
 import { User } from "../user/user.entity";
 import { Provider, UserStatus, UserType } from "../user/user.types";
 import { validatePassword, validateAge, hashPassword, generateVerificationCode, comparePassword, generateUsername } from "./auth.utils";

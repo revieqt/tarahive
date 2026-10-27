@@ -4,7 +4,7 @@ import cors from 'cors';
 import path from "path";
 import { createServer } from 'http';
 import { ipMiddleware } from './middleware/ipMiddleware';
-import { connectPostgres } from './config/postgres';
+import { connectPostgres } from './infrastructure/postgres/postgres';
 // import { connectMongoDB } from './config/mongodb';
 import { serverAdapter } from "./config/bullBoard";
 import { initializeFirebase } from './config/firebase';
