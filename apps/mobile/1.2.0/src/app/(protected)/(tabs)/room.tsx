@@ -24,7 +24,7 @@ export default function RoomsScreen() {
     <TView style={{flex: 1}}>
       <StickyScrollView 
         style={{ flex: 1 }} 
-        contentContainerStyle={{  }} 
+        contentContainerStyle={{ paddingBottom: 100 }} 
         showBackButton={false}
         headerAppearOn={60}
         title={"Rooms"}

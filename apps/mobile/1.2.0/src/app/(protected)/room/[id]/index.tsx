@@ -69,7 +69,12 @@ export default function RoomLayout() {
         title={room.name}
         subtitle="Room"
       >
-        <TView style={[styles.header, { backgroundColor: room.themeColor || primaryColor }]}>
+        <TView 
+          style={[styles.header, 
+            { backgroundColor: room.themeColor || primaryColor },
+            { height: roomImageUri ? 200 : 100 }
+            ]}
+          >
           {roomImageUri ? (
             <Image
               source={{ uri: roomImageUri }}
@@ -222,7 +227,8 @@ const styles = StyleSheet.create({
     right: '3%',
     top: 16,
     flexDirection: 'row',
-    gap: 4
+    gap: 4,
+    zIndex: 10
   },
   headerButtons:{
     backgroundColor: '#fff5',
