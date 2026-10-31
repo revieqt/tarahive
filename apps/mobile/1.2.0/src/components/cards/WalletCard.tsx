@@ -20,7 +20,7 @@ export default function Wallet({
   amount,
   amountLimit,
   name = 'My Wallet',
-  description = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+  description,
   style,
   onEdit,
   onDelete,
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   content:{
-    borderWidth: 2,
+    borderWidth: 1.5,
     flex: 1,
     borderColor: '#fff7',
     borderRadius: 10,

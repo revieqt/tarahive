@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { createWallet } from '@/services/expensesService';
-import { showError, showSuccess } from '@/services/toast.service';
+import { showError } from '@/services/toast.service';
 import { CreateWalletPayload } from '@/types/expensesTypes';
 import { walletsQueryKey } from './useGetWallets';
 
 const firstParam = (value?: string | string[]) =>
   Array.isArray(value) ? value[0] : value;
 
-export const useCreateWallet = () => {
+export const useCreateWallet = (onSuccess?: () => void) => {
   const params = useLocalSearchParams<{ roomId?: string | string[] }>();
   const queryClient = useQueryClient();
   const [name, setName] = useState('');
@@ -54,10 +54,9 @@ export const useCreateWallet = () => {
       }
       return response;
     },
-    onSuccess: (response) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: walletsQueryKey });
-      showSuccess('Success', response.message || 'Wallet created successfully');
-      router.back();
+      onSuccess?.();
     },
     onError: (error: Error) => showError('Create Error', error.message),
   });

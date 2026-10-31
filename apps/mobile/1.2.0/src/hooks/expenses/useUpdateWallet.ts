@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { updateWallet } from '@/services/expensesService';
-import { showError, showSuccess } from '@/services/toast.service';
+import { showError } from '@/services/toast.service';
 import { UpdateWalletPayload, Wallet } from '@/types/expensesTypes';
 import { useGetWallets, walletsQueryKey } from './useGetWallets';
 
-export const useUpdateWallet = () => {
+export const useUpdateWallet = (onSuccess?: () => void) => {
   const { id, roomId: roomIdParam } = useLocalSearchParams<{
     id?: string | string[];
     roomId?: string | string[];
@@ -58,10 +58,9 @@ export const useUpdateWallet = () => {
       }
       return response;
     },
-    onSuccess: (response) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: walletsQueryKey });
-      showSuccess('Success', response.message || 'Wallet updated successfully');
-      router.back();
+      onSuccess?.();
     },
     onError: (error: Error) => showError('Update Error', error.message),
   });

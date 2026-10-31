@@ -13,7 +13,7 @@ import { router } from 'expo-router';
 import { TIcon, TText, TView } from '@/components/ui/Themed';
 import StickyScrollView from '@/components/ui/StickyScrollView';
 import BackButton from '@/components/common/BackButton';
-import Wallet from '@/components/expenses/Wallet';
+import Wallet from '@/components/cards/WalletCard';
 import { useSession } from '@/context/SessionContext';
 import { useGetWallets } from '@/hooks/expenses/useGetWallets';
 import { useDeleteWallet } from '@/hooks/expenses/useDeleteWallet';
@@ -23,6 +23,8 @@ import { Dialog } from '@/services/dialog.service';
 import type { Wallet as WalletData } from '@/types/expensesTypes';
 
 const CARD_WIDTH = Dimensions.get('window').width - 40;
+const WALLET_GAP = 10;
+const SNAP_INTERVAL = CARD_WIDTH + WALLET_GAP;
 
 export default function ExpensesScreen() {
   const { session } = useSession();
@@ -36,13 +38,14 @@ export default function ExpensesScreen() {
   const selectedWallet = wallets[activeIndex];
   const { expenses, isLoading: isExpensesLoading } = useGetExpenses(selectedWallet?.id);
 
-  const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    setActiveIndex(Math.round(event.nativeEvent.contentOffset.x / CARD_WIDTH));
+  const onMomentumScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const snappedIndex = Math.round(event.nativeEvent.contentOffset.x / SNAP_INTERVAL);
+    setActiveIndex(snappedIndex);
   };
 
   const moveTo = (index: number) => {
     const nextIndex = Math.max(0, Math.min(itemCount - 1, index));
-    scrollRef.current?.scrollTo({ x: nextIndex * CARD_WIDTH, animated: true });
+    scrollRef.current?.scrollTo({ x: nextIndex * SNAP_INTERVAL, animated: true });
     setActiveIndex(nextIndex);
   };
 
@@ -67,19 +70,11 @@ export default function ExpensesScreen() {
         title={roomId ? 'Room Budget' : 'My Budget'}
         subtitle={`@${session?.user?.username ?? ''}`}
       >
-        <BackButton />
-
         <View style={styles.heading}>
+          <BackButton />
           <TText type="title">Wallets</TText>
-          <TouchableOpacity
-            onPress={() => router.push({
-              pathname: '/expenses/wallet/create',
-              params: roomId ? { roomId } : undefined,
-            })}
-            accessibilityRole="button"
-            accessibilityLabel="Add wallet"
-          >
-            <TIcon name="plus-circle" size={30} />
+          <TouchableOpacity>
+            <TIcon name="help-circle" size={20} />
           </TouchableOpacity>
         </View>
 
@@ -92,10 +87,9 @@ export default function ExpensesScreen() {
               horizontal
               pagingEnabled={false}
               showsHorizontalScrollIndicator={false}
-              snapToInterval={CARD_WIDTH}
+              snapToInterval={SNAP_INTERVAL}
               decelerationRate="fast"
-              onScroll={onScroll}
-              scrollEventThrottle={16}
+              onMomentumScrollEnd={onMomentumScrollEnd}
               contentContainerStyle={styles.walletList}
             >
               {wallets.map((wallet) => (
@@ -201,11 +195,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   walletList: { paddingHorizontal: 20 },
-  walletCard: { width: CARD_WIDTH, marginRight: 0 },
+  walletCard: { width: CARD_WIDTH, marginRight: WALLET_GAP },
   loader: { marginVertical: 100 },
   addWalletCard: {
     width: CARD_WIDTH,
     height: 200,
+    marginRight: WALLET_GAP,
     marginTop: 20,
     borderRadius: 10,
     borderWidth: 1,
