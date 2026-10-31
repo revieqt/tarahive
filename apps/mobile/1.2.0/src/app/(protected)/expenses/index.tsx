@@ -1,100 +1,188 @@
-import { TText, TView, TIcon } from '@/components/ui/Themed';
-import { useThemeColor } from '@/hooks/shared/useThemeColor';
-import { LinearGradient } from 'expo-linear-gradient';
+import { useRef, useState } from 'react';
+import {
+  ActivityIndicator,
+  Dimensions,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { router } from 'expo-router';
-import { ScrollView, StyleSheet, TouchableOpacity, View, Image, TextInput } from 'react-native';
-import { useInternetConnection } from '@/utils/checkInternetConnection';
-import HomeHeaderCard from '@/components/cards/HomeHeaderCard';
-import { useState, useEffect } from 'react';
-import { useLanguage } from '@/context/LanguageContext';
+import { TIcon, TText, TView } from '@/components/ui/Themed';
 import StickyScrollView from '@/components/ui/StickyScrollView';
-import { useSession } from '@/context/SessionContext';
-import SpeedDial from '@/components/ui/SpeedDial';
 import BackButton from '@/components/common/BackButton';
-import HiveBg from '@/components/common/HiveBg';
-import RadialGauge from '@/components/ui/RadialGauge';
+import Wallet from '@/components/expenses/Wallet';
+import { useSession } from '@/context/SessionContext';
+import { useGetWallets } from '@/hooks/expenses/useGetWallets';
+import { useDeleteWallet } from '@/hooks/expenses/useDeleteWallet';
+import { Dialog } from '@/services/dialog.service';
+import type { Wallet as WalletData } from '@/types/expensesTypes';
 
-export default function BudgetScreen() {
-  const isConnected = useInternetConnection();
-  const backgroundColor = useThemeColor({}, 'background');
-  const primaryColor = useThemeColor({}, 'primary');
-  const textColor = useThemeColor({}, 'text');
-  const accentColor = useThemeColor({}, 'accent');
-  const secondaryColor = useThemeColor({}, 'secondary');
-  const { t } = useLanguage();
+const CARD_WIDTH = Dimensions.get('window').width - 40;
+
+export default function ExpensesScreen() {
   const { session } = useSession();
+  const { wallets, isLoading } = useGetWallets();
+  const { deleteWallet, isPending: isDeleting } = useDeleteWallet();
+  const scrollRef = useRef<ScrollView>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const itemCount = wallets.length + 1;
+
+  const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    setActiveIndex(Math.round(event.nativeEvent.contentOffset.x / CARD_WIDTH));
+  };
+
+  const moveTo = (index: number) => {
+    const nextIndex = Math.max(0, Math.min(itemCount - 1, index));
+    scrollRef.current?.scrollTo({ x: nextIndex * CARD_WIDTH, animated: true });
+    setActiveIndex(nextIndex);
+  };
+
+  const confirmDelete = (wallet: WalletData) => {
+    Dialog.confirm(
+      'Delete wallet?',
+      `Delete "${wallet.name}" and its expense history?`,
+      {
+        confirmText: 'Delete',
+        destructive: true,
+        onConfirm: () => deleteWallet(wallet.id),
+      },
+    );
+  };
 
   return (
-    <TView style={{flex: 1}}>
-      <StickyScrollView 
-        style={{ flexGrow: 1 }} 
-        contentContainerStyle={{ height: 2000 }} 
+    <TView style={styles.container}>
+      <StickyScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
         headerAppearOn={60}
-        title={"My Budget"}
-        subtitle={'@'+session?.user?.username}
+        title="My Budget"
+        subtitle={`@${session?.user?.username ?? ''}`}
       >
-        <BackButton/>
+        <BackButton />
 
-        
-
-        <View style={styles.header}>
-          <RadialGauge 
-            maximum={3000} 
-            value={1000}
-            radius={110}
-            width={10}
-            style={styles.gauge}
-          />
-
-          <View style={styles.centerText}>
-            <TText type='title'>1000000.00</TText>
-            <TText>My Monthly Expenses Limit</TText>
-          </View>
-
-          {/* <View style={styles.headerTabContainer}>
-            <TouchableOpacity style={styles.headerTab}>
-
-            </TouchableOpacity>
-          </View> */}
-          
+        <View style={styles.heading}>
+          <TText type="title">Wallets</TText>
+          <TouchableOpacity
+            onPress={() => router.push('/expenses/wallet/create')}
+            accessibilityRole="button"
+            accessibilityLabel="Add wallet"
+          >
+            <TIcon name="plus-circle" size={30} />
+          </TouchableOpacity>
         </View>
 
-        <TView color='primary' style={styles.content}>
+        {isLoading ? (
+          <ActivityIndicator style={styles.loader} />
+        ) : (
+          <View>
+            <ScrollView
+              ref={scrollRef}
+              horizontal
+              pagingEnabled={false}
+              showsHorizontalScrollIndicator={false}
+              snapToInterval={CARD_WIDTH}
+              decelerationRate="fast"
+              onScroll={onScroll}
+              scrollEventThrottle={16}
+              contentContainerStyle={styles.walletList}
+            >
+              {wallets.map((wallet) => (
+                <Wallet
+                  key={wallet.id}
+                  wallet={wallet}
+                  style={styles.walletCard}
+                  onEdit={() => router.push({
+                    pathname: '/expenses/wallet/update',
+                    params: { id: wallet.id },
+                  })}
+                  onDelete={() => confirmDelete(wallet)}
+                />
+              ))}
+              <TouchableOpacity
+                style={styles.addWalletCard}
+                onPress={() => router.push('/expenses/wallet/create')}
+                accessibilityRole="button"
+              >
+                <TIcon name="plus-circle" size={42} />
+                <TText style={styles.addWalletText}>Add a new wallet</TText>
+              </TouchableOpacity>
+            </ScrollView>
 
+            <View style={styles.controls}>
+              <TouchableOpacity
+                onPress={() => moveTo(activeIndex - 1)}
+                disabled={activeIndex === 0 || isDeleting}
+                style={styles.arrow}
+              >
+                <TIcon name="chevron-left" size={28} />
+              </TouchableOpacity>
+              <TText style={styles.counter}>{activeIndex + 1} / {itemCount}</TText>
+              <TouchableOpacity
+                onPress={() => moveTo(activeIndex + 1)}
+                disabled={activeIndex === itemCount - 1 || isDeleting}
+                style={styles.arrow}
+              >
+                <TIcon name="chevron-right" size={28} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
+        <TView color="primary" style={styles.contentPanel}>
+          <TText type="subtitle">Expenses</TText>
+          <TText style={styles.emptyText}>Record expenses from a wallet to track your spending.</TText>
         </TView>
-
-        
       </StickyScrollView>
     </TView>
-    
   );
 }
 
 const styles = StyleSheet.create({
-  header:{
-  },
-  gauge:{
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%'
-  },
-  centerText:{
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: -50
-  },
-  editLimit:{
+  container: { flex: 1 },
+  scroll: { flexGrow: 1 },
+  content: { paddingBottom: 40 },
+  heading: {
+    marginHorizontal: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4
+    justifyContent: 'space-between',
   },
-  content:{
-    padding: '3%',
-    flexGrow: 1,
+  walletList: { paddingHorizontal: 20 },
+  walletCard: { width: CARD_WIDTH, marginRight: 0 },
+  loader: { marginVertical: 100 },
+  addWalletCard: {
+    width: CARD_WIDTH,
+    height: 200,
+    marginTop: 20,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#ccc2",
+    borderStyle: 'dashed',
+    borderColor: '#aaa8',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 10,
+  },
+  addWalletText: { fontWeight: '600' },
+  controls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 18,
+    marginTop: 10,
+  },
+  arrow: { padding: 4 },
+  counter: { opacity: 0.65 },
+  contentPanel: {
+    padding: '3%',
+    minHeight: 180,
+    borderWidth: 1,
+    borderColor: '#ccc2',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    marginTop: 50
-  }
+    marginTop: 35,
+  },
+  emptyText: { marginTop: 10, opacity: 0.7 },
 });

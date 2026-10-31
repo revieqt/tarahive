@@ -19,6 +19,9 @@ import { RoomMember } from "../../modules/v2/room/room-member.entity";
 import { AddUserSearchTrigramIndexes1790976000000 } from "../../migrations/1790976000000-AddUserSearchTrigramIndexes";
 import { AddOwnerCollaboratorPermission1790977000000 } from "../../migrations/1790977000000-AddOwnerCollaboratorPermission";
 import { RemoveCollaboratorStatusAndAssignOwners1790978000000 } from "../../migrations/1790978000000-RemoveCollaboratorStatusAndAssignOwners";
+import { Wallet } from "../../modules/v2/expenses/wallet.entity";
+import { Expense } from "../../modules/v2/expenses/expenses.entity";
+import { SharedExpense } from "../../modules/v2/expenses/shared-expense.entity";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -38,7 +41,20 @@ export const AppDataSource = new DataSource({
   migrationsTransactionMode: 'each',
   
   // entities: [User, Log, Itinerary, ItineraryCollaborator],
-  entities: [User, Auth, Log, Itinerary, ItineraryCollaborator, AiConversation, AiMessage, Room, RoomMember ],
+  entities: [
+    User,
+    Auth,
+    Log,
+    Itinerary,
+    ItineraryCollaborator,
+    AiConversation,
+    AiMessage,
+    Room,
+    RoomMember,
+    Wallet,
+    Expense,
+    SharedExpense,
+  ],
   
 });
 

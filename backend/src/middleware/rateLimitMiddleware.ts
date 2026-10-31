@@ -41,7 +41,7 @@ export const rateLimiter = (sensitivity: Sensitivity): RateLimitRequestHandler =
     },
 
     message: {
-      error: "RATE_LIMIT_EXCEEDED",
+      success: false,
       message: "Too many requests. Please try again later.",
     },
   });

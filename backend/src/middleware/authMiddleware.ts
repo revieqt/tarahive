@@ -14,7 +14,10 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
 
   if (!token) {
     console.log('❌ Auth middleware - No token provided');
-    return res.status(401).json({ message: "Access denied. No token provided." });
+    return res.status(401).json({
+      success: false,
+      message: "Access denied. No token provided.",
+    });
   }
 
   try {
@@ -25,7 +28,10 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
     next();
   } catch (err) {
     console.log('❌ Auth middleware - Token verification failed:', err);
-    return res.status(403).json({ message: "Invalid or expired token." });
+    return res.status(403).json({
+      success: false,
+      message: "Invalid or expired token.",
+    });
   }
 };
 
@@ -42,7 +48,10 @@ export const optionalAuthMiddleware = (
 
   const token = authHeader.split(" ")[1];
   if (!token) {
-    return res.status(403).json({ message: "Invalid authorization header." });
+    return res.status(403).json({
+      success: false,
+      message: "Invalid authorization header.",
+    });
   }
 
   try {
@@ -50,6 +59,9 @@ export const optionalAuthMiddleware = (
     req.user = jwt.verify(token, secretKey) as AuthRequest["user"];
     next();
   } catch {
-    return res.status(403).json({ message: "Invalid or expired token." });
+    return res.status(403).json({
+      success: false,
+      message: "Invalid or expired token.",
+    });
   }
 };
