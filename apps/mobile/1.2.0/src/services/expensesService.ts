@@ -1,6 +1,11 @@
 import { api } from '@/api/client';
 import {
+  CreateExpensePayload,
   CreateWalletPayload,
+  Expense,
+  ExpenseResponse,
+  ExpensesResponse,
+  UpdateExpensePayload,
   UpdateWalletPayload,
   Wallet,
   WalletResponse,
@@ -34,4 +39,43 @@ export const updateWallet = async (
 export const deleteWallet = async (walletId: string): Promise<WalletResponse> =>
   api.delete<WalletResponse>(
     `${API_URL}/wallet/${encodeURIComponent(walletId)}`,
+  );
+
+export const getExpensesByWallet = async (walletId: string): Promise<Expense[]> => {
+  const response = await api.get<ExpensesResponse>(
+    `${API_URL}/wallet/${encodeURIComponent(walletId)}`,
+  );
+  if (!response.success || !response.expenses) {
+    throw new Error(response.message || 'Failed to retrieve expenses');
+  }
+  return response.expenses;
+};
+
+export const getExpense = async (expenseId: string): Promise<Expense> => {
+  const response = await api.get<ExpenseResponse>(
+    `${API_URL}/${encodeURIComponent(expenseId)}`,
+  );
+  if (!response.success || !response.expense) {
+    throw new Error(response.message || 'Failed to retrieve expense');
+  }
+  return response.expense;
+};
+
+export const createExpense = async (
+  payload: CreateExpensePayload,
+): Promise<ExpenseResponse> =>
+  api.post<ExpenseResponse>(API_URL, payload);
+
+export const updateExpense = async (
+  expenseId: string,
+  payload: UpdateExpensePayload,
+): Promise<ExpenseResponse> =>
+  api.patch<ExpenseResponse>(
+    `${API_URL}/${encodeURIComponent(expenseId)}`,
+    payload,
+  );
+
+export const deleteExpense = async (expenseId: string): Promise<ExpenseResponse> =>
+  api.delete<ExpenseResponse>(
+    `${API_URL}/${encodeURIComponent(expenseId)}`,
   );

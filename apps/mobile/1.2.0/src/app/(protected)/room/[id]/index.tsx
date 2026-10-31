@@ -10,6 +10,7 @@ import { useGetRoom } from '@/hooks/room/useGetRoom';
 import ItineraryCard from '@/components/itinerary/ItineraryCard';
 import ShareModal from '@/components/modals/ShareModal';
 import { useState } from 'react';
+import { router } from 'expo-router';
 import { useRoomMembershipActions } from '@/hooks/room/useRoomMembershipActions';
 
 const formatDateTime = (value: string) => new Date(value).toLocaleString();
@@ -173,6 +174,16 @@ export default function RoomLayout() {
               onPress={navigateToChat}
             >
               <TText>Chat</TText>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.tabs, { backgroundColor: primaryColor }]}
+              onPress={() => router.push({
+                pathname: '/expenses',
+                params: { roomId: room.id },
+              })}
+            >
+              <TText>Expenses</TText>
             </TouchableOpacity>
           </ScrollView>
         </TView>

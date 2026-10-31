@@ -4,12 +4,15 @@ import { showError } from '@/services/toast.service';
 
 export const walletsQueryKey = ['user-wallets'];
 
-export const useGetWallets = () => {
+export const useGetWallets = (roomId?: string) => {
   const query = useQuery({
-    queryKey: walletsQueryKey,
+    queryKey: [...walletsQueryKey, roomId ?? 'personal'],
     queryFn: async () => {
       try {
-        return await getWallets();
+        const wallets = await getWallets();
+        return roomId
+          ? wallets.filter((wallet) => wallet.roomId === roomId)
+          : wallets.filter((wallet) => wallet.roomId === null);
       } catch (error) {
         const fetchError = error instanceof Error ? error : new Error('Failed to fetch wallets');
         showError('Wallet Error', fetchError.message);

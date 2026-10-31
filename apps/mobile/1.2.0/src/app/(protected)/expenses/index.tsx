@@ -17,6 +17,8 @@ import Wallet from '@/components/expenses/Wallet';
 import { useSession } from '@/context/SessionContext';
 import { useGetWallets } from '@/hooks/expenses/useGetWallets';
 import { useDeleteWallet } from '@/hooks/expenses/useDeleteWallet';
+import { useGetExpenses } from '@/hooks/expenses/useGetExpenses';
+import { useLocalSearchParams } from 'expo-router';
 import { Dialog } from '@/services/dialog.service';
 import type { Wallet as WalletData } from '@/types/expensesTypes';
 
@@ -24,11 +26,15 @@ const CARD_WIDTH = Dimensions.get('window').width - 40;
 
 export default function ExpensesScreen() {
   const { session } = useSession();
-  const { wallets, isLoading } = useGetWallets();
+  const { roomId: roomIdParam } = useLocalSearchParams<{ roomId?: string | string[] }>();
+  const roomId = Array.isArray(roomIdParam) ? roomIdParam[0] : roomIdParam;
+  const { wallets, isLoading } = useGetWallets(roomId);
   const { deleteWallet, isPending: isDeleting } = useDeleteWallet();
   const scrollRef = useRef<ScrollView>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const itemCount = wallets.length + 1;
+  const selectedWallet = wallets[activeIndex];
+  const { expenses, isLoading: isExpensesLoading } = useGetExpenses(selectedWallet?.id);
 
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     setActiveIndex(Math.round(event.nativeEvent.contentOffset.x / CARD_WIDTH));
@@ -58,7 +64,7 @@ export default function ExpensesScreen() {
         style={styles.scroll}
         contentContainerStyle={styles.content}
         headerAppearOn={60}
-        title="My Budget"
+        title={roomId ? 'Room Budget' : 'My Budget'}
         subtitle={`@${session?.user?.username ?? ''}`}
       >
         <BackButton />
@@ -66,7 +72,10 @@ export default function ExpensesScreen() {
         <View style={styles.heading}>
           <TText type="title">Wallets</TText>
           <TouchableOpacity
-            onPress={() => router.push('/expenses/wallet/create')}
+            onPress={() => router.push({
+              pathname: '/expenses/wallet/create',
+              params: roomId ? { roomId } : undefined,
+            })}
             accessibilityRole="button"
             accessibilityLabel="Add wallet"
           >
@@ -96,14 +105,20 @@ export default function ExpensesScreen() {
                   style={styles.walletCard}
                   onEdit={() => router.push({
                     pathname: '/expenses/wallet/update',
-                    params: { id: wallet.id },
+                    params: {
+                      id: wallet.id,
+                      ...(roomId ? { roomId } : {}),
+                    },
                   })}
                   onDelete={() => confirmDelete(wallet)}
                 />
               ))}
               <TouchableOpacity
                 style={styles.addWalletCard}
-                onPress={() => router.push('/expenses/wallet/create')}
+                onPress={() => router.push({
+                  pathname: '/expenses/wallet/create',
+                  params: roomId ? { roomId } : undefined,
+                })}
                 accessibilityRole="button"
               >
                 <TIcon name="plus-circle" size={42} />
@@ -132,8 +147,43 @@ export default function ExpensesScreen() {
         )}
 
         <TView color="primary" style={styles.contentPanel}>
-          <TText type="subtitle">Expenses</TText>
-          <TText style={styles.emptyText}>Record expenses from a wallet to track your spending.</TText>
+          <View style={styles.expenseHeading}>
+            <TText type="subtitle">Expenses</TText>
+            {selectedWallet && (
+              <TouchableOpacity
+                onPress={() => router.push({
+                  pathname: '/expenses/create',
+                  params: {
+                    walletId: selectedWallet.id,
+                    ...(roomId ? { roomId } : {}),
+                  },
+                })}
+              >
+                <TIcon name="plus-circle" size={28} />
+              </TouchableOpacity>
+            )}
+          </View>
+          {isExpensesLoading ? <ActivityIndicator style={styles.expenseLoader} /> : expenses.length === 0 ? (
+            <TText style={styles.emptyText}>Record expenses from this wallet to track your spending.</TText>
+          ) : expenses.map((expense) => (
+            <TouchableOpacity
+              key={expense.id}
+              style={styles.expenseRow}
+              onPress={() => router.push({
+                pathname: '/expenses/[id]',
+                params: {
+                  id: expense.id,
+                  ...(roomId ? { roomId } : {}),
+                },
+              })}
+            >
+              <View>
+                <TText style={styles.expenseTitle}>{expense.title}</TText>
+                <TText style={styles.expenseDate}>{new Date(expense.createdOn).toLocaleDateString()}</TText>
+              </View>
+              <TText style={styles.expenseAmount}>{expense.amount.toFixed(2)}</TText>
+            </TouchableOpacity>
+          ))}
         </TView>
       </StickyScrollView>
     </TView>
@@ -185,4 +235,21 @@ const styles = StyleSheet.create({
     marginTop: 35,
   },
   emptyText: { marginTop: 10, opacity: 0.7 },
+  expenseHeading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  expenseLoader: { marginVertical: 20 },
+  expenseRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc3',
+  },
+  expenseTitle: { fontWeight: '600' },
+  expenseDate: { fontSize: 11, opacity: 0.6, marginTop: 4 },
+  expenseAmount: { fontWeight: '700' },
 });

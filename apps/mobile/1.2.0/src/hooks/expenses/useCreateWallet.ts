@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
 import { createWallet } from '@/services/expensesService';
@@ -17,6 +17,10 @@ export const useCreateWallet = () => {
   const [amountLimit, setAmountLimit] = useState('');
   const [color, setColor] = useState('#4CAF50');
   const [roomId, setRoomId] = useState(firstParam(params.roomId) ?? '');
+
+  useEffect(() => {
+    setRoomId(firstParam(params.roomId) ?? '');
+  }, [params.roomId]);
 
   const mutation = useMutation({
     mutationFn: async () => {

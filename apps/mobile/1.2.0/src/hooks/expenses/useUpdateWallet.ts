@@ -7,10 +7,14 @@ import { UpdateWalletPayload, Wallet } from '@/types/expensesTypes';
 import { useGetWallets, walletsQueryKey } from './useGetWallets';
 
 export const useUpdateWallet = () => {
-  const { id } = useLocalSearchParams<{ id?: string | string[] }>();
+  const { id, roomId: roomIdParam } = useLocalSearchParams<{
+    id?: string | string[];
+    roomId?: string | string[];
+  }>();
   const walletId = Array.isArray(id) ? id[0] : id;
+  const roomId = Array.isArray(roomIdParam) ? roomIdParam[0] : roomIdParam;
   const queryClient = useQueryClient();
-  const walletsQuery = useGetWallets();
+  const walletsQuery = useGetWallets(roomId);
   const wallet = walletsQuery.wallets.find((item: Wallet) => item.id === walletId);
   const [name, setName] = useState(wallet?.name ?? '');
   const [description, setDescription] = useState(wallet?.description ?? '');

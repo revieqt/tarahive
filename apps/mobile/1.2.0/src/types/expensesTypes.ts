@@ -31,3 +31,58 @@ export interface CreateWalletPayload {
 }
 
 export type UpdateWalletPayload = Partial<Omit<CreateWalletPayload, 'roomId'>>;
+
+export type SharedExpenseStatus = 'PENDING' | 'PAID';
+
+export interface SharedExpense {
+  id: string;
+  expensesId: string;
+  userId: string;
+  amount: number;
+  note: string | null;
+  status: SharedExpenseStatus;
+  createdOn: string;
+  updatedOn: string;
+}
+
+export interface Expense {
+  id: string;
+  walletId: string;
+  userId: string;
+  amount: number;
+  title: string;
+  description: string | null;
+  sharedExpenses: SharedExpense[];
+  createdOn: string;
+  updatedOn: string;
+}
+
+export interface ExpensesResponse {
+  success: boolean;
+  expenses?: Expense[];
+  message?: string;
+}
+
+export interface ExpenseResponse {
+  success: boolean;
+  expense?: Expense;
+  data?: Expense;
+  message?: string;
+}
+
+export interface SharedExpensePayload {
+  userId: string;
+  amount: number;
+  note?: string | null;
+  status?: SharedExpenseStatus;
+}
+
+export interface CreateExpensePayload {
+  walletId: string;
+  amount: number;
+  title: string;
+  description?: string | null;
+  sharedBy?: SharedExpensePayload[];
+}
+
+export type UpdateExpensePayload = Partial<Omit<CreateExpensePayload, 'walletId'>>;
