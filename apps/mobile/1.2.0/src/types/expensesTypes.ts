@@ -59,8 +59,15 @@ export interface Expense {
 
 export interface ExpensesResponse {
   success: boolean;
+  total?: number;
   expenses?: Expense[];
   message?: string;
+}
+
+export interface WalletExpensesResponse {
+  success: boolean;
+  total: number;
+  expenses: Expense[];
 }
 
 export interface ExpenseResponse {

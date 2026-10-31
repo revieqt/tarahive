@@ -402,14 +402,16 @@ export const createExpense = async (
 export const getExpensesByWallet = async (
   walletId: string,
   userId: string,
-): Promise<Expense[]> =>
+): Promise<{ total: number; expenses: Expense[] }> =>
   AppDataSource.transaction(async (manager) => {
     const wallet = await getAccessibleWallet(manager, walletId, userId);
-    return manager.find(Expense, {
+    const expenses = await manager.find(Expense, {
       where: { walletId: wallet.id },
       relations: { sharedExpenses: true },
       order: { createdOn: 'DESC' },
     });
+    const total = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0);
+    return { total, expenses };
   });
 
 export const getExpenseById = async (

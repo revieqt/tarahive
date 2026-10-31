@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { createExpense } from '@/services/expensesService';
-import { showError, showSuccess } from '@/services/toast.service';
+import { showError } from '@/services/toast.service';
 import {
   CreateExpensePayload,
   SharedExpensePayload,
@@ -15,7 +15,7 @@ const firstParam = (value?: string | string[]) =>
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-export const useCreateExpense = () => {
+export const useCreateExpense = (onSuccess?: () => void) => {
   const params = useLocalSearchParams<{ walletId?: string | string[]; roomId?: string | string[] }>();
   const queryClient = useQueryClient();
   const [walletId, setWalletId] = useState(firstParam(params.walletId) ?? '');
@@ -51,8 +51,7 @@ export const useCreateExpense = () => {
     },
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: expensesByWalletQueryKey(walletId) });
-      showSuccess('Success', response.message || 'Expense created successfully');
-      router.back();
+      onSuccess?.();
     },
     onError: (error: Error) => showError('Create Error', error.message),
   });

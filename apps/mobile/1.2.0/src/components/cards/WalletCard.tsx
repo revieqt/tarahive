@@ -44,13 +44,22 @@ export default function Wallet({
         </TText>}
 
         <View style={styles.walletButtonsContainer}>
-            <TouchableOpacity style={styles.walletButtons} onPress={onEdit} disabled={!onEdit}>
-                <TIcon name='pencil' size={15} color='#fff'/>
-            </TouchableOpacity>
+          <TouchableOpacity style={styles.walletButtons} onPress={onEdit} disabled={!onEdit}>
+            <TIcon name='pencil' size={15} color='#fff'/>
+          </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.walletButtons, {backgroundColor: '#DC143C90'}]} onPress={onDelete} disabled={!onDelete}>
-                <TIcon name='delete' size={15} color='#fff'/>
-            </TouchableOpacity>
+          <TouchableOpacity style={[styles.walletButtons, {backgroundColor: '#DC143C90'}]} onPress={onDelete} disabled={!onDelete}>
+            <TIcon name='delete' size={15} color='#fff'/>
+          </TouchableOpacity>
+            {
+              walletAmountLimit !== undefined && walletAmountLimit > 0 && amount !== undefined && amount > walletAmountLimit && (
+                <View style={[styles.walletButtons, {backgroundColor: '#DC143C90'}]}>
+                  <TIcon name='exclamation' size={15} color='#fff'/>
+                  <TText style={{color: '#fff', fontSize: 12}}>Over-budget</TText>
+                </View>
+              )
+            }
+            
         </View>
       </View>
 
@@ -140,14 +149,11 @@ const styles = StyleSheet.create({
   walletButtonsContainer:{
     flexDirection: 'row',
     gap: 3,
-    position: 'absolute',
-    top: 10,
-    right: 10
+    marginTop: 5,
   },
   walletButtons:{
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
     backgroundColor: '#fff5',
     padding: 5,
     borderRadius: 20

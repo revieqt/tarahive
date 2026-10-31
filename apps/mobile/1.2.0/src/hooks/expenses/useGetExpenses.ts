@@ -9,7 +9,7 @@ export const useGetExpenses = (walletId?: string) => {
   const query = useQuery({
     queryKey: expensesByWalletQueryKey(walletId),
     queryFn: async () => {
-      if (!walletId) return [];
+      if (!walletId) return { total: 0, expenses: [] };
       try {
         return await getExpensesByWallet(walletId);
       } catch (error) {
@@ -23,7 +23,8 @@ export const useGetExpenses = (walletId?: string) => {
   });
 
   return {
-    expenses: query.data ?? [],
+    total: query.data?.total ?? 0,
+    expenses: query.data?.expenses ?? [],
     isLoading: query.isLoading,
     isFetching: query.isFetching,
     isError: query.isError,

@@ -1,14 +1,19 @@
+import { useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { router } from 'expo-router';
 import Header from '@/components/common/Header';
 import RoundButton from '@/components/ui/RoundButton';
 import { TText, TView } from '@/components/ui/Themed';
 import ExpenseFormFields from '@/components/expenses/ExpenseFormFields';
 import { useCreateExpense } from '@/hooks/expenses/useCreateExpense';
 import { useGetWallets } from '@/hooks/expenses/useGetWallets';
+import WalletSuccessModal from '@/components/expenses/WalletSuccessModal';
 
 export default function CreateExpenseScreen() {
-  const form = useCreateExpense();
+  const [successVisible, setSuccessVisible] = useState(false);
+  const form = useCreateExpense(() => setSuccessVisible(true));
   const { wallets, isLoading } = useGetWallets(form.roomId);
+  const selectedWallet = wallets.find((wallet) => wallet.id === form.walletId);
 
   return (
     <TView style={styles.container}>
@@ -32,6 +37,13 @@ export default function CreateExpenseScreen() {
         <ExpenseFormFields {...form} showSharedExpenses={form.showSharedExpenses} />
       </ScrollView>
       <RoundButton iconName="plus" onPress={form.create} loading={form.isPending} style={styles.button} />
+      <WalletSuccessModal
+        visible={successVisible}
+        onFinish={() => router.back()}
+        title="Expense Created"
+        subtitle={`${form.title} is ready to track`}
+        walletColor={selectedWallet?.color}
+      />
     </TView>
   );
 }

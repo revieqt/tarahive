@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { useQueries } from '@tanstack/react-query';
 import {
   ActivityIndicator,
   Dimensions,
@@ -21,6 +22,8 @@ import { useGetExpenses } from '@/hooks/expenses/useGetExpenses';
 import { useLocalSearchParams } from 'expo-router';
 import { Dialog } from '@/services/dialog.service';
 import type { Wallet as WalletData } from '@/types/expensesTypes';
+import { getExpensesByWallet } from '@/services/expensesService';
+import { expensesByWalletQueryKey } from '@/hooks/expenses/useGetExpenses';
 
 const CARD_WIDTH = Dimensions.get('window').width - 40;
 const WALLET_GAP = 10;
@@ -36,7 +39,15 @@ export default function ExpensesScreen() {
   const [activeIndex, setActiveIndex] = useState(0);
   const itemCount = wallets.length + 1;
   const selectedWallet = wallets[activeIndex];
-  const { expenses, isLoading: isExpensesLoading } = useGetExpenses(selectedWallet?.id);
+  const { total, expenses, isLoading: isExpensesLoading } = useGetExpenses(selectedWallet?.id);
+  const walletTotals = useQueries({
+    queries: wallets.map((wallet) => ({
+      queryKey: expensesByWalletQueryKey(wallet.id),
+      queryFn: () => getExpensesByWallet(wallet.id),
+      enabled: Boolean(wallet.id),
+      staleTime: 60 * 1000,
+    })),
+  });
 
   const onMomentumScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const snappedIndex = Math.round(event.nativeEvent.contentOffset.x / SNAP_INTERVAL);
@@ -92,10 +103,11 @@ export default function ExpensesScreen() {
               onMomentumScrollEnd={onMomentumScrollEnd}
               contentContainerStyle={styles.walletList}
             >
-              {wallets.map((wallet) => (
+              {wallets.map((wallet, index) => (
                 <Wallet
                   key={wallet.id}
                   wallet={wallet}
+                  amount={walletTotals[index]?.data?.total ?? 0}
                   style={styles.walletCard}
                   onEdit={() => router.push({
                     pathname: '/expenses/wallet/update',

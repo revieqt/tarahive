@@ -73,8 +73,8 @@ export const getExpensesByWalletController = async (
       return;
     }
 
-    const expenses = await getExpensesByWallet(req.params.id, userId);
-    res.status(200).json({ success: true, expenses });
+    const result = await getExpensesByWallet(req.params.id, userId);
+    res.status(200).json({ success: true, ...result });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to fetch expenses';
     res.status(errorStatus(error)).json({ success: false, message });

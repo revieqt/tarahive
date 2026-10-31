@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { updateExpense } from '@/services/expensesService';
-import { showError, showSuccess } from '@/services/toast.service';
+import { showError } from '@/services/toast.service';
 import { SharedExpensePayload, UpdateExpensePayload } from '@/types/expensesTypes';
 import { expenseQueryKey, useGetExpense } from './useGetExpense';
 import { expensesByWalletQueryKey } from './useGetExpenses';
+import { useGetWallets } from './useGetWallets';
 
-export const useUpdateExpense = () => {
+export const useUpdateExpense = (onSuccess?: () => void) => {
   const { id, roomId: roomIdParam } = useLocalSearchParams<{
     id?: string | string[];
     roomId?: string | string[];
@@ -17,6 +18,10 @@ export const useUpdateExpense = () => {
   const queryClient = useQueryClient();
   const expenseQuery = useGetExpense(expenseId);
   const expense = expenseQuery.expense;
+  const walletsQuery = useGetWallets(roomId);
+  const walletColor = walletsQuery.wallets.find(
+    (wallet) => wallet.id === expense?.walletId,
+  )?.color;
   const [amount, setAmount] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -76,8 +81,7 @@ export const useUpdateExpense = () => {
       if (expense) {
         queryClient.invalidateQueries({ queryKey: expensesByWalletQueryKey(expense.walletId) });
       }
-      showSuccess('Success', response.message || 'Expense updated successfully');
-      router.back();
+      onSuccess?.();
     },
     onError: (error: Error) => showError('Update Error', error.message),
   });
@@ -92,6 +96,7 @@ export const useUpdateExpense = () => {
   return {
     expense,     isLoading: expenseQuery.isLoading, amount, setAmount, title, setTitle,
     description, setDescription, roomId, showSharedExpenses: !roomId,
+    walletColor,
     sharedBy, addShare, updateShare, removeShare,
     save: () => mutation.mutate(), isPending: mutation.isPending,
   };

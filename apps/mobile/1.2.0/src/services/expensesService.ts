@@ -5,6 +5,7 @@ import {
   Expense,
   ExpenseResponse,
   ExpensesResponse,
+  WalletExpensesResponse,
   UpdateExpensePayload,
   UpdateWalletPayload,
   Wallet,
@@ -41,14 +42,20 @@ export const deleteWallet = async (walletId: string): Promise<WalletResponse> =>
     `${API_URL}/wallet/${encodeURIComponent(walletId)}`,
   );
 
-export const getExpensesByWallet = async (walletId: string): Promise<Expense[]> => {
+export const getExpensesByWallet = async (
+  walletId: string,
+): Promise<WalletExpensesResponse> => {
   const response = await api.get<ExpensesResponse>(
     `${API_URL}/wallet/${encodeURIComponent(walletId)}`,
   );
   if (!response.success || !response.expenses) {
     throw new Error(response.message || 'Failed to retrieve expenses');
   }
-  return response.expenses;
+  return {
+    success: response.success,
+    total: response.total ?? 0,
+    expenses: response.expenses,
+  };
 };
 
 export const getExpense = async (expenseId: string): Promise<Expense> => {
