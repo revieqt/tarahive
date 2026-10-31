@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { setSessionExpirationHandler } from '@/api/client';
 import React, { createContext, ReactNode, useContext, useEffect, useState, useRef } from 'react';
 
 const TOKEN_KEY = '@tarahive_session';
@@ -130,6 +131,11 @@ export const SessionProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
       }
     })();
+  }, []);
+
+  useEffect(() => {
+    setSessionExpirationHandler(clearSession);
+    return () => setSessionExpirationHandler(null);
   }, []);
 
   const updateSession = async (newData: Partial<SessionData>) => {

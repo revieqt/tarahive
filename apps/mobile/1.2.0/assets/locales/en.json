@@ -251,6 +251,12 @@
         "release_to_cancel": "Release here to cancel",
         "cancel_countdown": "Cancel SOS ({seconds})"
       },
+      "success": {
+        "activation_title": "SOS Activated",
+        "activation_subtitle": "Your emergency contacts have been notified.",
+        "deactivation_title": "SOS Deactivated",
+        "deactivation_subtitle": "Your emergency status has been cleared."
+      },
       "emergency_types": {
         "medical": "Medical Emergency",
         "criminal": "Criminal Activity",

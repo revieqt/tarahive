@@ -16,12 +16,10 @@ import { AiConversation } from "../../modules/v2/ai/ai-conversations.entity";
 import { AiMessage } from "../../modules/v2/ai/ai-messages.entity";
 import { Room } from "../../modules/v2/room/room.entity";
 import { RoomMember } from "../../modules/v2/room/room-member.entity";
-import { AddUserSearchTrigramIndexes1790976000000 } from "../../migrations/1790976000000-AddUserSearchTrigramIndexes";
-import { AddOwnerCollaboratorPermission1790977000000 } from "../../migrations/1790977000000-AddOwnerCollaboratorPermission";
-import { RemoveCollaboratorStatusAndAssignOwners1790978000000 } from "../../migrations/1790978000000-RemoveCollaboratorStatusAndAssignOwners";
 import { Wallet } from "../../modules/v2/expenses/wallet.entity";
 import { Expense } from "../../modules/v2/expenses/expenses.entity";
 import { SharedExpense } from "../../modules/v2/expenses/shared-expense.entity";
+import { RefreshToken } from "../../modules/v2/auth/refresh-token.entity";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -33,13 +31,6 @@ export const AppDataSource = new DataSource({
   synchronize: true, // ❗ DO NOT use synchronize in production
   logging: false,
   extra: { max: 10 },
-  migrations: [
-    AddUserSearchTrigramIndexes1790976000000,
-    AddOwnerCollaboratorPermission1790977000000,
-    RemoveCollaboratorStatusAndAssignOwners1790978000000,
-  ],
-  migrationsTransactionMode: 'each',
-  
   // entities: [User, Log, Itinerary, ItineraryCollaborator],
   entities: [
     User,
@@ -54,6 +45,7 @@ export const AppDataSource = new DataSource({
     Wallet,
     Expense,
     SharedExpense,
+    RefreshToken,
   ],
   
 });

@@ -1,4 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BACKEND_URL } from '@/constants/Config';
+import { ApiError } from '@/api/errors';
 
 const TOKEN_KEYS = {
   ACCESS_TOKEN: '@tarahive_access_token',
@@ -76,4 +78,46 @@ export const clearAllTokens = async () => {
     console.error('[tokenService] Error clearing all tokens:', error);
     throw error;
   }
+};
+
+export interface RefreshTokenResponse {
+  success: boolean;
+  accessToken: string;
+  refreshToken: string;
+}
+
+let refreshInFlight: Promise<RefreshTokenResponse> | null = null;
+
+const performRefreshAccessToken = async (): Promise<RefreshTokenResponse> => {
+  const refreshToken = await getRefreshToken();
+  const response = await fetch(`${BACKEND_URL}/v2/auth/refresh`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refreshToken }),
+  });
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok || !data?.accessToken || !data?.refreshToken) {
+    throw new ApiError(
+      data?.message || 'Refresh token rejected',
+      response.status,
+      data,
+    );
+  }
+
+  await Promise.all([
+    saveAccessToken(data.accessToken),
+    saveRefreshToken(data.refreshToken),
+  ]);
+  return data as RefreshTokenResponse;
+};
+
+export const refreshAccessToken = (): Promise<RefreshTokenResponse> => {
+  if (!refreshInFlight) {
+    refreshInFlight = performRefreshAccessToken().finally(() => {
+      refreshInFlight = null;
+    });
+  }
+
+  return refreshInFlight;
 };

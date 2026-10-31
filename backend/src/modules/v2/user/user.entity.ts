@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 
 import { Auth } from "../auth/auth.entity";
+import { RefreshToken } from "../auth/refresh-token.entity";
 import { UserStatus, UserType } from "./user.types";
 
 @Entity("users")
@@ -212,6 +213,9 @@ export class User {
 
   @OneToMany(() => Auth, (auth) => auth.user)
   authMethods!: Auth[];
+
+  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
+  refreshTokens!: RefreshToken[];
 
   // ======================
   // AUDIT

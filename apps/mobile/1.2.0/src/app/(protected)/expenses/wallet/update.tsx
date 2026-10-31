@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { ActivityIndicator, StyleSheet } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import Header from '@/components/common/Header';
 import { TView } from '@/components/ui/Themed';
 import WalletForm from '@/components/expenses/WalletForm';
 import WalletSuccessModal from '@/components/expenses/WalletSuccessModal';
 import { useUpdateWallet } from '@/hooks/expenses/useUpdateWallet';
+import BackButton from '@/components/common/BackButton';
 
 
 export default function UpdateWalletScreen() {
@@ -20,8 +21,8 @@ export default function UpdateWalletScreen() {
   }
 
   return (
-    <TView style={styles.container}>
-      <Header title="Update Wallet" />
+    <TView style={{flex: 1}}>
+      <BackButton type='floating'/>
       <WalletForm
         name={name}
         setName={setName}
@@ -48,5 +49,4 @@ export default function UpdateWalletScreen() {
 
 const styles = StyleSheet.create({
   loading: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  container: { flex: 1, padding: '3%' },
 });

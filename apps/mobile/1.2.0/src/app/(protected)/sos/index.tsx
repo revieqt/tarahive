@@ -25,6 +25,7 @@ import EmergencyPicker, {
   EMERGENCY_PICKER_CANCEL_ZONE_HEIGHT,
   getEmergencyTypeAtPoint,
 } from "@/components/sos/EmergencyPicker";
+import SOSSuccessModal, { SOSSuccessType } from "@/components/sos/SOSSuccessModal";
 
 const ACTIVATION_COUNTDOWN_SECONDS = 7;
 
@@ -47,6 +48,7 @@ export default function SOSSection() {
   const [countdown, setCountdown] = useState<number | null>(null);
   const [isAdviceOpen, setIsAdviceOpen] = useState(false);
   const [adviceEmergencyType, setAdviceEmergencyType] = useState<string | null>(null);
+  const [successType, setSuccessType] = useState<SOSSuccessType | null>(null);
 
   const gradientColors = isSOSActive
     ? (['#D53E0F', secondaryColor] as const)
@@ -72,7 +74,15 @@ export default function SOSSection() {
       { navigateBack: false },
     );
     if (response?.success) {
+      setSuccessType('activation');
       showAdvice(emergencyType);
+    }
+  };
+
+  const deactivateSOS = async () => {
+    const response = await handleDisableSOS();
+    if (response?.success) {
+      setSuccessType('deactivation');
     }
   };
 
@@ -112,7 +122,7 @@ export default function SOSSection() {
   const handleLongPressStart = () => {
     longPressTimer.current = setTimeout(() => {
       if (isSOSActive) {
-        void handleDisableSOS();
+        void deactivateSOS();
       } else {
         pickerActive.current = true;
         setIsPickingEmergency(true);
@@ -227,6 +237,18 @@ export default function SOSSection() {
         visible={isAdviceOpen}
         emergencyType={adviceEmergencyType}
         onClose={() => setIsAdviceOpen(false)}
+      />
+
+      <SOSSuccessModal
+        visible={successType !== null}
+        type={successType ?? 'activation'}
+        onFinish={() => setSuccessType(null)}
+        title={t(successType === 'deactivation'
+          ? 'sos.success.deactivation_title'
+          : 'sos.success.activation_title')}
+        subtitle={t(successType === 'deactivation'
+          ? 'sos.success.deactivation_subtitle'
+          : 'sos.success.activation_subtitle')}
       />
 
       <HiveBg fade={false} flipHorizontal flipVertical blur/>

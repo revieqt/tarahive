@@ -62,7 +62,7 @@ export const aiChatService = {
     const response = await fetch(`${BACKEND_URL}${AI_API_URL}`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: 'Bearer ' + accessToken,
         'Content-Type': 'application/json',
         Accept: 'application/json,text/event-stream',
       },

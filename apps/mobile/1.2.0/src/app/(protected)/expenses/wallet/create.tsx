@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import Header from '@/components/common/Header';
 import { TView } from '@/components/ui/Themed';
 import WalletForm from '@/components/expenses/WalletForm';
 import WalletSuccessModal from '@/components/expenses/WalletSuccessModal';
 import { useCreateWallet } from '@/hooks/expenses/useCreateWallet';
+import { BackButton } from '@/components/common/BackButton';
 
 export default function CreateWalletScreen() {
   const [successVisible, setSuccessVisible] = useState(false);
@@ -17,8 +18,8 @@ export default function CreateWalletScreen() {
   } = useCreateWallet(() => setSuccessVisible(true));
 
   return (
-    <TView style={styles.container}>
-      <Header title="Create Wallet" />
+    <TView style={{flex: 1}}>
+      <BackButton type='floating'/>
       <WalletForm
         name={name}
         setName={setName}
@@ -44,7 +45,3 @@ export default function CreateWalletScreen() {
     </TView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: '3%' },
-});

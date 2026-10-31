@@ -1,7 +1,12 @@
 import { Request, Response } from 'express';
 import { sendVerificationCode, verifyUserEmail } from './auth.service';
-import { generateAccessToken, generateRefreshToken } from './token.service';
 import { LogAction } from '../audit/audit.service';
+import {
+  issueTokenPair,
+  revokeAllRefreshTokens,
+  revokeRefreshToken,
+  rotateRefreshToken,
+} from './token.service';
 
 export const useEmailAuth = async (req: Request, res: Response) => {
   const { email, device } = req.body;
@@ -77,8 +82,10 @@ export const verifyEmail = async (req: Request, res: Response) => {
     }
 
     const { user, newAccount } = await verifyUserEmail(email, code, device);
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
+    const { accessToken, refreshToken } = await issueTokenPair(
+      user,
+      device as Record<string, unknown> | undefined,
+    );
 
     await LogAction.info({
       userId: user.id,
@@ -151,4 +158,41 @@ export const verifyEmail = async (req: Request, res: Response) => {
       message: res.locals.t(localizationKey),
     });
   }
+};
+
+export const refreshAuthToken = async (req: Request, res: Response) => {
+  const { refreshToken } = req.body;
+  if (typeof refreshToken !== "string" || !refreshToken) {
+    return res.status(401).json({
+      success: false,
+      message: "Refresh token is required.",
+    });
+  }
+
+  try {
+    const tokens = await rotateRefreshToken(refreshToken);
+    return res.status(200).json({ success: true, ...tokens });
+  } catch (error: any) {
+    return res.status(401).json({
+      success: false,
+      message: error.message || "Invalid or expired refresh token.",
+    });
+  }
+};
+
+export const logout = async (req: Request, res: Response) => {
+  const { refreshToken } = req.body;
+  if (typeof refreshToken === "string" && refreshToken) {
+    await revokeRefreshToken(refreshToken);
+  }
+  return res.status(200).json({ success: true });
+};
+
+export const logoutAll = async (req: Request, res: Response) => {
+  const userId = (req as Request & { user?: { sub?: string } }).user?.sub;
+  if (!userId) {
+    return res.status(401).json({ success: false, message: "Unauthorized." });
+  }
+  await revokeAllRefreshTokens(userId);
+  return res.status(200).json({ success: true });
 };

@@ -1,22 +1,25 @@
 import React from "react";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity, View, ViewStyle } from "react-native";
 import { THEME_COLORS } from "@/types/itineraryTypes";
-import { TIcon } from "../ui/Themed";
+import { useThemeColor } from "@/hooks/shared/useThemeColor";
 
 interface ColorBarProps {
-  primaryColor: string;
+  primaryColor?: string;
   selectedColor: string;
   onSelect: (color: string) => void;
+  style?: ViewStyle;
 }
 
 export default function ColorBar({
   primaryColor,
   selectedColor,
   onSelect,
+  style,
 }: ColorBarProps) {
+  const bgColor = primaryColor ? primaryColor : useThemeColor({}, 'primary');
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: primaryColor }]}
+      style={[styles.container, { backgroundColor: bgColor }, style]}
       contentContainerStyle={styles.content}
       horizontal
       showsHorizontalScrollIndicator={false}
