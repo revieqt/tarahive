@@ -12,6 +12,7 @@ import docsRouter from './modules/docs/docs.routes';
 import { initializeEmailDeliveryWorker } from './workers/delivery/email.worker';
 import { storagePath } from './infrastructure/storage';
 import { initializeSocketServer } from './infrastructure/socket';
+import placesRoutes from './modules/places/places.routes';
 
 const app = express();
 const server = createServer(app);
@@ -26,6 +27,7 @@ app.use('/uploads', express.static(path.join(__dirname, "../uploads")));
 app.use('/storage', express.static(storagePath));
 app.use("/queues", serverAdapter.getRouter());
 app.use('/v2', v2Router);
+app.use('/places', placesRoutes);
 app.use('/docs', docsRouter);
 app.set("trust proxy", 1);
 
