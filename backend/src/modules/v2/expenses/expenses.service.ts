@@ -1,4 +1,4 @@
-import { AppDataSource } from '../../../infrastructure/database/postgres';
+import { AppDataSource } from '../../../infrastructure/database/client/postgres';
 import { In, EntityManager } from 'typeorm';
 import { User } from '../user/user.entity';
 import { RoomMember, RoomMemberStatus } from '../room/room-member.entity';

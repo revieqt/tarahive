@@ -11,7 +11,7 @@ import {
   getAllUserItinerariesService,
   ItineraryVersionConflictError,
 } from './itinerary.service';
-import { notifyItineraryUpdated } from '../../../infrastructure/socket';
+import { notifyItineraryUpdated } from '../../../infrastructure/sockets/socket.server';
 import {
   CollaboratorPermissions,
   CreateItineraryCollaboratorRequest,

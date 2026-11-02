@@ -4,14 +4,14 @@ import cors from 'cors';
 import path from "path";
 import { createServer } from 'http';
 import { ipMiddleware } from './middleware/ipMiddleware';
-import { connectPostgres } from './infrastructure/database/postgres';
+import { connectPostgres } from './infrastructure/database/client/postgres';
 import { serverAdapter } from "./config/bullBoard";
 import { initializeFirebase } from './config/firebase';
 import v2Router from './modules/v2/v2.routes';
 import docsRouter from './modules/docs/docs.routes';
-import { initializeEmailDeliveryWorker } from './workers/delivery/email.worker';
+import { initializeEmailDeliveryWorker } from './jobs/delivery/email.worker';
 import { storagePath } from './infrastructure/storage';
-import { initializeSocketServer } from './infrastructure/socket';
+import { initializeSocketServer } from './infrastructure/sockets/socket.server';
 import placesRoutes from './modules/places/places.routes';
 
 const app = express();

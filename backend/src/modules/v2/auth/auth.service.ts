@@ -1,10 +1,10 @@
-import { AppDataSource } from "../../../infrastructure/database/postgres";
+import { AppDataSource } from "../../../infrastructure/database/client/postgres";
 import { Auth } from "./auth.entity";
 import { User } from "../user/user.entity";
 import { UserStatus, UserType } from "../user/user.types";
 import { AuthProvider } from "./auth.types";
 import { generateVerificationCode } from "./auth.utils";
-import { queueEmail } from '../../../workers/delivery/email.queue';
+import { queueEmail } from '../../../jobs/delivery/email.queue';
 import {
   storeVerificationCode,
   verifyVerificationCode,

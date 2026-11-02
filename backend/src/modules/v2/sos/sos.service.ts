@@ -1,7 +1,7 @@
 import { User } from '../user/user.entity';
 import { DisableSOSRequest } from './sos.types';
-import { AppDataSource } from "../../../infrastructure/database/postgres";
-import { queueEmail } from '../../../workers/delivery/email.queue';
+import { AppDataSource } from "../../../infrastructure/database/client/postgres";
+import { queueEmail } from '../../../jobs/delivery/email.queue';
 import { t } from '../localization/localization.service';
 
 const userRepo = AppDataSource.getRepository(User);

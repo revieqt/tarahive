@@ -1,8 +1,8 @@
 import { Server as HttpServer } from 'http';
 import jwt from 'jsonwebtoken';
 import { Server, Socket } from 'socket.io';
-import { getItineraryService } from '../modules/v2/itinerary/itinerary.service';
-import { getUserById } from '../modules/v2/user/user.service';
+import { getItineraryService } from '../../modules/v2/itinerary/itinerary.service';
+import { getUserById } from '../../modules/v2/user/user.service';
 
 export interface ItineraryUpdatedEvent {
   itineraryId: string;

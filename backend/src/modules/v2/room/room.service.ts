@@ -1,4 +1,4 @@
-import { AppDataSource } from '../../../infrastructure/database/postgres';
+import { AppDataSource } from '../../../infrastructure/database/client/postgres';
 import { randomUUID } from 'node:crypto';
 import { User } from '../user/user.entity';
 import { Room } from './room.entity';

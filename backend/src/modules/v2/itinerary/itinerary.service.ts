@@ -1,5 +1,5 @@
 import { In } from 'typeorm';
-import { AppDataSource } from '../../../infrastructure/database/postgres';
+import { AppDataSource } from '../../../infrastructure/database/client/postgres';
 import { User } from '../user/user.entity';
 import { Itinerary } from './itinerary.entity';
 import { ItineraryCollaborator } from './itinerary-collaborator.entity';

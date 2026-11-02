@@ -1,5 +1,5 @@
 
-import { AppDataSource } from '../postgres';
+import { AppDataSource } from '../client/postgres';
 import { seedCountries } from './country.seed';
 
 async function runSeeds(): Promise<void> {

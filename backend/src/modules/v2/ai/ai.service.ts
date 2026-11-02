@@ -1,5 +1,5 @@
 import { Repository } from 'typeorm';
-import { AppDataSource } from '../../../infrastructure/database/postgres';
+import { AppDataSource } from '../../../infrastructure/database/client/postgres';
 import { AiConversation } from './ai-conversations.entity';
 import { AiMessage, AiMessageRole } from './ai-messages.entity';
 import { TARA_SYSTEM_PROMPT } from './ai.prompts';

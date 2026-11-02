@@ -1,4 +1,4 @@
-import { AppDataSource } from '../../../infrastructure/database/postgres';
+import { AppDataSource } from '../../../infrastructure/database/client/postgres';
 import { Country } from './country.entity';
 
 export interface CountryPhoneCode {
