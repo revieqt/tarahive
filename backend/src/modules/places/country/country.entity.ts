@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import type { MultiPolygon } from 'geojson';
 
 @Entity('countries')
 @Index('UQ_countries_iso2', ['iso2'], { unique: true })
@@ -58,6 +59,12 @@ export class Country {
     nullable: true,
   })
   capital!: string | null;
+
+  @Column({
+    type: 'text',
+    nullable: true,
+  })
+  description!: string | null;
 
   @Column({
     type: 'jsonb',
@@ -118,6 +125,14 @@ export class Country {
     nullable: true,
   })
   longitude!: string | null;
+
+  @Column({
+    type: 'geometry',
+    spatialFeatureType: 'MultiPolygon',
+    srid: 4326,
+    nullable: true,
+  })
+  boundary!: MultiPolygon | null;
 
   @Column({
     type: 'boolean',

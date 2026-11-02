@@ -51,6 +51,22 @@ export class Division {
   @Column({ type: 'varchar', length: 200, nullable: true })
   nativeName!: string | null;
 
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 7,
+    nullable: true,
+  })
+  latitude!: string | null;
+
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 7,
+    nullable: true,
+  })
+  longitude!: string | null;
+
   // Administrative boundary represented as GeoJSON MultiPolygon.
   // Coordinates use WGS84 (EPSG:4326).
   @Column({
@@ -60,6 +76,12 @@ export class Division {
     nullable: true,
   })
   boundary!: MultiPolygon | null;
+
+  @Column({
+    type: 'text',
+    nullable: true,
+  })
+  description!: string | null;
 
   @Column({ type: 'boolean', default: true })
   isActive!: boolean;
