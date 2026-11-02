@@ -3,9 +3,10 @@ import { useLocalSearchParams } from 'expo-router';
 import { getRoomMembers } from '@/services/roomService';
 import { showError } from '@/services/toast.service';
 
-export const useGetRoomMembers = () => {
+export const useGetRoomMembers = (roomIdParam?: string) => {
   const { id } = useLocalSearchParams<{ id?: string | string[] }>();
-  const roomId = Array.isArray(id) ? id[0] : id;
+  const routeRoomId = Array.isArray(id) ? id[0] : id;
+  const roomId = roomIdParam ?? routeRoomId;
 
   const query = useQuery({
     queryKey: ['room', roomId, 'members'],

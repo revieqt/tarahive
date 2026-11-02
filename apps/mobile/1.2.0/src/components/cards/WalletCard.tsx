@@ -77,7 +77,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderTopRightRadius: 25,
     borderBottomRightRadius: 25,
-    marginTop: 20,
   },
   content:{
     borderWidth: 1.5,
@@ -149,7 +148,9 @@ const styles = StyleSheet.create({
   walletButtonsContainer:{
     flexDirection: 'row',
     gap: 3,
-    marginTop: 5,
+    position: 'absolute',
+    right: 10,
+    top: 10
   },
   walletButtons:{
     flexDirection: 'row',

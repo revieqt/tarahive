@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { disableSOS, enableSOS, updateSafetySettings } from './sos.service';
-import { LogAction } from '../../v1/audit/audit.service';
-import { AuthRequest } from '../../v1/auth/auth.types';
+import { LogAction } from '../../v2/audit/audit.service';
+import { AuthRequest } from '../../v2/auth/auth.types';
 import { t, detectBackendLanguage, detectLanguage } from '../localization/localization.service';
 
 const SOS_ADVICE_TYPES = new Set([

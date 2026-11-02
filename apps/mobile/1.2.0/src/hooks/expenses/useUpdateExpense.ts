@@ -63,7 +63,7 @@ export const useUpdateExpense = (onSuccess?: () => void) => {
         status: share.status,
       }));
       const sharesChanged = JSON.stringify(sharedBy) !== JSON.stringify(originalShares);
-      if (!roomId && (sharesChanged || (payload.amount !== undefined && originalShares.length > 0))) {
+      if (roomId && (sharesChanged || (payload.amount !== undefined && originalShares.length > 0))) {
         payload.sharedBy = sharedBy;
       }
       if (Object.keys(payload).length === 0) {
@@ -95,7 +95,7 @@ export const useUpdateExpense = (onSuccess?: () => void) => {
 
   return {
     expense,     isLoading: expenseQuery.isLoading, amount, setAmount, title, setTitle,
-    description, setDescription, roomId, showSharedExpenses: !roomId,
+    description, setDescription, roomId, showSharedExpenses: Boolean(roomId),
     walletColor,
     sharedBy, addShare, updateShare, removeShare,
     save: () => mutation.mutate(), isPending: mutation.isPending,

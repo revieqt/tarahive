@@ -1,5 +1,4 @@
 import { useMutation } from '@tanstack/react-query';
-import { router } from 'expo-router';
 import { useSession } from '@/context/SessionContext';
 import { showError, showSuccess } from '@/services/toast.service';
 import { setupUserAccount } from '@/services/userService';
@@ -20,12 +19,17 @@ export const useSetupAccount = () => {
 			return false;
 		}
 
-		if (step === 1 && (!values.bdate || !values.gender)) {
-			showError('Missing information', 'Please select your date of birth and gender');
+		if (step === 1 && !values.bdate) {
+			showError('Missing information', 'Please select your date of birth');
 			return false;
 		}
 
-		if (step === 2 && values.interests.length < MINIMUM_INTERESTS) {
+		if (step === 2 && !values.gender) {
+			showError('Missing information', 'Please select your gender');
+			return false;
+		}
+
+		if (step === 3 && values.interests.length < MINIMUM_INTERESTS) {
 			showError('Missing information', `Please select at least ${MINIMUM_INTERESTS} interests`);
 			return false;
 		}
@@ -70,7 +74,6 @@ export const useSetupAccount = () => {
 		onSuccess: async (response) => {
 			await updateSession({ user: response.data });
 			showSuccess('Profile ready', response.message);
-			router.replace('/home');
 		},
 		onError: (error: any) => {
 			showError('Setup Error', error.message || 'Unable to set up your account');

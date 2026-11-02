@@ -398,12 +398,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 16,
     right: 16,
-    fontFamily: 'Inter',
+    fontFamily: 'PlusJakartaSans',
   },
   displayText: {
     flex: 1,
     fontSize: 13,
-    fontFamily: 'Inter',
+    fontFamily: 'PlusJakartaSans',
   },
   modalOverlay: {
     flex: 1,
@@ -456,7 +456,7 @@ const styles = StyleSheet.create({
   },
   itemText: {
     opacity: 0.7,
-    fontFamily: 'Inter',
+    fontFamily: 'PlusJakartaSans',
     fontSize: 13,
   },
   selectedText: {

@@ -16,9 +16,10 @@ interface HeaderProps {
   style?: ViewStyle | ViewStyle[];
   children?: React.ReactNode;
   type?: 'default' | 'major' | 'minor';
+  textColor?: string;
 }
 
-const Header: React.FC<HeaderProps> = ({ title, subtitle, style, type = 'default' }) => {
+const Header: React.FC<HeaderProps> = ({ title, subtitle, style, type = 'default', textColor }) => {
   const secondaryColor = useThemeColor({}, 'secondary');
   const accentColor = useThemeColor({}, 'accent');
 
@@ -39,14 +40,14 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, style, type = 'default
         <View style={{marginHorizontal: '3%', marginTop: 55}}>
           {title && 
             <TText type="title"
-              style={{ color: 'white'}}
+              style={{ color: textColor || 'white'}}
             >
               {title}
             </TText>
           }
           {subtitle && 
             <TText
-              style={{ color: 'white', opacity: 0.8, marginTop: -4 }}
+              style={{ color: textColor || 'white', opacity: 0.8, marginTop: -4 }}
             >
               {subtitle}
             </TText>
@@ -75,14 +76,14 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, style, type = 'default
         <View style={{marginHorizontal: '3%', gap: 4, justifyContent: 'center', flex: 1, alignItems: 'center', marginTop: -16}}>
           {title && 
             <TText type="subtitle"
-              style={{ color: 'white'}}
+              style={{ color: textColor || 'white'}}
             >
               {title}
             </TText>
           }
           {subtitle && 
             <TText
-              style={{ color: 'white', opacity: 0.8, marginTop: -4, fontSize: 11 }}
+              style={{ color: textColor || 'white', opacity: 0.8, marginTop: -4, fontSize: 11 }}
             >
               {subtitle}
             </TText>
@@ -96,9 +97,9 @@ const Header: React.FC<HeaderProps> = ({ title, subtitle, style, type = 'default
 
   return (
     <View style={[{ marginBottom: 16 }, style]}>
-      <BackButton style={{ width: '50%' }}/>
-      {title && <TText type="title">{title}</TText>}
-      {subtitle && <TText style={{ opacity: 0.75 }}>{subtitle}</TText>}
+      <BackButton style={{ width: '50%' }} color={textColor || undefined}/>
+      {title && <TText type="title" style={{ color: textColor || undefined }}>{title}</TText>}
+      {subtitle && <TText style={{ color: textColor || undefined, opacity: 0.75 }}>{subtitle}</TText>}
     </View>
   );
 };

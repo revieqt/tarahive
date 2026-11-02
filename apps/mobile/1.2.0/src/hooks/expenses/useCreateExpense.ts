@@ -41,7 +41,7 @@ export const useCreateExpense = (onSuccess?: () => void) => {
         amount: parsedAmount,
         title: normalizedTitle,
         description: description.trim() || null,
-        ...(!roomId && sharedBy.length ? { sharedBy } : {}),
+        ...(roomId && sharedBy.length ? { sharedBy } : {}),
       };
       const response = await createExpense(payload);
       if (!response.success || !response.data && !response.expense) {
@@ -66,7 +66,7 @@ export const useCreateExpense = (onSuccess?: () => void) => {
   return {
     walletId, setWalletId, amount, setAmount, title, setTitle, description, setDescription,
     roomId,
-    showSharedExpenses: !roomId,
+    showSharedExpenses: Boolean(roomId),
     sharedBy, addShare, updateShare, removeShare, create: () => mutation.mutate(),
     isPending: mutation.isPending,
   };

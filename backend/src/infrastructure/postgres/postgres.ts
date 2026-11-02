@@ -1,12 +1,5 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-
-// import { Log } from "../modules/v1/audit/audit.entity";
-// import { User } from "../modules/v2/user/user.entity";
-// import { Auth } from "../modules/v2/auth/auth.entity";
-// import { Itinerary } from "../modules/v1/itinerary/itinerary.entity";
-// import { ItineraryCollaborator } from "../modules/v1/itinerary/itinerary-collaborator.entity";
-
 import { Log } from "../../modules/v2/audit/audit.entity";
 import { User } from "../../modules/v2/user/user.entity";
 import { Auth } from "../../modules/v2/auth/auth.entity";
@@ -31,7 +24,6 @@ export const AppDataSource = new DataSource({
   synchronize: true, // ❗ DO NOT use synchronize in production
   logging: false,
   extra: { max: 10 },
-  // entities: [User, Log, Itinerary, ItineraryCollaborator],
   entities: [
     User,
     Auth,
@@ -47,7 +39,6 @@ export const AppDataSource = new DataSource({
     SharedExpense,
     RefreshToken,
   ],
-  
 });
 
 export const connectPostgres = async () => {

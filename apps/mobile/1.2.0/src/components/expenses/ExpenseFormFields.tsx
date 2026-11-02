@@ -1,7 +1,10 @@
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useState } from 'react';
+import { ActivityIndicator, FlatList, Modal, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { TIcon, TText } from '@/components/ui/Themed';
 import TextField from '@/components/ui/TextField';
 import type { SharedExpensePayload, SharedExpenseStatus } from '@/types/expensesTypes';
+import { useGetRoomMembers } from '@/hooks/room/useGetRoomMembers';
+import type { RoomMember } from '@/types/roomTypes';
 
 interface ExpenseFormFieldsProps {
   amount: string;
@@ -15,6 +18,7 @@ interface ExpenseFormFieldsProps {
   updateShare: (index: number, patch: Partial<SharedExpensePayload>) => void;
   removeShare: (index: number) => void;
   showSharedExpenses?: boolean;
+  roomId?: string;
 }
 
 export default function ExpenseFormFields({
@@ -29,7 +33,23 @@ export default function ExpenseFormFields({
   updateShare,
   removeShare,
   showSharedExpenses = true,
+  roomId,
 }: ExpenseFormFieldsProps) {
+  const { members, isLoading: isMembersLoading } = useGetRoomMembers(roomId ?? '');
+  const [memberPickerIndex, setMemberPickerIndex] = useState<number | null>(null);
+
+  const getMemberName = (member: RoomMember) =>
+    [member.user.fname, member.user.lname].filter(Boolean).join(' ') || member.user.username || member.nickname;
+
+  const getMemberLabel = (member: RoomMember) =>
+    `${getMemberName(member)}${member.user.username ? ` (@${member.user.username})` : ''}`;
+
+  const selectMember = (member: RoomMember) => {
+    if (memberPickerIndex === null) return;
+    updateShare(memberPickerIndex, { userId: member.userId });
+    setMemberPickerIndex(null);
+  };
+
   return (
     <>
       <TextField value={title} onChangeText={setTitle} placeholder="Title" autoCapitalize="sentences" maxLength={150} />
@@ -44,11 +64,19 @@ export default function ExpenseFormFields({
       </View>}
       {showSharedExpenses && sharedBy.map((share, index) => (
         <View key={`${index}-${share.userId}`} style={styles.share}>
-          <TextField
-            value={share.userId}
-            onChangeText={(value) => updateShare(index, { userId: value })}
-            placeholder="Participant user ID"
-          />
+          <TouchableOpacity
+            style={styles.memberField}
+            onPress={() => setMemberPickerIndex(index)}
+            accessibilityRole="button"
+          >
+            <TText style={share.userId ? undefined : styles.placeholder}>
+              {(() => {
+                const member = members.find((item) => item.userId === share.userId);
+                return member ? getMemberLabel(member) : 'Choose a participant';
+              })()}
+            </TText>
+            <TIcon name="chevron-down" size={20} />
+          </TouchableOpacity>
           <TextField
             value={share.amount ? String(share.amount) : ''}
             onChangeText={(value) => updateShare(index, { amount: Number(value) || 0 })}
@@ -79,6 +107,39 @@ export default function ExpenseFormFields({
           </View>
         </View>
       ))}
+      <Modal
+        visible={memberPickerIndex !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setMemberPickerIndex(null)}
+      >
+        <Pressable style={styles.modalOverlay} onPress={() => setMemberPickerIndex(null)}>
+          <Pressable style={styles.memberModal} onPress={(event) => event.stopPropagation()}>
+            <View style={styles.modalHeader}>
+              <TText type="subtitle">Choose participant</TText>
+              <TouchableOpacity onPress={() => setMemberPickerIndex(null)}>
+                <TIcon name="close" size={24} />
+              </TouchableOpacity>
+            </View>
+            {isMembersLoading ? <ActivityIndicator /> : (
+              <FlatList
+                data={members}
+                keyExtractor={(member) => member.userId}
+                renderItem={({ item }) => (
+                  <TouchableOpacity style={styles.memberOption} onPress={() => selectMember(item)}>
+                    <View>
+                      <TText>{getMemberName(item)}</TText>
+                      {item.user.username && <TText style={styles.username}>@{item.user.username}</TText>}
+                    </View>
+                    {sharedBy[memberPickerIndex ?? -1]?.userId === item.userId && <TIcon name="check" size={22} />}
+                  </TouchableOpacity>
+                )}
+                ListEmptyComponent={<TText style={styles.emptyMembers}>No room members found.</TText>}
+              />
+            )}
+          </Pressable>
+        </Pressable>
+      </Modal>
     </>
   );
 }
@@ -98,6 +159,45 @@ const styles = StyleSheet.create({
     padding: 8,
     marginBottom: 10,
   },
+  memberField: {
+    borderWidth: 1,
+    borderColor: '#ccc6',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  placeholder: { opacity: 0.6 },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 24,
+    backgroundColor: '#0008',
+  },
+  memberModal: {
+    maxHeight: '80%',
+    borderRadius: 16,
+    padding: 16,
+    backgroundColor: '#fff',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  memberOption: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc6',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  username: { opacity: 0.6, marginTop: 2 },
+  emptyMembers: { paddingVertical: 20, textAlign: 'center' },
   shareActions: {
     flexDirection: 'row',
     alignItems: 'center',
