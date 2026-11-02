@@ -14,6 +14,7 @@ import { Expense } from "../../modules/v2/expenses/expenses.entity";
 import { SharedExpense } from "../../modules/v2/expenses/shared-expense.entity";
 import { RefreshToken } from "../../modules/v2/auth/refresh-token.entity";
 import { Country } from "../../modules/places/country/country.entity";
+import { EnablePostgis1762130000000 } from "./migrations/1762130000000-EnablePostgis";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -25,6 +26,7 @@ export const AppDataSource = new DataSource({
   synchronize: true, // ❗ DO NOT use synchronize in production
   logging: false,
   extra: { max: 10 },
+  migrations: [EnablePostgis1762130000000],
   entities: [
     User,
     Auth,
