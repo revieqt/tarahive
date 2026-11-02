@@ -46,14 +46,17 @@
     "socket.io-client": "^4.8.4",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
+    "tsx": "^4.23.15",
     "typescript": "^5.9.3"
   },
   "scripts": {
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev:seed": "npm run db:seed && npm run dev",
     "build": "tsc && node scripts/copyLocales.js",
     "init-subscriptions": "ts-node src/scripts/initializeSubscriptions.ts",
     "db:migrate": "ts-node scripts/migrate.ts",
-    "db:clear": "ts-node scripts/clearDb.ts"
+    "db:clear": "ts-node scripts/clearDb.ts",
+    "db:seed": "tsx src/infrastructure/database/seeds/seed.ts"
   }
 }

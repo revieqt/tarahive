@@ -13,6 +13,7 @@ import { Wallet } from "../../modules/v2/expenses/wallet.entity";
 import { Expense } from "../../modules/v2/expenses/expenses.entity";
 import { SharedExpense } from "../../modules/v2/expenses/shared-expense.entity";
 import { RefreshToken } from "../../modules/v2/auth/refresh-token.entity";
+import { Country } from "../../modules/places/country/country.entity";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -38,6 +39,7 @@ export const AppDataSource = new DataSource({
     Expense,
     SharedExpense,
     RefreshToken,
+    Country,
   ],
 });
 

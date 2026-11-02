@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { AppDataSource } from "../src/infrastructure/postgres/postgres";
+import { AppDataSource } from "../src/infrastructure/database/postgres";
 
 const clearDatabase = async () => {
   try {

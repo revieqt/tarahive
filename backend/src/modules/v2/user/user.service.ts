@@ -1,4 +1,4 @@
-import { userRepo } from "../../../infrastructure/postgres/postgres";
+import { userRepo } from "../../../infrastructure/database/postgres";
 import { storageService } from "../../../infrastructure/storage";
 import { User } from "./user.entity";
 import { ProfileUpdatePayload, SetupUserPayload, UserSearchResult, UserStatus } from "./user.types";

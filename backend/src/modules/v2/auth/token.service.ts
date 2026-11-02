@@ -1,5 +1,5 @@
 import { createHash } from "crypto";
-import { AppDataSource } from "../../../infrastructure/postgres/postgres";
+import { AppDataSource } from "../../../infrastructure/database/postgres";
 import { User } from "../user/user.entity";
 import jwt from 'jsonwebtoken';
 import { JwtPayload } from "jsonwebtoken";

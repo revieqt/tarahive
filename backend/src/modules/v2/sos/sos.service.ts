@@ -1,6 +1,6 @@
 import { User } from '../user/user.entity';
 import { DisableSOSRequest } from './sos.types';
-import { AppDataSource } from "../../../infrastructure/postgres/postgres";
+import { AppDataSource } from "../../../infrastructure/database/postgres";
 import { queueEmail } from '../../../workers/delivery/email.queue';
 import { t } from '../localization/localization.service';
 
