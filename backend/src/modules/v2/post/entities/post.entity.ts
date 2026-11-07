@@ -9,8 +9,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { User } from '../user/user.entity';
-import { Itinerary } from '../itinerary/itinerary.entity';
+import { User } from '../../user/user.entity';
+import { Itinerary } from '../../itinerary/itinerary.entity';
 
 export enum PostPrivacy {
   PUBLIC = 'public',
@@ -27,7 +27,6 @@ export class Post {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  // User who created the post
   @Column({ type: 'uuid' })
   userId!: string;
 
@@ -35,15 +34,6 @@ export class Post {
   @JoinColumn({ name: 'userId' })
   user!: User;
 
-  // User IDs tagged in the post
-  @Column({
-    type: 'jsonb',
-    nullable: true,
-    default: null,
-  })
-  taggedUsers!: string[] | null;
-
-  // Post categories or tags
   @Column({
     type: 'jsonb',
     nullable: true,
@@ -51,7 +41,6 @@ export class Post {
   })
   tags!: string[] | null;
 
-  // Associated itinerary
   @Column({
     type: 'uuid',
     nullable: true,
@@ -59,11 +48,13 @@ export class Post {
   })
   itineraryId!: string | null;
 
-  @ManyToOne(() => Itinerary, { nullable: true, onDelete: 'SET NULL' })
+  @ManyToOne(() => Itinerary, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
   @JoinColumn({ name: 'itineraryId' })
   itinerary!: Itinerary | null;
 
-  // Post content
   @Column({
     type: 'text',
     nullable: true,
@@ -71,7 +62,6 @@ export class Post {
   })
   text!: string | null;
 
-  // Image storage paths
   @Column({
     type: 'text',
     array: true,
@@ -80,7 +70,6 @@ export class Post {
   })
   images!: string[] | null;
 
-  // Post visibility
   @Column({
     type: 'enum',
     enum: PostPrivacy,
@@ -88,6 +77,12 @@ export class Post {
     default: PostPrivacy.PUBLIC,
   })
   privacy!: PostPrivacy;
+
+  @Column({
+    type: 'boolean',
+    default: false,
+  })
+  hideFromProfile!: boolean;
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdOn!: Date;

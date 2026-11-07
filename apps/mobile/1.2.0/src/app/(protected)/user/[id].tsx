@@ -18,6 +18,8 @@ import StickyScrollView from '@/components/ui/StickyScrollView';
 import ShareModal from '@/components/modals/ShareModal';
 import { Image } from 'expo-image';
 import OptionsPopup from '@/components/ui/OptionsPopup';
+import PostCard from '@/components/posts/PostCard';
+import { useUserPosts } from '@/hooks/post/useUserPosts';
 // import SOSInfoCard from '@/components/cards/SOSInfoCard';
 
 export default function ProfileScreen() {
@@ -36,6 +38,7 @@ export default function ProfileScreen() {
   const isCurrentUser = !id || id === user?.id || id === user?.username;
   const { user: otherUser, isLoading } = useGetUser(isCurrentUser ? null : (id as string));
   const displayUser = isCurrentUser ? user : otherUser;
+  const { posts, isLoading: postsLoading } = useUserPosts(displayUser?.id);
 
   const showTravelInfo = isCurrentUser || displayUser?.settings?.visibility?.isTravelInfoPublic !== false;
   const showAbout = isCurrentUser || displayUser?.settings?.visibility?.isPersonalInfoPublic !== false;
@@ -193,6 +196,16 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </ScrollView>
       </TView>
+      <TView style={styles.postsContainer} color='primary'>
+        <TText style={styles.postsTitle}>Posts</TText>
+        {postsLoading ? <TText>Loading posts...</TText> : posts.length ? posts.map((post) => <PostCard key={post.id} post={{ ...post, user: displayUser ? {
+          id: displayUser.id,
+          profileImage: displayUser.profileImage ?? '',
+          fname: displayUser.fname,
+          lname: displayUser.lname ?? '',
+          username: displayUser.username,
+        } : undefined }} />) : <TText style={{ opacity: 0.7 }}>No posts yet.</TText>}
+      </TView>
       
       <ShareModal
         visible={showShare}
@@ -261,6 +274,15 @@ const styles = StyleSheet.create({
   journalContainer:{
     marginTop: 10,
     paddingVertical: 10
+  },
+  postsContainer: {
+    marginTop: 10,
+    padding: '3%',
+  },
+  postsTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    marginBottom: 10,
   },
   journalTitle:{
     flexDirection: 'row',

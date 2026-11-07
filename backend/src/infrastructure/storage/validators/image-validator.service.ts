@@ -23,6 +23,16 @@ const PROFILES: Record<StorageCategory, ImageProfile> = {
     width: 1600,
     height: 900,
   },
+  postImage: {
+    maxBytes: 5 * 1024 * 1024,
+    maxWidth: 6000,
+    maxHeight: 6000,
+    outputFormat: "webp",
+    quality: 85,
+    fit: "inside",
+    width: 2048,
+    height: 2048,
+  },
 };
 
 const ALLOWED_FORMATS = new Set([

@@ -17,6 +17,12 @@ import { Country } from "../../../modules/places/country/country.entity";
 import { Division } from "../../../modules/places/division/division.entity";
 import { City } from "../../../modules/places/city/city.entity";
 import { EnablePostgis1762130000000 } from "../migrations/1762130000000-EnablePostgis";
+import { Post } from "../../../modules/v2/post/entities/post.entity";
+import { PostTagged } from "../../../modules/v2/post/entities/post-tagged.entity";
+import { PostRepost } from "../../../modules/v2/post/entities/repost.entity";
+import { Comment } from "../../../modules/v2/post/entities/comment.entity";
+import { Like } from "../../../modules/v2/post/entities/like.entity";
+import { AddPostSystemConstraints1762140000000 } from "../migrations/1762140000000-AddPostSystemConstraints";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -28,7 +34,7 @@ export const AppDataSource = new DataSource({
   synchronize: true, // ❗ DO NOT use synchronize in production
   logging: false,
   extra: { max: 10 },
-  migrations: [EnablePostgis1762130000000],
+  migrations: [EnablePostgis1762130000000, AddPostSystemConstraints1762140000000],
   entities: [
     User,
     Auth,
@@ -46,6 +52,11 @@ export const AppDataSource = new DataSource({
     Country,
     Division,
     City,
+    Post,
+    PostTagged,
+    PostRepost,
+    Comment,
+    Like,
   ],
 });
 
