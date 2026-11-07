@@ -90,6 +90,16 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
+        name="feed"
+        options={{
+          title: t('tabs.tabs.home_button'),
+          tabBarIcon: ({ color, focused }) => (
+            <TIcon name={focused ? 'cards' : 'cards-outline'} size={20} color={color}/>
+          ),
+        }}
+      />
+
+      <Tabs.Screen
         name="room"
         options={{
           title: t('tabs.tabs.home_button'),
