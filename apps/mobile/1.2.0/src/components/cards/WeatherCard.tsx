@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Image } from 'react-native';
-import { TText, TIcon } from '@/components/ui/Themed';
+import { TText, TIcon, TView } from '@/components/ui/Themed';
 import { useLocation } from '@/context/LocationContext';
 import { useCurrentWeather, type WeatherData } from '@/hooks/shared/useWeather';
 import Skeleton from '@/components/ui/Skeleton';
@@ -8,7 +8,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useThemeColor } from '@/hooks/shared/useThemeColor';
 import WeatherDisplay from '../common/WeatherDisplay';
 import { useLanguage } from '@/context/LanguageContext';
-import HiveBg from '../common/HiveBg';
 
 const getWeatherImage = (weatherCode: number): any => {
   if (weatherCode === 0) {
@@ -29,7 +28,7 @@ const getWeatherImage = (weatherCode: number): any => {
   return require('../../../assets/images/weather-sunny-min.png');
 };
 
-export default function HomeHeaderCard() {
+export default function WeatherCard() {
   const { t } = useLanguage();
   const locationData = useLocation();
   const secondaryColor = useThemeColor({}, 'secondary');
@@ -47,19 +46,18 @@ export default function HomeHeaderCard() {
   const showLoading = isLoading || (locationData.loading && !displayWeather);
 
   return (
-    <LinearGradient colors={[accentColor, secondaryColor]} style={styles.locationContent}>
-      <HiveBg/>
+    <TView style={[styles.locationContent, {backgroundColor: accentColor + '20'}]}>
       <View style={{ gap: 4, paddingTop: 17 }}>
         {showLoading ? <>
           <Skeleton style={styles.locationLoading} />
           <Skeleton style={styles.weatherTypeLoading} />
         </> :
           <>
-            <TText type='title' style={{ color: '#fff', fontSize: 17, lineHeight: 20, letterSpacing: 1 }}>
+            <TText type='title' style={{ fontSize: 17, lineHeight: 20, letterSpacing: 1 }}>
               {displayCity}
             </TText>
 
-            <TText style={{ opacity: 0.5, fontSize: 12,color: '#fff'}}>
+            <TText style={{ opacity: 0.5, fontSize: 12}}>
               {t(displayWeather?.weatherType || 'No data')}
             </TText>
           </>
@@ -81,24 +79,23 @@ export default function HomeHeaderCard() {
             humidValue={displayWeather?.humidity || 0}
             windValue={displayWeather?.windSpeed || 0}
             loading={showLoading}
-            textColor='white'
           />
         </View>
 
       </View>
-    </LinearGradient>
+    </TView>
   );
 }
 
 const styles = StyleSheet.create({
   locationContent: {
-    width: '100%',
     padding: 16,
     overflow: 'hidden',
     marginBottom: 15,
+    marginHorizontal: '3%',
     borderWidth: 1,
     borderColor: 'transparent',
-    height: 270,
+    borderRadius: 20
   },
   weatherImage: {
     position: 'absolute',

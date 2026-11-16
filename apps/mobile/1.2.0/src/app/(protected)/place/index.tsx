@@ -10,8 +10,10 @@ import { useThemeColor } from '@/hooks/shared/useThemeColor';
 import OSMMapView from '@/components/ui/OSMMapView';
 import { openDirections } from '@/utils/openDirections';
 import { useLanguage } from '@/context/LanguageContext';
+import { useLocation } from '@/context/LocationContext';
 
 export default function PlacesScreen() {
+	const currentLocation = useLocation();
 	const { id, address: addressParam, latitude, longitude, locationName, locationID } =
 		useLocalSearchParams<{
 			id?: string;
@@ -21,12 +23,28 @@ export default function PlacesScreen() {
 			locationName?: string;
 			locationID?: string;
 		}>();
-	const address = addressParam
+	const routeAddress = addressParam
 		? JSON.parse(Array.isArray(addressParam) ? addressParam[0] : addressParam)
 		: undefined;
-	const city = address?.city || locationName || '';
-	const latitudeValue = latitude ? Number(latitude) : undefined;
-	const longitudeValue = longitude ? Number(longitude) : undefined;
+	const address = routeAddress || currentLocation.address || undefined;
+	const locationTitle =
+		locationName ||
+		currentLocation.city ||
+		currentLocation.suburb ||
+		currentLocation.region ||
+		currentLocation.state ||
+		'';
+	const city = address?.city || locationTitle;
+	const latitudeValue = latitude
+		? Number(latitude)
+		: currentLocation.hasLocation
+			? currentLocation.latitude
+			: undefined;
+	const longitudeValue = longitude
+		? Number(longitude)
+		: currentLocation.hasLocation
+			? currentLocation.longitude
+			: undefined;
 	const { data: weather, isLoading: weatherLoading } = usePlaceWeather(
 		latitudeValue,
 		longitudeValue,
@@ -34,7 +52,7 @@ export default function PlacesScreen() {
 	);
 	const accentColor = useThemeColor({}, 'accent');
 	const searchQuery = [
-		locationName,
+		locationTitle,
 		address?.neighborhood,
 		address?.district,
 		address?.city,
@@ -58,7 +76,7 @@ export default function PlacesScreen() {
 				colors={[ 'transparent','#000']}
 				style={styles.footer}
 			>
-				<TText style={styles.name}>{locationName}</TText>
+				<TText style={styles.name}>{locationTitle}</TText>
 				<TText style={styles.address}>
 					{address?.neighborhood ? address.neighborhood + ', ' : null}
 					{address?.district ? address.district + ', ' : null}

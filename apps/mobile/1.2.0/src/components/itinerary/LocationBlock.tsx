@@ -3,6 +3,7 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { TIcon, TText, TView } from "@/components/ui/Themed";
 import { LocationBlockData } from "@/types/itineraryTypes";
 import { useThemeColor } from "@/hooks/shared/useThemeColor";
+import CommonImage from "../common/CommonImage";
 
 interface LocationBlockProps {
   block: LocationBlockData;
@@ -25,43 +26,52 @@ export default function LocationBlock({
 }: LocationBlockProps) {
   return (
     <TView color="primary" style={styles.container}>
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={editable ? onPress : undefined}
-        onLongPress={editable ? onLongPress : undefined}
-        style={styles.copy}
-      >
-          <TText style={styles.name}>{block.locationName}</TText>
-          <TText numberOfLines={1} style={styles.address}>
-            {block.address?.neighborhood ? block.address.neighborhood + ', ' : null}
-            {block.address?.district ? block.address.district + ', ' : null}
-            {block.address?.city ? block.address.city + ' ' : null}
-            {block.address?.postal_code ? block.address.postal_code + ', ' : block.address ? ', ' : null}
-            {block.address?.region ? block.address.region + ', ' : null}
-            {block.address?.country ? block.address.country : null}
-          </TText>
-      </TouchableOpacity>
-      <View style={styles.actions}>
-        {editable && (
+      
+      <View style={[styles.imageContainer, {backgroundColor: themeColor}]}>
+        <CommonImage searchQuery={block.locationName} style={{zIndex: 10}}/>
+        <TIcon name="map" size={20} color="#fff"/>
+      </View>
+
+      <View style={{flex: 1}}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={editable ? onPress : undefined}
+          onLongPress={editable ? onLongPress : undefined}
+          style={styles.copy}
+        >
+            <TText style={styles.name}>{block.locationName}</TText>
+            <TText numberOfLines={1} style={styles.address}>
+              {block.address?.neighborhood ? block.address.neighborhood + ', ' : null}
+              {block.address?.district ? block.address.district + ', ' : null}
+              {block.address?.city ? block.address.city + ' ' : null}
+              {block.address?.postal_code ? block.address.postal_code + ', ' : block.address ? ', ' : null}
+              {block.address?.region ? block.address.region + ', ' : null}
+              {block.address?.country ? block.address.country : null}
+            </TText>
+        </TouchableOpacity>
+        <View style={styles.actions}>
+          {editable && (
+            <TouchableOpacity
+              onPress={onEditPress}
+              style={styles.actionButton}
+              accessibilityRole="button"
+            >
+              <TIcon name="pencil" size={15} />
+              <TText style={styles.actionLabel}>Edit</TText>
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
-            onPress={onEditPress}
+            onPress={onMapPress}
             style={styles.actionButton}
             accessibilityRole="button"
           >
-            <TIcon name="pencil" size={15} />
-            <TText style={styles.actionLabel}>Edit</TText>
+            <TIcon name="map-search" size={15} />
+            <TText style={styles.actionLabel}>View Location</TText>
           </TouchableOpacity>
-        )}
-        <TouchableOpacity
-          onPress={onMapPress}
-          style={styles.actionButton}
-          accessibilityRole="button"
-        >
-          <TIcon name="map-search" size={15} />
-          <TText style={styles.actionLabel}>View Location</TText>
-        </TouchableOpacity>
-        
+          
+        </View>
       </View>
+      
     </TView>
   );
 }
@@ -71,7 +81,18 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#ccc2',
-    overflow: 'hidden'
+    overflow: 'hidden',
+    flexDirection: 'row'
+  },
+  imageContainer:{
+    width: 70,
+    aspectRatio: 1,
+    borderRadius: 5,
+    overflow: 'hidden',
+    marginVertical: 8,
+    marginLeft: 8,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   copy: { 
     flex: 1,
